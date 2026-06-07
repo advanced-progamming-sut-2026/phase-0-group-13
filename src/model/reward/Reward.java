@@ -1,0 +1,4 @@
+package model.reward;
+
+abstract public class Reward {
+}
