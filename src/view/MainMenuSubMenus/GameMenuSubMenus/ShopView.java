@@ -8,6 +8,5 @@ public class ShopView implements BaseMenu {
 
     @Override
     public void check(Scanner scanner) {
-
     }
 }

@@ -3,7 +3,7 @@ package model.enums.Commands;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum ScoreBoardMenuCommands {
+public enum ScoreBoardMenuCommands implements Command {
     SortByLastPassedLevel("sort\\s+by\\s+last\\s+passed\\s+level"),
     SortByMiniGames("sort\\s+by\\s+mini\\s+games"),
     SortByDailyQuests("sort\\s+by\\s+daily\\s+quests"),

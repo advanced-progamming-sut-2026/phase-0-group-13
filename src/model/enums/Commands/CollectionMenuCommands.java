@@ -3,7 +3,7 @@ package model.enums.Commands;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum CollectionMenuCommands {
+public enum CollectionMenuCommands implements Command {
     ShowPlants("menu\\s+collection\\s+show-plants"),
     ShowAllPlants("menu\\s+collection\\s+show-all-plants"),
     ShowZombies("menu\\s+collection\\s+show-zombies"),

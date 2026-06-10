@@ -10,14 +10,13 @@ public class Tile {
     private TileEffect effect;
 
     public void addPlant() {
-
     }
 
     public void addZombie() {
-
     }
 
     public void clearTile() {
-
+        plant = null;
+        zombie = null;
     }
 }

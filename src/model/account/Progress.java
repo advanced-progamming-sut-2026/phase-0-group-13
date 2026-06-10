@@ -5,15 +5,23 @@ public class Progress {
     private int completedMiniGames;
     private int highScore;
 
-    public void passLevel() {
+    public Progress() {
+    }
 
+    public Progress(int passedLevels, int completedMiniGames, int highScore) {
+        this.passedLevels = passedLevels;
+        this.completedMiniGames = completedMiniGames;
+        this.highScore = highScore;
+    }
+
+    public void passLevel() {
+        passedLevels++;
     }
 
     public void completeMiniGame() {
-
+        completedMiniGames++;
     }
 
     public void updateHighScore() {
-
     }
 }

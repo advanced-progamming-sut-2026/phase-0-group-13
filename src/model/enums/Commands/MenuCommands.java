@@ -3,7 +3,7 @@ package model.enums.Commands;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum MenuCommands {
+public enum MenuCommands implements Command {
     EnterMenu("menu\\s+enter\\s+(?<menuName>.+)"),
     ShowCurrentMenu("menu\\s+show\\s+current"),
     ExitMenu("menu\\s+exit");

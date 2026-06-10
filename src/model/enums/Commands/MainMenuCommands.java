@@ -3,7 +3,7 @@ package model.enums.Commands;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum MainMenuCommands {
+public enum MainMenuCommands implements Command {
     Logout("menu\\s+logout");
 
     private final String pattern;

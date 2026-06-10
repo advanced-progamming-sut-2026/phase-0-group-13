@@ -5,15 +5,39 @@ public class BaseZombie {
     private int health;
     private double speed;
 
-    public void move() {
+    public BaseZombie() {
+    }
 
+    public void move() {
     }
 
     public void attack() {
-
     }
 
     public void takeDamage() {
+    }
 
+    public String getType() {
+        return type;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    protected void setType(String type) {
+        this.type = type;
+    }
+
+    protected void setHealth(int health) {
+        this.health = health;
+    }
+
+    protected void setSpeed(double speed) {
+        this.speed = speed;
     }
 }

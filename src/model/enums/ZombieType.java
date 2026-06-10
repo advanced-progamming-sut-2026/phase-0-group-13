@@ -1,4 +1,11 @@
 package model.enums;
 
-public class ZombieType {
+public enum ZombieType {
+    NORMAL,
+    CONEHEAD,
+    BUCKETHEAD,
+    GARGANTUAR,
+    JALAPENO,
+    SQUASH,
+    WALL_NUT
 }

@@ -5,15 +5,15 @@ public class TileEffect {
     private int duration;
     private boolean active;
 
-    public void apply() {
 
+    public void apply() {
+        active = true;
     }
 
     public void tick() {
-
     }
 
     public void remove() {
-
+        active = false;
     }
 }

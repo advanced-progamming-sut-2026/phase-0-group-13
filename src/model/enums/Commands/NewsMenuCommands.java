@@ -3,7 +3,7 @@ package model.enums.Commands;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum NewsMenuCommands {
+public enum NewsMenuCommands implements Command {
     ShowUnread("menu\\s+news\\s+show-unread"),
     ShowAll("menu\\s+news\\s+show-all");
 

@@ -1,4 +1,15 @@
 package model.enums;
 
-public class PlantType {
+public enum PlantType {
+    PEASHOOTER,
+    REPEATER,
+    SUNFLOWER,
+    WALL_NUT,
+    TNT,
+    MINT,
+    WALL_NUTS,
+    CABBAGE_PULT,
+    MELON_PULT,
+    MELON,
+    FUMESHROOM
 }

@@ -6,14 +6,20 @@ public class Board {
     private Tile[][] tiles;
 
     public void initialize() {
-
+        tiles = new Tile[rows][columns];
     }
 
     public void placePlant() {
-
     }
 
     public void spawnZombie() {
+    }
 
+    public int getRows() {
+        return rows;
+    }
+
+    public int getColumns() {
+        return columns;
     }
 }

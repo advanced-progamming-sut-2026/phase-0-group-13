@@ -3,7 +3,7 @@ package model.enums.Commands;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum GamePlayMenuCommands {
+public enum GamePlayMenuCommands implements Command {
     AdvanceTime("advance\\s+time\\s+-t\\s+(?<count>\\S+)\\s+ticks"),
     CollectSun("collect\\s+sun\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),
     ShowSunAmount("show\\s+sun\\s+amount"),

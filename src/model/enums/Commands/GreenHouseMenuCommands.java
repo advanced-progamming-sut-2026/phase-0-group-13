@@ -3,7 +3,7 @@ package model.enums.Commands;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum GreenHouseMenuCommands {
+public enum GreenHouseMenuCommands implements Command {
     ShowGreenHouse("show\\s+greenhouse"),
     PlantPot("plant\\s+pot\\s+at\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),
     Collect("collect\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),

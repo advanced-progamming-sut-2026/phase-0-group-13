@@ -5,15 +5,21 @@ public class PlayerProfile {
     private String gender;
     private Progress progress;
 
-    public void showInfo() {
+    public PlayerProfile() {
+    }
 
+    public PlayerProfile(String nickname, String gender, Progress progress) {
+        this.nickname = nickname;
+        this.gender = gender;
+        this.progress = progress;
+    }
+
+    public void showInfo() {
     }
 
     public void changeNickname() {
-
     }
 
     public void changeEmail() {
-
     }
 }

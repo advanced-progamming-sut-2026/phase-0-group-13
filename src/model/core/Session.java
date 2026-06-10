@@ -7,15 +7,29 @@ public class Session {
     private boolean stayLoggedIn;
     private boolean authenticated;
 
-    public void login() {
+    public Session() {
+        this.currentUser = null;
+        this.stayLoggedIn = false;
+        this.authenticated = false;
+    }
 
+    public void login() {
+        authenticated = true;
     }
 
     public void logout() {
-
+        authenticated = false;
+        currentUser = null;
     }
 
     public void restoreSession() {
+    }
 
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
     }
 }

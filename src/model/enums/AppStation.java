@@ -1,4 +1,17 @@
 package model.enums;
 
 public enum AppStation {
+    SIGN_UP,
+    SIGN_IN,
+    MAIN_MENU,
+    GAME_MENU,
+    COLLECTION_MENU,
+    SHOP_MENU,
+    GREENHOUSE_MENU,
+    NEWS_MENU,
+    PROFILE_MENU,
+    SETTINGS_MENU,
+    QUEST_MENU,
+    SCORE_BOARD_MENU,
+    LEADERBOARD_MENU
 }

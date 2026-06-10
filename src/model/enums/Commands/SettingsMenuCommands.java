@@ -3,7 +3,7 @@ package model.enums.Commands;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum SettingsMenuCommands {
+public enum SettingsMenuCommands implements Command {
     ChangeDifficulty("menu\\s+settings\\s+change-difficulty\\s+-l\\s+(?<difficultyLevel>.+)");
 
     private final String pattern;
