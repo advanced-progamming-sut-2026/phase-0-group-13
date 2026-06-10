@@ -1,11 +1,19 @@
 package controller.MainMenuSubControllers.GameMenuSubControllers;
 
-import Controller.CommandHandler;
-import Model.Result;
+import controller.BaseController;
 
-public class ScoreBoardMenuController implements CommandHandler {
+public class ScoreBoardMenuController implements BaseController {
     @Override
-    public Result handle(String command) {
-        return null;
+    public void initController() {
+
+    }
+
+    public void handleinput(String command) {
+
+    }
+
+    @Override
+    public void exit() {
+
     }
 }

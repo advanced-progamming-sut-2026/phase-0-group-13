@@ -1,10 +1,18 @@
 package controller;
 
-import Model.Result;
-
-public class MainMenuControllers implements CommandHandler {
+public class MainMenuControllers implements BaseController {
     @Override
-    public Result handle(String command) {
-        return null;
+    public void initController() {
+
+    }
+
+    @Override
+    public void handleinput(String command) {
+
+    }
+
+    @Override
+    public void exit() {
+
     }
 }

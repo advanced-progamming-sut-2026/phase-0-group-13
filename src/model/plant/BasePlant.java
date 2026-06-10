@@ -1,4 +1,5 @@
 package model.plant;
 
-public class BasePlant {
+abstract public class BasePlant {
+    //type (Enum)
 }

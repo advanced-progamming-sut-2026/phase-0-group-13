@@ -1,10 +1,18 @@
 package controller;
 
-import Model.Result;
-
-public class SignUpMenuController implements CommandHandler {
+public class SignUpMenuController implements BaseController {
     @Override
-    public Result handle(String command) {
-        return null;
+    public void initController() {
+
+    }
+
+    @Override
+    public void handleinput(String command){
+
+    }
+
+    @Override
+    public void exit() {
+
     }
 }

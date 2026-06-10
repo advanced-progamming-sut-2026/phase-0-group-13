@@ -1,11 +1,19 @@
 package controller.MainMenuSubControllers;
 
-import Controller.CommandHandler;
-import Model.Result;
+import controller.BaseController;
 
-public class GameMenuController implements CommandHandler {
+public class GameMenuController implements BaseController {
     @Override
-    public Result handle(String command) {
-        return null;
+    public void initController() {
+
+    }
+
+    public void handleinput(String command) {
+
+    }
+
+    @Override
+    public void exit() {
+
     }
 }
