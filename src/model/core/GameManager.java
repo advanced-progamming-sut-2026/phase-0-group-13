@@ -1,5 +1,6 @@
 package model.core;
 
+import model.account.AdventureMap;
 import model.game.Board;
 import model.news.AllNews;
 import model.quest.Quest;
@@ -14,6 +15,7 @@ public class GameManager {
     private boolean running;
     private AllNews allnews;
     private List<Quest> quests;
+    private AdventureMap adventureMap;// این و میایم اینیشالایز میکنیم تو فاز 1
 
     public GameManager() {
         this.board = null;
