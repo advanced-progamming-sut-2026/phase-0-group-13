@@ -13,6 +13,7 @@ public class Board {
     private HashMap<XY, BaseZombie> Zombies;
     private HashMap<XY, BasePlant> Plants;
     private HashMap<XY , Sun> Suns ;
+    private HashMap<Double,BasePlant> availableplants;
     private GameState gameState = new GameState();
     public GameState getGameState() {
         return gameState;
@@ -20,6 +21,7 @@ public class Board {
     public Board(int rows, int columns) {
         this.rows = rows;
     }
+    // داخل کانسترکتور ما میایم و همه دیتا هارو اینیشیالایز میکنیم و ...(گیاهایی که انتخاب کردیم و میزاریم مثلا و... )
 
     public void initialize() {
         tiles = new Tile[rows][columns];
