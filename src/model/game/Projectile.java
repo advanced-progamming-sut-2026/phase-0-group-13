@@ -23,4 +23,6 @@ public class Projectile {
     public void hit(BaseZombie zombie) {
 
     }
+    public void destroyZombie(){}
+    public void destroyPlant(){}
 }

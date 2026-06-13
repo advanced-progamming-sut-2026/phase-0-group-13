@@ -8,7 +8,9 @@ public class Wave {
     private int waveNumber;
     private List<ZombieType> zombiesToSpawn;
     private int spawnDelay;
+    private int dificulity ;
     private boolean isCompleted;
+    private int Delay ;
     public Wave(int waveNumber, int spawnDelay) {
         this.waveNumber = waveNumber;
         this.spawnDelay = spawnDelay;
