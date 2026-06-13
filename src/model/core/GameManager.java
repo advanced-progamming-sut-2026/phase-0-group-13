@@ -2,8 +2,10 @@ package model.core;
 
 import model.game.Board;
 import model.news.AllNews;
+import model.quest.Quest;
 
 import java.sql.Array;
+import java.util.List;
 
 public class GameManager {
     private Board board;
@@ -11,6 +13,7 @@ public class GameManager {
     private int plantFoodCount;
     private boolean running;
     private AllNews allnews;
+    private List<Quest> quests;
 
     public GameManager() {
         this.board = null;
