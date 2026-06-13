@@ -4,7 +4,7 @@ public class PlayerProfile {
     private String nickname;
     private String gender;
     private Progress progress;
-
+    private Collection collection ;
     public PlayerProfile() {
     }
 
