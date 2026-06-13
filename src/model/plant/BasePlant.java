@@ -3,7 +3,7 @@ package model.plant;
 abstract public class BasePlant {
     private int health;
     private int cost;
-
+    private int cooldown;
     public int getHealth() {
         return health;
     }

@@ -25,6 +25,7 @@ public class PlantFactory {
             case MELON_PULT -> null;
             case MELON -> null;
             case FUMESHROOM -> null;
+            // اینجا هایی که نال گذاشتیم باید  در واقع از پکیج دیتا ، بریم اون چیز مربوطه رو برداریم
         };
 
 

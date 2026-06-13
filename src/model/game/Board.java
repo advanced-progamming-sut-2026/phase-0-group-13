@@ -1,6 +1,5 @@
 package model.game;
 
-import model.Sun;
 import model.XY;
 import model.plant.BasePlant;
 import model.zombie.BaseZombie;

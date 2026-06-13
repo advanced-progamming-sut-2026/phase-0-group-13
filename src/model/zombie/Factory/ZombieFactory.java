@@ -20,6 +20,8 @@ public class ZombieFactory {
             case SQUASH -> null;
             case WALL_NUT -> null;
         };
+        // اینجا هایی که نال گذاشتیم باید  در واقع از پکیج دیتا ، بریم اون چیز مربوطه رو برداریم
+
 
 
         return zombie;
