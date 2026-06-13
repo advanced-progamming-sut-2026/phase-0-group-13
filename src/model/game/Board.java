@@ -1,5 +1,6 @@
 package model.game;
 
+import model.Sun;
 import model.XY;
 import model.plant.BasePlant;
 import model.zombie.BaseZombie;
@@ -13,7 +14,10 @@ public class Board {
     private HashMap<XY, BaseZombie> Zombies;
     private HashMap<XY, BasePlant> Plants;
     private HashMap<XY , Sun> Suns ;
-
+    private GameState gameState = new GameState();
+    public GameState getGameState() {
+        return gameState;
+    }
     public Board(int rows, int columns) {
         this.rows = rows;
     }

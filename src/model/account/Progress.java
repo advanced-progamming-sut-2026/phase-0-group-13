@@ -1,9 +1,17 @@
 package model.account;
 
+import model.game.Wave;
+
+import java.util.Set;
+
 public class Progress {
     private int passedLevels;
     private int completedMiniGames;
     private int highScore;
+    private Set<String> completedStages;
+    private Set<String> unlockedStages;
+    private AdventureMap adventureMap;
+    private Wave wave;
 
     public Progress() {
     }

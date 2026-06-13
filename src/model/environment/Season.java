@@ -1,19 +1,29 @@
 package model.environment;
 
-public class Season {
-    private String name;
-    private boolean hasPool;
-    private boolean hasRoof;
-    private boolean isNight;
-    private int[][] gridPaths;
+import model.game.GameState;
+import model.game.Tile;
+import model.zombie.BaseZombie;
+import view.MainMenuSubMenus.GameMenuSubMenus.MiniGames.MiniGame;
 
-    public Season(String name, boolean hasPool, boolean hasRoof, boolean isNight) {
-        this.name = name;
-        this.hasPool = hasPool;
-        this.hasRoof = hasRoof;
-        this.isNight = isNight;
+import java.util.ArrayList;
+import java.util.List;
+
+abstract public class Season {
+    protected String name;
+    private List<BaseZombie> AvailableZombies;
+    private List<Stage> stages;
+    private List<MiniGame> miniGames;
+    public String getName() {
+        return name;
+    }
+    public void Initialize( )
+    {
+        // داخل اینجا مینی گیم ها و .... اینیشالایز میکنیم
     }
 
-    public void applyEnvironmentEffects() {
-    }
+    public abstract void applySeasonEffects(GameState gameState);
+
+    public abstract List<BaseZombie> getAvailableZombies();
+
+    public abstract List<Tile> generateMap();
 }
