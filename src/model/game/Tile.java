@@ -1,12 +1,16 @@
 package model.game;
 
+import model.XY;
 import model.game.TileEffects.TileEffect;
 import model.plant.BasePlant;
 import model.zombie.BaseZombie;
 
+import java.util.HashMap;
+
 public class Tile {
-    private BasePlant plant;
-    private BaseZombie zombie;
+    private HashMap<XY,BasePlant> plants;
+    private HashMap<XY,BaseZombie> zombies;
+    private HashMap<XY,Sun> Suns;
     private TileEffect effect;
 
     public void addPlant() {
@@ -16,7 +20,7 @@ public class Tile {
     }
 
     public void clearTile() {
-        plant = null;
-        zombie = null;
+        plants = null;
+        zombies = null;
     }
 }

@@ -1,4 +1,4 @@
-package model.plant.methods;
+package model.game;
 
 import model.zombie.BaseZombie;
 

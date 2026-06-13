@@ -1,4 +1,4 @@
-package model;
+package model.game;
 
 public class Lawnmower {
     private int row;
