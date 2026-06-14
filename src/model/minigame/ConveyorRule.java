@@ -1,7 +1,6 @@
 package model.minigame;
 
 import model.game.GameState;
-import model.zombie.BaseZombie;
 
 public class ConveyorRule extends MiniGame implements SpecialStageRule {
     public ConveyorRule()

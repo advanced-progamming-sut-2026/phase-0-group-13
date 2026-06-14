@@ -1,21 +1,26 @@
 package data.repository;
 
+import model.zombie.ZombieParts.ZombieTemplate;
+
 import java.util.List;
 
 public class ZombieRepository implements ReadOnlyRepository<Object> {
-    private final List<Object> zombies;
+    private final List<ZombieTemplate> zombies;
 
-    public ZombieRepository(List<Object> zombies) {
+    public ZombieRepository(List<ZombieTemplate> zombies) {
         this.zombies = zombies;
     }
-
+    public List<ZombieTemplate> getAll() {
+        return zombies;
+    }
     @Override
-    public Object findById(int id) {
+    public ZombieTemplate find(String alias) {
+        for (ZombieTemplate template : zombies) {
+            if (template.alias.equalsIgnoreCase(alias)) {
+                return template;
+            }
+        }
         return null;
     }
 
-    @Override
-    public List<Object> findAll() {
-        return zombies;
-    }
 }

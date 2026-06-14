@@ -2,15 +2,14 @@ package model.environment;
 
 import model.game.GameState;
 import model.game.Tile;
-import model.zombie.BaseZombie;
+import model.zombie.Zombie;
 import view.MainMenuSubMenus.GameMenuSubMenus.MiniGames.MiniGame;
 
-import java.util.ArrayList;
 import java.util.List;
 
 abstract public class Season {
     protected String name;
-    private List<BaseZombie> AvailableZombies;
+    private List<Zombie> AvailableZombies;
     private List<Stage> stages;
     private List<MiniGame> miniGames;
     public String getName() {
@@ -23,7 +22,7 @@ abstract public class Season {
 
     public abstract void applySeasonEffects(GameState gameState);
 
-    public abstract List<BaseZombie> getAvailableZombies();
+    public abstract List<Zombie> getAvailableZombies();
 
     public abstract List<Tile> generateMap();
 }

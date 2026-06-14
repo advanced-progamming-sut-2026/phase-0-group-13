@@ -1,16 +1,15 @@
 package model.game;
 
-import model.XY;
 import model.game.TileEffects.TileEffect;
-import model.plant.BasePlant;
-import model.zombie.BaseZombie;
+import model.plant.Plant;
+import model.zombie.Zombie;
 
-import java.util.HashMap;
+import java.util.List;
 
 public class Tile {
-    private HashMap<XY,BasePlant> plants;
-    private HashMap<XY,BaseZombie> zombies;
-    private HashMap<XY,Sun> Suns;
+    private List<Plant> plants;
+    private List<Zombie> zombies;
+    private List<Sun> Suns;
     private TileEffect effect;
 
     public void addPlant() {

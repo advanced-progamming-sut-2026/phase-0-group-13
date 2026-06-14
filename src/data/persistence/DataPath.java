@@ -2,6 +2,9 @@ package data.persistence;
 
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
 
 public class DataPath {
     private static final HashMap<String, Path> allPaths = new HashMap<>();
@@ -12,6 +15,9 @@ public class DataPath {
     }
 
     private void initialize() {
+        registerPath("plants", Paths.get("src/main/resources/data/database/plants.json"));
+        registerPath("zombies", Paths.get("src/main/resources/data/database/Zombies.json"));
+        registerPath("quests", Paths.get("src/main/resources/data/database/Quests.json"));
     }
 
     public static DataPath getInstance() {

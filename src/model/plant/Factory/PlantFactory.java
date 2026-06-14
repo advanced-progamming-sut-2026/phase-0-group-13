@@ -1,34 +1,23 @@
 package model.plant.Factory;
 
-import model.XY;
+import data.repository.PlantRepository;
+import data.repository.ZombieRepository;
 import model.enums.PlantType;
-import model.plant.BasePlant;
-import model.plant.LobberPlant;
-import model.plant.*;
+import model.plant.Plant;
+import model.plant.PlantParts.PlantTemplate;
 
 public class PlantFactory {
-    private PlantFactory() {
+    private PlantRepository repository;
+    public PlantFactory(PlantRepository repository) {
+        this.repository = repository;
     }
 
-    public static BasePlant createPlant(PlantType plantType) {
-
-        BasePlant plant = switch (plantType) {
-
-            //case PEASHOOTER-> new ShooterPlant();
-            case REPEATER -> null;
-            case SUNFLOWER -> null;
-            case WALL_NUT -> null;
-            case TNT -> null;
-            //case MINT -> new MintPlanet();
-            case WALL_NUTS -> null;
-            case CABBAGE_PULT -> null;
-            case MELON_PULT -> null;
-            case MELON -> null;
-            case FUMESHROOM -> null;
-            // اینجا هایی که نال گذاشتیم باید  در واقع از پکیج دیتا ، بریم اون چیز مربوطه رو برداریم
-        };
-
-
-        return plant;
+    public Plant createPlant(String name, int row, int col) {
+        PlantTemplate template = this.repository.find(name);
+        if (template == null) {
+            return null;
+        }
+        Plant livePlant = new Plant(template, row, col);
+        return livePlant;
     }
 }

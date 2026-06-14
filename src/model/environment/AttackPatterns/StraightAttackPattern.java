@@ -1,14 +1,14 @@
 package model.environment.AttackPatterns;
 
 import model.game.GameState;
-import model.plant.BasePlant;
-import model.zombie.BaseZombie;
+import model.plant.Plant;
+import model.zombie.Zombie;
 
 import java.util.List;
 
 public class StraightAttackPattern implements AttackPattern{
     @Override
-    public List<BaseZombie> findTargets(BasePlant attacker, GameState gameState) {
+    public List<Zombie> findTargets(Plant attacker, GameState gameState) {
         return List.of();
     }
 }

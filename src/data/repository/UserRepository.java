@@ -24,12 +24,12 @@ public class UserRepository implements CrudRepository<Object> {
     }
 
     @Override
-    public Object findById(int id) {
+    public Object find(String alias) {
         return null;
     }
 
     @Override
-    public List<Object> findAll() {
-        return users;
+    public Object getAll() {
+        return null;
     }
 }

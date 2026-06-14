@@ -1,6 +1,6 @@
 package model.greenhouse;
 
-import model.plant.BasePlant;
+import model.plant.Plant;
 
 public class GreenHouse {
     private int capacity;
@@ -28,7 +28,7 @@ public class GreenHouse {
 
     public void collectPlant() {
     }
-    public void PlantMaking(BasePlant plant){
+    public void PlantMaking(Plant plant){
         // اینجا میایم گیاه جدید و میزاریم ( کلاس پلنت اپگرید هم هستش )
     }
 }

@@ -1,6 +1,6 @@
 package model.game;
 
-import model.zombie.BaseZombie;
+import model.zombie.Zombie;
 
 public class Projectile {
     private int damage;
@@ -20,7 +20,7 @@ public class Projectile {
     public void move() {
     }
 
-    public void hit(BaseZombie zombie) {
+    public void hit(Zombie zombie) {
 
     }
     public void destroyZombie(){}

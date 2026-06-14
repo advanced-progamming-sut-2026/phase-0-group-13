@@ -2,7 +2,7 @@ package model.environment;
 
 import model.game.GameState;
 import model.game.Tile;
-import model.zombie.BaseZombie;
+import model.zombie.Zombie;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class FrostbiteCavesSeason extends Season {
     }
 
     @Override
-    public List<BaseZombie> getAvailableZombies() {
+    public List<Zombie> getAvailableZombies() {
         return null ;
     }
 

@@ -24,12 +24,12 @@ public class LeaderBoardRepository implements CrudRepository<Object> {
     }
 
     @Override
-    public Object findById(int id) {
+    public Object find(String alias) {
         return null;
     }
 
     @Override
-    public List<Object> findAll() {
-        return entries;
+    public Object getAll() {
+        return null;
     }
 }

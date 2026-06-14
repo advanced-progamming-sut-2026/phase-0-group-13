@@ -1,29 +1,18 @@
 package model.zombie.Factory;
 
-import model.enums.ZombieType;
-import model.zombie.BaseZombie;
+import data.repository.ZombieRepository;
+import model.zombie.Zombie;
+import model.zombie.ZombieParts.ZombieTemplate;
 
 public class ZombieFactory {
-    private ZombieFactory() {
+    private ZombieRepository repository;
+
+    public ZombieFactory(ZombieRepository repository) {
+        this.repository = repository;
     }
 
-    public static BaseZombie createZombie(
-            ZombieType Type
-    ) {
-
-        BaseZombie zombie = switch (Type) {
-            case NORMAL -> null;
-            case CONEHEAD -> null;
-            case BUCKETHEAD -> null;
-            case GARGANTUAR -> null;
-            case JALAPENO -> null;
-            case SQUASH -> null;
-            case WALL_NUT -> null;
-        };
-        // اینجا هایی که نال گذاشتیم باید  در واقع از پکیج دیتا ، بریم اون چیز مربوطه رو برداریم
-
-
-
-        return zombie;
+    public Zombie createZombie(String alias) {
+        ZombieTemplate template = repository.find(alias);
+        return new Zombie(template);
     }
 }

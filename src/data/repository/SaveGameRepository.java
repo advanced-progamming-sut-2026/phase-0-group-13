@@ -23,13 +23,14 @@ public class SaveGameRepository implements CrudRepository<Object> {
         saves.remove(o);
     }
 
+
     @Override
-    public Object findById(int id) {
+    public Object find(String alias) {
         return null;
     }
 
     @Override
-    public List<Object> findAll() {
-        return saves;
+    public Object getAll() {
+        return null;
     }
 }

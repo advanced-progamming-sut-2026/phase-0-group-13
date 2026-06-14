@@ -1,19 +1,24 @@
 package model.quest;
 
 public class Quest {
-    private String questName;
-    private String questDescription;
+    public String title;
+    private String category;
+    private String condition;
+    private String rewardType;
+    private String priority;
+    private String variable;
+
     private Double ProgressOfQuest ;
 
-    public Quest(String questName, String questDescription) {
-        this.questName = questName;
-        this.questDescription = questDescription;
+    public Quest() {
         this.ProgressOfQuest = 0.0;
     }
-
-    public Quest(String questName) {
-        this.questName = questName;
-    }
+    public String getTitle() { return title; }
+    public String getCategory() { return category; }
+    public String getCondition() { return condition; }
+    public String getRewardType() { return rewardType; }
+    public String getPriority() { return priority; }
+    public String getVariable() { return variable; }
 
     public void start() {
     }

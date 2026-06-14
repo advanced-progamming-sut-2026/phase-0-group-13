@@ -1,8 +1,7 @@
 package model.game;
 
-import model.XY;
-import model.plant.BasePlant;
-import model.zombie.BaseZombie;
+import model.plant.Plant;
+import model.zombie.Zombie;
 
 import java.util.HashMap;
 
@@ -10,10 +9,10 @@ public class Board {
     private int rows;
     private int columns;
     private Tile[][] tiles;
-    private HashMap<XY, BaseZombie> Zombies;
-    private HashMap<XY, BasePlant> Plants;
+    private HashMap<XY, Zombie> Zombies;
+    private HashMap<XY, Plant> Plants;
     private HashMap<XY , Sun> Suns ;
-    private HashMap<Double,BasePlant> availableplants;
+    private HashMap<Double, Plant> availableplants;
     private GameState gameState = new GameState();
     public GameState getGameState() {
         return gameState;
