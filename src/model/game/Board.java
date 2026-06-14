@@ -4,14 +4,15 @@ import model.plant.Plant;
 import model.zombie.Zombie;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class Board {
     private int rows;
     private int columns;
     private Tile[][] tiles;
-    private HashMap<XY, Zombie> Zombies;
-    private HashMap<XY, Plant> Plants;
-    private HashMap<XY , Sun> Suns ;
+    private List<Zombie> Zombies;
+    private List<Plant> Plants;
+    private List<Sun> Suns ;
     private HashMap<Double, Plant> availableplants;
     private GameState gameState = new GameState();
     public GameState getGameState() {
