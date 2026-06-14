@@ -4,6 +4,7 @@ public class BaseZombie {
     private String type;
     private int health;
     private double speed;
+    // دیزاین پترن bridge
 
     public BaseZombie() {
     }

@@ -6,6 +6,7 @@ import java.util.Objects;
 public class Shop {
     private List<Objects> AllTimeProducts ;
     private List<Objects> DailyTimeProducts ;
+
     public void listItems() {
     }
 

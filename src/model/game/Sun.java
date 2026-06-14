@@ -8,6 +8,8 @@ public class Sun {
     private int yCoordinate;
     private int timeToLive;
     private SunType sunType;
+    //amount باید داخل suntype باشد
+    //مختصات و داخل خود ابجکت ها ذخیره بکنیم ( یه اینترفیس داشته باشیم که این و هندل بکنه )
 
     public Sun(int amount, int x, int y, int timeToLive, SunType sunType) {
         this.amount = amount;

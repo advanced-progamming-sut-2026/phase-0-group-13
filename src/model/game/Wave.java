@@ -7,6 +7,7 @@ import java.util.List;
 public class Wave {
     private int waveNumber;
     private List<ZombieType> zombiesToSpawn;
+    // برای دیلی موجمون باید یه هش مپ بزنیم که دیلی هرکدوم و
     private int spawnDelay;
     private int dificulity;
     private boolean isCompleted;
