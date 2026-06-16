@@ -4,9 +4,9 @@ import data.persistence.DataPath;
 import data.persistence.JsonSerializer;
 import data.repository.PlantRepository;
 import data.repository.*;
-import model.plant.PlantParts.PlantTemplate;
-import model.quest.Quest;
-import model.zombie.ZombieParts.ZombieTemplate;
+import model.game.plant.PlantParts.PlantTemplate;
+import model.game.quest.Quest;
+import model.game.zombie.ZombieParts.ZombieTemplate;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,8 +1,8 @@
 package model.environment.AttackPatterns;
 
 import model.game.GameState;
-import model.plant.Plant;
-import model.zombie.Zombie;
+import model.game.plant.Plant;
+import model.game.zombie.Zombie;
 
 import java.util.List;
 

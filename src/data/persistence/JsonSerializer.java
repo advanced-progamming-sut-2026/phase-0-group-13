@@ -8,8 +8,15 @@ public class JsonSerializer {
     private static final Gson gson = new Gson();
 
     public void writeToFile(String filePath, Object data) {
-        try (Writer writer = new FileWriter(filePath)) {
-            gson.toJson(data, writer);
+        try {
+            File file = new File(filePath);
+            File parentDir = file.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
+            try (Writer writer = new FileWriter(file)) {
+                gson.toJson(data, writer);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

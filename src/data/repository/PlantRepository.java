@@ -1,7 +1,6 @@
 package data.repository;
 
-import model.plant.Plant;
-import model.plant.PlantParts.PlantTemplate;
+import model.game.plant.PlantParts.PlantTemplate;
 
 import java.util.List;
 

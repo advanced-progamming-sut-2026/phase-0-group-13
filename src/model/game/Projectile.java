@@ -1,6 +1,6 @@
 package model.game;
 
-import model.zombie.Zombie;
+import model.game.zombie.Zombie;
 
 public class Projectile {
     private int damage;

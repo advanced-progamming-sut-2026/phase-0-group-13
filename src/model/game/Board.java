@@ -1,7 +1,7 @@
 package model.game;
 
-import model.plant.Plant;
-import model.zombie.Zombie;
+import model.game.plant.Plant;
+import model.game.zombie.Zombie;
 
 import java.util.HashMap;
 import java.util.List;

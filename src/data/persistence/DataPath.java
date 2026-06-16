@@ -15,11 +15,13 @@ public class DataPath {
     }
 
     private void initialize() {
-        registerPath("plants", Paths.get("src/main/resources/data/database/plants.json"));
-        registerPath("zombies", Paths.get("src/main/resources/data/database/Zombies.json"));
-        registerPath("quests", Paths.get("src/main/resources/data/database/Quests.json"));
-        registerPath("games", Paths.get("src/main/resources/data/database/Games.json"));
-        registerPath("users", Paths.get("src/main/resources/data/database/Users.json"));
+        registerPath("plants", Paths.get("data/database/plants.json"));
+        registerPath("zombies", Paths.get("data/database/Zombies.json"));
+        registerPath("quests", Paths.get("data/database/Quests.json"));
+        registerPath("games", Paths.get("data/database/Games.json"));
+        registerPath("users", Paths.get("data/database/Users.json"));
+        registerPath("session", Paths.get("data/database/session.json"));
+
 
     }
 

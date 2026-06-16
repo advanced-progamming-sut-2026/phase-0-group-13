@@ -1,6 +1,6 @@
 package data.repository;
 
-import model.zombie.ZombieParts.ZombieTemplate;
+import model.game.zombie.ZombieParts.ZombieTemplate;
 
 import java.util.List;
 

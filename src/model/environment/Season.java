@@ -2,7 +2,7 @@ package model.environment;
 
 import model.game.GameState;
 import model.game.Tile;
-import model.zombie.Zombie;
+import model.game.zombie.Zombie;
 import view.MainMenuSubMenus.GameMenuSubMenus.MiniGames.MiniGame;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package data.repository;
 
-import model.quest.Quest;
+import model.game.quest.Quest;
 
 import java.util.List;
 

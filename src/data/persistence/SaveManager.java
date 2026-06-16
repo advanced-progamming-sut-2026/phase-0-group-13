@@ -1,13 +1,9 @@
 package data.persistence;
 
-import data.repository.SaveGameRepository;
-
 public class SaveManager {
-    private final SaveGameRepository saveRepository;
     private final JsonSerializer jsonSerializer;
 
-    public SaveManager(SaveGameRepository saveRepository, JsonSerializer jsonSerializer) {
-        this.saveRepository = saveRepository;
+    public SaveManager(JsonSerializer jsonSerializer) {
         this.jsonSerializer = jsonSerializer;
     }
 

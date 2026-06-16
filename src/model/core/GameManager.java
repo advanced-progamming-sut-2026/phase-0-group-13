@@ -2,10 +2,9 @@ package model.core;
 
 import model.account.AdventureMap;
 import model.game.Board;
-import model.news.AllNews;
-import model.quest.Quest;
+import model.game.news.AllNews;
+import model.game.quest.Quest;
 
-import java.sql.Array;
 import java.util.List;
 
 public class GameManager {
