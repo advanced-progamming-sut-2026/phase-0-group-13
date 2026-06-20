@@ -1,15 +1,28 @@
 package model.enums;
 
 public enum PlantType {
+    // گیاهان پایه
+    SUNFLOWER,
     PEASHOOTER,
     REPEATER,
-    SUNFLOWER,
+
+    // گیاهان مدافع
     WALL_NUT,
-    TNT,
-    MINT,
-    WALL_NUTS,
+    TALL_NUT,
+    PUMPKIN,
+
+    //  قارچ‌ها
+    PUFF_SHROOM,
+    FUME_SHROOM,
+
+    // پرتاب‌کننده‌ها (Lobbers) و ارتقاهایشان
     CABBAGE_PULT,
-    MELON_PULT,
-    MELON,
-    FUMESHROOM
+    MELON_PULT,    // خربزه‌ مرحله 1
+    WINTER_MELON,  // هندوانه  مرحلع 2
+
+    // گیاهان انفجاری و خاص
+    CHERRY_BOMB,
+    JALAPENO,
+    TNT,
+    MINT
 }

@@ -148,4 +148,18 @@ public class UserManager {
             file.delete();
         }
     }
+    // این متد را به UserManager.java اضافه کنید
+    public void updateCurrentUserGameState() throws Exception {
+        if (this.currentUser == null) {
+            throw new Exception("error: no user is currently logged in to save game state.");
+        }
+        // چون مرجع (Reference) کاربر در لیست users وجود دارد،
+        // تغییرات سکه و تاریخچه مستقیماً در لیست اعمال شده و فقط کافیست متد سیو خودتان را صدا بزنید
+        saveUsersToJSON();
+    }
+
+    // متد کمکی برای دسترسی به کاربری که الان لاگین کرده (برای وصل کردن به Game Engine)
+    public User getCurrentUser() {
+        return this.currentUser;
+    }
 }
