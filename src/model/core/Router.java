@@ -1,43 +1,50 @@
 package model.core;
 
-import model.enums.Menu;
+import controller.BaseController;
+
+import java.util.Scanner;
 
 public class Router {
-    private Menu currentMenu;
-    private Menu previousMenu;
-    private static final Router instance = new Router();
+    private static Router instance;
+    private BaseController currentController;
+    private Scanner scanner;
 
     private Router() {
+        this.scanner = new Scanner(System.in);
     }
 
     public static Router getInstance() {
+        if (instance == null) {
+            instance = new Router();
+        }
         return instance;
     }
 
-    public Menu getCurrentMenu() {
-        return currentMenu;
+
+    public void navigateTo(BaseController newController) {
+        if (currentController != null) {
+            currentController.exit();
+        }
+
+        this.currentController = newController;
+
+        if (this.currentController != null) {
+            this.currentController.initController();
+            startInputLoop();
+        }
     }
 
-    public Menu getPreviousMenu() {
-        return previousMenu;
+    private void startInputLoop() {
+        while (currentController != null) {
+            if (scanner.hasNextLine()) {
+                String input = scanner.nextLine();
+                currentController.handleinput(input);
+            }
+        }
     }
 
-    public void enterMenu() {
-    }
-
-    public void enterMenu(Menu menu) {
-        previousMenu = currentMenu;
-        currentMenu = menu;
-    }
-
-    public void exitMenu() {
-    }
-
-    public void exitMenu(Menu fallback) {
-        previousMenu = currentMenu;
-        currentMenu = fallback;
-    }
-
-    public void showCurrentMenu() {
+    public void close() {
+        this.currentController = null;
+        System.out.println("Router closed.");
     }
 }

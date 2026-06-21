@@ -3,33 +3,34 @@ package model.core;
 import model.account.User;
 
 public class Session {
-    private User currentUser;
-    private boolean stayLoggedIn;
-    private boolean authenticated;
+    // با الگوی سینگلتون رفتار میکنیم
+    private static Session instance;
+    private User loggedInUser;
 
-    public Session() {
-        this.currentUser = null;
-        this.stayLoggedIn = false;
-        this.authenticated = false;
+    private Session() {
+        this.loggedInUser = null;
     }
 
-    public void login() {
-        authenticated = true;
+    public static Session getInstance() {
+        if (instance == null) {
+            instance = new Session();
+        }
+        return instance;
+    }
+
+    public void login(User user) {
+        this.loggedInUser = user;
     }
 
     public void logout() {
-        authenticated = false;
-        currentUser = null;
+        this.loggedInUser = null;
     }
 
-    public void restoreSession() {
+    public boolean isLoggedIn() {
+        return this.loggedInUser != null;
     }
 
-    public boolean isAuthenticated() {
-        return authenticated;
-    }
-
-    public User getCurrentUser() {
-        return currentUser;
+    public User getLoggedInUser() {
+        return loggedInUser;
     }
 }

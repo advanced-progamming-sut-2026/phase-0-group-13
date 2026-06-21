@@ -2,6 +2,7 @@ package model.game;
 
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Random;
 public class Board {
     private int rows;
     private int columns;
-    private Tile[][] tiles;
+    private Tile[][] tiles; // این داستان که افکت هارو چجوری باید اضافه بکنیم و ایده ای ندارم
 
     private List<Zombie> zombies;
     private List<Plant> plants;
@@ -52,14 +53,20 @@ public class Board {
     public void updateAll(int currentTick) {
         gameState.update(null, null);
 
+        // تو اینجا این افکت های رو تایل ( الگوی استراتژی ) مثل یخ یا قبر اینارو ، اپدیت میکنیم ولی ناکامله
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                tiles[i][j].getEffect().tick();
+            }
+        }
         handleSkySunDrop(currentTick);
 
         for (Plant plant : plants) {
-            plant.update(currentTick,this);
+            plant.update(currentTick, this);
         }
 
         for (Zombie zombie : zombies) {
-            zombie.update(currentTick,this);
+            zombie.update(currentTick, this);
             checkZombiePlantCollisions(zombie, currentTick);
         }
 
@@ -189,13 +196,30 @@ public class Board {
         return null;
     }
 
-    public void addProjectile(Projectile p) { projectiles.add(p); }
-    public void addSun(Sun s) { suns.add(s); }
-    public void placePlant(Plant p) { plants.add(p); }
-    public void spawnZombie(Zombie z) { zombies.add(z); }
+    public void addProjectile(Projectile p) {
+        projectiles.add(p);
+    }
 
-    public int getRows() { return rows; }
-    public int getColumns() { return columns; }
+    public void addSun(Sun s) {
+        suns.add(s);
+    }
+
+    public void placePlant(Plant p) {
+        plants.add(p);
+    }
+
+    public void spawnZombie(Zombie z) {
+        zombies.add(z);
+    }
+
+    public int getRows() {
+        return rows;
+    }
+
+    public int getColumns() {
+        return columns;
+    }
+
     public boolean hasZombieInRow(int row, double plantX) {
         for (Zombie zombie : zombies) {
             if (zombie.getRow() == row && !zombie.isDead() && zombie.getX() >= plantX) {
@@ -220,4 +244,5 @@ public class Board {
         }
         return null;
     }
+
 }
