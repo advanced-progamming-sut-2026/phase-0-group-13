@@ -124,3 +124,6 @@ To-Do / Next Commits
 - GameManager کامل شد.
 - کلاس PlantFood درست شد و درون کلاس Plant قرار گرفت(هندل کردن PlantFoodDuration و PlantFoodBehavior)
 - SaveManager حذف شد، چون هر User یک سیو مخصوص خودش را دارد، و صرفا با اضافه کردن یک Progress به یوزر، مشکل حل میشود.
+  - متوجه دلیل وجود PlayerProfile نمیشوم، اللخصوص وقتی User به صورت عادی هست و هر User یک Progress مخصوص خودش را دارد.
+- برای انوع مختلف PlantFood و Behavoir های مختلف این کلاس باید دست به کار شویم،‌ گیاه ها قابلیت خاص خیلی به خصوصی دارند.
+- به گیم منیجیر،  لیستی از wave ها اضافه شد. همچنین متغیر های sunAmount و plantFoodCount کاملا بدون استفاده بودند چون این متغیر ها در board.gameState ذخیره میشود!
