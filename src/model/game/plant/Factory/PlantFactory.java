@@ -3,6 +3,7 @@ package model.game.plant.Factory;
 import data.repository.PlantRepository; // اضافه شدن ریپازیتوری
 import model.enums.PlantCategory;
 import model.enums.PlantTag;
+import model.game.PlantFood;
 import model.game.plant.Plant;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.game.plant.behavior.*;
@@ -31,8 +32,9 @@ public class PlantFactory {
         int damage = parseDamage(template.damage);
 
         PlantAction behavior = determineBehavior(category, interval, damage);
+        PlantFood plantFood = determinePlantFood(category);
 
-        return new Plant(template, row, col, category, tags, behavior);
+        return new Plant(template, row, col, category, tags, behavior,plantFood);
     }
 
     private PlantCategory determineCategory(String catStr) {
@@ -92,5 +94,9 @@ public class PlantFactory {
             default:
                 return null;
         }
+    }
+
+    private PlantFood determinePlantFood(PlantCategory category) {
+        // TODO
     }
 }
