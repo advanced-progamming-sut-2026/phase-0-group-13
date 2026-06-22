@@ -98,5 +98,6 @@ public class PlantFactory {
 
     private PlantFood determinePlantFood(PlantCategory category) {
         // TODO
+        return null;
     }
 }
