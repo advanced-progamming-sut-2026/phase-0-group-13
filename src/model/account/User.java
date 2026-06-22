@@ -18,6 +18,7 @@ public class User {
     private List<String> unlockedPlants;
     private List<String> unlockedZombies;
     private List<MatchResult> recentGames;
+    private Progress progress;
 
     public User(String username, String passwordHash, String email, String nickname, String gender) {
         this.username = username;
@@ -34,6 +35,7 @@ public class User {
 
         this.unlockedPlants.add("peashooter");
         this.unlockedPlants.add("sunflower");
+        this.progress = new Progress();
     }
 
     public void setSecurityQuestion(String qNumber, String answer) {
@@ -60,4 +62,5 @@ public class User {
     public List<String> getUnlockedPlants() { return unlockedPlants; }
     public List<String> getUnlockedZombies() { return unlockedZombies; }
     public List<MatchResult> getRecentGames() { return recentGames; }
+    public Progress getProgress() { return progress;}
 }

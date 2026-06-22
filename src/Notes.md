@@ -123,3 +123,4 @@ To-Do / Next Commits
 
 - GameManager کامل شد.
 - کلاس PlantFood درست شد و درون کلاس Plant قرار گرفت(هندل کردن PlantFoodDuration و PlantFoodBehavior)
+- SaveManager حذف شد، چون هر User یک سیو مخصوص خودش را دارد، و صرفا با اضافه کردن یک Progress به یوزر، مشکل حل میشود.
