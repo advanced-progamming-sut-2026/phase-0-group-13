@@ -220,6 +220,10 @@ public class Board {
         return columns;
     }
 
+    public GameState getGameState() {
+        return gameState;
+    }
+
     public boolean hasZombieInRow(int row, double plantX) {
         for (Zombie zombie : zombies) {
             if (zombie.getRow() == row && !zombie.isDead() && zombie.getX() >= plantX) {

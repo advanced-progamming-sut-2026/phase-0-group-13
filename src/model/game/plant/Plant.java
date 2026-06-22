@@ -4,6 +4,7 @@ import model.enums.PlantCategory;
 import model.enums.PlantType;
 import model.enums.PlantTag;
 import model.game.Board;
+import model.game.PlantFood;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.game.plant.behavior.PlantAction;
 import java.util.EnumSet;
@@ -25,12 +26,12 @@ public class Plant {
     private EnumSet<PlantTag> tags;
 
     private PlantAction behavior;
+    private PlantFood plantFood;
     private int lastActionTick;
 
     private boolean isBoosted;
-    private int plantFoodDuration;
 
-    public Plant(PlantTemplate template, int row, int col, PlantCategory category, EnumSet<PlantTag> tags, PlantAction behavior) {
+    public Plant(PlantTemplate template, int row, int col, PlantCategory category, EnumSet<PlantTag> tags, PlantAction behavior, PlantFood plantFood) {
         this.id = template.id;
         this.name = template.name;
         this.maxHealth = template.baseHp;
@@ -39,6 +40,7 @@ public class Plant {
         this.category = category;
         this.tags = tags;
         this.behavior = behavior;
+        this.plantFood = plantFood;
 
         this.row = row;
         this.col = col;
@@ -48,19 +50,23 @@ public class Plant {
         this.lastActionTick = 0;
         this.level = 1;
         this.isBoosted = false;
-        this.plantFoodDuration = 0;
     }
 
     public void update(int currentTick, Board board) {
         if (isDead()) return;
 
-        if (plantFoodDuration > 0) {
-            plantFoodDuration--;
+        if (plantFood.canExecute()) {
+            plantFood.execute(this, board, currentTick);
+            return;
         }
 
         if (behavior != null) {
             behavior.execute(this, board, currentTick);
         }
+    }
+
+    public void applyPlantFood() {
+        plantFood.activate();
     }
 
     public void takeDamage(int damage) {
@@ -86,4 +92,6 @@ public class Plant {
     public double getY() { return y; }
     public int getLastActionTick() { return lastActionTick; }
     public void setLastActionTick(int tick) { this.lastActionTick = tick; }
+
+
 }
