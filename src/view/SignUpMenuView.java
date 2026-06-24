@@ -1,26 +1,22 @@
 package view;
 
-import controller.AuthController;
+import controller.SignUpMenuController;
 import model.core.App;
 import model.enums.Menu;
 import java.util.Scanner;
 
 public class SignUpMenuView implements BaseMenu {
-    private final AuthController authController;
+    private final SignUpMenuController signUpController;
 
     public SignUpMenuView() {
-        this.authController = new AuthController();
+        this.signUpController = new SignUpMenuController();
     }
 
     @Override
     public void check(Scanner scanner) {
         System.out.println("Entered Sign Up Menu. Use 'register' to create an account.");
 
-        while (!App.shouldExit && App.getCurrentMenu() == Menu.SignUpMenu) {
-            String command = scanner.nextLine().trim();
-            if (command.isEmpty()) continue;
-
-            authController.handleinput(command);
-        }
+        String input = scanner.nextLine();
+        signUpController.handleinput(input);
     }
 }

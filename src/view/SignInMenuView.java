@@ -1,26 +1,23 @@
 package view;
 
-import controller.AuthController;
+import controller.SignInMenuController;
 import model.core.App;
 import model.enums.Menu;
 import java.util.Scanner;
+import java.util.regex.Matcher;
 
 public class SignInMenuView implements BaseMenu {
-    private final AuthController authController;
+    private final SignInMenuController signInMenuController;
 
     public SignInMenuView() {
-        this.authController = new AuthController();
+        this.signInMenuController = new SignInMenuController();
     }
 
     @Override
     public void check(Scanner scanner) {
         System.out.println("Entered Sign In Menu. Use 'login' to enter your account.");
 
-        while (!App.shouldExit && App.getCurrentMenu() == Menu.SignInMenu) {
-            String command = scanner.nextLine().trim();
-            if (command.isEmpty()) continue;
-
-            authController.handleinput(command);
-        }
+        String input = scanner.nextLine();
+        signInMenuController.handleinput(input);
     }
 }
