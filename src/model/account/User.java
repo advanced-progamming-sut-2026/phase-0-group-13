@@ -51,9 +51,13 @@ public class User {
     }
 
     public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
     public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
     public String getNickname() { return nickname; }
+    public void setNickname(String nickname) { this.nickname = nickname; }
     public String getGender() { return gender; }
     public String getSecurityQuestionNumber() { return securityQuestionNumber; }
     public String getSecurityAnswer() { return securityAnswer; }

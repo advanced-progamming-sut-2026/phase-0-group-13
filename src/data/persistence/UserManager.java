@@ -158,4 +158,51 @@ public class UserManager {
     public User getCurrentUser() {
         return this.currentUser;
     }
+
+    public void changeUsername(String newUsername) throws Exception {
+        if (this.currentUser == null) throw new Exception("error: no user is currently logged in");
+        if (this.currentUser.getUsername().equals(newUsername)) {
+            throw new Exception("error: new username is the same as the current one");
+        }
+        for (User u : users) {
+            if (u.getUsername().equals(newUsername)) throw new Exception("error: username already exists");
+        }
+        this.currentUser.setUsername(newUsername);
+        saveUsersToJSON();
+    }
+
+    public void changeNickname(String newNickname) throws Exception {
+        if (this.currentUser == null) throw new Exception("error: no user is currently logged in");
+        if (this.currentUser.getNickname().equals(newNickname)) {
+            throw new Exception("error: new nickname is the same as the current one");
+        }
+        this.currentUser.setNickname(newNickname);
+        saveUsersToJSON();
+    }
+
+    public void changeEmail(String newEmail) throws Exception {
+        if (this.currentUser == null) throw new Exception("error: no user is currently logged in");
+        if (this.currentUser.getEmail().equals(newEmail)) {
+            throw new Exception("error: new email is the same as the current one");
+        }
+        Result emailCheck = AuthService.checkEmail(newEmail);
+        if (!emailCheck.success()) throw new Exception(emailCheck.message());
+        this.currentUser.setEmail(newEmail);
+        saveUsersToJSON();
+    }
+
+    public void changePassword(String newPassword, String oldPassword) throws Exception {
+        if (this.currentUser == null) throw new Exception("error: no user is currently logged in");
+        String oldHash = AuthService.hashPassword(oldPassword);
+        if (!this.currentUser.getPasswordHash().equals(oldHash)) {
+            throw new Exception("error: old password is incorrect");
+        }
+        if (this.currentUser.getPasswordHash().equals(AuthService.hashPassword(newPassword))) {
+            throw new Exception("error: new password is the same as the current one");
+        }
+        Result passCheck = AuthService.checkPassword(newPassword);
+        if (!passCheck.success()) throw new Exception(passCheck.message());
+        this.currentUser.setPasswordHash(AuthService.hashPassword(newPassword));
+        saveUsersToJSON();
+    }
 }
