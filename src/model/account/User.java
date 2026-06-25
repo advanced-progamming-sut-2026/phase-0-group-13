@@ -15,6 +15,7 @@ public class User {
 
     private int coins;
     private int diamonds;
+    private int difficultyLevel;
     private List<String> unlockedPlants;
     private List<String> unlockedZombies;
     private List<MatchResult> recentGames;
@@ -29,6 +30,7 @@ public class User {
 
         this.coins = 0;
         this.diamonds = 0;
+        this.difficultyLevel = 3;
         this.unlockedPlants = new ArrayList<>();
         this.unlockedZombies = new ArrayList<>();
         this.recentGames = new ArrayList<>();
@@ -59,6 +61,8 @@ public class User {
     public int getCoins() { return coins; }
     public void addCoins(int amount) { this.coins += amount; }
     public int getDiamonds() { return diamonds; }
+    public int getDifficultyLevel() { return difficultyLevel; }
+    public void setDifficultyLevel(int difficultyLevel) { this.difficultyLevel = difficultyLevel; }
     public List<String> getUnlockedPlants() { return unlockedPlants; }
     public List<String> getUnlockedZombies() { return unlockedZombies; }
     public List<MatchResult> getRecentGames() { return recentGames; }
