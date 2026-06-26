@@ -1,28 +1,28 @@
 package model.environment;
 
+import java.util.List;
 import model.game.GameState;
 import model.game.Tile;
 import model.game.zombie.Zombie;
 import view.MainMenuSubMenus.GameMenuSubMenus.MiniGames.MiniGame;
 
-import java.util.List;
+public abstract class Season {
+  protected String name;
+  private List<Zombie> availableZombies;
+  private List<Stage> stages;
+  private List<MiniGame> miniGames;
 
-abstract public class Season {
-    protected String name;
-    private List<Zombie> AvailableZombies;
-    private List<Stage> stages;
-    private List<MiniGame> miniGames;
-    public String getName() {
-        return name;
-    }
-    public void Initialize( )
-    {
-        // داخل اینجا مینی گیم ها و .... اینیشالایز میکنیم
-    }
+  public String getName() {
+    return name;
+  }
 
-    public abstract void applySeasonEffects(GameState gameState);
+  public void initialize() {
+    // داخل اینجا مینی گیم ها و .... اینیشالایز میکنیم
+  }
 
-    public abstract List<Zombie> getAvailableZombies();
+  public abstract void applySeasonEffects(GameState gameState);
 
-    public abstract List<Tile> generateMap();
+  public abstract List<Zombie> getAvailableZombies();
+
+  public abstract List<Tile> generateMap();
 }

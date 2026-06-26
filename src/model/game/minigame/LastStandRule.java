@@ -2,16 +2,14 @@ package model.game.minigame;
 
 import model.game.GameState;
 
-public class LastStandRule extends MiniGame implements SpecialStageRule{
-    public LastStandRule()
-    {}
-    @Override
-    public boolean checkWinCondition() {
-        return false;
-    }
+public class LastStandRule extends MiniGame implements SpecialStageRule {
+  public LastStandRule() {}
 
-    @Override
-    public void apply(GameState gameState) {
+  @Override
+  public boolean checkWinCondition() {
+    return false;
+  }
 
-    }
+  @Override
+  public void apply(GameState gameState) {}
 }

@@ -1,18 +1,14 @@
 package controller;
 
 public class MiniGameController implements BaseController {
-    public MiniGameController() {
-    }
+  public MiniGameController() {}
 
-    @Override
-    public void initController() {
-    }
+  @Override
+  public void initController() {}
 
-    @Override
-    public void handleinput(String command) {
-    }
+  @Override
+  public void handleinput(String command) {}
 
-    @Override
-    public void exit() {
-    }
+  @Override
+  public void exit() {}
 }

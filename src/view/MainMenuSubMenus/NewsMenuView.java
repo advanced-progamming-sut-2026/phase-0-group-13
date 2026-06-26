@@ -1,22 +1,23 @@
 package view.MainMenuSubMenus;
 
 import controller.MainMenuSubControllers.NewsMenuController;
+import java.util.Scanner;
 import view.BaseMenu;
 
-import java.util.Scanner;
-
 public class NewsMenuView implements BaseMenu {
-    private final NewsMenuController newsMenuController;
+  private final NewsMenuController newsMenuController;
 
-    public NewsMenuView() {
-        this.newsMenuController = new NewsMenuController();
-    }
+  public NewsMenuView() {
+    this.newsMenuController = new NewsMenuController();
+  }
 
-    @Override
-    public void check(Scanner scanner) {
-        System.out.println("News Menu. Use 'menu news show-unread' or 'menu news show-all'. Use 'menu exit' to go back.");
+  @Override
+  public void check(Scanner scanner) {
+    System.out.println(
+        "News Menu. Use 'menu news show-unread' or 'menu news show-all'. Use 'menu exit' to go"
+            + " back.");
 
-        String input = scanner.nextLine();
-        newsMenuController.handleinput(input);
-    }
+    String input = scanner.nextLine();
+    newsMenuController.handleinput(input);
+  }
 }

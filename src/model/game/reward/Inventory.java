@@ -3,12 +3,11 @@ package model.game.reward;
 import java.util.Map;
 
 public class Inventory {
-    private final Map<String, Object> items;
+  private final Map<String, Object> items;
 
-    public Inventory(Map<String, Object> items) {
-        this.items = items;
-    }
+  public Inventory(Map<String, Object> items) {
+    this.items = items;
+  }
 
-    public void addItem(String itemId) {
-    }
+  public void addItem(String itemId) {}
 }

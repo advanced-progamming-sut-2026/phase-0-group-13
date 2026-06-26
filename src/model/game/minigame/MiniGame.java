@@ -1,20 +1,20 @@
 package model.game.minigame;
 
 abstract class MiniGame {
-    private boolean started;
-    private int score;
+  private boolean started;
+  private int score;
 
-    public void start() {
-        started = true;
-    }
+  public void start() {
+    started = true;
+  }
 
-    public void end() {
-        started = false;
-    }
+  public void end() {
+    started = false;
+  }
 
-    public abstract boolean checkWinCondition();
+  public abstract boolean checkWinCondition();
 
-    public int getScore() {
-        return score;
-    }
+  public int getScore() {
+    return score;
+  }
 }

@@ -3,16 +3,16 @@ package model.environment;
 import model.enums.StageType;
 
 public class Stage {
-    private String id;
+  private String id;
 
-    private String name;
+  private String name;
 
-    private Season season;
+  private Season season;
 
-    private StageType type;
+  private StageType type;
 
-    private boolean unlocked;
-    private Stage nextStage;
+  private boolean unlocked;
+  private Stage nextStage;
 
-    private boolean completed;
+  private boolean completed;
 }

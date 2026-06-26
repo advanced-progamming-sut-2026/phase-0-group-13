@@ -1,22 +1,23 @@
 package view.MainMenuSubMenus;
 
 import controller.MainMenuSubControllers.ProfileMenuController;
+import java.util.Scanner;
 import view.BaseMenu;
 
-import java.util.Scanner;
-
 public class ProfileMenuView implements BaseMenu {
-    private final ProfileMenuController profileMenuController;
+  private final ProfileMenuController profileMenuController;
 
-    public ProfileMenuView() {
-        this.profileMenuController = new ProfileMenuController();
-    }
+  public ProfileMenuView() {
+    this.profileMenuController = new ProfileMenuController();
+  }
 
-    @Override
-    public void check(Scanner scanner) {
-        System.out.println("Profile Menu. Use 'menu profile show-info', change-username/-nickname/-email/-password, or 'menu exit' to go back.");
+  @Override
+  public void check(Scanner scanner) {
+    System.out.println(
+        "Profile Menu. Use 'menu profile show-info', change-username/-nickname/-email/-password, or"
+            + " 'menu exit' to go back.");
 
-        String input = scanner.nextLine();
-        profileMenuController.handleinput(input);
-    }
+    String input = scanner.nextLine();
+    profileMenuController.handleinput(input);
+  }
 }

@@ -1,11 +1,9 @@
 package view.MainMenuSubMenus;
 
+import java.util.Scanner;
 import view.BaseMenu;
 
-import java.util.Scanner;
-
 public class ThreadMenuView implements BaseMenu {
-    @Override
-    public void check(Scanner scanner) {
-    }
+  @Override
+  public void check(Scanner scanner) {}
 }

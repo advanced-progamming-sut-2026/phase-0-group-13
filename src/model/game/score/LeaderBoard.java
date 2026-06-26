@@ -3,12 +3,11 @@ package model.game.score;
 import java.util.List;
 
 public class LeaderBoard {
-    private List<Score> scores;
+  private List<Score> scores;
 
-    public void addScore(Score score) {
-    }
+  public void addScore(Score score) {}
 
-    public List<Score> getScores() {
-        return scores;
-    }
+  public List<Score> getScores() {
+    return scores;
+  }
 }
