@@ -1,13 +1,20 @@
 package model.game.reward;
 
-import java.util.Map;
+import model.account.User;
 
-public class Inventory {
-  private final Map<String, Object> items;
-
-  public Inventory(Map<String, Object> items) {
-    this.items = items;
+public class Inventory implements Reward {
+  private final String itemId;
+  private final int quantity;
+  public Inventory(String itemId, int quantity) {
+    this.itemId = itemId;
+    this.quantity = quantity;
   }
 
-  public void addItem(String itemId) {}
+  @Override
+  public void apply(User user) {
+    user.getInventory().addItem(itemId, quantity);
+  }
+
+  public String getItemId() { return itemId; }
+  public int getQuantity() { return quantity; }
 }

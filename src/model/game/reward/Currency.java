@@ -1,21 +1,16 @@
 package model.game.reward;
 
-public class Currency {
-  private int coins;
-  private int diamonds;
+import model.account.User;
 
-  public Currency() {}
-
-  public Currency(int coins, int diamonds) {
-    this.coins = coins;
-    this.diamonds = diamonds;
+public record Currency(String currencyType, int amount) implements Reward {
+  @Override
+  public void apply(User user) {
+    if ("COIN".equalsIgnoreCase(currencyType)) {
+      user.addCoins(amount);
+    } else if ("DIAMOND".equalsIgnoreCase(currencyType)) {
+      user.addDiamonds(amount);
+    }
   }
 
-  public void addCoins(int amount) {
-    coins += amount;
-  }
 
-  public void addDiamonds(int amount) {
-    diamonds += amount;
-  }
 }

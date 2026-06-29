@@ -1,29 +1,42 @@
 package model.game.shop;
 
+import model.enums.CurrencyType;
+import model.enums.ItemCategory;
 import model.enums.PlantType;
 
 public class ShopItem {
-  private String id;
-  private int price;
+
+
+  private final String id;
+  private final int price;
+  private final CurrencyType currencyType;
+  private final ItemCategory category;
+  private final PlantType plantType ;
+  private final boolean daily;
   private int stock;
-  private PlantType plantType;
-  private boolean daily;
 
-  public ShopItem() {}
-
-  public ShopItem(String id, int price, int stock, PlantType plantType, boolean daily) {
+  public ShopItem(String id, int price, CurrencyType currencyType, int stock, ItemCategory category,
+                  PlantType plantType, boolean daily) {
     this.id = id;
     this.price = price;
+    this.currencyType = currencyType;
     this.stock = stock;
+    this.category = category;
     this.plantType = plantType;
     this.daily = daily;
   }
 
-  public int getPrice() {
-    return price;
+  public int getPrice() { return price; }
+
+  public CurrencyType getCurrencyType() { return currencyType; }
+
+  public ItemCategory getCategory() { return category; }
+
+  public boolean isAvailable() { return stock > 0 || stock == -1; }
+
+  public void decreaseStock() {
+    if (stock > 0) stock--;
   }
 
-  public boolean isAvailable() {
-    return stock > 0;
-  }
+
 }

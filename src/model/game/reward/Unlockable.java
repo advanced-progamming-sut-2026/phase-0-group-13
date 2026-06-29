@@ -1,19 +1,19 @@
 package model.game.reward;
 
-public class Unlockable {
-  private String targetId;
-  private boolean unlocked;
+import model.account.User;
 
-  public Unlockable() {
-    this.unlocked = false;
-  }
+public class Unlockable implements Reward {
+
+  private final String alias;
 
   public Unlockable(String targetId) {
-    this.targetId = targetId;
-    this.unlocked = false;
+    this.alias = targetId;
   }
 
-  public void unlock() {
-    unlocked = true;
+  @Override
+  public void apply(User user) {
+    user.unlockItem(alias);
   }
+
+  public String getAlias() { return alias; }
 }

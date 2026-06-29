@@ -13,7 +13,7 @@ public class DataPath {
   }
 
   public static DataPath getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   private void initialize() {

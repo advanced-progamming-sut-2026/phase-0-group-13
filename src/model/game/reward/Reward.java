@@ -1,5 +1,7 @@
 package model.game.reward;
 
-public abstract class Reward {
-  public abstract void apply();
+import model.account.User;
+
+public  interface Reward {
+   void apply(User user);
 }

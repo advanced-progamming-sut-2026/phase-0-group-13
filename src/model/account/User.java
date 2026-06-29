@@ -5,21 +5,24 @@ import java.util.List;
 import model.game.MatchResult;
 
 public class User {
+  private final String gender;
+
+  private final List<String> unlockedPlants;
+  private final List<String> unlockedZombies;
+  private final List<MatchResult> recentGames;
+  private final List<String> unlockedStages;
+  private final Progress progress;
+  private final Inventory inventory;
+
   private String username;
   private String passwordHash;
   private String email;
   private String nickname;
-  private String gender;
   private String securityQuestionNumber;
   private String securityAnswer;
-
   private int coins;
   private int diamonds;
   private int difficultyLevel;
-  private List<String> unlockedPlants;
-  private List<String> unlockedZombies;
-  private List<MatchResult> recentGames;
-  private Progress progress;
 
   public User(String username, String passwordHash, String email, String nickname, String gender) {
     this.username = username;
@@ -34,15 +37,50 @@ public class User {
     this.unlockedPlants = new ArrayList<>();
     this.unlockedZombies = new ArrayList<>();
     this.recentGames = new ArrayList<>();
+    this.unlockedStages = new ArrayList<>();
+    this.inventory = new Inventory();
 
     this.unlockedPlants.add("peashooter");
     this.unlockedPlants.add("sunflower");
     this.progress = new Progress();
   }
 
+  public void unlockItem(String targetId) {
+    if (targetId == null || targetId.isEmpty()) {
+      return;
+    }
+
+    if (hasAlreadyUnlocked(targetId)) {
+      return;
+    }
+
+    if (targetId.startsWith("plant_")) {
+      unlockedPlants.add(targetId);
+      generateNews("plant", targetId);
+
+    } else if (targetId.startsWith("zombie_")) {
+      unlockedZombies.add(targetId);
+      generateNews("zombie", targetId);
+
+    } else if (targetId.startsWith("stage_") || targetId.startsWith("minigame_")) {
+      unlockedStages.add(targetId);
+      generateNews("stage", targetId);
+    }
+  }
+
+  private boolean hasAlreadyUnlocked(String targetId) {
+    return unlockedPlants.contains(targetId)
+            || unlockedZombies.contains(targetId)
+            || unlockedStages.contains(targetId);
+  }
   public void setSecurityQuestion(String qNumber, String answer) {
     this.securityQuestionNumber = qNumber;
     this.securityAnswer = answer;
+  }
+
+  private void generateNews(String type, String targetId) {
+
+    // تو اینجا باید این خبر که این ابجکت اپدیت شده رو وارد خبر بکنیم و اپدیت بکنیم NEWS رو
   }
 
   public void addMatchResult(MatchResult result) {
@@ -102,6 +140,11 @@ public class User {
     this.coins += amount;
   }
 
+  public void addDiamonds(int amount) {
+    this.diamonds += amount;
+  }
+
+
   public int getDiamonds() {
     return diamonds;
   }
@@ -129,4 +172,12 @@ public class User {
   public Progress getProgress() {
     return progress;
   }
+
+  public List<String> getUnlockedStages() {
+    return unlockedStages;
+  }
+  public Inventory getInventory() {
+    return inventory;
+  }
+
 }
