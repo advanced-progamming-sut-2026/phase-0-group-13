@@ -159,3 +159,10 @@ Get-ChildItem -Path "src" -Filter "*.java" -Recurse | ForEach-Object { .\google-
 بعدا باید این کوئست و وصل شدن درستش به جیسون ها و ریپازیوری و پرسیستنس بررسی بشه
 
 
+**تاریخ** ۱۴۰۵/۰۴/۱۰ -
+
+تابع main از App.java پاک شد به دلیل استفاده از Main.java و AppView.java برای ران کردن برنامه.
+GameDataManager اول برنامه اینیت میشود.
+کنترلر منوی بازی با ویو منوی بازی تکمیل شد.
+ShopView با جزئیات اضافه تکمیل شد.
+ShopMenuController اضافه و تکمیل شد.
