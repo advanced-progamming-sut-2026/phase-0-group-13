@@ -36,6 +36,14 @@ public class Shop {
     dailyTimeProducts.add(new ShopItem("daily_seed", 1600, CurrencyType.COIN, 1, ItemCategory.RANDOM_SEED, null, true));
   }
 
+  public List<ShopItem> getAllTimeProducts() {
+    return allTimeProducts;
+  }
+
+  public List<ShopItem> getDailyTimeProducts() {
+    return dailyTimeProducts;
+  }
+
   public void buyItem(User currentUser, String itemId, int count, String plantTypeStr) {
     // تو اینجا وقتی یارو یچی میخره باید این و صدا بزنیم که هندل بکنه کاری که میخوایم و
 

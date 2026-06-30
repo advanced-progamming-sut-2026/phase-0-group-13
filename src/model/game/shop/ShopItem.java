@@ -28,6 +28,10 @@ public class ShopItem {
 
   public int getPrice() { return price; }
 
+  public String getId() { return id; }
+
+  public int getStock() { return stock; }
+
   public CurrencyType getCurrencyType() { return currencyType; }
 
   public ItemCategory getCategory() { return category; }

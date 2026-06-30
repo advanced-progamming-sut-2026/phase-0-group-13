@@ -4,6 +4,7 @@ import java.util.Scanner;
 import view.BaseMenu;
 import view.MainMenuSubMenus.GameMenuView;
 import view.MainMenuSubMenus.NewsMenuView;
+import view.MainMenuSubMenus.GameMenuSubMenus.ShopView;
 import view.MainMenuSubMenus.ProfileMenuView;
 import view.MainMenuSubMenus.SettingsMenuView;
 import view.MainMenuView;
@@ -13,6 +14,7 @@ import view.SignUpMenuView;
 public enum Menu {
   MainMenu(new MainMenuView()),
   GameMenu(new GameMenuView()),
+  ShopMenu(new ShopView()),
   NewsMenu(new NewsMenuView()),
   SettingsMenu(new SettingsMenuView()),
   ProfileMenu(new ProfileMenuView()),
