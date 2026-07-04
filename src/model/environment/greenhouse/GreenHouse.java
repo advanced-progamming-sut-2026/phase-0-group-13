@@ -1,35 +1,45 @@
 package model.environment.greenhouse;
 
-import model.game.plant.Plant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GreenHouse {
-  private final int capacity;
-  private int time;
-  private PlantUpgrade plantUpgrade;
+  private final int maxCapacity;
+  private final List<Pot> pots;
 
   public GreenHouse() {
-    this(0);
+    this.maxCapacity = 20;
+    this.pots = new ArrayList<>(maxCapacity);
+
+    for (int i = 0; i < maxCapacity; i++) {
+      pots.add(new Pot(false));
+    }
   }
 
-  public GreenHouse(int capacity) {
-    this.capacity = capacity;
+  public int getMaxCapacity() {
+    return maxCapacity;
   }
 
-  public int getCapacity() {
-    return capacity;
+  public List<Pot> getPots() {
+    return pots;
   }
 
-  public void setCapacity(int capacity) {}
-
-  public void setTime(int time) {
-    this.time = time;
+  public boolean unlockNextPot() {
+    for (Pot pot : pots) {
+      if (!pot.isUnlocked()) {
+        pot.unlock();
+        return true;
+      }
+    }
+    return false;
   }
 
-  public void showAllPlants() {}
-
-  public void collectPlant() {}
-
-  public void plantMaking(Plant plant) {
-    // اینجا میایم گیاه جدید و میزاریم ( کلاس پلنت اپگرید هم هستش )
+  public int getUnlockedPotsCount() {
+    int count = 0;
+    for (Pot pot : pots) {
+      if (pot.isUnlocked()) count++;
+    }
+    return count;
   }
+  
 }

@@ -2,7 +2,10 @@ package model.account;
 
 import java.util.ArrayList;
 import java.util.List;
+import model.environment.greenhouse.GreenHouse;
 import model.game.MatchResult;
+import model.game.news.AllNews;
+import model.game.quest.Quest;
 
 public class User {
   private final String gender;
@@ -13,6 +16,9 @@ public class User {
   private final List<String> unlockedStages;
   private final Progress progress;
   private final Inventory inventory;
+  private final GreenHouse greenHouse;
+  private final AllNews newsBox;
+  private final List<Quest> quests;
 
   private String username;
   private String passwordHash;
@@ -23,6 +29,8 @@ public class User {
   private int coins;
   private int diamonds;
   private int difficultyLevel;
+  private long lastShopRefreshTime;
+  private int meowPoints;
 
   public User(String username, String passwordHash, String email, String nickname, String gender) {
     this.username = username;
@@ -39,6 +47,11 @@ public class User {
     this.recentGames = new ArrayList<>();
     this.unlockedStages = new ArrayList<>();
     this.inventory = new Inventory();
+    this.greenHouse = new GreenHouse();
+    this.newsBox = new AllNews();
+    this.quests = new ArrayList<>();
+    this.lastShopRefreshTime = 0L;
+    this.meowPoints = 0;
 
     this.unlockedPlants.add("peashooter");
     this.unlockedPlants.add("sunflower");
@@ -79,8 +92,21 @@ public class User {
   }
 
   private void generateNews(String type, String targetId) {
-
-    // تو اینجا باید این خبر که این ابجکت اپدیت شده رو وارد خبر بکنیم و اپدیت بکنیم NEWS رو
+    String message;
+    switch (type) {
+      case "plant":
+        message = "New plant unlocked: " + targetId;
+        break;
+      case "zombie":
+        message = "New zombie discovered: " + targetId;
+        break;
+      case "stage":
+        message = "New stage available: " + targetId;
+        break;
+      default:
+        message = "New item unlocked: " + targetId;
+    }
+    newsBox.addNews(new model.game.news.News(type, targetId, message));
   }
 
   public void addMatchResult(MatchResult result) {
@@ -178,6 +204,34 @@ public class User {
   }
   public Inventory getInventory() {
     return inventory;
+  }
+
+  public GreenHouse getGreenHouse() {
+    return greenHouse;
+  }
+
+  public AllNews getNewsBox() {
+    return newsBox;
+  }
+
+  public List<Quest> getQuests() {
+    return quests;
+  }
+
+  public long getLastShopRefreshTime() {
+    return lastShopRefreshTime;
+  }
+
+  public void setLastShopRefreshTime(long lastShopRefreshTime) {
+    this.lastShopRefreshTime = lastShopRefreshTime;
+  }
+
+  public int getMeowPoints() {
+    return meowPoints;
+  }
+
+  public void addMeowPoints(int amount) {
+    this.meowPoints += amount;
   }
 
 }

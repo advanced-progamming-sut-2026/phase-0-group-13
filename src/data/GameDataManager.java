@@ -2,6 +2,7 @@ package data;
 
 import data.persistence.DataPath;
 import data.persistence.JsonSerializer;
+import data.persistence.UserManager;
 import data.repository.*;
 import data.repository.PlantRepository;
 import java.util.Arrays;
@@ -15,6 +16,8 @@ public class GameDataManager {
   public static PlantRepository plantRepository;
   public static QuestRepository questRepository;
   public static ZombieRepository zombieRepository;
+
+  private static boolean sessionRestored = false;
 
   public GameDataManager() {
     initAllData();
@@ -33,7 +36,7 @@ public class GameDataManager {
       if (dataPath.getPath("plants") != null) {
         String plantsFilePath = dataPath.getPath("plants").toString();
         PlantTemplate[] plantTemplates =
-            serializer.readFromFile(plantsFilePath, PlantTemplate[].class);
+                serializer.readFromFile(plantsFilePath, PlantTemplate[].class);
 
         if (plantTemplates != null) {
           List<PlantTemplate> plantList = Arrays.asList(plantTemplates);
@@ -53,24 +56,32 @@ public class GameDataManager {
       if (dataPath.getPath("zombies") != null) {
         String zombiesFilePath = dataPath.getPath("zombies").toString();
         ZombieTemplate[] zombieTemplates =
-            serializer.readFromFile(zombiesFilePath, ZombieTemplate[].class);
+                serializer.readFromFile(zombiesFilePath, ZombieTemplate[].class);
         if (zombieTemplates != null) {
           List<ZombieTemplate> zombieList = Arrays.asList(zombieTemplates);
           zombieRepository = new ZombieRepository(zombieList);
         }
       }
+
+      sessionRestored = UserManager.getInstance().restoreSession();
+
       isLoaded = true;
 
     } catch (Exception e) {
-      System.err.println("سرور گوزید" + e.getMessage());
+      System.err.println("EROR,at initAllData" + e.getMessage());
       e.printStackTrace();
     }
+  }
+
+  public static boolean wasSessionRestored() {
+    return sessionRestored;
   }
 
   public static void clearData() {
     plantRepository = null;
     questRepository = null;
     zombieRepository = null;
+    sessionRestored = false;
     isLoaded = false;
   }
 }
