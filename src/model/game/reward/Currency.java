@@ -11,6 +11,4 @@ public record Currency(String currencyType, int amount) implements Reward {
       user.addDiamonds(amount);
     }
   }
-
-
 }

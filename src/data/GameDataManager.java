@@ -36,7 +36,7 @@ public class GameDataManager {
       if (dataPath.getPath("plants") != null) {
         String plantsFilePath = dataPath.getPath("plants").toString();
         PlantTemplate[] plantTemplates =
-                serializer.readFromFile(plantsFilePath, PlantTemplate[].class);
+            serializer.readFromFile(plantsFilePath, PlantTemplate[].class);
 
         if (plantTemplates != null) {
           List<PlantTemplate> plantList = Arrays.asList(plantTemplates);
@@ -56,7 +56,7 @@ public class GameDataManager {
       if (dataPath.getPath("zombies") != null) {
         String zombiesFilePath = dataPath.getPath("zombies").toString();
         ZombieTemplate[] zombieTemplates =
-                serializer.readFromFile(zombiesFilePath, ZombieTemplate[].class);
+            serializer.readFromFile(zombiesFilePath, ZombieTemplate[].class);
         if (zombieTemplates != null) {
           List<ZombieTemplate> zombieList = Arrays.asList(zombieTemplates);
           zombieRepository = new ZombieRepository(zombieList);

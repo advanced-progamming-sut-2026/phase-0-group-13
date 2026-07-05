@@ -15,9 +15,17 @@ public class PlantUpgrade {
     this.requiredSun = requiredSun;
   }
 
-  public String getFromPlant() { return fromPlant; }
-  public String getToPlant() { return toPlant; }
-  public int getRequiredSun() { return requiredSun; }
+  public String getFromPlant() {
+    return fromPlant;
+  }
+
+  public String getToPlant() {
+    return toPlant;
+  }
+
+  public int getRequiredSun() {
+    return requiredSun;
+  }
 
   public boolean applyUpgrade(User user, int availableSun) {
     if (availableSun < this.requiredSun) {

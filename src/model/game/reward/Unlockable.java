@@ -15,5 +15,7 @@ public class Unlockable implements Reward {
     user.unlockItem(alias);
   }
 
-  public String getAlias() { return alias; }
+  public String getAlias() {
+    return alias;
+  }
 }

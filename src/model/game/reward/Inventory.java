@@ -5,6 +5,7 @@ import model.account.User;
 public class Inventory implements Reward {
   private final String itemId;
   private final int quantity;
+
   public Inventory(String itemId, int quantity) {
     this.itemId = itemId;
     this.quantity = quantity;
@@ -15,6 +16,11 @@ public class Inventory implements Reward {
     user.getInventory().addItem(itemId, quantity);
   }
 
-  public String getItemId() { return itemId; }
-  public int getQuantity() { return quantity; }
+  public String getItemId() {
+    return itemId;
+  }
+
+  public int getQuantity() {
+    return quantity;
+  }
 }

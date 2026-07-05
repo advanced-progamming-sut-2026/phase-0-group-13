@@ -1,7 +1,7 @@
 package model.game.news;
 
 public class News {
-  private String type; // "plant" و "zombie" و"stage"
+  private String type; //plant ,stage ,zombie این سه تا مدل و داریم برای خبرا
   private String targetId;
   private String message;
   private long timestamp;
