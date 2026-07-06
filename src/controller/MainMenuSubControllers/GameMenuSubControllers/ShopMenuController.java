@@ -1,8 +1,9 @@
 package controller.MainMenuSubControllers.GameMenuSubControllers;
 
-import java.util.regex.Matcher;
 import controller.BaseController;
 import data.persistence.UserManager;
+import java.util.regex.Matcher;
+import model.Result;
 import model.account.User;
 import model.core.App;
 import model.enums.Commands.MenuCommands;
@@ -20,11 +21,22 @@ public class ShopMenuController implements BaseController {
   }
 
   @Override
-  public void initController() {}
+  public void initController() {
+
+    User currentUser = UserManager.getInstance().getCurrentUser();
+    if (currentUser != null) {
+      shop.refreshDailyDealsIfNeeded(currentUser);
+    }
+  }
 
   @Override
   public void handleinput(String command) {
     Matcher matcher;
+
+    User currentUser = UserManager.getInstance().getCurrentUser();
+    if (currentUser != null) {
+      shop.refreshDailyDealsIfNeeded(currentUser);
+    }
 
     if (ShopMenuCommands.List.getMatcher(command) != null) {
       handleList();
@@ -75,61 +87,16 @@ public class ShopMenuController implements BaseController {
       return;
     }
 
-    if (count <= 0) {
-      System.out.println("error: count must be positive");
-      return;
-    }
+    Result result = shop.buyItem(currentUser, itemId, count, plantType);
+    System.out.println(result.message());
 
-    ShopItem item = findItem(itemId);
-    if (item == null) {
-      System.out.println("error: item not found");
-      return;
-    }
-
-    if (!item.isAvailable()) {
-      System.out.println("error: item out of stock");
-      return;
-    }
-
-    int totalCost = item.getPrice() * count;
-    if (item.getCurrencyType() == CurrencyType.COIN) {
-      if (currentUser.getCoins() < totalCost) {
-        System.out.println("error: not enough coins");
-        return;
-      }
-      currentUser.addCoins(-totalCost);
-    } else {
-      if (currentUser.getDiamonds() < totalCost) {
-        System.out.println("error: not enough diamonds");
-        return;
-      }
-      currentUser.addDiamonds(-totalCost);
-    }
-
-    item.decreaseStock();
-    currentUser.getInventory().addItem(item.getId(), count);
-
-    try {
-      UserManager.getInstance().updateCurrentUserGameState();
-    } catch (Exception e) {
-      System.out.println(e.getMessage());
-    }
-
-    System.out.println("Bought " + count + "x " + itemId + " for " + totalCost + ".");
-  }
-
-  private ShopItem findItem(String itemId) {
-    for (ShopItem item : shop.getAllTimeProducts()) {
-      if (item.getId().equals(itemId)) {
-        return item;
+    if (result.success()) {
+      try {
+        UserManager.getInstance().updateCurrentUserGameState();
+      } catch (Exception e) {
+        System.out.println(e.getMessage());
       }
     }
-    for (ShopItem item : shop.getDailyTimeProducts()) {
-      if (item.getId().equals(itemId)) {
-        return item;
-      }
-    }
-    return null;
   }
 
   @Override

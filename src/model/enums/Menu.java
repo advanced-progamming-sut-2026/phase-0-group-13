@@ -1,20 +1,21 @@
 package model.enums;
 
 import java.util.Scanner;
-import view.BaseMenu;
+import view.*;
+import view.MainMenuSubMenus.GameMenuSubMenus.GreenHouseView;
+import view.MainMenuSubMenus.GameMenuSubMenus.ShopView;
 import view.MainMenuSubMenus.GameMenuView;
 import view.MainMenuSubMenus.NewsMenuView;
-import view.MainMenuSubMenus.GameMenuSubMenus.ShopView;
 import view.MainMenuSubMenus.ProfileMenuView;
 import view.MainMenuSubMenus.SettingsMenuView;
-import view.MainMenuView;
-import view.SignInMenuView;
-import view.SignUpMenuView;
 
 public enum Menu {
   MainMenu(new MainMenuView()),
   GameMenu(new GameMenuView()),
   ShopMenu(new ShopView()),
+  GreenHouseMenu(new GreenHouseView()),
+  CollectionMenu(new CollectionMenuView()),
+  PlantSelectionMenu(new PlantSelectionMenuView()),
   NewsMenu(new NewsMenuView()),
   SettingsMenu(new SettingsMenuView()),
   ProfileMenu(new ProfileMenuView()),

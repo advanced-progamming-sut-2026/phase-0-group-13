@@ -140,16 +140,42 @@ public class UserManager {
     clearSessionFromDisk();
   }
 
+  private String getSessionFilePath() {
+    Path path = DataPath.getInstance().getPath("session");
+    return path != null ? path.toString() : "data/database/session.json";
+  }
+
   private void saveSessionToDisk(String username) {
-    String sessionPath = "data/database/session.json";
-    jsonSerializer.writeToFile(sessionPath, username);
+    jsonSerializer.writeToFile(getSessionFilePath(), username);
   }
 
   private void clearSessionFromDisk() {
-    java.io.File file = new java.io.File("data/database/session.json");
+    java.io.File file = new java.io.File(getSessionFilePath());
     if (file.exists()) {
       file.delete();
     }
+  }
+
+  public boolean restoreSession() {
+    String savedUsername = jsonSerializer.readFromFile(getSessionFilePath(), String.class);
+    if (savedUsername == null || savedUsername.isEmpty()) {
+      return false;
+    }
+
+    for (User u : users) {
+      if (u.getUsername().equals(savedUsername)) {
+        this.currentUser = u;
+        this.isStayLoggedIn = true;
+        return true;
+      }
+    }
+
+    clearSessionFromDisk();
+    return false;
+  }
+
+  public boolean isStayLoggedIn() {
+    return isStayLoggedIn;
   }
 
   public void updateCurrentUserGameState() throws Exception {
