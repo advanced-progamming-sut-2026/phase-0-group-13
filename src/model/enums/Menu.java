@@ -16,6 +16,7 @@ public enum Menu {
   GreenHouseMenu(new GreenHouseView()),
   CollectionMenu(new CollectionMenuView()),
   PlantSelectionMenu(new PlantSelectionMenuView()),
+  GamePlayMenu(new GamePlayView()),
   NewsMenu(new NewsMenuView()),
   SettingsMenu(new SettingsMenuView()),
   ProfileMenu(new ProfileMenuView()),

@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import model.Result;
 import model.account.User;
 import model.core.App;
+import model.core.MatchLauncher;
 import model.core.MatchSetup;
 import model.enums.Commands.MenuCommands;
 import model.enums.Commands.PlantSelectionMenuCommands;
@@ -124,7 +125,7 @@ public class PlantSelectionMenuController implements BaseController {
 
     System.out.println("Seed Bank locked in: " + user.getSelectedDeck());
     System.out.println("Handing off to the game engine...");
-    exit();
+    MatchLauncher.launch();
   }
 
   private void saveState() {

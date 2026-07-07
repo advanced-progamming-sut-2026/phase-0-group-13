@@ -17,6 +17,7 @@ public enum GamePlayMenuCommands implements Command {
   ShowMap("show\\s+map"),
   ShowPlantsStatus("show\\s+plants\\s+status"),
   ShowTileStatus("show\\s+tile\\s+status\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),
+  ZombiesInfo("zombies\\s+info"),
   CheatSpawnZombie(
       "cheat\\s+spawn-zombie\\s+-t\\s+(?<zombieType>\\S+)\\s+-l\\s+<(?<x>\\S+),\\s*(?<y>\\S+)>"),
   StartZombieWaves("start\\s+zombie\\s+waves");
