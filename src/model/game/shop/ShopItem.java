@@ -15,13 +15,13 @@ public class ShopItem {
   private int stock;
 
   public ShopItem(
-      String id,
-      int price,
-      CurrencyType currencyType,
-      int stock,
-      ItemCategory category,
-      PlantType plantType,
-      boolean daily) {
+          String id,
+          int price,
+          CurrencyType currencyType,
+          int stock,
+          ItemCategory category,
+          PlantType plantType,
+          boolean daily) {
     this.id = id;
     this.price = price;
     this.currencyType = currencyType;
@@ -53,6 +53,10 @@ public class ShopItem {
 
   public boolean isAvailable() {
     return stock > 0 || stock == -1;
+  }
+
+  public boolean isDaily() {
+    return daily;
   }
 
   public void decreaseStock() {

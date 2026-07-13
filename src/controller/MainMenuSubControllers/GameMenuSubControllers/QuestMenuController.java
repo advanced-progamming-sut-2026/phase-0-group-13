@@ -3,6 +3,8 @@ package controller.MainMenuSubControllers.GameMenuSubControllers;
 import controller.BaseController;
 import data.GameDataManager;
 import data.persistence.UserManager;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import model.account.Progress;
@@ -16,6 +18,8 @@ import model.enums.MiniGameType;
 import model.game.quest.Quest;
 
 public class QuestMenuController implements BaseController {
+
+  private static final List<String> PRIORITY_ORDER = List.of("بحرانی", "بالا", "متوسط", "کم");
 
   private static final List<String> AVAILABLE_MINI_GAMES = List.of("zombotany", "vasebreaker");
 
@@ -71,7 +75,7 @@ public class QuestMenuController implements BaseController {
     }
 
     List<Quest> templates =
-        GameDataManager.questRepository != null ? GameDataManager.questRepository.getAll() : null;
+            GameDataManager.questRepository != null ? GameDataManager.questRepository.getAll() : null;
     if (templates == null) {
       return;
     }
@@ -92,13 +96,16 @@ public class QuestMenuController implements BaseController {
     }
 
     boolean filtering =
-        pageName != null && !pageName.isBlank() && !pageName.equalsIgnoreCase("all");
+            pageName != null && !pageName.isBlank() && !pageName.equalsIgnoreCase("all");
+
+    List<Quest> sortedQuests = new ArrayList<>(quests);
+    sortedQuests.sort(Comparator.comparingInt(this::priorityRank));
 
     System.out.println(filtering ? "--- Travel Log: " + pageName + " ---" : "--- Travel Log ---");
     boolean printedAny = false;
-    for (Quest quest : quests) {
+    for (Quest quest : sortedQuests) {
       if (filtering
-          && (quest.getCategory() == null
+              && (quest.getCategory() == null
               || !quest.getCategory().toLowerCase().contains(pageName.toLowerCase()))) {
         continue;
       }
@@ -109,6 +116,11 @@ public class QuestMenuController implements BaseController {
     if (!printedAny) {
       System.out.println("No quests found for \"" + pageName + "\".");
     }
+  }
+
+  private int priorityRank(Quest quest) {
+    int index = PRIORITY_ORDER.indexOf(quest.getPriority());
+    return index == -1 ? PRIORITY_ORDER.size() : index;
   }
 
   private void printQuest(Quest quest) {
@@ -122,14 +134,14 @@ public class QuestMenuController implements BaseController {
     }
 
     System.out.println(
-        "  "
-            + quest.getTitle()
-            + " ["
-            + (quest.getCategory() != null ? quest.getCategory() : "general")
-            + "] - "
-            + quest.getCondition()
-            + " - "
-            + status);
+            "  "
+                    + quest.getTitle()
+                    + " ["
+                    + (quest.getCategory() != null ? quest.getCategory() : "general")
+                    + "] - "
+                    + quest.getCondition()
+                    + " - "
+                    + status);
   }
 
   private void handleClaimQuest(String title) {

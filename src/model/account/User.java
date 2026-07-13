@@ -13,7 +13,7 @@ import model.game.quest.Quest;
 public class User {
 
   public static final int MIN_DECK_SLOTS = 6;
-  public static final int MAX_DECK_SLOTS = 7;
+  public static final int MAX_DECK_SLOTS = 8;
 
   private final String gender;
 
@@ -41,6 +41,7 @@ public class User {
   private int diamonds;
   private int difficultyLevel;
   private long lastShopRefreshTime;
+  private long lastDailyDealPurchaseTime;
   private int meowPoints;
 
   public User(String username, String passwordHash, String email, String nickname, String gender) {
@@ -62,6 +63,7 @@ public class User {
     this.newsBox = new AllNews();
     this.quests = new ArrayList<>();
     this.lastShopRefreshTime = 0L;
+    this.lastDailyDealPurchaseTime = 0L;
     this.meowPoints = 0;
     this.plantLevels = new HashMap<>();
     this.selectedDeck = new ArrayList<>();
@@ -98,8 +100,8 @@ public class User {
 
   private boolean hasAlreadyUnlocked(String targetId) {
     return unlockedPlants.contains(targetId)
-        || unlockedZombies.contains(targetId)
-        || unlockedStages.contains(targetId);
+            || unlockedZombies.contains(targetId)
+            || unlockedStages.contains(targetId);
   }
 
   public void setSecurityQuestion(String qNumber, String answer) {
@@ -179,11 +181,11 @@ public class User {
   }
 
   public void addCoins(int amount) {
-    this.coins += amount;
+    this.coins = Math.max(0, this.coins + amount);
   }
 
   public void addDiamonds(int amount) {
-    this.diamonds += amount;
+    this.diamonds = Math.max(0, this.diamonds + amount);
   }
 
   public int getDiamonds() {
@@ -242,6 +244,14 @@ public class User {
     this.lastShopRefreshTime = lastShopRefreshTime;
   }
 
+  public long getLastDailyDealPurchaseTime() {
+    return lastDailyDealPurchaseTime;
+  }
+
+  public void setLastDailyDealPurchaseTime(long lastDailyDealPurchaseTime) {
+    this.lastDailyDealPurchaseTime = lastDailyDealPurchaseTime;
+  }
+
   public int getMeowPoints() {
     return meowPoints;
   }
@@ -298,14 +308,14 @@ public class User {
     }
     if (selectedDeck.size() >= MAX_DECK_SLOTS) {
       return new Result(
-          false, "error: seed bank is full (maximum " + MAX_DECK_SLOTS + " plants)", null);
+              false, "error: seed bank is full (maximum " + MAX_DECK_SLOTS + " plants)", null);
     }
 
     selectedDeck.add(key);
     return new Result(
-        true,
-        plantName + " added to the seed bank (" + selectedDeck.size() + "/" + MAX_DECK_SLOTS + ").",
-        selectedDeck.size());
+            true,
+            plantName + " added to the seed bank (" + selectedDeck.size() + "/" + MAX_DECK_SLOTS + ").",
+            selectedDeck.size());
   }
 
   public Result removeFromDeck(String plantName) {
@@ -349,9 +359,9 @@ public class User {
     diamonds -= 2;
     boostedPlants.add(key);
     return new Result(
-        true,
-        plantName + " boosted! Its Plant Food effect will trigger instantly once planted.",
-        key);
+            true,
+            plantName + " boosted! Its Plant Food effect will trigger instantly once planted.",
+            key);
   }
 
   public boolean isPlantBoosted(String plantName) {

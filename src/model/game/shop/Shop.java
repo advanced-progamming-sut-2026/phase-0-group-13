@@ -12,6 +12,7 @@ import model.enums.ItemCategory;
 
 public class Shop {
   private static final long ONE_DAY_MILLIS = 24L * 60 * 60 * 1000;
+  private static final long MILLIS_PER_DAY = 86400000L;
   private static final int DAILY_DEAL_COUNT = 3;
 
   private final List<ShopItem> allTimeProducts;
@@ -26,24 +27,24 @@ public class Shop {
 
   public void addAllTimeProducts() {
     allTimeProducts.add(
-        new ShopItem("pot_1", 2000, CurrencyType.COIN, -1, ItemCategory.POT, null, false));
+            new ShopItem("pot_1", 2000, CurrencyType.COIN, -1, ItemCategory.POT, null, false));
     allTimeProducts.add(
-        new ShopItem("food_1", 3, CurrencyType.DIAMOND, -1, ItemCategory.PLANT_FOOD, null, false));
+            new ShopItem("food_1", 3, CurrencyType.DIAMOND, -1, ItemCategory.PLANT_FOOD, null, false));
     allTimeProducts.add(
-        new ShopItem(
-            "rand_seed", 1000, CurrencyType.COIN, -1, ItemCategory.RANDOM_SEED, null, false));
+            new ShopItem(
+                    "rand_seed", 1000, CurrencyType.COIN, -1, ItemCategory.RANDOM_SEED, null, false));
     allTimeProducts.add(
-        new ShopItem(
-            "cust_seed", 5, CurrencyType.DIAMOND, -1, ItemCategory.CUSTOM_SEED, null, false));
+            new ShopItem(
+                    "cust_seed", 5, CurrencyType.DIAMOND, -1, ItemCategory.CUSTOM_SEED, null, false));
     allTimeProducts.add(
-        new ShopItem(
-            "currency",
-            5,
-            CurrencyType.DIAMOND,
-            -1,
-            ItemCategory.CURRENCY_CONVERSION,
-            null,
-            false));
+            new ShopItem(
+                    "currency",
+                    5,
+                    CurrencyType.DIAMOND,
+                    -1,
+                    ItemCategory.CURRENCY_CONVERSION,
+                    null,
+                    false));
   }
 
   public List<ShopItem> getAllTimeProducts() {
@@ -61,8 +62,8 @@ public class Shop {
     long last = user.getLastShopRefreshTime();
 
     if (!userDailyDeals.containsKey(user.getUsername())
-        || last == 0
-        || (now - last) >= ONE_DAY_MILLIS) {
+            || last == 0
+            || (now - last) >= ONE_DAY_MILLIS) {
       generateDailyDeals(user, now);
       if ((now - last) >= ONE_DAY_MILLIS || last == 0) {
         user.setLastShopRefreshTime(now);
@@ -79,14 +80,14 @@ public class Shop {
 
     if (unlocked == null || unlocked.isEmpty()) {
       daily.add(
-          new ShopItem(
-              "daily_seed_peashooter",
-              1600,
-              CurrencyType.COIN,
-              1,
-              ItemCategory.RANDOM_SEED,
-              null,
-              true));
+              new ShopItem(
+                      "daily_seed_peashooter",
+                      1600,
+                      CurrencyType.COIN,
+                      1,
+                      ItemCategory.RANDOM_SEED,
+                      null,
+                      true));
     } else {
       List<String> pool = new ArrayList<>(unlocked);
       for (int i = 0; i < DAILY_DEAL_COUNT && !pool.isEmpty(); i++) {
@@ -94,7 +95,7 @@ public class Shop {
         String chosen = pool.remove(pickIndex);
         String itemId = "daily_seed_" + chosen;
         daily.add(
-            new ShopItem(itemId, 1600, CurrencyType.COIN, 1, ItemCategory.RANDOM_SEED, null, true));
+                new ShopItem(itemId, 1600, CurrencyType.COIN, 1, ItemCategory.RANDOM_SEED, null, true));
       }
     }
     userDailyDeals.put(user.getUsername(), daily);
@@ -107,6 +108,9 @@ public class Shop {
     ShopItem item = findItem(user, itemId);
     if (item == null) return new Result(false, "error: item not found", null);
     if (!item.isAvailable()) return new Result(false, "error: item out of stock", null);
+
+    Result dailyCheck = checkDailyDealNotAlreadyBought(user, item);
+    if (!dailyCheck.success()) return dailyCheck;
 
     int totalCost = item.getPrice() * count;
     if (item.getCurrencyType() == CurrencyType.COIN) {
@@ -127,7 +131,24 @@ public class Shop {
 
     for (int i = 0; i < count; i++) item.decreaseStock();
 
+    if (item.isDaily()) {
+      user.setLastDailyDealPurchaseTime(System.currentTimeMillis());
+    }
+
     return new Result(true, effectResult.message(), item);
+  }
+
+
+  private Result checkDailyDealNotAlreadyBought(User user, ShopItem item) {
+    if (!item.isDaily()) {
+      return new Result(true, "ok", null);
+    }
+    long today = System.currentTimeMillis() / MILLIS_PER_DAY;
+    long lastPurchaseDay = user.getLastDailyDealPurchaseTime() / MILLIS_PER_DAY;
+    if (today == lastPurchaseDay) {
+      return new Result(false, "error: you already bought today's daily deal", null);
+    }
+    return new Result(true, "ok", null);
   }
 
   private Result applyPurchaseEffect(User user, ShopItem item, int count, String plantTypeParam) {
@@ -135,7 +156,7 @@ public class Shop {
       case POT:
         if (!user.getInventory().canAdd("pot", count)) {
           return new Result(
-              false, "error: greenhouse already has the maximum number of pots", null);
+                  false, "error: greenhouse already has the maximum number of pots", null);
         }
         for (int i = 0; i < count; i++) user.getGreenHouse().unlockNextPot();
         user.getInventory().addItem("pot", count);
@@ -159,7 +180,7 @@ public class Shop {
           return new Result(false, "error: no unlocked plants available to grant", null);
         user.getInventory().addItem("seed_" + seedId, count * 10);
         return new Result(
-            true, "Bought " + count + "x seed pack(s) (10 seeds each) for: " + seedId, null);
+                true, "Bought " + count + "x seed pack(s) (10 seeds each) for: " + seedId, null);
 
       case CUSTOM_SEED:
         if (plantTypeParam == null || plantTypeParam.trim().isEmpty()) {
@@ -171,7 +192,7 @@ public class Shop {
         }
         user.getInventory().addItem("seed_" + customName, count * 10);
         return new Result(
-            true, "Bought " + count + "x seed pack(s) (10 seeds each) for: " + customName, null);
+                true, "Bought " + count + "x seed pack(s) (10 seeds each) for: " + customName, null);
 
       default:
         return new Result(false, "error: unknown item category", null);
