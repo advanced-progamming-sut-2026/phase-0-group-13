@@ -31,8 +31,8 @@ public class UserManager {
   }
 
   public void registerUser(
-      String username, String password, String nickname, String email, String gender)
-      throws Exception {
+          String username, String password, String nickname, String email, String gender)
+          throws Exception {
     for (User u : users) {
       if (u.getUsername().equals(username)) {
         throw new Exception("error: username already exists");
@@ -118,8 +118,8 @@ public class UserManager {
     this.recoveryUser = foundUser;
 
     return "Your security question is number "
-        + foundUser.getSecurityQuestionNumber()
-        + ". Please answer it:";
+            + foundUser.getSecurityQuestionNumber()
+            + ". Please answer it:";
   }
 
   public void verifyRecoveryAnswer(String answer) throws Exception {
@@ -156,6 +156,7 @@ public class UserManager {
     }
   }
 
+
   public boolean restoreSession() {
     String savedUsername = jsonSerializer.readFromFile(getSessionFilePath(), String.class);
     if (savedUsername == null || savedUsername.isEmpty()) {
@@ -187,6 +188,10 @@ public class UserManager {
 
   public User getCurrentUser() {
     return this.currentUser;
+  }
+
+  public List<User> getAllUsers() {
+    return this.users;
   }
 
   public void changeUsername(String newUsername) throws Exception {

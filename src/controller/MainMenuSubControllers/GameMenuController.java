@@ -1,8 +1,8 @@
 package controller.MainMenuSubControllers;
 
+import java.util.regex.Matcher;
 import controller.BaseController;
 import data.persistence.UserManager;
-import java.util.regex.Matcher;
 import model.account.AdventureMap;
 import model.account.User;
 import model.core.App;
@@ -26,9 +26,9 @@ public class GameMenuController implements BaseController {
     } else if (GameMenuCommands.GreenHouse.getMatcher(command) != null) {
       App.setCurrentMenu(Menu.GreenHouseMenu);
     } else if (GameMenuCommands.TravelLog.getMatcher(command) != null) {
-      System.out.println("Travel log is not available yet.");
+      changeMenu("Travel Log", Menu.QuestMenu);
     } else if (GameMenuCommands.LeaderBoard.getMatcher(command) != null) {
-      System.out.println("Leaderboard is not available yet.");
+      changeMenu("Leaderboard", Menu.ScoreBoardMenu);
     } else if (GameMenuCommands.CoinWallet.getMatcher(command) != null) {
       handleShowWallet("coin");
     } else if (GameMenuCommands.GemWallet.getMatcher(command) != null) {
@@ -66,18 +66,14 @@ public class GameMenuController implements BaseController {
     Integer stageNumber = parseStageNumber(chapterName);
     if (stageNumber == null || stageNumber < 1 || stageNumber > AdventureMap.MAX_STAGES) {
       System.out.println(
-          "error: unknown chapter \""
-              + chapterName
-              + "\" (valid chapters are 1-"
-              + AdventureMap.MAX_STAGES
-              + ")");
+              "error: unknown chapter \"" + chapterName + "\" (valid chapters are 1-" + AdventureMap.MAX_STAGES + ")");
       return;
     }
 
     String stageKey = "stage_" + stageNumber;
     if (!user.getUnlockedStages().contains(stageKey)) {
       System.out.println(
-          "error: chapter " + stageNumber + " is locked. Clear the previous chapter first.");
+              "error: chapter " + stageNumber + " is locked. Clear the previous chapter first.");
       return;
     }
 
@@ -85,14 +81,11 @@ public class GameMenuController implements BaseController {
     MatchSetup.getInstance().setTargetChapter(chapterName);
 
     System.out.println(
-        "Entering " + chapterName + ". Choose your plants for the Seed Bank before starting.");
+            "Entering " + chapterName + ". Choose your plants for the Seed Bank before starting.");
     changeMenu("Plant Selection Menu", Menu.PlantSelectionMenu);
   }
 
-  /**
-   * Extracts the numeric stage id from a chapter name typed by the player. Accepts plain numbers
-   * ("1") as well as "chapter 1", "stage 1", "stage-1", "stage_1", etc.
-   */
+
   private Integer parseStageNumber(String chapterName) {
     if (chapterName == null) {
       return null;
