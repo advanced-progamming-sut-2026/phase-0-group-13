@@ -6,7 +6,6 @@ import model.enums.Commands.MenuCommands;
 import model.enums.Menu;
 import view.BaseMenu;
 
-
 public class ThreadMenuView implements BaseMenu {
   @Override
   public void check(Scanner scanner) {

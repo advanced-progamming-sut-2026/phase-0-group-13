@@ -52,16 +52,41 @@ public class Quest {
     this.rewardClaimed = false;
   }
 
-  public String getTitle() { return title; }
-  public String getCategory() { return category; }
-  public String getCondition() { return condition; }
-  public String getRewardType() { return rewardType; }
-  public String getPriority() { return priority; }
-  public String getVariable() { return variable; }
-  public boolean isCompleted() { return isCompleted; }
-  public double getProgressOfQuest() { return progressOfQuest; }
-  public boolean isRewardClaimed() { return rewardClaimed; }
+  public String getTitle() {
+    return title;
+  }
 
+  public String getCategory() {
+    return category;
+  }
+
+  public String getCondition() {
+    return condition;
+  }
+
+  public String getRewardType() {
+    return rewardType;
+  }
+
+  public String getPriority() {
+    return priority;
+  }
+
+  public String getVariable() {
+    return variable;
+  }
+
+  public boolean isCompleted() {
+    return isCompleted;
+  }
+
+  public double getProgressOfQuest() {
+    return progressOfQuest;
+  }
+
+  public boolean isRewardClaimed() {
+    return rewardClaimed;
+  }
 
   public void addProgress(double amount, double target) {
     if (isCompleted) return;
@@ -75,7 +100,8 @@ public class Quest {
   }
 
   public void start() {
-    // مثلا وقتی این و بزنیم یه کوئست شروع میشه به بررسی شذن ( یعنی مثلا تو لیست کوست ها هستش و روند شو چک میکنیم
+    // مثلا وقتی این و بزنیم یه کوئست شروع میشه به بررسی شذن ( یعنی مثلا تو لیست کوست ها هستش و روند
+    // شو چک میکنیم
     // که مثلا چند درصد پیشرفت هست یا هرچیزی
   }
 
@@ -83,7 +109,6 @@ public class Quest {
     // وقتی کامل بشه اینجا یا خروجی ای میدیم یا هرچیزی
     this.isCompleted = true;
   }
-
 
   public void claimReward(User user) {
     if (!isCompleted || rewardClaimed) return;

@@ -1,8 +1,8 @@
 package controller.MainMenuSubControllers;
 
-import java.util.regex.Matcher;
 import controller.BaseController;
 import data.persistence.UserManager;
+import java.util.regex.Matcher;
 import model.account.AdventureMap;
 import model.account.User;
 import model.core.App;
@@ -66,14 +66,18 @@ public class GameMenuController implements BaseController {
     Integer stageNumber = parseStageNumber(chapterName);
     if (stageNumber == null || stageNumber < 1 || stageNumber > AdventureMap.MAX_STAGES) {
       System.out.println(
-              "error: unknown chapter \"" + chapterName + "\" (valid chapters are 1-" + AdventureMap.MAX_STAGES + ")");
+          "error: unknown chapter \""
+              + chapterName
+              + "\" (valid chapters are 1-"
+              + AdventureMap.MAX_STAGES
+              + ")");
       return;
     }
 
     String stageKey = "stage_" + stageNumber;
     if (!user.getUnlockedStages().contains(stageKey)) {
       System.out.println(
-              "error: chapter " + stageNumber + " is locked. Clear the previous chapter first.");
+          "error: chapter " + stageNumber + " is locked. Clear the previous chapter first.");
       return;
     }
 
@@ -81,10 +85,9 @@ public class GameMenuController implements BaseController {
     MatchSetup.getInstance().setTargetChapter(chapterName);
 
     System.out.println(
-            "Entering " + chapterName + ". Choose your plants for the Seed Bank before starting.");
+        "Entering " + chapterName + ". Choose your plants for the Seed Bank before starting.");
     changeMenu("Plant Selection Menu", Menu.PlantSelectionMenu);
   }
-
 
   private Integer parseStageNumber(String chapterName) {
     if (chapterName == null) {

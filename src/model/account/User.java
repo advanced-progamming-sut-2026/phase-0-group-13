@@ -28,8 +28,8 @@ public class User {
   private final List<Quest> quests;
 
   private final Map<String, Integer> plantLevels;
-  private final transient List<String> selectedDeck;
-  private final transient List<String> boostedPlants;
+  private final List<String> selectedDeck;
+  private final List<String> boostedPlants;
 
   private String username;
   private String passwordHash;
@@ -360,5 +360,21 @@ public class User {
 
   public List<String> getBoostedPlants() {
     return boostedPlants;
+  }
+
+  public Result addFreeBoost(String plantName) {
+    if (plantName == null || plantName.trim().isEmpty()) {
+      return new Result(false, "error: invalid plant name", null);
+    }
+    String key = plantName.toLowerCase().trim();
+    if (!hasUnlockedPlant(key)) {
+      return new Result(false, "error: you haven't unlocked " + plantName + " yet", null);
+    }
+    if (boostedPlants.contains(key)) {
+      return new Result(false, plantName + " is already boosted.", null);
+    }
+
+    boostedPlants.add(key);
+    return new Result(true, plantName + " free boost stored!", key);
   }
 }

@@ -8,8 +8,7 @@ public enum QuestMenuCommands implements Command {
   ShowQuests("show\\s+quests"),
   ClaimQuest("claim\\s+quest\\s+-t\\s+(?<title>.+)"),
   ShowMiniGames("show\\s+mini-games"),
-  PlayMiniGame("play\\s+mini-game\\s+-n\\s+(?<name>.+)");
-
+  PlayMiniGame("play\\s+mini-game\\s+-n\\s+(?<name>\\S+)\\s+-l\\s+(?<level>\\d+)");
   private final String pattern;
 
   QuestMenuCommands(String pattern) {

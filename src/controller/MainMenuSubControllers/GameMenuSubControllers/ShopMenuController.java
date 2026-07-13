@@ -22,7 +22,6 @@ public class ShopMenuController implements BaseController {
 
   @Override
   public void initController() {
-
     User currentUser = UserManager.getInstance().getCurrentUser();
     if (currentUser != null) {
       shop.refreshDailyDealsIfNeeded(currentUser);
@@ -41,7 +40,7 @@ public class ShopMenuController implements BaseController {
     if (ShopMenuCommands.List.getMatcher(command) != null) {
       handleList();
     } else if (ShopMenuCommands.Daily.getMatcher(command) != null) {
-      handleDaily();
+      handleDaily(currentUser);
     } else if ((matcher = ShopMenuCommands.Buy.getMatcher(command)) != null) {
       String countStr = matcher.group("count");
       int count;
@@ -68,9 +67,10 @@ public class ShopMenuController implements BaseController {
     }
   }
 
-  private void handleDaily() {
+  private void handleDaily(User currentUser) {
+    if (currentUser == null) return;
     System.out.println("--- Daily Products ---");
-    for (ShopItem item : shop.getDailyTimeProducts()) {
+    for (ShopItem item : shop.getDailyTimeProducts(currentUser)) {
       printItem(item);
     }
   }
