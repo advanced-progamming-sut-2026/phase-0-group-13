@@ -4,28 +4,33 @@ public class Pot {
   private boolean isUnlocked;
   private String plantedSeedId;
   private long plantTime;
+  private long growthDurationMillis;
 
-  public static final long DEFAULT_GROWTH_DURATION_MILLIS = 30L * 60 * 1000;
+  public static final long MARIGOLD_GROWTH = 2L * 60 * 60 * 1000;
+  public static final long RANDOM_GROWTH = 8L * 60 * 60 * 1000;
 
   public Pot(boolean isUnlocked) {
     this.isUnlocked = isUnlocked;
     this.plantedSeedId = null;
     this.plantTime = 0;
+    this.growthDurationMillis = 0;
   }
 
   public void unlock() {
     this.isUnlocked = true;
   }
 
-  public void plant(String seedId) {
+  public void plant(String seedId, long durationMillis) {
     if (!isUnlocked) return;
     this.plantedSeedId = seedId;
+    this.growthDurationMillis = durationMillis;
     this.plantTime = System.currentTimeMillis();
   }
 
   public void collect() {
     this.plantedSeedId = null;
     this.plantTime = 0;
+    this.growthDurationMillis = 0;
   }
 
   public long getElapsedGrowTime() {
@@ -33,37 +38,25 @@ public class Pot {
     return System.currentTimeMillis() - plantTime;
   }
 
-  public long getRemainingGrowTime(long growthDurationMillis) {
+  public long getRemainingGrowTime() {
     if (isEmpty()) return 0;
     long remaining = growthDurationMillis - getElapsedGrowTime();
     return Math.max(0, remaining);
   }
 
-  public long getRemainingGrowTime() {
-    return getRemainingGrowTime(DEFAULT_GROWTH_DURATION_MILLIS);
-  }
-
-  public double getGrowthProgress(long growthDurationMillis) {
+  public double getGrowthProgress() {
     if (isEmpty() || growthDurationMillis <= 0) return 0.0;
     double progress = (double) getElapsedGrowTime() / (double) growthDurationMillis;
     return Math.max(0.0, Math.min(1.0, progress));
   }
 
-  public double getGrowthProgress() {
-    return getGrowthProgress(DEFAULT_GROWTH_DURATION_MILLIS);
-  }
-
-  public boolean isFullyGrown(long growthDurationMillis) {
-    return !isEmpty() && getElapsedGrowTime() >= growthDurationMillis;
-  }
-
   public boolean isFullyGrown() {
-    return isFullyGrown(DEFAULT_GROWTH_DURATION_MILLIS);
+    return !isEmpty() && getElapsedGrowTime() >= growthDurationMillis;
   }
 
   public void forceFinishGrowth() {
     if (isEmpty()) return;
-    this.plantTime = System.currentTimeMillis() - DEFAULT_GROWTH_DURATION_MILLIS;
+    this.plantTime = System.currentTimeMillis() - growthDurationMillis;
   }
 
   public boolean isUnlocked() {
@@ -76,9 +69,5 @@ public class Pot {
 
   public String getPlantedSeedId() {
     return plantedSeedId;
-  }
-
-  public long getPlantTime() {
-    return plantTime;
   }
 }

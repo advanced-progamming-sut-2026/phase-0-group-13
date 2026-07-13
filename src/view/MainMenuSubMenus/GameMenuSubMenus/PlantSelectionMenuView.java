@@ -1,7 +1,8 @@
-package view;
+package view.MainMenuSubMenus.GameMenuSubMenus;
 
 import controller.MainMenuSubControllers.GameMenuSubControllers.PlantSelectionMenuController;
 import java.util.Scanner;
+import view.BaseMenu;
 
 public class PlantSelectionMenuView implements BaseMenu {
   private final PlantSelectionMenuController plantSelectionMenuController;

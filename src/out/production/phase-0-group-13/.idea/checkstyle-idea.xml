@@ -6,7 +6,7 @@
     <copyLibs>true</copyLibs>
     <option name="thirdPartyClasspath" />
     <option name="activeLocationIds">
-      <option value="bundled-google-checks" />
+      <option value="992e7507-0f81-4227-b287-62d0fb669742" />
     </option>
     <option name="locations">
       <list>
@@ -21,6 +21,7 @@
             </map>
           </option>
         </ConfigurationLocation>
+        <ConfigurationLocation id="992e7507-0f81-4227-b287-62d0fb669742" type="LOCAL_FILE" scope="All" description="sharif">C:\Users\amirh\Desktop\phase-0-group-13\sharif_checkstyle.xml</ConfigurationLocation>
       </list>
     </option>
   </component>

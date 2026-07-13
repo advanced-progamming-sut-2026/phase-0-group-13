@@ -20,29 +20,18 @@ public class ScoreBoardMenuController implements BaseController {
   @Override
   public void handleinput(String command) {
     if (ScoreBoardMenuCommands.SortByHighScore.getMatcher(command) != null) {
-      handleShow("High Score", Comparator.comparingInt(this::meowPoints).reversed(), this::meowPoints);
+      handleShow("High Score (MyoPoints)", Comparator.comparingInt(this::meowPoints).reversed());
     } else if (ScoreBoardMenuCommands.SortByLastPassedLevel.getMatcher(command) != null) {
-      handleShow(
-              "Last Passed Level",
-              Comparator.comparingInt(this::stageLevelScore).reversed(),
-              this::stageLevelScore);
+      handleShow("Last Passed Level", Comparator.comparingInt(this::stageLevelScore).reversed());
     } else if (ScoreBoardMenuCommands.SortByMiniGames.getMatcher(command) != null) {
-      handleShow(
-              "Mini-Games Cleared",
-              Comparator.comparingInt(this::miniGamesCleared).reversed(),
-              this::miniGamesCleared);
+      handleShow("Mini-Games Cleared", Comparator.comparingInt(this::miniGamesCleared).reversed());
     } else if (ScoreBoardMenuCommands.SortByQuests.getMatcher(command) != null) {
-      handleShow(
-              "Quests Completed",
-              Comparator.comparingInt(this::completedQuests).reversed(),
-              this::completedQuests);
+      handleShow("Quests Completed", Comparator.comparingInt(this::completedQuests).reversed());
     } else if (ScoreBoardMenuCommands.SortByDailyQuests.getMatcher(command) != null) {
       handleShow(
-              "Daily Quests Completed",
-              Comparator.comparingInt(this::completedDailyQuests).reversed(),
-              this::completedDailyQuests);
+          "Daily Quests Completed", Comparator.comparingInt(this::completedDailyQuests).reversed());
     } else if (MenuCommands.ShowCurrentMenu.getMatcher(command) != null) {
-      System.out.println("Leaderboard");
+      System.out.println("Leaderboard Menu (Score Board)");
     } else if (MenuCommands.ExitMenu.getMatcher(command) != null) {
       exit();
     } else {
@@ -50,22 +39,36 @@ public class ScoreBoardMenuController implements BaseController {
     }
   }
 
-  private void handleShow(
-          String label, Comparator<User> comparator, java.util.function.ToIntFunction<User> valueOf) {
+  private void handleShow(String label, Comparator<User> primaryComparator) {
     List<User> ranked = new ArrayList<>(UserManager.getInstance().getAllUsers());
     if (ranked.isEmpty()) {
       System.out.println("No registered users yet.");
       return;
     }
 
-    ranked.sort(comparator);
+    Comparator<User> finalComparator = primaryComparator.thenComparing(User::getUsername);
+    ranked.sort(finalComparator);
 
-    System.out.println("--- Leaderboard: " + label + " ---");
+    System.out.println("\n--- Global Leaderboard (Sorted by: " + label + ") ---");
+    System.out.printf(
+        "%-5s | %-15s | %-10s | %-10s | %-10s | %-15s%n",
+        "Rank", "Username", "MyoPoints", "Stages", "MiniGames", "Quests(Tot/Day)");
+    System.out.println("-".repeat(78));
+
     int rank = 1;
     for (User user : ranked) {
-      System.out.println("  " + rank + ". " + user.getUsername() + " - " + valueOf.applyAsInt(user));
+      System.out.printf(
+          "%-5d | %-15s | %-10d | %-10d | %-10d | %d / %d%n",
+          rank,
+          user.getUsername(),
+          meowPoints(user),
+          stageLevelScore(user),
+          miniGamesCleared(user),
+          completedQuests(user),
+          completedDailyQuests(user));
       rank++;
     }
+    System.out.println();
   }
 
   private int meowPoints(User user) {
@@ -73,6 +76,7 @@ public class ScoreBoardMenuController implements BaseController {
   }
 
   private int stageLevelScore(User user) {
+    // فرض بر این است که در کلاس Progress این متدها وجود دارند
     return user.getProgress().getMaxClearedStage() * 100 + user.getProgress().getMaxClearedLevel();
   }
 
@@ -92,8 +96,8 @@ public class ScoreBoardMenuController implements BaseController {
     int count = 0;
     for (Quest quest : user.getQuests()) {
       if (quest.isCompleted()
-              && quest.getCategory() != null
-              && (quest.getCategory().toLowerCase().contains("daily")
+          && quest.getCategory() != null
+          && (quest.getCategory().toLowerCase().contains("daily")
               || quest.getCategory().contains("روزانه"))) {
         count++;
       }

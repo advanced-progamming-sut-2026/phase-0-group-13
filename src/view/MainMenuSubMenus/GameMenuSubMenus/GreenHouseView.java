@@ -14,8 +14,8 @@ public class GreenHouseView implements BaseMenu {
   @Override
   public void check(Scanner scanner) {
     System.out.println(
-        "GreenHouse Menu. Use 'show greenhouse', 'plant pot at (<index>, <seedId>)', "
-            + "'collect (<index>, _)', 'grow (<index>, _)', 'enter shop', or 'menu exit'.");
+        "GreenHouse Menu. Use 'show greenhouse', 'plant pot at (<x>, <y>)', "
+            + "'collect (<x>, <y>)', 'grow (<x>, <y>)', 'enter shop', or 'menu exit'.");
 
     String input = scanner.nextLine();
     greenHouseMenuController.handleinput(input);

@@ -14,9 +14,9 @@ public class QuestView implements BaseMenu {
   @Override
   public void check(Scanner scanner) {
     System.out.println(
-            "Travel Log. Use 'show quests', 'travel log page <category>', "
-                    + "'claim quest -t <title>', 'show mini-games', 'play mini-game -n <name>', "
-                    + "or 'menu exit'.");
+        "Travel Log. Use 'show quests', 'travel log page <category>', "
+            + "'claim quest -t <title>', 'show mini-games', 'play mini-game -n <name>', "
+            + "or 'menu exit'.");
 
     String input = scanner.nextLine();
     questMenuController.handleinput(input);
