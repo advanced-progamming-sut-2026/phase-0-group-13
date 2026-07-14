@@ -27,9 +27,9 @@ public class GreenHouseMenuController implements BaseController {
     } else if ((matcher = GreenHouseMenuCommands.PlantPot.getMatcher(command)) != null) {
       handlePlant(matcher.group("x"), matcher.group("y"));
     } else if ((matcher = GreenHouseMenuCommands.Collect.getMatcher(command)) != null) {
-      handleCollect(matcher.group("x"));
+      handleCollect(matcher.group("x"), matcher.group("y"));
     } else if ((matcher = GreenHouseMenuCommands.Grow.getMatcher(command)) != null) {
-      handleGrow(matcher.group("x"));
+      handleGrow(matcher.group("x"), matcher.group("y"));
     } else if (GreenHouseMenuCommands.EnterShop.getMatcher(command) != null) {
       App.setCurrentMenu(Menu.ShopMenu);
     } else if (MenuCommands.ShowCurrentMenu.getMatcher(command) != null) {
@@ -57,6 +57,11 @@ public class GreenHouseMenuController implements BaseController {
     }
   }
 
+  private int getIndexFromCoordinates(int x, int y) {
+    if (x < 1 || x > 5 || y < 1 || y > 4) return -1;
+    return (y - 1) * 5 + (x - 1);
+  }
+
   private void handleShow() {
     User user = requireUser();
     if (user == null) return;
@@ -74,16 +79,22 @@ public class GreenHouseMenuController implements BaseController {
       Pot pot = pots.get(i);
       if (!pot.isUnlocked()) continue;
 
+      int x = (i % 5) + 1;
+      int y = (i / 5) + 1;
+
       if (pot.isEmpty()) {
-        System.out.println("  [" + i + "] empty");
+        System.out.println("  (" + x + ", " + y + ") empty");
       } else if (pot.isFullyGrown()) {
-        System.out.println("  [" + i + "] " + pot.getPlantedSeedId() + " - ready to collect!");
+        System.out.println(
+            "  (" + x + ", " + y + ") " + pot.getPlantedSeedId() + " - [READY TO HARVEST]");
       } else {
         long remainingSec = pot.getRemainingGrowTime() / 1000;
         System.out.println(
-            "  ["
-                + i
-                + "] "
+            "  ("
+                + x
+                + ", "
+                + y
+                + ") "
                 + pot.getPlantedSeedId()
                 + " - growing ("
                 + Math.round(pot.getGrowthProgress() * 100)
@@ -98,45 +109,81 @@ public class GreenHouseMenuController implements BaseController {
     User user = requireUser();
     if (user == null) return;
 
-    int index = parseIndex(xStr);
-    String seedId = yStr;
+    int x = parseIndex(xStr);
+    int y = parseIndex(yStr);
+    int index = getIndexFromCoordinates(x, y);
 
-    Result result = user.getGreenHouse().plantSeed(index, seedId);
+    if (index == -1) {
+      System.out.println("error: coordinates out of bounds (x:1-5, y:1-4)");
+      return;
+    }
+
+    Result result = user.getGreenHouse().plantSeed(index, user);
     System.out.println(result.message());
     saveIfSuccess(result);
   }
 
-  private void handleCollect(String xStr) {
+  private void handleCollect(String xStr, String yStr) {
     User user = requireUser();
     if (user == null) return;
 
-    int index = parseIndex(xStr);
+    int x = parseIndex(xStr);
+    int y = parseIndex(yStr);
+    int index = getIndexFromCoordinates(x, y);
+
+    if (index == -1) {
+      System.out.println("error: coordinates out of bounds");
+      return;
+    }
+
     Result result = user.getGreenHouse().collectSeed(index);
     System.out.println(result.message());
 
     if (result.success()) {
       String seedId = (String) result.getObject();
-      user.getInventory().addItem("seed_" + seedId, 1);
+      if ("marigold".equalsIgnoreCase(seedId)) {
+        user.addCoins(500);
+        System.out.println("You earned 500 coins from the Marigold!");
+      } else {
+        Result boostRes = user.addFreeBoost(seedId);
+        System.out.println("Harvested a boost for " + seedId + ": " + boostRes.message());
+      }
       saveIfSuccess(result);
     }
   }
 
-  private void handleGrow(String xStr) {
+  private void handleGrow(String xStr, String yStr) {
     User user = requireUser();
     if (user == null) return;
 
-    int index = parseIndex(xStr);
+    int x = parseIndex(xStr);
+    int y = parseIndex(yStr);
+    int index = getIndexFromCoordinates(x, y);
 
-    if (!user.getInventory().consumeItem("plant_food", 1)) {
-      System.out.println("error: you don't have any plant food");
+    if (index == -1) {
+      System.out.println("error: coordinates out of bounds");
       return;
     }
 
-    Result result = user.getGreenHouse().forceGrow(index);
-    if (!result.success()) {
-      user.getInventory().addItem("plant_food", 1);
+    Pot pot = user.getGreenHouse().getPotAt(index);
+    if (pot == null || pot.isEmpty() || pot.isFullyGrown()) {
+      System.out.println("error: invalid pot for growing");
+      return;
     }
+
+    long remainingMs = pot.getRemainingGrowTime();
+    int requiredDiamonds = (int) Math.ceil(remainingMs / (double) (60 * 60 * 1000));
+
+    if (user.getDiamonds() < requiredDiamonds) {
+      System.out.println("error: not enough diamonds. You need " + requiredDiamonds + " diamonds.");
+      return;
+    }
+
+    user.addDiamonds(-requiredDiamonds);
+    Result result = user.getGreenHouse().forceGrow(index);
+
     System.out.println(result.message());
+    System.out.println("Spent " + requiredDiamonds + " diamonds to instantly grow the plant.");
     saveIfSuccess(result);
   }
 

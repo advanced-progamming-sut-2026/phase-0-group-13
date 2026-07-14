@@ -26,9 +26,9 @@ public class GameMenuController implements BaseController {
     } else if (GameMenuCommands.GreenHouse.getMatcher(command) != null) {
       App.setCurrentMenu(Menu.GreenHouseMenu);
     } else if (GameMenuCommands.TravelLog.getMatcher(command) != null) {
-      System.out.println("Travel log is not available yet.");
+      changeMenu("Travel Log", Menu.QuestMenu);
     } else if (GameMenuCommands.LeaderBoard.getMatcher(command) != null) {
-      System.out.println("Leaderboard is not available yet.");
+      changeMenu("Leaderboard", Menu.ScoreBoardMenu);
     } else if (GameMenuCommands.CoinWallet.getMatcher(command) != null) {
       handleShowWallet("coin");
     } else if (GameMenuCommands.GemWallet.getMatcher(command) != null) {
@@ -89,10 +89,6 @@ public class GameMenuController implements BaseController {
     changeMenu("Plant Selection Menu", Menu.PlantSelectionMenu);
   }
 
-  /**
-   * Extracts the numeric stage id from a chapter name typed by the player. Accepts plain numbers
-   * ("1") as well as "chapter 1", "stage 1", "stage-1", "stage_1", etc.
-   */
   private Integer parseStageNumber(String chapterName) {
     if (chapterName == null) {
       return null;

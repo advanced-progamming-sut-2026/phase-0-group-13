@@ -1,7 +1,8 @@
-package view;
+package view.MainMenuSubMenus;
 
 import controller.MainMenuSubControllers.GameMenuSubControllers.CollectionMenuController;
 import java.util.Scanner;
+import view.BaseMenu;
 
 public class CollectionMenuView implements BaseMenu {
   private final CollectionMenuController collectionMenuController;

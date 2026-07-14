@@ -39,6 +39,19 @@ public class Quest {
     this.rewardClaimed = false;
   }
 
+  /** Clones a shared quest template into a fresh, per-user progress instance. */
+  public Quest(Quest template) {
+    this.title = template.title;
+    this.category = template.category;
+    this.condition = template.condition;
+    this.rewardType = template.rewardType;
+    this.priority = template.priority;
+    this.variable = template.variable;
+    this.progressOfQuest = 0.0;
+    this.isCompleted = false;
+    this.rewardClaimed = false;
+  }
+
   public String getTitle() {
     return title;
   }
@@ -65,6 +78,14 @@ public class Quest {
 
   public boolean isCompleted() {
     return isCompleted;
+  }
+
+  public double getProgressOfQuest() {
+    return progressOfQuest;
+  }
+
+  public boolean isRewardClaimed() {
+    return rewardClaimed;
   }
 
   public void addProgress(double amount, double target) {

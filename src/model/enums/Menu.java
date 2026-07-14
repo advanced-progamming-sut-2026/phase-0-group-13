@@ -2,12 +2,8 @@ package model.enums;
 
 import java.util.Scanner;
 import view.*;
-import view.MainMenuSubMenus.GameMenuSubMenus.GreenHouseView;
-import view.MainMenuSubMenus.GameMenuSubMenus.ShopView;
-import view.MainMenuSubMenus.GameMenuView;
-import view.MainMenuSubMenus.NewsMenuView;
-import view.MainMenuSubMenus.ProfileMenuView;
-import view.MainMenuSubMenus.SettingsMenuView;
+import view.MainMenuSubMenus.*;
+import view.MainMenuSubMenus.GameMenuSubMenus.*;
 
 public enum Menu {
   MainMenu(new MainMenuView()),
@@ -17,6 +13,8 @@ public enum Menu {
   CollectionMenu(new CollectionMenuView()),
   PlantSelectionMenu(new PlantSelectionMenuView()),
   GamePlayMenu(new GamePlayView()),
+  QuestMenu(new QuestView()),
+  ScoreBoardMenu(new ScoreBoardMenuView()),
   NewsMenu(new NewsMenuView()),
   SettingsMenu(new SettingsMenuView()),
   ProfileMenu(new ProfileMenuView()),

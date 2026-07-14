@@ -189,6 +189,10 @@ public class UserManager {
     return this.currentUser;
   }
 
+  public List<User> getAllUsers() {
+    return this.users;
+  }
+
   public void changeUsername(String newUsername) throws Exception {
     if (this.currentUser == null) throw new Exception("error: no user is currently logged in");
     if (this.currentUser.getUsername().equals(newUsername)) {

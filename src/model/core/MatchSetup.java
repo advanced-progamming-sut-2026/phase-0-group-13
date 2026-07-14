@@ -1,20 +1,24 @@
 package model.core;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import model.enums.MiniGameType;
 
 public class MatchSetup {
-
   private static MatchSetup instance;
 
   private String targetChapter;
   private List<String> selectedPlants;
   private List<String> boostedPlants;
 
+  private MiniGameType currentMiniGame;
+  private int miniGameLevel;
+
   private MatchSetup() {
-    this.selectedPlants = new ArrayList<>();
-    this.boostedPlants = new ArrayList<>();
+    selectedPlants = new ArrayList<>();
+    boostedPlants = new ArrayList<>();
+    currentMiniGame = MiniGameType.NONE;
+    miniGameLevel = 1;
   }
 
   public static MatchSetup getInstance() {
@@ -24,33 +28,38 @@ public class MatchSetup {
     return instance;
   }
 
-  public void setTargetChapter(String chapter) {
-    this.targetChapter = chapter;
+  public void setTargetChapter(String targetChapter) {
+    this.targetChapter = targetChapter;
+    this.currentMiniGame = MiniGameType.NONE;
   }
 
-  public String getTargetChapter() {
-    return targetChapter;
+  public void setMiniGame(MiniGameType type, int level) {
+    this.currentMiniGame = type;
+    this.miniGameLevel = level;
+    this.targetChapter = null;
+  }
+
+  public MiniGameType getCurrentMiniGame() {
+    return currentMiniGame;
+  }
+
+  public int getMiniGameLevel() {
+    return miniGameLevel;
   }
 
   public void setSelectedPlants(List<String> plants) {
-    this.selectedPlants = plants == null ? new ArrayList<>() : new ArrayList<>(plants);
+    this.selectedPlants = plants;
   }
 
   public List<String> getSelectedPlants() {
-    return Collections.unmodifiableList(selectedPlants);
+    return selectedPlants;
   }
 
   public void setBoostedPlants(List<String> plants) {
-    this.boostedPlants = plants == null ? new ArrayList<>() : new ArrayList<>(plants);
+    this.boostedPlants = plants;
   }
 
   public List<String> getBoostedPlants() {
-    return Collections.unmodifiableList(boostedPlants);
-  }
-
-  public void clear() {
-    this.targetChapter = null;
-    this.selectedPlants.clear();
-    this.boostedPlants.clear();
+    return boostedPlants;
   }
 }
