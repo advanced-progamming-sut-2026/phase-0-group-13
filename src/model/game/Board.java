@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import model.game.TileEffects.TileEffect;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
@@ -55,7 +56,10 @@ public class Board {
     // ناکامله
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < columns; j++) {
-        tiles[i][j].getEffect().tick();
+        TileEffect effect = tiles[i][j].getEffect();
+        if (effect != null) {
+          effect.tick();
+        }
       }
     }
     handleSkySunDrop(currentTick);
@@ -248,5 +252,27 @@ public class Board {
       }
     }
     return null;
+  }
+
+  // ---- Frozen read-only accessors (Person A contract; used by rendering & feature code) ----
+
+  public List<Plant> getPlants() {
+    return plants;
+  }
+
+  public List<Sun> getSuns() {
+    return suns;
+  }
+
+  public List<Lawnmower> getLawnmowers() {
+    return lawnmowers;
+  }
+
+  /** Returns the tile at 0-indexed (row, col), or null if out of bounds. */
+  public Tile getTile(int row, int col) {
+    if (row < 0 || row >= rows || col < 0 || col >= columns) {
+      return null;
+    }
+    return tiles[row][col];
   }
 }
