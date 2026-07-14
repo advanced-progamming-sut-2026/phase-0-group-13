@@ -24,6 +24,9 @@ public class SignInMenuController implements BaseController {
       handleForgetPassword(matcher.group("username"), matcher.group("email"));
     } else if ((matcher = SignInMenuCommands.Answer.getMatcher(input)) != null) {
       handleAnswer(matcher.group("answer"));
+    } else if (input.startsWith("set new password ")) {
+      String newPassword = input.replace("set new password ", "").trim();
+      handleResetPassword(newPassword);
     } else if ((matcher = MenuCommands.ShowCurrentMenu.getMatcher(input)) != null) {
       System.out.println("Auth Menu");
     } else if ((matcher = MenuCommands.ExitMenu.getMatcher(input)) != null) {
@@ -60,6 +63,15 @@ public class SignInMenuController implements BaseController {
     try {
       UserManager.getInstance().verifyRecoveryAnswer(answer);
       System.out.println("Checking security answer...");
+      System.out.println("Please enter your new password using: 'set new password <password>'");
+    } catch (Exception e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  private void handleResetPassword(String newPassword) {
+    try {
+      UserManager.getInstance().resetPasswordAfterRecovery(newPassword);
     } catch (Exception e) {
       System.out.println(e.getMessage());
     }

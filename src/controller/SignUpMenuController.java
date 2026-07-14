@@ -66,6 +66,7 @@ public class SignUpMenuController implements BaseController {
     }
 
     try {
+      UserManager.getInstance().setSecurityQuestionForLatestUser(qNumber, answer);
       System.out.println("Security question picked successfully.");
     } catch (Exception e) {
       System.out.println(e.getMessage());

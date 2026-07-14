@@ -31,8 +31,8 @@ public class UserManager {
   }
 
   public void registerUser(
-      String username, String password, String nickname, String email, String gender)
-      throws Exception {
+          String username, String password, String nickname, String email, String gender)
+          throws Exception {
     for (User u : users) {
       if (u.getUsername().equals(username)) {
         throw new Exception("error: username already exists");
@@ -118,8 +118,8 @@ public class UserManager {
     this.recoveryUser = foundUser;
 
     return "Your security question is number "
-        + foundUser.getSecurityQuestionNumber()
-        + ". Please answer it:";
+            + foundUser.getSecurityQuestionNumber()
+            + ". Please answer it:";
   }
 
   public void verifyRecoveryAnswer(String answer) throws Exception {
@@ -128,9 +128,24 @@ public class UserManager {
     }
 
     if (!this.recoveryUser.getSecurityAnswer().equals(answer)) {
+      this.recoveryUser = null; 
       throw new Exception("error: incorrect security answer");
     }
     System.out.println("Answer verified successfully for user: " + recoveryUser.getUsername());
+  }
+
+  public void resetPasswordAfterRecovery(String newPassword) throws Exception {
+    if (this.recoveryUser == null) {
+      throw new Exception("error: no active recovery session. Please answer the security question first.");
+    }
+
+    Result passCheck = AuthService.checkPassword(newPassword);
+    if (!passCheck.success()) throw new Exception(passCheck.message());
+
+    this.recoveryUser.setPasswordHash(AuthService.hashPassword(newPassword));
+    saveUsersToJSON();
+
+    System.out.println("Password reset successfully for user: " + this.recoveryUser.getUsername());
     this.recoveryUser = null;
   }
 
