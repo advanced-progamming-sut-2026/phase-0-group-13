@@ -22,6 +22,7 @@ public class Board {
   private GameState gameState;
   private int lastSunDropTick;
   private Random random;
+  private boolean playerLost;
 
   public Board(int rows, int columns) {
     this.rows = rows;
@@ -160,6 +161,7 @@ public class Board {
         for (Zombie z : zombies) {
           if (z.getRow() == mower.getRow() && z.getX() <= -0.5) {
             System.out.println("The zombie ate your brain; LOSER!!!");
+            playerLost = true;
             return;
           }
         }
@@ -227,6 +229,10 @@ public class Board {
 
   public GameState getGameState() {
     return gameState;
+  }
+
+  public boolean isPlayerLost() {
+    return playerLost;
   }
 
   public boolean hasZombieInRow(int row, double plantX) {

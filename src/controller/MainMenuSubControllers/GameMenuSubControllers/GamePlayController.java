@@ -2,8 +2,12 @@ package controller.MainMenuSubControllers.GameMenuSubControllers;
 
 import controller.BaseController;
 import data.GameDataManager;
+import data.persistence.UserManager;
 import java.util.List;
 import java.util.regex.Matcher;
+import model.account.AdventureMap;
+import model.account.Progress;
+import model.account.User;
 import model.core.App;
 import model.core.GameManager;
 import model.core.GameSession;
@@ -11,6 +15,7 @@ import model.enums.Commands.GamePlayMenuCommands;
 import model.enums.Commands.MenuCommands;
 import model.enums.Menu;
 import model.game.Board;
+import model.game.MatchResult;
 import model.game.Sun;
 import model.game.Tile;
 import model.game.plant.Plant;
@@ -101,7 +106,7 @@ public class GamePlayController implements BaseController {
       gm.advanceTime();
     }
     if (!gm.isRunning()) {
-      finishMatch();
+      finishMatch(gm);
     }
   }
 
@@ -308,12 +313,50 @@ public class GamePlayController implements BaseController {
 
   // ---------------------------------------------------------------- helpers
 
-  private void finishMatch() {
-    // TODO(Person C): hand the MatchResult to progression (rewards, Progress, leaderboard).
+  private void finishMatch(GameManager gm) {
+    MatchResult result = gm.getMatchResult();
+    if (result.isWon()) {
+      System.out.println(
+          "Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.");
+    } else {
+      System.out.println("You lost the battle.");
+    }
+
+    applyProgression(gm, result);
+
     Menu back = GameSession.getReturnMenu();
     GameSession.end();
-    System.out.println("Match over. Returning to menu.");
     App.setCurrentMenu(back);
+  }
+
+  /** Applies match outcome to the logged-in user: record, MyoPoints, rewards, adventure step. */
+  private void applyProgression(GameManager gm, MatchResult result) {
+    User user = UserManager.getInstance().getCurrentUser();
+    if (user == null) {
+      return;
+    }
+
+    user.addMatchResult(result);
+    gm.getScoreManager().applyScoresToUser(user);
+
+    if (result.isWon()) {
+      Progress progress = user.getProgress();
+      model.Result reward =
+          AdventureMap.getLevelReward(progress.getCurrentStage(), progress.getCurrentLevel());
+      if (reward.success() && reward.getObject() instanceof String unlockId) {
+        System.out.println(reward.message());
+        if (!unlockId.contains("trophy")) {
+          user.unlockPlant(unlockId);
+        }
+      }
+      System.out.println(progress.advanceAdventure().message());
+    }
+
+    try {
+      UserManager.getInstance().updateCurrentUserGameState();
+    } catch (Exception e) {
+      System.out.println(e.getMessage());
+    }
   }
 
   /** Converts 1-indexed command coords (x=col, y=row) to 0-indexed {row, col}; null if invalid. */

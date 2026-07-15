@@ -5,6 +5,7 @@ import java.util.List;
 import model.account.AdventureMap;
 import model.game.Board;
 import model.game.MatchResult;
+import model.game.ScoreManager;
 import model.game.Sun;
 import model.game.Wave;
 import model.game.news.AllNews;
@@ -19,6 +20,7 @@ public class GameManager {
   private int currentWaveIndex;
   private boolean running;
   private MatchResult matchResult;
+  private final ScoreManager scoreManager = new ScoreManager();
   private AllNews allnews;
   private List<Quest> quests;
   private AdventureMap adventureMap;
@@ -61,6 +63,12 @@ public class GameManager {
 
     currentTick++;
     board.updateAll(currentTick);
+
+    if (board.isPlayerLost()) {
+      endGame();
+      matchResult.markLose();
+      return;
+    }
 
     if (currentWaveIndex < waves.size()) {
       Wave currentWave = waves.get(currentWaveIndex);
@@ -158,6 +166,10 @@ public class GameManager {
 
   public MatchResult getMatchResult() {
     return matchResult;
+  }
+
+  public ScoreManager getScoreManager() {
+    return scoreManager;
   }
 
   public int getCurrentWaveIndex() {
