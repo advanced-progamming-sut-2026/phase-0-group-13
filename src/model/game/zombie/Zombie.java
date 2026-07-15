@@ -11,23 +11,26 @@ import model.game.zombie.ZombieParts.Armor;
 import model.game.zombie.behavior.ZombieAction;
 
 public class Zombie {
-  private String name;
+  private final String name;
   private int currentHealth;
-  private int maxHealth;
-  private double speed;
+  private final int maxHealth;
+  private final double speed;
 
-  private int row;
+  private final int row;
   private double x;
   private double y;
 
-  private List<Armor> armors;
-  private ZombieAction behavior;
+  private final List<Armor> armors;
+  private final ZombieAction behavior;
 
   private boolean isEating;
-  private Map<StatusEffect, Integer> activeEffects;
+  private final Map<StatusEffect, Integer> activeEffects;
+
+
+  private boolean shieldBlocker;
 
   public Zombie(
-      String name, int health, double speed, int row, double startX, ZombieAction behavior) {
+          String name, int health, double speed, int row, double startX, ZombieAction behavior) {
     this.name = name;
     this.maxHealth = health;
     this.currentHealth = health;
@@ -39,6 +42,7 @@ public class Zombie {
     this.behavior = behavior;
     this.isEating = false;
     this.activeEffects = new EnumMap<>(StatusEffect.class);
+    this.shieldBlocker = false;
   }
 
   public void addArmor(Armor armor) {
@@ -89,7 +93,6 @@ public class Zombie {
       this.currentHealth -= damage;
     } else {
       int remainingDamage = damage;
-      // فیلتر کردن دمیج از طریق لایه‌های زره
       for (Armor armor : armors) {
         if (!armor.isDestroyed()) {
           remainingDamage = armor.takeDamage(remainingDamage);
@@ -105,6 +108,20 @@ public class Zombie {
 
   public void applyEffect(StatusEffect effect, int durationInTicks) {
     this.activeEffects.put(effect, durationInTicks);
+  }
+
+
+  public void extinguishFrozenStatus() {
+    activeEffects.remove(StatusEffect.FROZEN);
+    activeEffects.remove(StatusEffect.CHILLED);
+  }
+
+  public boolean hasShieldBlocker() {
+    return shieldBlocker;
+  }
+
+  public void setShieldBlocker(boolean shieldBlocker) {
+    this.shieldBlocker = shieldBlocker;
   }
 
   public boolean isDead() {

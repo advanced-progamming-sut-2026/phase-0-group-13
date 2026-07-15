@@ -59,7 +59,7 @@ public class PlantSelectionMenuController implements BaseController {
       boolean selected = user.getSelectedDeck().contains(name);
       boolean boosted = user.isPlantBoosted(name);
       System.out.println(
-          "  " + name + (selected ? " [selected]" : "") + (boosted ? " [boosted]" : ""));
+              "  " + name + (selected ? " [selected]" : "") + (boosted ? " [boosted]" : ""));
     }
   }
 
@@ -110,18 +110,19 @@ public class PlantSelectionMenuController implements BaseController {
     int deckSize = user.getSelectedDeck().size();
     if (deckSize < User.MIN_DECK_SLOTS) {
       System.out.println(
-          "error: select at least "
-              + User.MIN_DECK_SLOTS
-              + " plants before starting the game (you have "
-              + deckSize
-              + "/"
-              + User.MIN_DECK_SLOTS
-              + ")");
+              "error: select at least "
+                      + User.MIN_DECK_SLOTS
+                      + " plants before starting the game (you have "
+                      + deckSize
+                      + "/"
+                      + User.MIN_DECK_SLOTS
+                      + ")");
       return;
     }
 
     MatchSetup.getInstance().setSelectedPlants(user.getSelectedDeck());
     MatchSetup.getInstance().setBoostedPlants(user.getBoostedPlants());
+    MatchSetup.getInstance().setDifficultyLevel(user.getDifficultyLevel());
 
     System.out.println("Seed Bank locked in: " + user.getSelectedDeck());
     System.out.println("Handing off to the game engine...");

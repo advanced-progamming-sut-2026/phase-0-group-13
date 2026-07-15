@@ -6,6 +6,7 @@ import model.core.App;
 import model.enums.Commands.MenuCommands;
 import model.enums.Commands.SignUpMenuCommands;
 import model.enums.Menu;
+import model.enums.SecurityQuestion;
 
 public class SignUpMenuController implements BaseController {
   @Override
@@ -25,7 +26,7 @@ public class SignUpMenuController implements BaseController {
       String targetMenu = matcher.group("menuName").trim().toLowerCase();
       handleEnterMenu(targetMenu);
     } else if ((matcher = MenuCommands.ShowCurrentMenu.getMatcher(input)) != null) {
-      System.out.println("Auth Menu");
+      System.out.println("Sign Up Menu"); // اصلاح نام منو
     } else if ((matcher = MenuCommands.ExitMenu.getMatcher(input)) != null) {
       exit();
     } else {
@@ -49,6 +50,8 @@ public class SignUpMenuController implements BaseController {
     try {
       UserManager.getInstance().registerUser(username, password, nickname, email, gender);
       System.out.println("User data syntax is valid. Proceeding to pick a security question...");
+      System.out.println(SecurityQuestion.listAll());
+      System.out.println("pick question -q <question_number> -a <answer> -c <answer_confirm>");
 
     } catch (Exception e) {
       System.out.println(e.getMessage());
@@ -57,8 +60,15 @@ public class SignUpMenuController implements BaseController {
 
   private void handlePickQuestion(Matcher matcher) {
     String qNumber = matcher.group("questionNumber");
-    String answer = matcher.group("answer");
-    String answerConfirm = matcher.group("answerConfirm");
+
+    if (SecurityQuestion.fromNumber(qNumber) == null) {
+      System.out.println("error: invalid question number");
+      System.out.println(SecurityQuestion.listAll());
+      return;
+    }
+
+    String answer = matcher.group("answer").replace("\"", "").trim();
+    String answerConfirm = matcher.group("answerConfirm").replace("\"", "").trim();
 
     if (!answer.equals(answerConfirm)) {
       System.out.println("error: answers do not match");
@@ -66,14 +76,18 @@ public class SignUpMenuController implements BaseController {
     }
 
     try {
+      UserManager.getInstance().setSecurityQuestionForLatestUser(qNumber, answer);
       System.out.println("Security question picked successfully.");
+      System.out.println("Changed to sign in menu.");
+      App.setCurrentMenu(Menu.SignInMenu);
+
     } catch (Exception e) {
       System.out.println(e.getMessage());
     }
   }
 
   private void handleEnterMenu(String targetMenu) {
-    if (!targetMenu.equals("sign in menu")) {
+    if (!targetMenu.equals("signin menu")) {
       System.out.println("invalid menu!!!");
       return;
     }

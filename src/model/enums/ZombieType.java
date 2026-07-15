@@ -1,14 +1,46 @@
 package model.enums;
 
 public enum ZombieType {
-  NORMAL, // زامبی ساده
-  CONEHEAD, // زامبی کله‌مخروطی
-  BUCKETHEAD, // زامبی کله‌سطلی
-  KNIGHT, //  شوالیه
-  BLOCKHEAD, // زامبی کله‌ اجری
-  GARGANTUAR, // زامبی غول‌پیکر
-  IMP, //  بچه زامبی
-  EXPLORER, //  زامبی مشعل‌دار
-  ZOMBOTANY_PEASHOOTER, //  شلیک نخود
-  ZOMBOTANY_WALLNUT //  سپر گردویی
+  NORMAL,
+  CONEHEAD,
+  BUCKETHEAD,
+  KNIGHT,
+  BLOCKHEAD,
+
+  GARGANTUAR,
+  IMP,
+
+  FOOTBALLER,
+  ARCADE,
+  PARASOL,
+  TURQUOISE,
+  PROSPECTOR,
+  PIANIST,
+  NEWSPAPER,
+  BARREL_ROLLER,
+
+  RA,
+  EXPLORER,
+  TOMBRAISER,
+
+  DODO_RIDER,
+  HUNTER,
+  TROGLOBITE,
+
+  FISHERMAN,
+  SNORKEL,
+  OCTOPUS,
+
+  JUGGLER,
+  WIZARD,
+  KING,
+  IMP_DRAGON,
+
+  ZOMBOTANY_PEASHOOTER,
+  ZOMBOTANY_WALLNUT,
+
+  ZOMBOSS_EGYPT,
+  ZOMBOSS_PIRATE,
+  ZOMBOSS_COWBOY,
+  ZOMBOSS_DARK
 }

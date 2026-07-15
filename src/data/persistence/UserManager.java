@@ -31,8 +31,11 @@ public class UserManager {
   }
 
   public void registerUser(
-      String username, String password, String nickname, String email, String gender)
-      throws Exception {
+          String username, String password, String nickname, String email, String gender)
+          throws Exception {
+    Result usernameCheck = AuthService.checkUsername(username);
+    if (!usernameCheck.success()) throw new Exception(usernameCheck.message());
+
     for (User u : users) {
       if (u.getUsername().equals(username)) {
         throw new Exception("error: username already exists");
@@ -44,6 +47,12 @@ public class UserManager {
 
     Result emailCheck = AuthService.checkEmail(email);
     if (!emailCheck.success()) throw new Exception(emailCheck.message());
+
+    Result nicknameCheck = AuthService.checkNickname(nickname);
+    if (!nicknameCheck.success()) throw new Exception(nicknameCheck.message());
+
+    Result genderCheck = AuthService.checkGender(gender);
+    if (!genderCheck.success()) throw new Exception(genderCheck.message());
 
     String hashedPass = AuthService.hashPassword(password);
     User newUser = new User(username, hashedPass, email, nickname, gender);
@@ -117,9 +126,11 @@ public class UserManager {
 
     this.recoveryUser = foundUser;
 
-    return "Your security question is number "
-        + foundUser.getSecurityQuestionNumber()
-        + ". Please answer it:";
+    model.enums.SecurityQuestion question =
+            model.enums.SecurityQuestion.fromNumber(foundUser.getSecurityQuestionNumber());
+    String questionText = question != null ? question.getText() : "(question unavailable)";
+
+    return "Your security question is: " + questionText;
   }
 
   public void verifyRecoveryAnswer(String answer) throws Exception {
@@ -128,9 +139,24 @@ public class UserManager {
     }
 
     if (!this.recoveryUser.getSecurityAnswer().equals(answer)) {
+      this.recoveryUser = null;
       throw new Exception("error: incorrect security answer");
     }
     System.out.println("Answer verified successfully for user: " + recoveryUser.getUsername());
+  }
+
+  public void resetPasswordAfterRecovery(String newPassword) throws Exception {
+    if (this.recoveryUser == null) {
+      throw new Exception("error: no active recovery session. Please answer the security question first.");
+    }
+
+    Result passCheck = AuthService.checkPassword(newPassword);
+    if (!passCheck.success()) throw new Exception(passCheck.message());
+
+    this.recoveryUser.setPasswordHash(AuthService.hashPassword(newPassword));
+    saveUsersToJSON();
+
+    System.out.println("Password reset successfully for user: " + this.recoveryUser.getUsername());
     this.recoveryUser = null;
   }
 
@@ -195,6 +221,8 @@ public class UserManager {
 
   public void changeUsername(String newUsername) throws Exception {
     if (this.currentUser == null) throw new Exception("error: no user is currently logged in");
+    Result usernameCheck = AuthService.checkUsername(newUsername);
+    if (!usernameCheck.success()) throw new Exception(usernameCheck.message());
     if (this.currentUser.getUsername().equals(newUsername)) {
       throw new Exception("error: new username is the same as the current one");
     }
@@ -208,6 +236,8 @@ public class UserManager {
 
   public void changeNickname(String newNickname) throws Exception {
     if (this.currentUser == null) throw new Exception("error: no user is currently logged in");
+    Result nicknameCheck = AuthService.checkNickname(newNickname);
+    if (!nicknameCheck.success()) throw new Exception(nicknameCheck.message());
     if (this.currentUser.getNickname().equals(newNickname)) {
       throw new Exception("error: new nickname is the same as the current one");
     }

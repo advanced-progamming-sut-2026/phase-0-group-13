@@ -13,6 +13,7 @@ import model.enums.Commands.MenuCommands;
 import model.enums.Menu;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.game.zombie.ZombieParts.ZombieTemplate;
+import model.game.zombie.ZombieParts.ZombieTypeResolver;
 
 public class CollectionMenuController implements BaseController {
 
@@ -106,7 +107,7 @@ public class CollectionMenuController implements BaseController {
     System.out.println("--- Zombies You've Seen ---");
     for (String rawName : user.getUnlockedZombies()) {
       ZombieTemplate template = findZombieTemplate(stripZombiePrefix(rawName));
-      System.out.println("  " + (template != null ? template.name : stripZombiePrefix(rawName)));
+      System.out.println("  " + (template != null ? template.getName() : stripZombiePrefix(rawName)));
     }
   }
 
@@ -120,8 +121,8 @@ public class CollectionMenuController implements BaseController {
     User user = UserManager.getInstance().getCurrentUser();
     System.out.println("--- All Zombies ---");
     for (ZombieTemplate template : all) {
-      boolean seen = user != null && user.getUnlockedZombies().contains(zombieKey(template.name));
-      System.out.println("  " + template.name + " - " + (seen ? "seen" : "not yet encountered"));
+      boolean seen = user != null && user.getUnlockedZombies().contains(zombieKey(template.getName()));
+      System.out.println("  " + template.getName() + " - " + (seen ? "seen" : "not yet encountered"));
     }
   }
 
@@ -142,8 +143,8 @@ public class CollectionMenuController implements BaseController {
     System.out.println("Tags: " + template.tags);
     System.out.println("Ability: " + template.baseAbility);
     System.out.println(
-        "Status: "
-            + (unlocked ? "unlocked (level " + user.getPlantLevel(template.name) + ")" : "locked"));
+            "Status: "
+                    + (unlocked ? "unlocked (level " + user.getPlantLevel(template.name) + ")" : "locked"));
   }
 
   private void handleShowZombie(String zombieName) {
@@ -154,13 +155,13 @@ public class CollectionMenuController implements BaseController {
     }
 
     User user = UserManager.getInstance().getCurrentUser();
-    boolean seen = user != null && user.getUnlockedZombies().contains(zombieKey(template.name));
+    boolean seen = user != null && user.getUnlockedZombies().contains(zombieKey(template.getName()));
 
-    System.out.println("Name: " + template.name);
-    System.out.println("Type: " + template.type);
-    System.out.println("Health: " + template.baseHp);
-    System.out.println("Speed: " + template.baseSpeed);
-    System.out.println("Special abilities: " + template.specialAbilities);
+    System.out.println("Name: " + template.getName());
+    System.out.println("Type: " + ZombieTypeResolver.resolve(template));
+    System.out.println("Health: " + template.getBaseHp());
+    System.out.println("Speed: " + template.getBaseSpeed());
+    System.out.println("Special abilities: " + template.getStatsSummary());
     System.out.println("Status: " + (seen ? "seen" : "not yet encountered"));
   }
 
@@ -175,7 +176,7 @@ public class CollectionMenuController implements BaseController {
 
     PlantTemplate template = findPlantTemplate(plantName);
     String canonicalName =
-        template != null ? template.name.toLowerCase() : plantName.toLowerCase().trim();
+            template != null ? template.name.toLowerCase() : plantName.toLowerCase().trim();
 
     int currentLevel = user.getPlantLevel(canonicalName);
     if (currentLevel >= MAX_PLANT_LEVEL) {
@@ -184,18 +185,14 @@ public class CollectionMenuController implements BaseController {
     }
 
     String seedKey = "seed_" + canonicalName;
-    if (user.getInventory().getItemCount(seedKey) < UPGRADE_SEED_COST) {
-      System.out.println(
-          "error: not enough seed packets for " + plantName + " (need " + UPGRADE_SEED_COST + ")");
-      return;
-    }
-    if (user.getCoins() < UPGRADE_COIN_COST) {
-      System.out.println("error: not enough coins (need " + UPGRADE_COIN_COST + ")");
+    int seedCost = UPGRADE_SEED_COST * currentLevel;
+    int coinCost = UPGRADE_COIN_COST * currentLevel;
+    if (!hasSufficientUpgradeResources(user, plantName, seedKey, seedCost, coinCost)) {
       return;
     }
 
-    user.getInventory().consumeItem(seedKey, UPGRADE_SEED_COST);
-    user.addCoins(-UPGRADE_COIN_COST);
+    user.getInventory().consumeItem(seedKey, seedCost);
+    user.addCoins(-coinCost);
 
     int newLevel = currentLevel + 1;
     user.setPlantLevel(canonicalName, newLevel);
@@ -203,6 +200,20 @@ public class CollectionMenuController implements BaseController {
     System.out.println(plantName + " upgraded to level " + newLevel + "!");
     printLevelAbility(template, newLevel);
     saveState();
+  }
+
+  private boolean hasSufficientUpgradeResources(
+          User user, String plantName, String seedKey, int seedCost, int coinCost) {
+    if (user.getInventory().getItemCount(seedKey) < seedCost) {
+      System.out.println(
+              "error: not enough seed packets for " + plantName + " (need " + seedCost + ")");
+      return false;
+    }
+    if (user.getCoins() < coinCost) {
+      System.out.println("error: not enough coins (need " + coinCost + ")");
+      return false;
+    }
+    return true;
   }
 
   private void printLevelAbility(PlantTemplate template, int level) {
@@ -269,26 +280,26 @@ public class CollectionMenuController implements BaseController {
 
   private List<PlantTemplate> allPlants() {
     return GameDataManager.plantRepository != null
-        ? GameDataManager.plantRepository.getAll()
-        : null;
+            ? GameDataManager.plantRepository.getAll()
+            : null;
   }
 
   private List<ZombieTemplate> allZombies() {
     return GameDataManager.zombieRepository != null
-        ? GameDataManager.zombieRepository.getAll()
-        : null;
+            ? GameDataManager.zombieRepository.getAll()
+            : null;
   }
 
   private PlantTemplate findPlantTemplate(String name) {
     return GameDataManager.plantRepository != null
-        ? GameDataManager.plantRepository.find(name.trim())
-        : null;
+            ? GameDataManager.plantRepository.find(name.trim())
+            : null;
   }
 
   private ZombieTemplate findZombieTemplate(String name) {
     return GameDataManager.zombieRepository != null
-        ? GameDataManager.zombieRepository.find(name.trim())
-        : null;
+            ? GameDataManager.zombieRepository.find(name.trim())
+            : null;
   }
 
   private String zombieKey(String templateName) {

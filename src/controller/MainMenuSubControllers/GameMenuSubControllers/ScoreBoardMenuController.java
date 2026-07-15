@@ -14,22 +14,24 @@ import model.game.quest.Quest;
 
 public class ScoreBoardMenuController implements BaseController {
 
+  private String lastSortedLabel = null;
+  private boolean lastAscending = false;
+
   @Override
   public void initController() {}
 
   @Override
   public void handleinput(String command) {
     if (ScoreBoardMenuCommands.SortByHighScore.getMatcher(command) != null) {
-      handleShow("High Score (MyoPoints)", Comparator.comparingInt(this::meowPoints).reversed());
+      handleShow("High Score (MyoPoints)", Comparator.comparingInt(this::meowPoints));
     } else if (ScoreBoardMenuCommands.SortByLastPassedLevel.getMatcher(command) != null) {
-      handleShow("Last Passed Level", Comparator.comparingInt(this::stageLevelScore).reversed());
+      handleShow("Last Passed Level", Comparator.comparingInt(this::stageLevelScore));
     } else if (ScoreBoardMenuCommands.SortByMiniGames.getMatcher(command) != null) {
-      handleShow("Mini-Games Cleared", Comparator.comparingInt(this::miniGamesCleared).reversed());
+      handleShow("Mini-Games Cleared", Comparator.comparingInt(this::miniGamesCleared));
     } else if (ScoreBoardMenuCommands.SortByQuests.getMatcher(command) != null) {
-      handleShow("Quests Completed", Comparator.comparingInt(this::completedQuests).reversed());
+      handleShow("Quests Completed", Comparator.comparingInt(this::completedQuests));
     } else if (ScoreBoardMenuCommands.SortByDailyQuests.getMatcher(command) != null) {
-      handleShow(
-          "Daily Quests Completed", Comparator.comparingInt(this::completedDailyQuests).reversed());
+      handleShow("Daily Quests Completed", Comparator.comparingInt(this::completedDailyQuests));
     } else if (MenuCommands.ShowCurrentMenu.getMatcher(command) != null) {
       System.out.println("Leaderboard Menu (Score Board)");
     } else if (MenuCommands.ExitMenu.getMatcher(command) != null) {
@@ -39,33 +41,52 @@ public class ScoreBoardMenuController implements BaseController {
     }
   }
 
-  private void handleShow(String label, Comparator<User> primaryComparator) {
+  private boolean resolveDirection(String label) {
+    boolean ascending = label.equals(lastSortedLabel) && !lastAscending;
+    lastSortedLabel = label;
+    lastAscending = ascending;
+    return ascending;
+  }
+
+  private void handleShow(String label, Comparator<User> ascendingComparator) {
     List<User> ranked = new ArrayList<>(UserManager.getInstance().getAllUsers());
     if (ranked.isEmpty()) {
       System.out.println("No registered users yet.");
       return;
     }
 
-    Comparator<User> finalComparator = primaryComparator.thenComparing(User::getUsername);
+    boolean ascending = resolveDirection(label);
+    Comparator<User> directionalComparator =
+            ascending ? ascendingComparator : ascendingComparator.reversed();
+    Comparator<User> finalComparator = directionalComparator.thenComparing(User::getUsername);
     ranked.sort(finalComparator);
 
-    System.out.println("\n--- Global Leaderboard (Sorted by: " + label + ") ---");
+    printLeaderboard(label, ascending, ranked);
+  }
+
+  private void printLeaderboard(String label, boolean ascending, List<User> ranked) {
+    System.out.println(
+            "\n--- Global Leaderboard (Sorted by: "
+                    + label
+                    + ", "
+                    + (ascending ? "Ascending" : "Descending")
+                    + ") ---");
     System.out.printf(
-        "%-5s | %-15s | %-10s | %-10s | %-10s | %-15s%n",
-        "Rank", "Username", "MyoPoints", "Stages", "MiniGames", "Quests(Tot/Day)");
+            "%-5s | %-15s | %-10s | %-10s | %-10s | %-15s%n",
+            "Rank", "Username", "MyoPoints", "Stages", "MiniGames", "Quests(Tot/Day)");
     System.out.println("-".repeat(78));
 
     int rank = 1;
     for (User user : ranked) {
       System.out.printf(
-          "%-5d | %-15s | %-10d | %-10d | %-10d | %d / %d%n",
-          rank,
-          user.getUsername(),
-          meowPoints(user),
-          stageLevelScore(user),
-          miniGamesCleared(user),
-          completedQuests(user),
-          completedDailyQuests(user));
+              "%-5d | %-15s | %-10d | %-10d | %-10d | %d / %d%n",
+              rank,
+              user.getUsername(),
+              meowPoints(user),
+              stageLevelScore(user),
+              miniGamesCleared(user),
+              completedQuests(user),
+              completedDailyQuests(user));
       rank++;
     }
     System.out.println();
@@ -96,8 +117,8 @@ public class ScoreBoardMenuController implements BaseController {
     int count = 0;
     for (Quest quest : user.getQuests()) {
       if (quest.isCompleted()
-          && quest.getCategory() != null
-          && (quest.getCategory().toLowerCase().contains("daily")
+              && quest.getCategory() != null
+              && (quest.getCategory().toLowerCase().contains("daily")
               || quest.getCategory().contains("روزانه"))) {
         count++;
       }

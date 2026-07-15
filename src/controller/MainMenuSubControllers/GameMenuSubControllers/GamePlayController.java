@@ -18,12 +18,7 @@ import model.game.plant.Factory.PlantFactory;
 import model.game.zombie.Zombie;
 import model.game.zombie.factory.ZombieFactory;
 
-/**
- * Drives the single active match held by {@link GameSession}. Parses every {@link
- * GamePlayMenuCommands} entry and mutates the board through the frozen engine API.
- */
 public class GamePlayController implements BaseController {
-
   @Override
   public void initController() {}
 

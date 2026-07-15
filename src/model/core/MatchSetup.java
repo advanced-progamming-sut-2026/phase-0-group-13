@@ -13,6 +13,7 @@ public class MatchSetup {
 
   private MiniGameType currentMiniGame;
   private int miniGameLevel;
+  private int difficultyLevel = 3;
 
   private MatchSetup() {
     selectedPlants = new ArrayList<>();
@@ -61,5 +62,13 @@ public class MatchSetup {
 
   public List<String> getBoostedPlants() {
     return boostedPlants;
+  }
+
+  public void setDifficultyLevel(int difficultyLevel) {
+    this.difficultyLevel = difficultyLevel;
+  }
+
+  public int getDifficultyLevel() {
+    return difficultyLevel;
   }
 }

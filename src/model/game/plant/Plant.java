@@ -9,35 +9,37 @@ import model.game.plant.PlantParts.PlantTemplate;
 import model.game.plant.behavior.PlantAction;
 
 public class Plant {
-  private int id;
-  private String name;
+  private final int id;
+  private final String name;
   private int currentHealth;
-  private int maxHealth;
-  private int cost;
-  private int level;
+  private final int maxHealth;
+  private final int cost;
+  private final int level;
 
-  private int row;
-  private int col;
+  private final int row;
+  private final int col;
   private double x;
   private double y;
 
-  private PlantCategory category;
-  private EnumSet<PlantTag> tags;
+  private final PlantCategory category;
+  private final EnumSet<PlantTag> tags;
+  // حس میکنم tags بی فایده اس کلا وجودش و تاثیر خاصی نداره انچنان
+  // بودنش بیهودس
 
-  private PlantAction behavior;
-  private PlantFood plantFood;
+  private final PlantAction behavior;
+  private final PlantFood plantFood;
   private int lastActionTick;
 
-  private boolean isBoosted;
+  private final boolean isBoosted;
 
   public Plant(
-      PlantTemplate template,
-      int row,
-      int col,
-      PlantCategory category,
-      EnumSet<PlantTag> tags,
-      PlantAction behavior,
-      PlantFood plantFood) {
+          PlantTemplate template,
+          int row,
+          int col,
+          PlantCategory category,
+          EnumSet<PlantTag> tags,
+          PlantAction behavior,
+          PlantFood plantFood) {
     this.id = template.id;
     this.name = template.name;
     this.maxHealth = template.baseHp;
@@ -61,7 +63,7 @@ public class Plant {
   public void update(int currentTick, Board board) {
     if (isDead()) return;
 
-    if (plantFood.canExecute()) {
+    if (plantFood != null && plantFood.canExecute()) {
       plantFood.execute(this, board, currentTick);
       return;
     }
@@ -72,7 +74,12 @@ public class Plant {
   }
 
   public void applyPlantFood() {
-    plantFood.activate();
+    if (plantFood != null) {
+      plantFood.activate();
+    } else {
+      System.out.println(
+              "Warning: " + name + " has no Plant Food effect configured; feed ignored.");
+    }
   }
 
   public void takeDamage(int damage) {
@@ -88,7 +95,6 @@ public class Plant {
     return this.currentHealth <= 0;
   }
 
-  // --- Getters & Setters ---
   public String getName() {
     return name;
   }

@@ -13,7 +13,9 @@ public class SignUpMenuView implements BaseMenu {
   @Override
   public void check(Scanner scanner) {
     System.out.println("Entered Sign Up Menu. Use 'register' to create an account.");
-
+    System.out.println("register format : \" register -u <username> " +
+            "-p <password> <password_confirm> " +
+            "-n <nickname> -e <email> g <gender>\"");
     String input = scanner.nextLine();
     signUpController.handleinput(input);
   }
