@@ -1,6 +1,6 @@
 package model.game.plant.Factory;
 
-import data.repository.PlantRepository; // اضافه شدن ریپازیتوری
+import data.repository.PlantRepository;
 import java.util.EnumSet;
 import model.enums.PlantCategory;
 import model.enums.PlantTag;
@@ -10,7 +10,7 @@ import model.game.plant.PlantParts.PlantTemplate;
 import model.game.plant.behavior.*;
 
 public class PlantFactory {
-  private PlantRepository repository;
+  private final PlantRepository repository;
 
   public PlantFactory(PlantRepository repository) {
     this.repository = repository;
@@ -31,7 +31,7 @@ public class PlantFactory {
     int damage = parseDamage(template.damage);
 
     PlantAction behavior = determineBehavior(category, interval, damage);
-    PlantFood plantFood = determinePlantFood(category);
+    PlantFood plantFood = determinePlantFood(template, category, interval, damage);
 
     return new Plant(template, row, col, category, tags, behavior, plantFood);
   }
@@ -40,17 +40,32 @@ public class PlantFactory {
     if (catStr == null) return PlantCategory.SHOOTER;
     switch (catStr.toLowerCase().trim()) {
       case "sun producers":
+      case "sun producer":
         return PlantCategory.SUN_PRODUCER;
       case "shooters":
+      case "shooter":
         return PlantCategory.SHOOTER;
       case "lobbers":
+      case "lobber":
         return PlantCategory.LOBBER;
       case "explosives":
+      case "explosive":
         return PlantCategory.EXPLOSIVE;
       case "wall-nuts":
+      case "wall-nut":
         return PlantCategory.WALL_NUT;
       case "melee":
         return PlantCategory.MELEE;
+      case "modifier":
+      case "modifiers":
+        return PlantCategory.MODIFIER;
+      case "strike-through":
+        return PlantCategory.STRIKE_THROUGH;
+      case "homing":
+        return PlantCategory.HOMING;
+      case "mint":
+      case "mints":
+        return PlantCategory.MINT;
       default:
         return PlantCategory.SHOOTER;
     }
@@ -89,6 +104,10 @@ public class PlantFactory {
     return 20;
   }
 
+
+
+  // بقیش باید کامل بشه
+  //
   private PlantAction determineBehavior(PlantCategory category, int interval, int damage) {
     switch (category) {
       case SUN_PRODUCER:
@@ -97,13 +116,33 @@ public class PlantFactory {
         return new ShootForwardAction(interval, damage);
       case EXPLOSIVE:
         return new ExplodeAction();
-      default:
+      case WALL_NUT:
         return null;
+      case LOBBER:
+      case MELEE:
+      case MODIFIER:
+      case STRIKE_THROUGH:
+      case HOMING:
+      case MINT:
+        return new DummyPlantAction("category " + category + " has no real behavior class yet");
+      default:
+        throw new UnsupportedOperationException("Unknown PlantCategory: " + category);
     }
   }
 
-  private PlantFood determinePlantFood(PlantCategory category) {
-    // TODO
-    return null;
+
+  private PlantFood determinePlantFood(
+          PlantTemplate template, PlantCategory category, int interval, int damage) {
+    switch (category) {
+      case SUN_PRODUCER:
+        return new PlantFood(1, new ProduceSunAction(1));
+      case SHOOTER:
+        return new PlantFood(150, new ShootForwardAction(Math.max(1, interval / 3), damage * 2));
+      default:
+        return new PlantFood(
+                1,
+                new DummyPlantAction(
+                        "Plant Food effect '" + template.plantFoodEffect + "' not implemented"));
+    }
   }
 }
