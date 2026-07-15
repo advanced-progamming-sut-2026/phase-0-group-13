@@ -3,26 +3,7 @@ package model.game.zombie.ZombieParts;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
-/**
- * Mirrors ONE raw entry from Zombies.json.
- *
- * IMPORTANT — this is NOT a flat table like plants.json. Two different kinds
- * of objects share this file, distinguished by "objclass":
- *   - "ZombiePropertySheet"                -> a real zombie
- *   - "ArmorPropertySheet" / "NewspaperArmorPropertySheet" -> an armor definition
- *     (Cone/Bucket/Brick/ShoulderArmor/Crown/Newspaper), referenced by OTHER
- *     zombies via an RTID string like "RTID(ConeDefault@ArmorTypes)" instead
- *     of an inline HP number.
- *
- * There is also no "name" or "type" key anywhere in this file — the only
- * identifier is aliases[0] (e.g. "ZombieIceAgeHunter"). Annotating fields
- * cannot invent a type field that doesn't exist; ZombieFactory.resolveType()
- * does best-effort name matching on the alias instead (see ZombieFactory.java).
- *
- * Splitting zombies from armor-defs and resolving the RTID references is done
- * in ZombieRepository (see the companion patch to that file) — a single
- * ZombieTemplate cannot answer "what's my armor HP" on its own.
- */
+
 public class ZombieTemplate {
 
   @SerializedName("aliases")
@@ -69,16 +50,16 @@ public class ZombieTemplate {
     public Integer armorBaseHealth;
 
     @SerializedName("ArmorLayers")
-    public Integer armorLayers;
+    public List<String> armorLayers;
 
     @SerializedName("ArmorLayerHealth")
-    public Integer armorLayerHealth;
+    public List<Double> armorLayerHealth;
 
     @SerializedName("ArmorFlags")
     public List<String> armorFlags;
 
     @SerializedName("FireLayer")
-    public Boolean fireLayer;
+    public String fireLayer;
   }
 
   public static class ZombieStatEntry {
@@ -125,5 +106,25 @@ public class ZombieTemplate {
     return objdata.zombieArmorProps.stream()
             .map(s -> s.replaceAll("RTID\\((.*?)@ArmorTypes\\)", "$1"))
             .toList();
+  }
+
+
+  public String getStatsSummary() {
+    StringBuilder sb = new StringBuilder();
+
+    if (objdata != null && objdata.zombieStats != null && !objdata.zombieStats.isEmpty()) {
+      for (ZombieStatEntry stat : objdata.zombieStats) {
+        if (sb.length() > 0) sb.append(", ");
+        sb.append(stat.type).append("=").append(stat.value);
+      }
+    }
+
+    List<String> armor = getArmorRefAliases();
+    if (!armor.isEmpty()) {
+      if (sb.length() > 0) sb.append("; ");
+      sb.append("armor: ").append(String.join(", ", armor));
+    }
+
+    return sb.length() > 0 ? sb.toString() : "none";
   }
 }

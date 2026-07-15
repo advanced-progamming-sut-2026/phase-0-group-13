@@ -4,9 +4,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum SignInMenuCommands implements Command {
-  Login("login\\s+-u\\s+(?<username>\\S+)\\s+-p\\s+(?<password>\\S+)(?<stay>\\s+-stay-logged-in)?"),
-  ForgetPassword("forget\\s+password\\s+-u\\s+(?<username>\\S+)\\s+-e\\s+(?<email>.+)"),
-  Answer("answer\\s+-a\\s+(?<answer>.+)");
+  Login("^\\s*login\\s+-u\\s+(?<username>\\S+)\\s+-p\\s+(?<password>\\S+)(?<stay>\\s+-stay-logged-in)?\\s*$"),
+  ForgetPassword("^\\s*forget\\s+password\\s+-u\\s+(?<username>\\S+)\\s+-e\\s+(?<email>\\S+)\\s*$"),
+  Answer("^\\s*answer\\s+-a\\s+(?<answer>.+)\\s*$");
 
   private final String pattern;
 
@@ -15,8 +15,7 @@ public enum SignInMenuCommands implements Command {
   }
 
   public Matcher getMatcher(String input) {
-    Matcher matcher = Pattern.compile("\\s*" + this.pattern + "\\s*").matcher(input);
-
+    Matcher matcher = Pattern.compile(this.pattern).matcher(input);
     if (matcher.matches()) {
       return matcher;
     }

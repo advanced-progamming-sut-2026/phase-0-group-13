@@ -28,7 +28,7 @@ public class SignInMenuController implements BaseController {
       String newPassword = input.replace("set new password ", "").trim();
       handleResetPassword(newPassword);
     } else if ((matcher = MenuCommands.ShowCurrentMenu.getMatcher(input)) != null) {
-      System.out.println("Auth Menu");
+      System.out.println("Sign In Menu"); // اصلاح نام منو
     } else if ((matcher = MenuCommands.ExitMenu.getMatcher(input)) != null) {
       exit();
     } else {
@@ -37,7 +37,7 @@ public class SignInMenuController implements BaseController {
   }
 
   private void handleLogin(String username, String password, String stay) {
-    boolean stayLoggedIn = stay != null;
+    boolean stayLoggedIn = stay != null && !stay.trim().isEmpty();
 
     try {
       UserManager.getInstance().loginUser(username, password, stayLoggedIn);

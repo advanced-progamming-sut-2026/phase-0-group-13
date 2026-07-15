@@ -13,8 +13,11 @@ public class SignInMenuView implements BaseMenu {
   @Override
   public void check(Scanner scanner) {
     System.out.println("Entered Sign In Menu. Use 'login' to enter your account.");
-
-    String input = scanner.nextLine();
+    System.out.println("login format : \"login -u <username> " +
+            "-p <password> -stay-logged-in\"");
+    System.out.println("forget password format : \"forget password -u <username> " +
+            "-e <email>\n\"");
+      String input = scanner.nextLine();
     signInMenuController.handleinput(input);
   }
 }

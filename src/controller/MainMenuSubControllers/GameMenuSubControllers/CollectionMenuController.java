@@ -13,6 +13,7 @@ import model.enums.Commands.MenuCommands;
 import model.enums.Menu;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.game.zombie.ZombieParts.ZombieTemplate;
+import model.game.zombie.ZombieParts.ZombieTypeResolver;
 
 public class CollectionMenuController implements BaseController {
 
@@ -106,7 +107,7 @@ public class CollectionMenuController implements BaseController {
     System.out.println("--- Zombies You've Seen ---");
     for (String rawName : user.getUnlockedZombies()) {
       ZombieTemplate template = findZombieTemplate(stripZombiePrefix(rawName));
-      System.out.println("  " + (template != null ? template.name : stripZombiePrefix(rawName)));
+      System.out.println("  " + (template != null ? template.getName() : stripZombiePrefix(rawName)));
     }
   }
 
@@ -120,8 +121,8 @@ public class CollectionMenuController implements BaseController {
     User user = UserManager.getInstance().getCurrentUser();
     System.out.println("--- All Zombies ---");
     for (ZombieTemplate template : all) {
-      boolean seen = user != null && user.getUnlockedZombies().contains(zombieKey(template.name));
-      System.out.println("  " + template.name + " - " + (seen ? "seen" : "not yet encountered"));
+      boolean seen = user != null && user.getUnlockedZombies().contains(zombieKey(template.getName()));
+      System.out.println("  " + template.getName() + " - " + (seen ? "seen" : "not yet encountered"));
     }
   }
 
@@ -154,13 +155,13 @@ public class CollectionMenuController implements BaseController {
     }
 
     User user = UserManager.getInstance().getCurrentUser();
-    boolean seen = user != null && user.getUnlockedZombies().contains(zombieKey(template.name));
+    boolean seen = user != null && user.getUnlockedZombies().contains(zombieKey(template.getName()));
 
-    System.out.println("Name: " + template.name);
-    System.out.println("Type: " + template.type);
-    System.out.println("Health: " + template.baseHp);
-    System.out.println("Speed: " + template.baseSpeed);
-    System.out.println("Special abilities: " + template.specialAbilities);
+    System.out.println("Name: " + template.getName());
+    System.out.println("Type: " + ZombieTypeResolver.resolve(template));
+    System.out.println("Health: " + template.getBaseHp());
+    System.out.println("Speed: " + template.getBaseSpeed());
+    System.out.println("Special abilities: " + template.getStatsSummary());
     System.out.println("Status: " + (seen ? "seen" : "not yet encountered"));
   }
 
