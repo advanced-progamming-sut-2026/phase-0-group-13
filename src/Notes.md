@@ -124,7 +124,7 @@ To-Do / Next Commits
 - GameManager کامل شد.
 - کلاس PlantFood درست شد و درون کلاس Plant قرار گرفت(هندل کردن PlantFoodDuration و PlantFoodBehavior)
 - SaveManager حذف شد، چون هر User یک سیو مخصوص خودش را دارد، و صرفا با اضافه کردن یک Progress به یوزر، مشکل حل میشود.
-  - متوجه دلیل وجود PlayerProfile نمیشوم، اللخصوص وقتی User به صورت عادی هست و هر User یک Progress مخصوص خودش را دارد.
+    - متوجه دلیل وجود PlayerProfile نمیشوم، اللخصوص وقتی User به صورت عادی هست و هر User یک Progress مخصوص خودش را دارد.
 - برای انوع مختلف PlantFood و Behavoir های مختلف این کلاس باید دست به کار شویم،‌ گیاه ها قابلیت خاص خیلی به خصوصی دارند.
 - به گیم منیجیر،  لیستی از wave ها اضافه شد. همچنین متغیر های sunAmount و plantFoodCount کاملا بدون استفاده بودند چون این متغیر ها در board.gameState ذخیره میشود!
 
@@ -135,16 +135,16 @@ To-Do / Next Commits
 ## Context
 
 چک استایل مختص پروژه ( به اسم شریف چک استایل اضافه شدش ) هربار که تغییری دادید با اون چک بکنید که قوانین رعایت شده باشه ، و همچنین یه گوگل جاوا فورمتر ریختم که تا حد خوبی از قوانین و پوشش میده و درست کردش
-ولی هربار تغییری میدید با شریف چک استایل چک کنید برطرف کنید به مشکلی نمیخوریم ، 
+ولی هربار تغییری میدید با شریف چک استایل چک کنید برطرف کنید به مشکلی نمیخوریم ،
 داخل چک استایل ا اضافه اش کنید تو ستینگ ، بعدش با پلاگین ران بکنیدش
 همین
 
-برای ران کردنش هم تو ترمینال پروژه این و بزنید که خودش درست کنه 
+برای ران کردنش هم تو ترمینال پروژه این و بزنید که خودش درست کنه
 فقط اگه همه فایل ها نباید بشن
 خودتون تغییرش بدید که عوض نکنه همه چیزو  :( بعضی چیزاش با قوانین پروژه یکم فرق داره ، شاید عوض کنه خراب بشه )
 Get-ChildItem -Path "src" -Filter "*.java" -Recurse | ForEach-Object { .\google-java-format_windows-x86-64.exe --replace $_.FullName }
 
-یعنی ریپلیس فول نیم و اگه اشتباه نکنم باید تغییر بدید 
+یعنی ریپلیس فول نیم و اگه اشتباه نکنم باید تغییر بدید
 
 
 - **تاریخ:** ۱۴۰۵/۰4/08
@@ -166,3 +166,25 @@ GameDataManager اول برنامه اینیت میشود.
 کنترلر منوی بازی با ویو منوی بازی تکمیل شد.
 ShopView با جزئیات اضافه تکمیل شد.
 ShopMenuController اضافه و تکمیل شد.
+
+
+**تاریخ:** ۱۴۰۵/۰۴/۲۴
+
+- تیر شوترها بر اساس تگ رنگی شدن و `ShootForwardAction` با `ProjectileEffect` کار می‌کنه. `PlantFactory` هم `resolveProjectileEffect(tags)` گرفت.
+- `LobAction`، `MeleeAction`، `HomingAction` و Strike-through اضافه/کامل شدن.
+- `Modifier` و `Mint` هنوز `DummyPlantAction` هستن.
+- برای زامبی‌ها `TacklerZombieAction`، `ParasolZombieAction`، `RangedDemolisherZombieAction` و `EnrageOnArmorBreakZombieAction` اضافه شد.
+- به `Zombie` چند متود جدید اضافه شد و `move()` ضریب سرعت را حساب می‌کند.
+- `Imp`، `Arcade`، `Turquoise` و `Pianist` از `StandardZombieAction` استفاده می‌کنن.
+- `Endurian` و `Sun Bean` رفتار واقعی گرفتن و `Board.getZombieAt` اضافه شد.
+- `Garlic`، `Sweet Potato` و `Explode-o-nut` هنوز Dummy موندن.
+- برای زامبی‌ها سیستم دراپ اضافه شد، ولی اعمال واقعی دراپ هنوز وصل نشده.
+- فصل‌های `AncientEgypt` و `FrostbiteCaves` کامل شدن و `BigWaveBeach` و `DarkAges` اضافه شدن.
+- `WaveGenerator.generate(levelNumber, availableZombieNames)` اضافه شد.
+- `LastStandRule` و `ConveyorRule` کامل شدن.
+- `BARREL_ROLLER` و `IMP_DRAGON` از `TacklerZombieAction`، `HUNTER` و `JUGGLER` از `ZombotanyPeashooterAction`، و `TROGLOBITE` از `RangedDemolisherZombieAction` استفاده می‌کنن.
+- `RaHealAuraZombieAction`، `TombRaiserZombieAction`، `DodoRiderZombieAction`، `HookPullZombieAction`، `SubmergedZombieAction`، `WizardZombieAction` و `KingAuraZombieAction` اضافه شدن.
+- برای `Wizard`، متودهای غیرفعال‌کردن به `Plant` اضافه شد.
+- ۴ تا `ZOMBOSS` فعلا با `StandardZombieAction` هستن و براشون HP فالبک گذاشته شد.
+- باگ پیدا کردن `Imp` در `GargantuarAction` و `TombRaiserZombieAction` اصلاح شد.
+- باگ `ConcurrentModificationException` در `Board.updateAll` هم رفع شد.

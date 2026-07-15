@@ -11,15 +11,17 @@ public class AncientEgyptSeason extends Season {
   }
 
   @Override
-  public void applySeasonEffects(GameState gameState) {}
+  public void applySeasonEffects(GameState gameState) {
+    gameState.update(gameState.getCurrentWave(), this);
+  }
 
   @Override
   public List<Zombie> getAvailableZombies() {
-    return null;
+    return zombiesByAliasKeyword("egypt", "mummy", "ra", "tombraiser");
   }
 
   @Override
   public List<Tile> generateMap() {
-    return null;
+    return plainGrid();
   }
 }

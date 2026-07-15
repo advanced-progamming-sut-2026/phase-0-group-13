@@ -68,7 +68,11 @@ public class Board {
       plant.update(currentTick, this);
     }
 
-    for (Zombie zombie : zombies) {
+    // یه کپی جدا میگیریم چون بعضی رفتارها (مثل Gargantuar/TombRaiser) وسط همین حلقه زامبی جدید به
+    // board.spawnZombie اضافه میکنن؛ بدون این کپی، حلقه رو لیست اصلی ConcurrentModificationException
+    // میداد (این باگ قبلا هیچ‌وقت دیده نمیشد چون Gargantuar's imp throw خودش یه باگ دیگه داشت که
+    // silently fail میشد)
+    for (Zombie zombie : new ArrayList<>(zombies)) {
       zombie.update(currentTick, this);
       checkZombiePlantCollisions(zombie, currentTick);
     }
@@ -196,6 +200,16 @@ public class Board {
     for (Plant p : plants) {
       if (p.getRow() == row && Math.abs(p.getCol() - x) < 0.5) {
         return p;
+      }
+    }
+    return null;
+  }
+
+  // برای گیاهایی که وقتی خورده میشن باید به زامبی مهاجم واکنش نشون بدن (مثل رفلکت دمیج)
+  public Zombie getZombieAt(int row, double x) {
+    for (Zombie z : zombies) {
+      if (z.getRow() == row && !z.isDead() && Math.abs(z.getX() - x) < 0.5) {
+        return z;
       }
     }
     return null;

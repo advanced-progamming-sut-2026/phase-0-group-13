@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import model.enums.StatusEffect;
 import model.game.Board;
+import model.game.reward.Reward;
 import model.game.zombie.ZombieParts.Armor;
 import model.game.zombie.behavior.ZombieAction;
 
@@ -28,6 +29,10 @@ public class Zombie {
 
 
   private boolean shieldBlocker;
+  private double speedMultiplier;
+
+  private boolean shiny;
+  private final List<Reward> lootDrops;
 
   public Zombie(
           String name, int health, double speed, int row, double startX, ZombieAction behavior) {
@@ -43,6 +48,30 @@ public class Zombie {
     this.isEating = false;
     this.activeEffects = new EnumMap<>(StatusEffect.class);
     this.shieldBlocker = false;
+    this.speedMultiplier = 1.0;
+    this.shiny = false;
+    this.lootDrops = new ArrayList<>();
+  }
+
+  // مسئولیت خود دراپ‌ها اینجاست (چون به دیتای زامبی وابسته‌ست)؛ اعمال کردنشون رو یوزر بعد از مرگ
+  // زامبی هنوز جایی صدا زده نمیشه (Board.cleanupEntities فعلا فقط زامبی مرده رو حذف میکنه، جایزه‌ای
+  // نمیده) - این قسمت باید تو GameManager/Board وصل بشه.
+  public void addLoot(Reward reward) {
+    if (reward != null) {
+      this.lootDrops.add(reward);
+    }
+  }
+
+  public List<Reward> getLootDrops() {
+    return lootDrops;
+  }
+
+  public boolean isShiny() {
+    return shiny;
+  }
+
+  public void setShiny(boolean shiny) {
+    this.shiny = shiny;
   }
 
   public void addArmor(Armor armor) {
@@ -84,7 +113,26 @@ public class Zombie {
   public void move() {
     if (!isEating && !activeEffects.containsKey(StatusEffect.FROZEN)) {
       double actualSpeed = activeEffects.containsKey(StatusEffect.CHILLED) ? speed / 2.0 : speed;
-      this.x -= actualSpeed;
+      this.x -= actualSpeed * speedMultiplier;
+    }
+  }
+
+  public void setSpeedMultiplier(double speedMultiplier) {
+    this.speedMultiplier = speedMultiplier;
+  }
+
+  public boolean hasIntactArmor() {
+    for (Armor armor : armors) {
+      if (!armor.isDestroyed()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public void heal(int amount) {
+    if (amount > 0) {
+      this.currentHealth = Math.min(maxHealth, currentHealth + amount);
     }
   }
 
@@ -146,6 +194,10 @@ public class Zombie {
 
   public int getCurrentHealth() {
     return currentHealth;
+  }
+
+  public int getMaxHealth() {
+    return maxHealth;
   }
 
   public boolean isEating() {

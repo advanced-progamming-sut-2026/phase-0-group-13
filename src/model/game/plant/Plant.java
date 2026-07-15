@@ -32,6 +32,8 @@ public class Plant {
 
   private final boolean isBoosted;
 
+  private int disabledUntilTick = -1;
+
   public Plant(
           PlantTemplate template,
           int row,
@@ -62,6 +64,7 @@ public class Plant {
 
   public void update(int currentTick, Board board) {
     if (isDead()) return;
+    if (currentTick < disabledUntilTick) return;
 
     if (plantFood != null && plantFood.canExecute()) {
       plantFood.execute(this, board, currentTick);
@@ -71,6 +74,15 @@ public class Plant {
     if (behavior != null) {
       behavior.execute(this, board, currentTick);
     }
+  }
+
+  // برای زامبی‌هایی مثل Wizard که به‌جای خوردن، گیاه رو موقتا از کار میندازن (تبدیل به گوسفند و ...)
+  public void disableUntil(int tick) {
+    this.disabledUntilTick = tick;
+  }
+
+  public boolean isDisabled(int currentTick) {
+    return currentTick < disabledUntilTick;
   }
 
   public void applyPlantFood() {

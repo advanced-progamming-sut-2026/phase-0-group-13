@@ -5,9 +5,9 @@ import model.game.GameState;
 import model.game.Tile;
 import model.game.zombie.Zombie;
 
-public class FrostbiteCavesSeason extends Season {
-  public FrostbiteCavesSeason() {
-    this.name = "Frostbite Caves";
+public class DarkAgesSeason extends Season {
+  public DarkAgesSeason() {
+    this.name = "Dark Ages";
   }
 
   @Override
@@ -17,7 +17,7 @@ public class FrostbiteCavesSeason extends Season {
 
   @Override
   public List<Zombie> getAvailableZombies() {
-    return zombiesByAliasKeyword("iceage");
+    return zombiesByAliasKeyword("dark");
   }
 
   @Override

@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import model.enums.PlantCategory;
 import model.enums.PlantTag;
 import model.game.PlantFood;
+import model.game.Projectile;
 import model.game.plant.Plant;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.game.plant.behavior.*;
@@ -30,8 +31,8 @@ public class PlantFactory {
     int interval = parseActionInterval(template.actionInterval);
     int damage = parseDamage(template.damage);
 
-    PlantAction behavior = determineBehavior(category, interval, damage);
-    PlantFood plantFood = determinePlantFood(template, category, interval, damage);
+    PlantAction behavior = determineBehavior(category, interval, damage, tags, template.name);
+    PlantFood plantFood = determinePlantFood(template, category, interval, damage, tags);
 
     return new Plant(template, row, col, category, tags, behavior, plantFood);
   }
@@ -106,23 +107,40 @@ public class PlantFactory {
 
 
 
+  // افکت تیر (آتشین/یخی/سمی) بر اساس تگ گیاه انتخاب میشه؛ هم شوتر معمولی هم استرایک-ثرو ازش استفاده میکنن
+  private Projectile.ProjectileEffect resolveProjectileEffect(EnumSet<PlantTag> tags) {
+    if (tags.contains(PlantTag.FIRE)) return Projectile.ProjectileEffect.FIRE;
+    if (tags.contains(PlantTag.ICE)) return Projectile.ProjectileEffect.ICE;
+    if (tags.contains(PlantTag.POISON)) return Projectile.ProjectileEffect.POISON;
+    return Projectile.ProjectileEffect.NORMAL;
+  }
+
   // بقیش باید کامل بشه
   //
-  private PlantAction determineBehavior(PlantCategory category, int interval, int damage) {
+  // MODIFIER پیاده نشده چون هر گیاهش (Torchwood/Hypno-shroom/Imitater/Lily Pad) کارکرد کاملا متفاوتی
+  // داره و یه استراتژی مشترک براشون معنی نداره؛ هرکدوم باید کلاس اختصاصی خودش رو بگیره.
+  // MINT هم چون تو plants.json هیچ گیاهی این دسته رو نداره (گیاهای mint-family زیر دسته خودشون افتادن)
+  // فعلا استاب مونده.
+  private PlantAction determineBehavior(
+      PlantCategory category, int interval, int damage, EnumSet<PlantTag> tags, String name) {
     switch (category) {
       case SUN_PRODUCER:
         return new ProduceSunAction(interval);
       case SHOOTER:
-        return new ShootForwardAction(interval, damage);
+        return new ShootForwardAction(interval, damage, resolveProjectileEffect(tags));
+      case STRIKE_THROUGH:
+        return new ShootForwardAction(interval, damage, resolveProjectileEffect(tags), true);
+      case LOBBER:
+        return new LobAction(interval, damage, tags.contains(PlantTag.AOE), resolveProjectileEffect(tags));
+      case MELEE:
+        return new MeleeAction(interval, damage);
+      case HOMING:
+        return new HomingAction(interval, damage);
       case EXPLOSIVE:
         return new ExplodeAction();
       case WALL_NUT:
-        return null;
-      case LOBBER:
-      case MELEE:
+        return determineWallNutBehavior(tags, name);
       case MODIFIER:
-      case STRIKE_THROUGH:
-      case HOMING:
       case MINT:
         return new DummyPlantAction("category " + category + " has no real behavior class yet");
       default:
@@ -130,14 +148,42 @@ public class PlantFactory {
     }
   }
 
+  // اکثر Wall-nut ها واقعا صرفا سپر منفعلن (null درسته براشون)، ولی چندتاشون قابلیت فعال دارن که با
+  // تگ/اسم تشخیص داده میشن؛ اونایی که فعلا زیرساخت لازم رو ندارن (رج عوض کردن زامبی، انفجار موقع مرگ)
+  // با DummyPlantAction به‌جای null صادقانه علامت‌گذاری میشن که با سپر واقعی اشتباه گرفته نشن
+  private PlantAction determineWallNutBehavior(EnumSet<PlantTag> tags, String name) {
+    if (tags.contains(PlantTag.SUN)) {
+      return new SunOnHitAction(5);
+    }
+    if (name != null && name.toLowerCase().contains("endurian")) {
+      return new ReflectDamageAction();
+    }
+    if (tags.contains(PlantTag.MOVE_ZOMBIES)) {
+      return new DummyPlantAction(
+          "lane-redirect needs Zombie's row to become mutable (Person A's Board contract)");
+    }
+    if (tags.contains(PlantTag.EXPLOSIVE)) {
+      return new DummyPlantAction(
+          "explode-on-death needs an on-death hook; Plant.update() skips dead plants entirely");
+    }
+    return null;
+  }
+
 
   private PlantFood determinePlantFood(
-          PlantTemplate template, PlantCategory category, int interval, int damage) {
+          PlantTemplate template,
+          PlantCategory category,
+          int interval,
+          int damage,
+          EnumSet<PlantTag> tags) {
     switch (category) {
       case SUN_PRODUCER:
         return new PlantFood(1, new ProduceSunAction(1));
       case SHOOTER:
-        return new PlantFood(150, new ShootForwardAction(Math.max(1, interval / 3), damage * 2));
+        return new PlantFood(
+                150,
+                new ShootForwardAction(
+                        Math.max(1, interval / 3), damage * 2, resolveProjectileEffect(tags)));
       default:
         return new PlantFood(
                 1,

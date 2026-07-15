@@ -5,9 +5,9 @@ import model.game.GameState;
 import model.game.Tile;
 import model.game.zombie.Zombie;
 
-public class FrostbiteCavesSeason extends Season {
-  public FrostbiteCavesSeason() {
-    this.name = "Frostbite Caves";
+public class BigWaveBeachSeason extends Season {
+  public BigWaveBeachSeason() {
+    this.name = "Big Wave Beach";
   }
 
   @Override
@@ -17,11 +17,12 @@ public class FrostbiteCavesSeason extends Season {
 
   @Override
   public List<Zombie> getAvailableZombies() {
-    return zombiesByAliasKeyword("iceage");
+    return zombiesByAliasKeyword("beach");
   }
 
   @Override
   public List<Tile> generateMap() {
+    // خونه‌های آب (برای Lily Pad و گیاهان شناور) هنوز تو Tile مدل نشدن؛ فعلا شبکه معمولی برمیگردونیم
     return plainGrid();
   }
 }
