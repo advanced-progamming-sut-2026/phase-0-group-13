@@ -1,7 +1,9 @@
 package model.core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.account.AdventureMap;
 import model.game.Board;
 import model.game.MatchResult;
@@ -21,6 +23,8 @@ public class GameManager {
   private boolean running;
   private MatchResult matchResult;
   private final ScoreManager scoreManager = new ScoreManager();
+  private final Map<String, Integer> lastPlantedTick = new HashMap<>();
+  private boolean cooldownsDisabled;
   private AllNews allnews;
   private List<Quest> quests;
   private AdventureMap adventureMap;
@@ -170,6 +174,32 @@ public class GameManager {
 
   public ScoreManager getScoreManager() {
     return scoreManager;
+  }
+
+  // ---- planting cooldown (recharge) ----
+
+  /** Remaining ticks until this plant type can be planted again; 0 means ready. */
+  public int ticksUntilPlantReady(String plantType, int rechargeSeconds) {
+    if (cooldownsDisabled || plantType == null) {
+      return 0;
+    }
+    Integer last = lastPlantedTick.get(plantType.toLowerCase());
+    if (last == null) {
+      return 0;
+    }
+    int readyAt = last + rechargeSeconds * 10;
+    return Math.max(0, readyAt - currentTick);
+  }
+
+  public void recordPlanting(String plantType) {
+    if (plantType != null) {
+      lastPlantedTick.put(plantType.toLowerCase(), currentTick);
+    }
+  }
+
+  public void disableCooldowns() {
+    cooldownsDisabled = true;
+    lastPlantedTick.clear();
   }
 
   public int getCurrentWaveIndex() {

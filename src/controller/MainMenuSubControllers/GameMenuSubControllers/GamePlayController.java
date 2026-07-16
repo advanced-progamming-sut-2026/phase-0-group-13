@@ -11,6 +11,7 @@ import model.account.User;
 import model.core.App;
 import model.core.GameManager;
 import model.core.GameSession;
+import model.core.MatchSetup;
 import model.enums.Commands.GamePlayMenuCommands;
 import model.enums.Commands.MenuCommands;
 import model.enums.Menu;
@@ -20,6 +21,7 @@ import model.game.Sun;
 import model.game.Tile;
 import model.game.plant.Plant;
 import model.game.plant.Factory.PlantFactory;
+import model.game.plant.PlantParts.PlantTemplate;
 import model.game.zombie.Zombie;
 import model.game.zombie.factory.ZombieFactory;
 
@@ -79,6 +81,7 @@ public class GamePlayController implements BaseController {
     } else if (GamePlayMenuCommands.CheatAddPlantFood.getMatcher(command) != null) {
       gm.getBoard().getGameState().addPlantFood();
     } else if (GamePlayMenuCommands.CheatRemoveCooldown.getMatcher(command) != null) {
+      gm.disableCooldowns();
       System.out.println("All plant cooldowns cleared.");
     } else if (GamePlayMenuCommands.ReleaseTheNuke.getMatcher(command) != null) {
       handleNuke(gm);
@@ -120,6 +123,18 @@ public class GamePlayController implements BaseController {
       return;
     }
     String type = m.group("type").trim();
+    PlantTemplate template = GameDataManager.plantRepository.find(type);
+    if (template == null) {
+      System.out.println("error: unknown plant '" + type + "'");
+      return;
+    }
+
+    int remaining = gm.ticksUntilPlantReady(type, template.recharge);
+    if (remaining > 0) {
+      System.out.printf("error: %s is recharging; ready in %.1f seconds%n", type, remaining / 10.0);
+      return;
+    }
+
     Plant plant = null;
     try {
       plant = new PlantFactory(GameDataManager.plantRepository).createPlant(type, rc[0], rc[1]);
@@ -132,6 +147,7 @@ public class GamePlayController implements BaseController {
       return;
     }
     if (gm.placePlant(plant, rc[0], rc[1])) {
+      gm.recordPlanting(type);
       System.out.printf("Planted %s at (%s, %s).%n", type, m.group("x"), m.group("y"));
     } else {
       System.out.println("error: cannot plant there (tile occupied or not enough sun)");
@@ -226,15 +242,19 @@ public class GamePlayController implements BaseController {
   }
 
   private void handlePlantsStatus(GameManager gm) {
-    List<Plant> plants = gm.getBoard().getPlants();
-    if (plants.isEmpty()) {
-      System.out.println("No plants on the field.");
+    List<String> deck = MatchSetup.getInstance().getSelectedPlants();
+    if (deck.isEmpty() || GameDataManager.plantRepository == null) {
+      System.out.println("No plants selected for this match.");
       return;
     }
-    for (Plant p : plants) {
-      System.out.printf(
-          "  %s at (%d, %d) - hp %d%n", p.getName(), p.getCol() + 1, p.getRow() + 1,
-          p.getCurrentHealth());
+    for (String name : deck) {
+      PlantTemplate template = GameDataManager.plantRepository.find(name);
+      if (template == null) {
+        continue;
+      }
+      int remaining = gm.ticksUntilPlantReady(name, template.recharge);
+      String state = remaining == 0 ? "ready" : String.format("ready in %.1fs", remaining / 10.0);
+      System.out.printf("  %s - cost %d sun - %s%n", template.name, template.cost, state);
     }
   }
 

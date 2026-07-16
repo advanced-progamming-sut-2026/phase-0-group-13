@@ -34,6 +34,10 @@ public class MatchSetup {
     this.currentMiniGame = MiniGameType.NONE;
   }
 
+  public String getTargetChapter() {
+    return targetChapter;
+  }
+
   public void setMiniGame(MiniGameType type, int level) {
     this.currentMiniGame = type;
     this.miniGameLevel = level;

@@ -99,21 +99,24 @@ public class Board {
       int amount;
 
       if (roll < 80) {
-        type = model.enums.SunType.PEASHOOTER;
+        type = model.enums.SunType.NORMAL;
         amount = 25;
       } else if (roll < 95) {
-        type = model.enums.SunType.REPEATER;
+        type = model.enums.SunType.LARGE;
         amount = 100;
       } else {
-        type = model.enums.SunType.SUNFLOWER;
-        amount = 0;
+        // رادیواکتیو اگه رو زمین برسه مثل خورشید معمولی جمع میشه
+        type = model.enums.SunType.RADIOACTIVE;
+        amount = 25;
       }
 
       Sun newSun = new Sun(amount, 150, type);
       newSun.changinCordinate(targetCol, targetRow);
       suns.add(newSun);
 
-      System.out.printf("New sun dropping at position (%d, %d)%n", targetCol, targetRow);
+      System.out.printf(
+          "New %s sun is dropping at position (%d, %d)%n",
+          type.name().toLowerCase(), targetCol + 1, targetRow + 1);
     }
   }
 
