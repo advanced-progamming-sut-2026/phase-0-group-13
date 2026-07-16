@@ -207,4 +207,12 @@ public class Zombie {
   public void setEating(boolean eating) {
     this.isEating = eating;
   }
+
+  public List<Armor> getArmors() {
+    return armors;
+  }
+
+  public Map<StatusEffect, Integer> getActiveEffects() {
+    return activeEffects;
+  }
 }

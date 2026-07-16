@@ -149,8 +149,20 @@ public class GamePlayController implements BaseController {
     if (gm.placePlant(plant, rc[0], rc[1])) {
       gm.recordPlanting(type);
       System.out.printf("Planted %s at (%s, %s).%n", type, m.group("x"), m.group("y"));
+      activateBoostIfAny(plant, type);
     } else {
       System.out.println("error: cannot plant there (tile occupied or not enough sun)");
+    }
+  }
+
+  /** Boosted plants (picked in plant selection) get their plant-food effect on every planting. */
+  private void activateBoostIfAny(Plant plant, String type) {
+    for (String boosted : MatchSetup.getInstance().getBoostedPlants()) {
+      if (boosted != null && boosted.equalsIgnoreCase(type)) {
+        plant.applyPlantFood();
+        System.out.println(type + " is boosted: plant food effect activated!");
+        return;
+      }
     }
   }
 
@@ -293,6 +305,17 @@ public class GamePlayController implements BaseController {
       System.out.println(z.getName() + ":");
       System.out.printf("  position: %.1f, %d%n", z.getX() + 1, z.getRow() + 1);
       System.out.println("  health: " + z.getCurrentHealth());
+      System.out.println("  armor:");
+      for (var armor : z.getArmors()) {
+        if (!armor.isDestroyed()) {
+          System.out.println("    " + armor.getName() + ": " + armor.getCurrentHealth());
+        }
+      }
+      System.out.println("  effects:");
+      for (var effect : z.getActiveEffects().entrySet()) {
+        System.out.printf(
+            "    %s: %.1fs%n", effect.getKey().name().toLowerCase(), effect.getValue() / 10.0);
+      }
     }
   }
 
