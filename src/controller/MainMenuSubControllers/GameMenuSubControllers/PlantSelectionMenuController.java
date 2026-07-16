@@ -108,14 +108,15 @@ public class PlantSelectionMenuController implements BaseController {
     if (user == null) return;
 
     int deckSize = user.getSelectedDeck().size();
-    if (deckSize < User.MIN_DECK_SLOTS) {
+    int requiredSlots = Math.min(User.MIN_DECK_SLOTS, user.getUnlockedPlants().size());
+    if (deckSize < requiredSlots) {
       System.out.println(
               "error: select at least "
-                      + User.MIN_DECK_SLOTS
+                      + requiredSlots
                       + " plants before starting the game (you have "
                       + deckSize
                       + "/"
-                      + User.MIN_DECK_SLOTS
+                      + requiredSlots
                       + ")");
       return;
     }

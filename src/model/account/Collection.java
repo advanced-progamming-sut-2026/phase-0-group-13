@@ -5,9 +5,9 @@ import java.util.List;
 import model.Result;
 
 public class Collection {
-  private List<String> unlockedPlants;
+  private final List<String> unlockedPlants;
 
-  private transient List<String> selectedDeck;
+  private final transient List<String> selectedDeck;
 
   private int maxSeedSlots;
 
@@ -82,11 +82,10 @@ public class Collection {
   }
 
   public Result upgradeSeedSlots() {
-    if (this.maxSeedSlots
-        < 10) { // یادم نمیاد چند تا بود ، حوصله ندارم داک و ببینم الان دقیقش ، 10 گذاشتم
+    if (this.maxSeedSlots < User.MAX_DECK_SLOTS) {
       this.maxSeedSlots++;
       return new Result(
-          true, "Seed slots upgraded! Current slots: " + this.maxSeedSlots, this.maxSeedSlots);
+              true, "Seed slots upgraded! Current slots: " + this.maxSeedSlots, this.maxSeedSlots);
     }
     return new Result(false, "Seed slots are already at maximum capacity.", null);
   }

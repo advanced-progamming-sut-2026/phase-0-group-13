@@ -19,8 +19,6 @@ import model.game.quest.Quest;
 
 public class QuestMenuController implements BaseController {
 
-  private static final List<String> PRIORITY_ORDER = List.of("بحرانی", "بالا", "متوسط", "کم");
-
   private static final List<String> AVAILABLE_MINI_GAMES = List.of("zombotany", "vasebreaker");
 
   @Override
@@ -119,8 +117,14 @@ public class QuestMenuController implements BaseController {
   }
 
   private int priorityRank(Quest quest) {
-    int index = PRIORITY_ORDER.indexOf(quest.getPriority());
-    return index == -1 ? PRIORITY_ORDER.size() : index;
+    if (quest.getPriority() == null) return 5;
+    String p = quest.getPriority().toLowerCase();
+
+    if (p.contains("بحرانی") || p.contains("critical")) return 1;
+    if (p.contains("بالا") || p.contains("high")) return 2;
+    if (p.contains("روزانه") || p.contains("daily")) return 3;
+    if (p.contains("کم") || p.contains("low")) return 4;
+    return 5;
   }
 
   private void printQuest(Quest quest) {

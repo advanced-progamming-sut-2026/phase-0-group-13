@@ -5,12 +5,6 @@ import model.account.User;
 
 public class Quest {
 
-  // فعلا ارتباط بین جیسون ها و دیتا سرور درست نشده
-  // یعنی صرفا زده شده ساختار کلی جیسون
-
-  // جیسون کوئست ها فارسیه
-  // دیگه جای اینکه کل جیسون و عوض کنیم اسم هارو اینجا بهش میفهمونیم که چی چیه
-  // اولش اگه فارسی نمیکردش ایعای از روی CSV نیازی به این مورد نبودش الان
   @SerializedName("نام کوئست ها")
   public String title;
 
@@ -39,7 +33,6 @@ public class Quest {
     this.rewardClaimed = false;
   }
 
-  /** Clones a shared quest template into a fresh, per-user progress instance. */
   public Quest(Quest template) {
     this.title = template.title;
     this.category = template.category;
@@ -52,41 +45,15 @@ public class Quest {
     this.rewardClaimed = false;
   }
 
-  public String getTitle() {
-    return title;
-  }
-
-  public String getCategory() {
-    return category;
-  }
-
-  public String getCondition() {
-    return condition;
-  }
-
-  public String getRewardType() {
-    return rewardType;
-  }
-
-  public String getPriority() {
-    return priority;
-  }
-
-  public String getVariable() {
-    return variable;
-  }
-
-  public boolean isCompleted() {
-    return isCompleted;
-  }
-
-  public double getProgressOfQuest() {
-    return progressOfQuest;
-  }
-
-  public boolean isRewardClaimed() {
-    return rewardClaimed;
-  }
+  public String getTitle() { return title; }
+  public String getCategory() { return category; }
+  public String getCondition() { return condition; }
+  public String getRewardType() { return rewardType; }
+  public String getPriority() { return priority; }
+  public String getVariable() { return variable; }
+  public boolean isCompleted() { return isCompleted; }
+  public double getProgressOfQuest() { return progressOfQuest; }
+  public boolean isRewardClaimed() { return rewardClaimed; }
 
   public void addProgress(double amount, double target) {
     if (isCompleted) return;
@@ -94,19 +61,13 @@ public class Quest {
     progressOfQuest += amount;
     if (progressOfQuest >= target) {
       progressOfQuest = target;
-      isCompleted = true;
       finish();
     }
   }
 
-  public void start() {
-    // مثلا وقتی این و بزنیم یه کوئست شروع میشه به بررسی شذن ( یعنی مثلا تو لیست کوست ها هستش و روند
-    // شو چک میکنیم
-    // که مثلا چند درصد پیشرفت هست یا هرچیزی
-  }
+  public void start() {}
 
   public void finish() {
-    // وقتی کامل بشه اینجا یا خروجی ای میدیم یا هرچیزی
     this.isCompleted = true;
   }
 
@@ -114,15 +75,24 @@ public class Quest {
     if (!isCompleted || rewardClaimed) return;
 
     if (rewardType != null) {
-      if (rewardType.contains("الماس") || rewardType.contains("Gem")) {
-        int amount = extractNumber(rewardType);
-        user.addDiamonds(amount);
-      } else if (rewardType.contains("سکه") || rewardType.contains("Coin")) {
-        int amount = extractNumber(rewardType);
-        user.addCoins(amount);
-      } else if (rewardType.contains("پک دانه")) {
-        int amount = extractNumber(rewardType);
-        user.getInventory().addItem("seed_packet", amount);
+      String rtLower = rewardType.toLowerCase();
+      int amount = extractNumber(rewardType);
+
+      if (rtLower.contains("الماس") || rtLower.contains("gem")) {
+        user.addDiamonds(amount > 0 ? amount : 1);
+      } else if (rtLower.contains("سکه") || rtLower.contains("coin")) {
+        user.addCoins(amount > 0 ? amount : 100);
+      }
+      else if (rtLower.contains("پک دانه") || rtLower.contains("seed")) {
+        String target = (variable != null && !variable.trim().isEmpty()) ? variable.trim() : "random";
+        user.getInventory().addItem("seed_" + target, amount > 0 ? amount : 1);
+      } else if (rtLower.contains("غذا") || rtLower.contains("food")) {
+        user.getInventory().addItem("plant_food", amount > 0 ? amount : 1);
+      }
+      else if (rtLower.contains("آنلاک") || rtLower.contains("unlock") || rtLower.contains("باز کردن")) {
+        if (variable != null && !variable.trim().isEmpty()) {
+          user.unlockItem(variable.trim());
+        }
       }
     }
     rewardClaimed = true;

@@ -13,19 +13,24 @@ public class WaveGenerator {
 
   private WaveGenerator() {}
 
-  // فرمول اولیه: هرچی levelNumber بالاتر بره هم تعداد موج‌ها بیشتر میشه هم تعداد زامبی هر موج، و موج
-  // آخر (موج پرچم) ۵۰٪ سنگین‌تر از بقیه‌س. چون Wave.spawnDelays فقط یه delay برای هر اسم زامبی نگه
-  // میداره (نه هر نمونه جداگانه)، تا جایی که ممکنه از تکرار یه اسم تو یه موج پرهیز میکنیم؛ وقتی
-  // استخر زامبی از تعداد لازم کوچیک‌تر باشه، تکرار پیش میاد و همه‌ی نمونه‌های اون اسم با هم روی یه
-  // delay اسپاون میشن (محدودیت خود Wave، نه این جنریتور).
   public static List<Wave> generate(int levelNumber, List<String> availableZombieNames) {
+    return generateInternal(levelNumber, availableZombieNames, new Random());
+  }
+
+  public static List<Wave> generateDailyScoreGameWaves(int levelNumber, List<String> availableZombieNames) {
+    long dailySeed = System.currentTimeMillis() / 86400000L; 
+    Random dailyRandom = new Random(dailySeed);
+    return generateInternal(levelNumber, availableZombieNames, dailyRandom);
+  }
+
+  private static List<Wave> generateInternal(
+          int levelNumber, List<String> availableZombieNames, Random random) {
     List<Wave> waves = new ArrayList<>();
     if (availableZombieNames == null || availableZombieNames.isEmpty()) {
       return waves;
     }
 
     int waveCount = Math.min(MAX_WAVES, 3 + levelNumber / 2);
-    Random random = new Random();
 
     for (int waveNumber = 1; waveNumber <= waveCount; waveNumber++) {
       boolean isFlagWave = waveNumber == waveCount;
@@ -41,7 +46,7 @@ public class WaveGenerator {
   }
 
   private static Wave buildWave(
-      int waveNumber, int zombieCount, List<String> pool, Random random) {
+          int waveNumber, int zombieCount, List<String> pool, Random random) {
     List<String> shuffledPool = new ArrayList<>(pool);
     java.util.Collections.shuffle(shuffledPool, random);
 
@@ -50,7 +55,7 @@ public class WaveGenerator {
 
     for (int i = 0; i < zombieCount; i++) {
       String zombieName =
-          i < shuffledPool.size() ? shuffledPool.get(i) : pool.get(random.nextInt(pool.size()));
+              i < shuffledPool.size() ? shuffledPool.get(i) : pool.get(random.nextInt(pool.size()));
       zombiesToSpawn.add(zombieName);
 
       int delay = (i / 2) * SPAWN_SPACING_SECONDS * TICKS_PER_SECOND;

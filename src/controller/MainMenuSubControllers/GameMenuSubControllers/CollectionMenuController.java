@@ -122,7 +122,11 @@ public class CollectionMenuController implements BaseController {
     System.out.println("--- All Zombies ---");
     for (ZombieTemplate template : all) {
       boolean seen = user != null && user.getUnlockedZombies().contains(zombieKey(template.getName()));
-      System.out.println("  " + template.getName() + " - " + (seen ? "seen" : "not yet encountered"));
+      if (seen) {
+        System.out.println("  " + template.getName() + " - seen");
+      } else {
+        System.out.println("  ??? - not yet encountered");
+      }
     }
   }
 
@@ -157,12 +161,17 @@ public class CollectionMenuController implements BaseController {
     User user = UserManager.getInstance().getCurrentUser();
     boolean seen = user != null && user.getUnlockedZombies().contains(zombieKey(template.getName()));
 
+    if (!seen) {
+      System.out.println("error: You haven't encountered this zombie yet! Its details are unknown.");
+      return;
+    }
+
     System.out.println("Name: " + template.getName());
     System.out.println("Type: " + ZombieTypeResolver.resolve(template));
     System.out.println("Health: " + template.getBaseHp());
     System.out.println("Speed: " + template.getBaseSpeed());
     System.out.println("Special abilities: " + template.getStatsSummary());
-    System.out.println("Status: " + (seen ? "seen" : "not yet encountered"));
+    System.out.println("Status: seen");
   }
 
   private void handleUpgradePlant(String plantName) {
@@ -187,6 +196,7 @@ public class CollectionMenuController implements BaseController {
     String seedKey = "seed_" + canonicalName;
     int seedCost = UPGRADE_SEED_COST * currentLevel;
     int coinCost = UPGRADE_COIN_COST * currentLevel;
+
     if (!hasSufficientUpgradeResources(user, plantName, seedKey, seedCost, coinCost)) {
       return;
     }

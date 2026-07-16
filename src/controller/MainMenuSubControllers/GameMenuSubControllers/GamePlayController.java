@@ -43,7 +43,6 @@ public class GamePlayController implements BaseController {
     }
   }
 
-  /** Returns true if the command matched something. */
   private boolean dispatch(String command, GameManager gm) {
     Matcher m;
     if ((m = GamePlayMenuCommands.AdvanceTime.getMatcher(command)) != null) {
@@ -68,7 +67,6 @@ public class GamePlayController implements BaseController {
     return true;
   }
 
-  /** Second half of dispatch for the argument-less commands (keeps each method short). */
   private boolean dispatchNoArg(String command, GameManager gm) {
     if (GamePlayMenuCommands.ShowMap.getMatcher(command) != null) {
       renderMap(gm);
@@ -80,13 +78,19 @@ public class GamePlayController implements BaseController {
       handleZombiesInfo(gm);
     } else if (GamePlayMenuCommands.CheatAddPlantFood.getMatcher(command) != null) {
       gm.getBoard().getGameState().addPlantFood();
+      System.out.println("1 Plant food added.");
     } else if (GamePlayMenuCommands.CheatRemoveCooldown.getMatcher(command) != null) {
       gm.disableCooldowns();
       System.out.println("All plant cooldowns cleared.");
     } else if (GamePlayMenuCommands.ReleaseTheNuke.getMatcher(command) != null) {
       handleNuke(gm);
     } else if (GamePlayMenuCommands.StartZombieWaves.getMatcher(command) != null) {
-      System.out.println("Zombie waves started.");
+      try {
+        gm.startZombieWaves();
+        System.out.println("Zombie waves started.");
+      } catch (Exception e) {
+        System.out.println("error: could not start zombie waves. " + e.getMessage());
+      }
     } else if (MenuCommands.ShowCurrentMenu.getMatcher(command) != null) {
       System.out.println("GamePlay Menu");
     } else if (MenuCommands.ExitMenu.getMatcher(command) != null) {
@@ -96,8 +100,6 @@ public class GamePlayController implements BaseController {
     }
     return true;
   }
-
-  // ---------------------------------------------------------------- command handlers
 
   private void handleAdvance(GameManager gm, Matcher m) {
     int count = parseInt(m.group("count"));
@@ -155,7 +157,6 @@ public class GamePlayController implements BaseController {
     }
   }
 
-  /** Boosted plants (picked in plant selection) get their plant-food effect on every planting. */
   private void activateBoostIfAny(Plant plant, String type) {
     for (String boosted : MatchSetup.getInstance().getBoostedPlants()) {
       if (boosted != null && boosted.equalsIgnoreCase(type)) {
@@ -187,8 +188,8 @@ public class GamePlayController implements BaseController {
     }
     for (Sun sun : gm.getBoard().getSuns()) {
       if (!sun.isExpired()
-          && Math.round(sun.getX()) == rc[1]
-          && Math.round(sun.getY()) == rc[0]) {
+              && Math.round(sun.getX()) == rc[1]
+              && Math.round(sun.getY()) == rc[0]) {
         gm.collectSun(sun);
         return;
       }
@@ -216,6 +217,7 @@ public class GamePlayController implements BaseController {
       return;
     }
     gm.getBoard().getGameState().addSun(count);
+    System.out.println("Added " + count + " suns.");
   }
 
   private void handleSpawnZombie(GameManager gm, Matcher m) {
@@ -230,7 +232,7 @@ public class GamePlayController implements BaseController {
     String type = m.group("zombieType").trim();
     try {
       Zombie zombie =
-          new ZombieFactory(GameDataManager.zombieRepository).createZombie(type, rc[0], rc[1]);
+              new ZombieFactory(GameDataManager.zombieRepository).createZombie(type, rc[0], rc[1]);
       if (zombie == null) {
         System.out.println("error: unknown zombie type '" + type + "'");
         return;
@@ -280,19 +282,19 @@ public class GamePlayController implements BaseController {
     Tile tile = board.getTile(rc[0], rc[1]);
     System.out.printf("Tile (%s, %s):%n", m.group("x"), m.group("y"));
     System.out.println(
-        "  plant: " + (plant == null ? "none" : plant.getName() + " (hp " + plant.getCurrentHealth() + ")"));
+            "  plant: " + (plant == null ? "none" : plant.getName() + " (hp " + plant.getCurrentHealth() + ")"));
     StringBuilder zs = new StringBuilder();
     for (Zombie z : board.getZombies()) {
       if (Math.round(z.getX()) == rc[1] && z.getRow() == rc[0]) {
-        zs.append(z.getName()).append(' ');
+        zs.append(z.getName()).append(" ");
       }
     }
     System.out.println("  zombies: " + (zs.length() == 0 ? "none" : zs.toString().trim()));
     System.out.println(
-        "  effect: "
-            + (tile == null || tile.getEffect() == null
-                ? "none"
-                : tile.getEffect().getClass().getSimpleName()));
+            "  effect: "
+                    + (tile == null || tile.getEffect() == null
+                    ? "none"
+                    : tile.getEffect().getClass().getSimpleName()));
   }
 
   private void handleZombiesInfo(GameManager gm) {
@@ -314,19 +316,17 @@ public class GamePlayController implements BaseController {
       System.out.println("  effects:");
       for (var effect : z.getActiveEffects().entrySet()) {
         System.out.printf(
-            "    %s: %.1fs%n", effect.getKey().name().toLowerCase(), effect.getValue() / 10.0);
+                "    %s: %.1fs%n", effect.getKey().name().toLowerCase(), effect.getValue() / 10.0);
       }
     }
   }
 
-  // ---------------------------------------------------------------- rendering
-
   private void renderMap(GameManager gm) {
     Board board = gm.getBoard();
     System.out.printf(
-        "=== Wave %d/%d | Sun: %d | Plant Food: %d ===%n",
-        gm.getCurrentWaveIndex() + 1, gm.getTotalWaves(), gm.getSunAmount(),
-        gm.getPlantFoodCount());
+            "=== Wave %d/%d | Sun: %d | Plant Food: %d ===%n",
+            gm.getCurrentWaveIndex() + 1, gm.getTotalWaves(), gm.getSunAmount(),
+            gm.getPlantFoodCount());
     for (int row = 0; row < board.getRows(); row++) {
       StringBuilder line = new StringBuilder();
       for (int col = 0; col < board.getColumns(); col++) {
@@ -354,13 +354,11 @@ public class GamePlayController implements BaseController {
     return '.';
   }
 
-  // ---------------------------------------------------------------- helpers
-
   private void finishMatch(GameManager gm) {
     MatchResult result = gm.getMatchResult();
     if (result.isWon()) {
       System.out.println(
-          "Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.");
+              "Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.");
     } else {
       System.out.println("You lost the battle.");
     }
@@ -372,7 +370,6 @@ public class GamePlayController implements BaseController {
     App.setCurrentMenu(back);
   }
 
-  /** Applies match outcome to the logged-in user: record, MyoPoints, rewards, adventure step. */
   private void applyProgression(GameManager gm, MatchResult result) {
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) {
@@ -385,7 +382,7 @@ public class GamePlayController implements BaseController {
     if (result.isWon()) {
       Progress progress = user.getProgress();
       model.Result reward =
-          AdventureMap.getLevelReward(progress.getCurrentStage(), progress.getCurrentLevel());
+              AdventureMap.getLevelReward(progress.getCurrentStage(), progress.getCurrentLevel());
       if (reward.success() && reward.getObject() instanceof String unlockId) {
         System.out.println(reward.message());
         if (!unlockId.contains("trophy")) {
@@ -402,7 +399,6 @@ public class GamePlayController implements BaseController {
     }
   }
 
-  /** Converts 1-indexed command coords (x=col, y=row) to 0-indexed {row, col}; null if invalid. */
   private int[] parseCoord(Board board, String xStr, String yStr) {
     int x = parseInt(xStr);
     int y = parseInt(yStr);
@@ -413,10 +409,10 @@ public class GamePlayController implements BaseController {
     int col = x - 1;
     int row = y - 1;
     if (board == null
-        || row < 0
-        || row >= board.getRows()
-        || col < 0
-        || col >= board.getColumns()) {
+            || row < 0
+            || row >= board.getRows()
+            || col < 0
+            || col >= board.getColumns()) {
       System.out.println("error: coordinates out of bounds");
       return null;
     }

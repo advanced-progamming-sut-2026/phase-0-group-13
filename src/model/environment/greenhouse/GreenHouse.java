@@ -15,7 +15,7 @@ public class GreenHouse {
     this.pots = new ArrayList<>(maxCapacity);
 
     for (int i = 0; i < maxCapacity; i++) {
-      pots.add(new Pot(false));
+      pots.add(new Pot(i < 5));
     }
   }
 
@@ -62,15 +62,15 @@ public class GreenHouse {
 
     if (Math.random() < 0.5) {
       seedToPlant = "marigold";
-      duration = Pot.MARIGOLD_GROWTH;
+      duration = 2L * 60 * 60 * 1000;
     } else {
       List<String> unlocked = user.getUnlockedPlants();
       if (unlocked.isEmpty()) {
         seedToPlant = "marigold";
-        duration = Pot.MARIGOLD_GROWTH;
+        duration = 2L * 60 * 60 * 1000;
       } else {
         seedToPlant = unlocked.get(new Random().nextInt(unlocked.size()));
-        duration = Pot.RANDOM_GROWTH;
+        duration = 8L * 60 * 60 * 1000;
       }
     }
 
@@ -86,7 +86,7 @@ public class GreenHouse {
     if (!pot.isFullyGrown()) {
       long remainingMinutes = (pot.getRemainingGrowTime() / 1000) / 60;
       return new Result(
-          false, "error: seed is still growing, ~" + remainingMinutes + " minute(s) left", null);
+              false, "error: seed is still growing, ~" + remainingMinutes + " minute(s) left", null);
     }
 
     String seedId = pot.getPlantedSeedId();

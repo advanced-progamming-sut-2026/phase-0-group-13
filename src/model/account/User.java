@@ -71,6 +71,15 @@ public class User {
 
     this.unlockedPlants.add("peashooter");
     this.unlockedPlants.add("sunflower");
+    this.unlockedPlants.add("wall-nut");
+    this.unlockedPlants.add("potato-mine");
+    this.unlockedPlants.add("cabbage-pult");
+    this.unlockedPlants.add("puff-shroom");
+
+    for (String plant : this.unlockedPlants) {
+      this.plantLevels.put(plant, 1);
+    }
+
     this.unlockedStages.add("stage_1");
     this.progress = new Progress();
   }
@@ -80,28 +89,22 @@ public class User {
       return;
     }
 
-    if (hasAlreadyUnlocked(targetId)) {
-      return;
-    }
-
     if (targetId.startsWith("plant_")) {
-      unlockedPlants.add(targetId);
-      generateNews("plant", targetId);
+      String plantName = targetId.substring("plant_".length());
+      unlockPlant(plantName); 
 
     } else if (targetId.startsWith("zombie_")) {
-      unlockedZombies.add(targetId);
-      generateNews("zombie", targetId);
+      if (!unlockedZombies.contains(targetId)) {
+        unlockedZombies.add(targetId);
+        generateNews("zombie", targetId);
+      }
 
     } else if (targetId.startsWith("stage_") || targetId.startsWith("minigame_")) {
-      unlockedStages.add(targetId);
-      generateNews("stage", targetId);
+      if (!unlockedStages.contains(targetId)) {
+        unlockedStages.add(targetId);
+        generateNews("stage", targetId);
+      }
     }
-  }
-
-  private boolean hasAlreadyUnlocked(String targetId) {
-    return unlockedPlants.contains(targetId)
-            || unlockedZombies.contains(targetId)
-            || unlockedStages.contains(targetId);
   }
 
   public void setSecurityQuestion(String qNumber, String answer) {
@@ -132,53 +135,18 @@ public class User {
     recentGames.add(0, result);
   }
 
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public String getPasswordHash() {
-    return passwordHash;
-  }
-
-  public void setPasswordHash(String passwordHash) {
-    this.passwordHash = passwordHash;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public String getNickname() {
-    return nickname;
-  }
-
-  public void setNickname(String nickname) {
-    this.nickname = nickname;
-  }
-
-  public String getGender() {
-    return gender;
-  }
-
-  public String getSecurityQuestionNumber() {
-    return securityQuestionNumber;
-  }
-
-  public String getSecurityAnswer() {
-    return securityAnswer;
-  }
-
-  public int getCoins() {
-    return coins;
-  }
+  public String getUsername() { return username; }
+  public void setUsername(String username) { this.username = username; }
+  public String getPasswordHash() { return passwordHash; }
+  public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+  public String getEmail() { return email; }
+  public void setEmail(String email) { this.email = email; }
+  public String getNickname() { return nickname; }
+  public void setNickname(String nickname) { this.nickname = nickname; }
+  public String getGender() { return gender; }
+  public String getSecurityQuestionNumber() { return securityQuestionNumber; }
+  public String getSecurityAnswer() { return securityAnswer; }
+  public int getCoins() { return coins; }
 
   public void addCoins(int amount) {
     this.coins = Math.max(0, this.coins + amount);
@@ -188,73 +156,23 @@ public class User {
     this.diamonds = Math.max(0, this.diamonds + amount);
   }
 
-  public int getDiamonds() {
-    return diamonds;
-  }
-
-  public int getDifficultyLevel() {
-    return difficultyLevel;
-  }
-
-  public void setDifficultyLevel(int difficultyLevel) {
-    this.difficultyLevel = difficultyLevel;
-  }
-
-  public List<String> getUnlockedPlants() {
-    return unlockedPlants;
-  }
-
-  public List<String> getUnlockedZombies() {
-    return unlockedZombies;
-  }
-
-  public List<MatchResult> getRecentGames() {
-    return recentGames;
-  }
-
-  public Progress getProgress() {
-    return progress;
-  }
-
-  public List<String> getUnlockedStages() {
-    return unlockedStages;
-  }
-
-  public Inventory getInventory() {
-    return inventory;
-  }
-
-  public GreenHouse getGreenHouse() {
-    return greenHouse;
-  }
-
-  public AllNews getNewsBox() {
-    return newsBox;
-  }
-
-  public List<Quest> getQuests() {
-    return quests;
-  }
-
-  public long getLastShopRefreshTime() {
-    return lastShopRefreshTime;
-  }
-
-  public void setLastShopRefreshTime(long lastShopRefreshTime) {
-    this.lastShopRefreshTime = lastShopRefreshTime;
-  }
-
-  public long getLastDailyDealPurchaseTime() {
-    return lastDailyDealPurchaseTime;
-  }
-
-  public void setLastDailyDealPurchaseTime(long lastDailyDealPurchaseTime) {
-    this.lastDailyDealPurchaseTime = lastDailyDealPurchaseTime;
-  }
-
-  public int getMeowPoints() {
-    return meowPoints;
-  }
+  public int getDiamonds() { return diamonds; }
+  public int getDifficultyLevel() { return difficultyLevel; }
+  public void setDifficultyLevel(int difficultyLevel) { this.difficultyLevel = difficultyLevel; }
+  public List<String> getUnlockedPlants() { return unlockedPlants; }
+  public List<String> getUnlockedZombies() { return unlockedZombies; }
+  public List<MatchResult> getRecentGames() { return recentGames; }
+  public Progress getProgress() { return progress; }
+  public List<String> getUnlockedStages() { return unlockedStages; }
+  public Inventory getInventory() { return inventory; }
+  public GreenHouse getGreenHouse() { return greenHouse; }
+  public AllNews getNewsBox() { return newsBox; }
+  public List<Quest> getQuests() { return quests; }
+  public long getLastShopRefreshTime() { return lastShopRefreshTime; }
+  public void setLastShopRefreshTime(long lastShopRefreshTime) { this.lastShopRefreshTime = lastShopRefreshTime; }
+  public long getLastDailyDealPurchaseTime() { return lastDailyDealPurchaseTime; }
+  public void setLastDailyDealPurchaseTime(long lastDailyDealPurchaseTime) { this.lastDailyDealPurchaseTime = lastDailyDealPurchaseTime; }
+  public int getMeowPoints() { return meowPoints; }
 
   public void addMeowPoints(int amount) {
     this.meowPoints += amount;

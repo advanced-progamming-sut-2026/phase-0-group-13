@@ -11,9 +11,7 @@ import model.enums.CurrencyType;
 import model.enums.ItemCategory;
 
 public class Shop {
-  private static final long ONE_DAY_MILLIS = 24L * 60 * 60 * 1000;
   private static final long MILLIS_PER_DAY = 86400000L;
-  private static final int DAILY_DEAL_COUNT = 3;
 
   private final List<ShopItem> allTimeProducts;
   private final Map<String, List<ShopItem>> userDailyDeals;
@@ -59,15 +57,14 @@ public class Shop {
     if (user == null) return;
 
     long now = System.currentTimeMillis();
-    long last = user.getLastShopRefreshTime();
+    long currentDay = now / MILLIS_PER_DAY;
+    long lastRefreshDay = user.getLastShopRefreshTime() / MILLIS_PER_DAY;
 
     if (!userDailyDeals.containsKey(user.getUsername())
-            || last == 0
-            || (now - last) >= ONE_DAY_MILLIS) {
+            || lastRefreshDay < currentDay
+            || user.getLastShopRefreshTime() == 0) {
       generateDailyDeals(user, now);
-      if ((now - last) >= ONE_DAY_MILLIS || last == 0) {
-        user.setLastShopRefreshTime(now);
-      }
+      user.setLastShopRefreshTime(now);
     }
   }
 
@@ -75,7 +72,7 @@ public class Shop {
     List<ShopItem> daily = new ArrayList<>();
     List<String> unlocked = user.getUnlockedPlants();
 
-    long dayId = currentTime / ONE_DAY_MILLIS;
+    long dayId = currentTime / MILLIS_PER_DAY;
     Random dailyRandom = new Random(user.getUsername().hashCode() + dayId);
 
     if (unlocked == null || unlocked.isEmpty()) {
@@ -89,14 +86,11 @@ public class Shop {
                       null,
                       true));
     } else {
-      List<String> pool = new ArrayList<>(unlocked);
-      for (int i = 0; i < DAILY_DEAL_COUNT && !pool.isEmpty(); i++) {
-        int pickIndex = dailyRandom.nextInt(pool.size());
-        String chosen = pool.remove(pickIndex);
-        String itemId = "daily_seed_" + chosen;
-        daily.add(
-                new ShopItem(itemId, 1600, CurrencyType.COIN, 1, ItemCategory.RANDOM_SEED, null, true));
-      }
+      int pickIndex = dailyRandom.nextInt(unlocked.size());
+      String chosen = unlocked.get(pickIndex);
+      String itemId = "daily_seed_" + chosen;
+      daily.add(
+              new ShopItem(itemId, 1600, CurrencyType.COIN, 1, ItemCategory.RANDOM_SEED, null, true));
     }
     userDailyDeals.put(user.getUsername(), daily);
   }
@@ -108,6 +102,10 @@ public class Shop {
     ShopItem item = findItem(user, itemId);
     if (item == null) return new Result(false, "error: item not found", null);
     if (!item.isAvailable()) return new Result(false, "error: item out of stock", null);
+
+    if (item.isDaily() && count > 1) {
+      return new Result(false, "error: you can only buy 1 daily deal per day", null);
+    }
 
     Result dailyCheck = checkDailyDealNotAlreadyBought(user, item);
     if (!dailyCheck.success()) return dailyCheck;
@@ -138,14 +136,13 @@ public class Shop {
     return new Result(true, effectResult.message(), item);
   }
 
-
   private Result checkDailyDealNotAlreadyBought(User user, ShopItem item) {
     if (!item.isDaily()) {
       return new Result(true, "ok", null);
     }
     long today = System.currentTimeMillis() / MILLIS_PER_DAY;
     long lastPurchaseDay = user.getLastDailyDealPurchaseTime() / MILLIS_PER_DAY;
-    if (today == lastPurchaseDay) {
+    if (user.getLastDailyDealPurchaseTime() > 0 && today == lastPurchaseDay) {
       return new Result(false, "error: you already bought today's daily deal", null);
     }
     return new Result(true, "ok", null);

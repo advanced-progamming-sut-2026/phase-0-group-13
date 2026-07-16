@@ -97,12 +97,19 @@ public class ScoreBoardMenuController implements BaseController {
   }
 
   private int stageLevelScore(User user) {
-    // فرض بر این است که در کلاس Progress این متدها وجود دارند
-    return user.getProgress().getMaxClearedStage() * 100 + user.getProgress().getMaxClearedLevel();
+    int count = 0;
+    for (String stage : user.getUnlockedStages()) {
+      if (stage.startsWith("stage_")) count++;
+    }
+    return count;
   }
 
   private int miniGamesCleared(User user) {
-    return user.getProgress().getUnlockedMiniGames().size();
+    int count = 0;
+    for (String stage : user.getUnlockedStages()) {
+      if (stage.startsWith("minigame_")) count++;
+    }
+    return count;
   }
 
   private int completedQuests(User user) {

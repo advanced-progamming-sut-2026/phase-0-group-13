@@ -14,6 +14,7 @@ public class MatchSetup {
   private MiniGameType currentMiniGame;
   private int miniGameLevel;
   private int difficultyLevel = 3;
+  private int maxDeckSlots = 8;
 
   private MatchSetup() {
     selectedPlants = new ArrayList<>();
@@ -74,5 +75,17 @@ public class MatchSetup {
 
   public int getDifficultyLevel() {
     return difficultyLevel;
+  }
+
+  public int getMaxDeckSlots() {
+    return maxDeckSlots;
+  }
+
+  public void setMaxDeckSlots(int maxDeckSlots) {
+    this.maxDeckSlots = maxDeckSlots;
+  }
+
+  public int getMinDeckSlots() {
+    return 2;
   }
 }

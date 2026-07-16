@@ -48,9 +48,8 @@ public abstract class Season {
       if (alias == null) {
         continue;
       }
-      String lower = alias.toLowerCase();
       for (String keyword : keywords) {
-        if (lower.contains(keyword)) {
+        if (matchesAliasSegment(alias, keyword)) {
           Zombie zombie = factory.createZombie(template.getName(), 0, 9.0);
           if (zombie != null) {
             result.add(zombie);
@@ -60,6 +59,27 @@ public abstract class Season {
       }
     }
     return result;
+  }
+  
+  private boolean matchesAliasSegment(String alias, String keyword) {
+    String lower = alias.toLowerCase();
+    String keywordLower = keyword.toLowerCase();
+    int idx = 0;
+    while ((idx = lower.indexOf(keywordLower, idx)) != -1) {
+      boolean startsOnBoundary =
+              idx == 0 || Character.isUpperCase(alias.charAt(idx)) || !Character.isLetter(alias.charAt(idx - 1));
+      int endIdx = idx + keywordLower.length();
+      boolean endsOnBoundary =
+              endIdx == alias.length()
+                      || Character.isUpperCase(alias.charAt(endIdx))
+                      || !Character.isLetter(alias.charAt(endIdx));
+
+      if (startsOnBoundary && endsOnBoundary) {
+        return true;
+      }
+      idx++;
+    }
+    return false;
   }
 
   // فعلا فقط یه شبکه‌ی صاف از خونه‌های معمولی میسازه؛ چون Board الان خودش تایل‌هاش رو مستقل میسازه

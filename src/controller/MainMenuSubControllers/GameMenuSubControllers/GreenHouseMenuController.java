@@ -69,11 +69,11 @@ public class GreenHouseMenuController implements BaseController {
     GreenHouse greenHouse = user.getGreenHouse();
     List<Pot> pots = greenHouse.getPots();
     System.out.println(
-        "GreenHouse: "
-            + greenHouse.getUnlockedPotsCount()
-            + "/"
-            + greenHouse.getMaxCapacity()
-            + " pots unlocked.");
+            "GreenHouse: "
+                    + greenHouse.getUnlockedPotsCount()
+                    + "/"
+                    + greenHouse.getMaxCapacity()
+                    + " pots unlocked.");
 
     for (int i = 0; i < pots.size(); i++) {
       Pot pot = pots.get(i);
@@ -86,21 +86,21 @@ public class GreenHouseMenuController implements BaseController {
         System.out.println("  (" + x + ", " + y + ") empty");
       } else if (pot.isFullyGrown()) {
         System.out.println(
-            "  (" + x + ", " + y + ") " + pot.getPlantedSeedId() + " - [READY TO HARVEST]");
+                "  (" + x + ", " + y + ") " + pot.getPlantedSeedId() + " - ready");
       } else {
         long remainingSec = pot.getRemainingGrowTime() / 1000;
         System.out.println(
-            "  ("
-                + x
-                + ", "
-                + y
-                + ") "
-                + pot.getPlantedSeedId()
-                + " - growing ("
-                + Math.round(pot.getGrowthProgress() * 100)
-                + "%, ~"
-                + remainingSec
-                + "s left)");
+                "  ("
+                        + x
+                        + ", "
+                        + y
+                        + ") "
+                        + pot.getPlantedSeedId()
+                        + " - growing ("
+                        + Math.round(pot.getGrowthProgress() * 100)
+                        + "%, ~"
+                        + remainingSec
+                        + "s left)");
       }
     }
   }
@@ -172,6 +172,7 @@ public class GreenHouseMenuController implements BaseController {
     }
 
     long remainingMs = pot.getRemainingGrowTime();
+    // محاسبه الماس‌ها: هر ساعت باقی‌مانده (حتی یک دقیقه) 1 الماس هزینه دارد
     int requiredDiamonds = (int) Math.ceil(remainingMs / (double) (60 * 60 * 1000));
 
     if (user.getDiamonds() < requiredDiamonds) {

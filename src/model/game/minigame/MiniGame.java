@@ -1,8 +1,10 @@
 package model.game.minigame;
 
-abstract class MiniGame {
-  private boolean started;
-  private int score;
+import model.game.GameState;
+
+public abstract class MiniGame {
+  protected boolean started;
+  protected int score; // معادل با MyoPoints در بازی‌های امتیازی
 
   public void start() {
     started = true;
@@ -14,7 +16,18 @@ abstract class MiniGame {
 
   public abstract boolean checkWinCondition();
 
+  public boolean checkLoseCondition() {
+    return false;
+  }
+
+  public void update(GameState gameState) {
+  }
+
   public int getScore() {
     return score;
+  }
+
+  public void addScore(int points) {
+    this.score += points;
   }
 }

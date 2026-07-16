@@ -29,6 +29,9 @@ public class GameManager {
   private List<Quest> quests;
   private AdventureMap adventureMap;
 
+  // اضافه شدن متغیر برای کنترل موج زامبی‌ها
+  private boolean zombieWavesStarted = true;
+
   public GameManager() {
     this.board = null;
     this.currentTick = 0;
@@ -60,6 +63,14 @@ public class GameManager {
     running = true;
   }
 
+  public void startZombieWaves() {
+    this.zombieWavesStarted = true;
+  }
+
+  public void pauseZombieWaves() {
+    this.zombieWavesStarted = false;
+  }
+
   public void advanceTime() {
     if (!running || board == null) {
       return;
@@ -74,7 +85,7 @@ public class GameManager {
       return;
     }
 
-    if (currentWaveIndex < waves.size()) {
+    if (zombieWavesStarted && currentWaveIndex < waves.size()) {
       Wave currentWave = waves.get(currentWaveIndex);
       currentWave.update(board);
 

@@ -2,6 +2,7 @@ package controller;
 
 import data.persistence.UserManager;
 import java.util.regex.Matcher;
+import model.account.User;
 import model.core.App;
 import model.enums.Commands.MainMenuCommands;
 import model.enums.Commands.MenuCommands;
@@ -10,7 +11,13 @@ import model.enums.Menu;
 public class MainMenuControllers implements BaseController {
 
   @Override
-  public void initController() {}
+  public void initController() {
+    User user = UserManager.getInstance().getCurrentUser();
+    if (user != null && user.getNewsBox().getUnreadCount() > 0) {
+      System.out.println("\n[!] You have " + user.getNewsBox().getUnreadCount()
+              + " unread news items. Check the News Menu!\n");
+    }
+  }
 
   @Override
   public void handleinput(String input) {
@@ -21,7 +28,11 @@ public class MainMenuControllers implements BaseController {
     } else if (MainMenuCommands.Logout.getMatcher(input) != null) {
       handleLogout();
     } else if (MenuCommands.ShowCurrentMenu.getMatcher(input) != null) {
+      User user = UserManager.getInstance().getCurrentUser();
+      boolean hasUnread = user != null && user.getNewsBox().getUnreadCount() > 0;
+
       System.out.println("Main Menu");
+      System.out.println("Available Menus: Game, Profile, Settings, News" + (hasUnread ? " (!)" : ""));
     } else if (MenuCommands.ExitMenu.getMatcher(input) != null) {
       exit();
     } else {
