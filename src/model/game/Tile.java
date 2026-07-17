@@ -7,16 +7,26 @@ import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
 public class Tile {
-  private List<Plant> plants;
-  private List<Zombie> zombies;
-  private List<Sun> suns;
+  private final List<Plant> plants;
+  private final List<Zombie> zombies;
+  private final List<Sun> suns;
   private TileEffect effect;
+  private boolean water;
 
   public Tile() {
     this.plants = new ArrayList<>();
     this.zombies = new ArrayList<>();
     this.suns = new ArrayList<>();
     this.effect = null;
+    this.water = false;
+  }
+
+  public boolean isWater() {
+    return water;
+  }
+
+  public void setWater(boolean water) {
+    this.water = water;
   }
 
   public void addPlant(Plant plant) {

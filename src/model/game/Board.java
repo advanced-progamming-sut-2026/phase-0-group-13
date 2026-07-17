@@ -3,25 +3,27 @@ package model.game;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Random;
+import model.enums.PlantTag;
 import model.game.TileEffects.TileEffect;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
 public class Board {
-  private int rows;
-  private int columns;
+  private final int rows;
+  private final int columns;
   private Tile[][] tiles; // این داستان که افکت هارو چجوری باید اضافه بکنیم و ایده ای ندارم
 
-  private List<Zombie> zombies;
-  private List<Plant> plants;
-  private List<Sun> suns;
-  private List<Projectile> projectiles;
-  private List<Lawnmower> lawnmowers;
+  private final List<Zombie> zombies;
+  private final List<Plant> plants;
+  private final List<Sun> suns;
+  private final List<Projectile> projectiles;
+  private final List<Lawnmower> lawnmowers;
 
-  private GameState gameState;
+  private final GameState gameState;
   private int lastSunDropTick;
-  private Random random;
+  private final Random random;
   private boolean playerLost;
 
   public Board(int rows, int columns) {
@@ -80,7 +82,37 @@ public class Board {
 
     handleProjectiles();
     handleLawnmowers();
+    triggerDeathExplosions();
+    handleGlowingZombieDrops();
     cleanupEntities();
+  }
+
+
+  private final model.game.plant.behavior.ExplodeAction deathExplodeAction =
+          new model.game.plant.behavior.ExplodeAction(0, 1800, 1);
+
+  private void triggerDeathExplosions() {
+    for (Plant plant : plants) {
+      if (plant.isDead()
+              && !plant.hasDeathHookFired()
+              && plant.getTags().contains(PlantTag.EXPLOSIVE)) {
+        plant.markDeathHookFired();
+        deathExplodeAction.detonateNow(plant, this);
+      }
+    }
+  }
+
+  private void handleGlowingZombieDrops() {
+    for (Zombie zombie : zombies) {
+      if (zombie.isDead() && zombie.isShiny() && !zombie.hasDroppedPlantFood()) {
+        zombie.markPlantFoodDropped();
+        if (gameState.addPlantFood()) {
+          System.out.printf(
+                  "The glowing zombie dropeed a plant food; you have %d plant foods now.%n",
+                  gameState.getPlantFoodCount());
+        }
+      }
+    }
   }
 
   private void handleSkySunDrop(int currentTick) {
@@ -115,12 +147,17 @@ public class Board {
       suns.add(newSun);
 
       System.out.printf(
-          "New %s sun is dropping at position (%d, %d)%n",
-          type.name().toLowerCase(), targetCol + 1, targetRow + 1);
+              "New %s sun is dropping at position (%d, %d)%n",
+              type.name().toLowerCase(), targetCol + 1, targetRow + 1);
     }
   }
 
   private void checkZombiePlantCollisions(Zombie zombie, int currentTick) {
+    if (zombie.isHypnotized()) {
+      checkHypnotizedZombieCollisions(zombie, currentTick);
+      return;
+    }
+
     Plant targetPlant = getPlantAt(zombie.getRow(), zombie.getX());
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
@@ -129,8 +166,8 @@ public class Board {
         targetPlant.takeDamage(10);
         if (targetPlant.isDead()) {
           System.out.printf(
-              "Plant %s at (%d, %d) is destroyed.%n",
-              targetPlant.getName(), targetPlant.getCol(), targetPlant.getRow());
+                  "Plant %s at (%d, %d) is destroyed.%n",
+                  targetPlant.getName(), targetPlant.getCol(), targetPlant.getRow());
         }
       }
     } else {
@@ -139,16 +176,55 @@ public class Board {
     }
   }
 
+  // زامبی هیپنوتایز شده به جای گیاه‌ها، به سمت راست حرکت میکنه و به بقیه زامبی‌ها آسیب میزنه
+  private void checkHypnotizedZombieCollisions(Zombie zombie, int currentTick) {
+    Zombie targetZombie = findNearestZombieAhead(zombie);
+    if (targetZombie != null && !targetZombie.isDead()) {
+      zombie.setEating(true);
+      if (currentTick % 10 == 0) {
+        targetZombie.takeDamage(10, false);
+      }
+    } else {
+      zombie.setEating(false);
+      zombie.move();
+    }
+  }
+
+  private Zombie findNearestZombieAhead(Zombie zombie) {
+    Zombie nearest = null;
+    double nearestDistance = Double.MAX_VALUE;
+    for (Zombie other : zombies) {
+      if (other == zombie || other.isDead() || other.getRow() != zombie.getRow()) {
+        continue;
+      }
+      double distance = other.getX() - zombie.getX();
+      if (distance > 0 && distance < 0.5 && distance < nearestDistance) {
+        nearest = other;
+        nearestDistance = distance;
+      }
+    }
+    return nearest;
+  }
+
   private void handleProjectiles() {
-    Iterator<Projectile> iterator = projectiles.iterator();
+    ListIterator<Projectile> iterator = projectiles.listIterator();
     while (iterator.hasNext()) {
       Projectile p = iterator.next();
       p.move();
 
+
+      if (!p.isFromZombie() && p.getEffect() != Projectile.ProjectileEffect.FIRE) {
+        Plant plantHere = getPlantAt(Math.round(p.getYCoordinate()), p.getXCoordinate());
+        if (plantHere != null && plantHere.getTags().contains(PlantTag.FIRE)) {
+          p = p.ignited();
+          iterator.set(p);
+        }
+      }
+
       boolean hitRegistered = false;
       for (Zombie zombie : zombies) {
         if (zombie.getRow() == p.getYCoordinate()
-            && Math.abs(zombie.getX() - p.getXCoordinate()) < 0.5) {
+                && Math.abs(zombie.getX() - p.getXCoordinate()) < 0.5) {
           p.hitZombie(zombie);
           hitRegistered = true;
           break;
@@ -199,6 +275,20 @@ public class Board {
     plants.removeIf(Plant::isDead);
     zombies.removeIf(Zombie::isDead);
     suns.removeIf(Sun::isExpired);
+  }
+
+  public boolean isWaterAt(int row, int col) {
+    if (row < 0 || row >= rows || col < 0 || col >= columns) {
+      return false;
+    }
+    return tiles[row][col].isWater();
+  }
+
+  public void setWaterAt(int row, int col, boolean water) {
+    if (row < 0 || row >= rows || col < 0 || col >= columns) {
+      return;
+    }
+    tiles[row][col].setWater(water);
   }
 
   public Plant getPlantAt(int row, double x) {

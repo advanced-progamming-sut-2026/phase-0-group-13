@@ -128,4 +128,15 @@ public class Projectile {
   public ProjectileEffect getEffect() {
     return effect;
   }
+
+
+  public Projectile ignited() {
+    if (effect == ProjectileEffect.FIRE || isFromZombie) {
+      return this;
+    }
+    Projectile lit =
+            new Projectile(damage, speed, xCoordinate, yCoordinate, ProjectileEffect.FIRE, piercing, lobbed, isFromZombie);
+    lit.alreadyHit.addAll(this.alreadyHit);
+    return lit;
+  }
 }

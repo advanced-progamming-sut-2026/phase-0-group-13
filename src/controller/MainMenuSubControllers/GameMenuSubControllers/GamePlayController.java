@@ -79,8 +79,11 @@ public class GamePlayController implements BaseController {
     } else if (GamePlayMenuCommands.ZombiesInfo.getMatcher(command) != null) {
       handleZombiesInfo(gm);
     } else if (GamePlayMenuCommands.CheatAddPlantFood.getMatcher(command) != null) {
-      gm.getBoard().getGameState().addPlantFood();
-      System.out.println("1 Plant food added.");
+      if (gm.getBoard().getGameState().addPlantFood()) {
+        System.out.println("1 Plant food added.");
+      } else {
+        System.out.println("error: you cannot hold more than 3 plant foods");
+      }
     } else if (GamePlayMenuCommands.CheatRemoveCooldown.getMatcher(command) != null) {
       gm.disableCooldowns();
       System.out.println("All plant cooldowns cleared.");
@@ -133,7 +136,9 @@ public class GamePlayController implements BaseController {
       return;
     }
 
-    int remaining = gm.ticksUntilPlantReady(type, template.recharge);
+    int userLevel = getCurrentPlantLevel(type);
+    int adjustedRecharge = adjustedRechargeSeconds(template, userLevel);
+    int remaining = gm.ticksUntilPlantReady(type, adjustedRecharge);
     if (remaining > 0) {
       System.out.printf("error: %s is recharging; ready in %.1f seconds%n", type, remaining / 10.0);
       return;
@@ -141,7 +146,8 @@ public class GamePlayController implements BaseController {
 
     Plant plant = null;
     try {
-      plant = new PlantFactory(GameDataManager.plantRepository).createPlant(type, rc[0], rc[1]);
+      plant =
+              new PlantFactory(GameDataManager.plantRepository).createPlant(type, rc[0], rc[1], userLevel);
     } catch (RuntimeException e) {
       System.out.println("error: could not build plant '" + type + "'");
       return;
@@ -157,6 +163,18 @@ public class GamePlayController implements BaseController {
     } else {
       System.out.println("error: cannot plant there (tile occupied or not enough sun)");
     }
+  }
+  
+  private int getCurrentPlantLevel(String plantType) {
+    User user = UserManager.getInstance().getCurrentUser();
+    if (user == null) return 1;
+    return Math.max(1, user.getPlantLevel(plantType));
+  }
+
+  private int adjustedRechargeSeconds(PlantTemplate template, int level) {
+    model.game.plant.PlantParts.PlantLevel levelStats =
+            model.game.plant.PlantParts.PlantLevel.cumulative(template, level);
+    return Math.max(0, template.recharge + levelStats.getCooldownDeltaSeconds());
   }
 
   private void activateBoostIfAny(Plant plant, String type) {
@@ -272,7 +290,7 @@ public class GamePlayController implements BaseController {
       if (template == null) {
         continue;
       }
-      int remaining = gm.ticksUntilPlantReady(name, template.recharge);
+      int remaining = gm.ticksUntilPlantReady(name, adjustedRechargeSeconds(template, getCurrentPlantLevel(name)));
       String state = remaining == 0 ? "ready" : String.format("ready in %.1fs", remaining / 10.0);
       System.out.printf("  %s - cost %d sun - %s%n", template.name, template.cost, state);
     }

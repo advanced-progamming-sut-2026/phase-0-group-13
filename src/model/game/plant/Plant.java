@@ -34,6 +34,8 @@ public class Plant {
 
   private int disabledUntilTick = -1;
 
+  private boolean deathHookFired = false;
+
   public Plant(
           PlantTemplate template,
           int row,
@@ -42,11 +44,25 @@ public class Plant {
           EnumSet<PlantTag> tags,
           PlantAction behavior,
           PlantFood plantFood) {
+    this(template, row, col, category, tags, behavior, plantFood, 1, template.baseHp, template.cost);
+  }
+
+  public Plant(
+          PlantTemplate template,
+          int row,
+          int col,
+          PlantCategory category,
+          EnumSet<PlantTag> tags,
+          PlantAction behavior,
+          PlantFood plantFood,
+          int level,
+          int maxHealth,
+          int cost) {
     this.id = template.id;
     this.name = template.name;
-    this.maxHealth = template.baseHp;
-    this.currentHealth = template.baseHp;
-    this.cost = template.cost;
+    this.maxHealth = maxHealth;
+    this.currentHealth = maxHealth;
+    this.cost = cost;
     this.category = category;
     this.tags = tags;
     this.behavior = behavior;
@@ -58,7 +74,7 @@ public class Plant {
     this.y = row;
 
     this.lastActionTick = 0;
-    this.level = 1;
+    this.level = level;
     this.isBoosted = false;
   }
 
@@ -96,6 +112,36 @@ public class Plant {
 
   public void takeDamage(int damage) {
     this.currentHealth = Math.max(0, this.currentHealth - damage);
+  }
+
+  public void heal(int amount) {
+    if (amount > 0) {
+      this.currentHealth = Math.min(maxHealth, this.currentHealth + amount);
+    }
+  }
+
+  public int getMaxHealth() {
+    return maxHealth;
+  }
+
+  public int getLevel() {
+    return level;
+  }
+
+  public PlantCategory getCategory() {
+    return category;
+  }
+
+  public EnumSet<PlantTag> getTags() {
+    return tags;
+  }
+
+  public boolean hasDeathHookFired() {
+    return deathHookFired;
+  }
+
+  public void markDeathHookFired() {
+    this.deathHookFired = true;
   }
 
   public void changinCordinate(double x, double y) {

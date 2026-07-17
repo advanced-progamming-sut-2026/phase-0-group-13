@@ -112,7 +112,15 @@ public class GameManager {
       return false;
     }
 
-    if (board.getPlantAt(row, col) != null) {
+    model.game.plant.Plant existingPlant = board.getPlantAt(row, col);
+    boolean plantIsAquatic = plant.getTags().contains(model.enums.PlantTag.WATER);
+
+    if (board.isWaterAt(row, col) && !plantIsAquatic) {
+
+      if (existingPlant == null || !existingPlant.getTags().contains(model.enums.PlantTag.WATER)) {
+        return false;
+      }
+    } else if (existingPlant != null) {
       return false;
     }
 
