@@ -18,6 +18,10 @@ public class PlantFactory {
   }
 
   public Plant createPlant(String name, int row, int col) {
+    return createPlant(name, row, col, 1);
+  }
+
+  public Plant createPlant(String name, int row, int col, int level) {
     PlantTemplate template = this.repository.find(name.toLowerCase());
 
     if (template == null) {
@@ -28,13 +32,21 @@ public class PlantFactory {
     PlantCategory category = determineCategory(template.category);
     EnumSet<PlantTag> tags = parseTags(template.tags);
 
-    int interval = parseActionInterval(template.actionInterval);
-    int damage = parseDamage(template.damage);
+    int baseInterval = parseActionInterval(template.actionInterval);
+    int baseDamage = parseDamage(template.damage);
+
+    model.game.plant.PlantParts.PlantLevel levelStats =
+            model.game.plant.PlantParts.PlantLevel.cumulative(template, level);
+
+    int interval = Math.max(1, baseInterval + levelStats.getActionIntervalDeltaSeconds());
+    int damage = Math.max(0, baseDamage + levelStats.getDamageDelta());
+    int hp = Math.max(1, template.baseHp + levelStats.getHpDelta());
+    int cost = Math.max(0, template.cost + levelStats.getCostDelta());
 
     PlantAction behavior = determineBehavior(category, interval, damage, tags, template.name);
     PlantFood plantFood = determinePlantFood(template, category, interval, damage, tags);
 
-    return new Plant(template, row, col, category, tags, behavior, plantFood);
+    return new Plant(template, row, col, category, tags, behavior, plantFood, level, hp, cost);
   }
 
   private PlantCategory determineCategory(String catStr) {
@@ -122,7 +134,7 @@ public class PlantFactory {
   // MINT هم چون تو plants.json هیچ گیاهی این دسته رو نداره (گیاهای mint-family زیر دسته خودشون افتادن)
   // فعلا استاب مونده.
   private PlantAction determineBehavior(
-      PlantCategory category, int interval, int damage, EnumSet<PlantTag> tags, String name) {
+          PlantCategory category, int interval, int damage, EnumSet<PlantTag> tags, String name) {
     switch (category) {
       case SUN_PRODUCER:
         return new ProduceSunAction(interval);
@@ -160,11 +172,12 @@ public class PlantFactory {
     }
     if (tags.contains(PlantTag.MOVE_ZOMBIES)) {
       return new DummyPlantAction(
-          "lane-redirect needs Zombie's row to become mutable (Person A's Board contract)");
+              "lane-redirect needs Zombie's row to become mutable (Person A's Board contract)");
     }
     if (tags.contains(PlantTag.EXPLOSIVE)) {
-      return new DummyPlantAction(
-          "explode-on-death needs an on-death hook; Plant.update() skips dead plants entirely");
+      // این گیاه وقتی زنده‌ست کاری نمی‌کنه؛ لحظه‌ی مرگش Board.triggerDeathExplosions() تشخیص میده
+      // و خودش ExplodeAction رو روی مختصات گیاه اجرا میکنه (نیازی به رفتار فعال نیست).
+      return null;
     }
     return null;
   }

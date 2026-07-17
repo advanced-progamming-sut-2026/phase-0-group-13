@@ -39,9 +39,14 @@ public class GameState {
     return false;
   }
 
-  public void addPlantFood() {
+  public static final int MAX_PLANT_FOOD = 3;
+
+  public boolean addPlantFood() {
+    if (this.plantFoodCount >= MAX_PLANT_FOOD) {
+      return false;
+    }
     this.plantFoodCount++;
-    System.out.printf("Plant Food acquired! Total: %d%n", this.plantFoodCount);
+    return true;
   }
 
   public boolean usePlantFood() {

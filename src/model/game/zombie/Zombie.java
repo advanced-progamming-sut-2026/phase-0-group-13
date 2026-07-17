@@ -32,7 +32,10 @@ public class Zombie {
   private double speedMultiplier;
 
   private boolean shiny;
+  private boolean plantFoodDropped;
   private final List<Reward> lootDrops;
+
+  private boolean hypnotized;
 
   public Zombie(
           String name, int health, double speed, int row, double startX, ZombieAction behavior) {
@@ -50,7 +53,9 @@ public class Zombie {
     this.shieldBlocker = false;
     this.speedMultiplier = 1.0;
     this.shiny = false;
+    this.plantFoodDropped = false;
     this.lootDrops = new ArrayList<>();
+    this.hypnotized = false;
   }
 
   // مسئولیت خود دراپ‌ها اینجاست (چون به دیتای زامبی وابسته‌ست)؛ اعمال کردنشون رو یوزر بعد از مرگ
@@ -72,6 +77,22 @@ public class Zombie {
 
   public void setShiny(boolean shiny) {
     this.shiny = shiny;
+  }
+
+  public boolean hasDroppedPlantFood() {
+    return plantFoodDropped;
+  }
+
+  public void markPlantFoodDropped() {
+    this.plantFoodDropped = true;
+  }
+
+  public boolean isHypnotized() {
+    return hypnotized;
+  }
+
+  public void setHypnotized(boolean hypnotized) {
+    this.hypnotized = hypnotized;
   }
 
   public void addArmor(Armor armor) {
@@ -113,7 +134,8 @@ public class Zombie {
   public void move() {
     if (!isEating && !activeEffects.containsKey(StatusEffect.FROZEN)) {
       double actualSpeed = activeEffects.containsKey(StatusEffect.CHILLED) ? speed / 2.0 : speed;
-      this.x -= actualSpeed * speedMultiplier;
+      double direction = hypnotized ? 1.0 : -1.0;
+      this.x += direction * actualSpeed * speedMultiplier;
     }
   }
 

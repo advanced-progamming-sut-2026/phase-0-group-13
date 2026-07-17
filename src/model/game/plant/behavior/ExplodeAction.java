@@ -6,9 +6,9 @@ import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
 public class ExplodeAction implements PlantAction {
-  private int fuseTime;
-  private int damage;
-  private int range;
+  private final int fuseTime;
+  private final int damage;
+  private final int range;
 
   public ExplodeAction(int fuseTime, int damage, int range) {
     this.fuseTime = fuseTime;
@@ -27,19 +27,23 @@ public class ExplodeAction implements PlantAction {
     }
 
     if (currentTick - plant.getLastActionTick() >= fuseTime) {
-      System.out.printf(
-          "BOOM! %s exploded at (%d, %d)%n", plant.getName(), plant.getCol(), plant.getRow());
-
-      List<Zombie> zombies = board.getZombies();
-
-      for (Zombie zombie : zombies) {
-        if (zombie.getRow() == plant.getRow()
-            && Math.abs(zombie.getX() - plant.getCol()) <= range) {
-          zombie.takeDamage(damage, false);
-        }
-      }
-
-      plant.takeDamage(10000);
+      detonateNow(plant, board);
     }
+  }
+
+  public void detonateNow(Plant plant, Board board) {
+    System.out.printf(
+            "BOOM! %s exploded at (%d, %d)%n", plant.getName(), plant.getCol(), plant.getRow());
+
+    List<Zombie> zombies = board.getZombies();
+
+    for (Zombie zombie : zombies) {
+      if (zombie.getRow() == plant.getRow()
+              && Math.abs(zombie.getX() - plant.getCol()) <= range) {
+        zombie.takeDamage(damage, false);
+      }
+    }
+
+    plant.takeDamage(10000);
   }
 }
