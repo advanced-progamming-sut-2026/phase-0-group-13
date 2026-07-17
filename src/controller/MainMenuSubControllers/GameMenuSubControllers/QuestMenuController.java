@@ -11,6 +11,7 @@ import model.account.Progress;
 import model.account.User;
 import model.core.App;
 import model.core.MatchSetup;
+import model.core.MiniGameLauncher;
 import model.enums.Commands.MenuCommands;
 import model.enums.Commands.QuestMenuCommands;
 import model.enums.Menu;
@@ -19,7 +20,8 @@ import model.game.quest.Quest;
 
 public class QuestMenuController implements BaseController {
 
-  private static final List<String> AVAILABLE_MINI_GAMES = List.of("zombotany", "vasebreaker");
+  private static final List<String> AVAILABLE_MINI_GAMES =
+          List.of("vasebreaker", "wallnut_bowling", "i_zombie");
 
   @Override
   public void initController() {
@@ -117,14 +119,15 @@ public class QuestMenuController implements BaseController {
   }
 
   private int priorityRank(Quest quest) {
-    if (quest.getPriority() == null) return 5;
+    if (quest.getPriority() == null) return 6;
     String p = quest.getPriority().toLowerCase();
 
     if (p.contains("بحرانی") || p.contains("critical")) return 1;
     if (p.contains("بالا") || p.contains("high")) return 2;
-    if (p.contains("روزانه") || p.contains("daily")) return 3;
+    if (p.contains("متوسط") || p.contains("medium")) return 3;
     if (p.contains("کم") || p.contains("low")) return 4;
-    return 5;
+    if (p.contains("روزانه") || p.contains("daily")) return 5;
+    return 6;
   }
 
   private void printQuest(Quest quest) {
@@ -243,8 +246,7 @@ public class QuestMenuController implements BaseController {
 
     MatchSetup.getInstance().setMiniGame(type, level);
     System.out.println("Loading Mini-Game: " + type.name() + " (Level " + level + ") ...");
-    System.out.println("Handing off to the game engine...");
-    App.setCurrentMenu(Menu.GameMenu);
+    MiniGameLauncher.launch();
   }
 
   private void saveState() {

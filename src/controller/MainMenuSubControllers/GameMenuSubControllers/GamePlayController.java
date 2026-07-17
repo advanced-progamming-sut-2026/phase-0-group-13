@@ -15,7 +15,9 @@ import model.core.MatchSetup;
 import model.enums.Commands.GamePlayMenuCommands;
 import model.enums.Commands.MenuCommands;
 import model.enums.Menu;
+import model.enums.ScoreEvent;
 import model.game.Board;
+import model.game.Lawnmower;
 import model.game.MatchResult;
 import model.game.Sun;
 import model.game.Tile;
@@ -253,6 +255,10 @@ public class GamePlayController implements BaseController {
       }
     }
     System.out.println("Nuke released. Zombies wiped: " + killed);
+    if (killed >= 2) {
+
+      gm.registerCombatEvent(ScoreEvent.SIMULTANEOUS_KILL);
+    }
   }
 
   private void handlePlantsStatus(GameManager gm) {
@@ -356,7 +362,15 @@ public class GamePlayController implements BaseController {
 
   private void finishMatch(GameManager gm) {
     MatchResult result = gm.getMatchResult();
-    if (result.isWon()) {
+
+    if (result.isWon() && allLawnmowersUnused(gm)) {
+      gm.registerCombatEvent(ScoreEvent.WAVE_CLEARED_NO_LOSS);
+    }
+
+    if (gm.isBonusMatch()) {
+      System.out.println(
+              "Game Bonus finished! MyoPoints earned this run: " + gm.getScoreManager().getCurrentMatchScore());
+    } else if (result.isWon()) {
       System.out.println(
               "Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.");
     } else {
@@ -370,14 +384,30 @@ public class GamePlayController implements BaseController {
     App.setCurrentMenu(back);
   }
 
+  private boolean allLawnmowersUnused(GameManager gm) {
+    for (Lawnmower lawnmower : gm.getBoard().getLawnmowers()) {
+      if (!lawnmower.isActive()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   private void applyProgression(GameManager gm, MatchResult result) {
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) {
       return;
     }
 
-    user.addMatchResult(result);
     gm.getScoreManager().applyScoresToUser(user);
+
+    if (gm.isBonusMatch()) {
+
+      saveUserState();
+      return;
+    }
+
+    user.addMatchResult(result);
 
     if (result.isWon()) {
       Progress progress = user.getProgress();
@@ -392,6 +422,10 @@ public class GamePlayController implements BaseController {
       System.out.println(progress.advanceAdventure().message());
     }
 
+    saveUserState();
+  }
+
+  private void saveUserState() {
     try {
       UserManager.getInstance().updateCurrentUserGameState();
     } catch (Exception e) {
