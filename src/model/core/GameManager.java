@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import model.account.AdventureMap;
+import model.enums.ScoreEvent;
 import model.game.Board;
 import model.game.MatchResult;
 import model.game.ScoreManager;
@@ -25,6 +26,7 @@ public class GameManager {
   private final ScoreManager scoreManager = new ScoreManager();
   private final Map<String, Integer> lastPlantedTick = new HashMap<>();
   private boolean cooldownsDisabled;
+  private boolean bonusMatch;
   private AllNews allnews;
   private List<Quest> quests;
   private AdventureMap adventureMap;
@@ -187,9 +189,26 @@ public class GameManager {
     return scoreManager;
   }
 
-  // ---- planting cooldown (recharge) ----
+  public void registerCombatEvent(ScoreEvent event) {
+    registerCombatEvent(event, 1);
+  }
 
-  /** Remaining ticks until this plant type can be planted again; 0 means ready. */
+  public void registerCombatEvent(ScoreEvent event, int multiplier) {
+    if (!running || event == null) {
+      return;
+    }
+    scoreManager.triggerEvent(event, multiplier);
+  }
+
+  public boolean isBonusMatch() {
+    return bonusMatch;
+  }
+
+  public void setBonusMatch(boolean bonusMatch) {
+    this.bonusMatch = bonusMatch;
+  }
+
+
   public int ticksUntilPlantReady(String plantType, int rechargeSeconds) {
     if (cooldownsDisabled || plantType == null) {
       return 0;

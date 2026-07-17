@@ -4,6 +4,7 @@ import java.util.Scanner;
 import view.*;
 import view.MainMenuSubMenus.*;
 import view.MainMenuSubMenus.GameMenuSubMenus.*;
+import view.MainMenuSubMenus.GameMenuSubMenus.MiniGames.MiniGame;
 
 public enum Menu {
   MainMenu(new MainMenuView()),
@@ -14,6 +15,7 @@ public enum Menu {
   PlantSelectionMenu(new PlantSelectionMenuView()),
   GamePlayMenu(new GamePlayView()),
   QuestMenu(new QuestView()),
+  MiniGameMenu(new MiniGame()),
   ScoreBoardMenu(new ScoreBoardMenuView()),
   NewsMenu(new NewsMenuView()),
   SettingsMenu(new SettingsMenuView()),

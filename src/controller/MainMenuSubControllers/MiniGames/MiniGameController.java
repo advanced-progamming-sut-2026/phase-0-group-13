@@ -15,6 +15,7 @@ public class MiniGameController implements BaseController {
   private final Pattern smashVasePattern = Pattern.compile("(?i)^smash\\s+vase\\s+(?<x>\\d+)\\s+(?<y>\\d+)$");
   private final Pattern placeZombiePattern = Pattern.compile("(?i)^place\\s+zombie\\s+" +
           "(?<type>[\\w\\-]+)\\s+(?<x>\\d+)\\s+(?<y>\\d+)$");
+  private final Pattern rollWalnutPattern = Pattern.compile("(?i)^roll\\s+walnut\\s+(?<lane>\\d+)$");
   private final Pattern advancePattern = Pattern.compile("(?i)^advance\\s+time\\s+(?<count>\\d+)\\s+ticks?$");
 
   @Override
@@ -53,6 +54,12 @@ public class MiniGameController implements BaseController {
       } else {
         handlePlaceZombie(gm, m);
       }
+    } else if ((m = rollWalnutPattern.matcher(command)).matches()) {
+      if (type != MiniGameType.WALLNUT_BOWLING) {
+        System.out.println("error: 'roll walnut' command is only available in Wallnut Bowling.");
+      } else {
+        handleRollWalnut(gm, m);
+      }
     } else if (command.equalsIgnoreCase("exit")) {
       exit();
     } else {
@@ -75,7 +82,6 @@ public class MiniGameController implements BaseController {
     String x = m.group("x");
     String y = m.group("y");
     System.out.printf("Smashed vase at (%s, %s).%n", x, y);
-    // TODO: اگر آیتمی افتاد، آن را به عنوان Reward یا Zombie اعمال کنید
   }
 
   private void handlePlaceZombie(GameManager gm, Matcher m) {
@@ -85,10 +91,17 @@ public class MiniGameController implements BaseController {
     System.out.printf("You placed a %s zombie at (%s, %s).%n", type, x, y);
   }
 
+  private void handleRollWalnut(GameManager gm, Matcher m) {
+    String lane = m.group("lane");
+    System.out.printf("Bowling walnut down lane %s...%n", lane);
+    // TODO: complete this shit when the main engine is done ( arash bezan )
+  }
+
   @Override
   public void exit() {
-    System.out.println("Exiting Mini-Game... Returning to Game Menu.");
+    Menu back = GameSession.getReturnMenu();
+    System.out.println("Exiting Mini-Game... Returning to Travel Log.");
     GameSession.end();
-    App.setCurrentMenu(Menu.GameMenu);
+    App.setCurrentMenu(back);
   }
 }
