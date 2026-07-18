@@ -99,6 +99,10 @@ public class ZombieTemplate {
     return (objdata != null && objdata.eatDps != null) ? objdata.eatDps : 10.0;
   }
 
+  public int getWavePointCost() {
+    return (objdata != null && objdata.wavePointCost != null) ? objdata.wavePointCost : 0;
+  }
+
   public List<String> getArmorRefAliases() {
     if (objdata == null || objdata.zombieArmorProps == null) {
       return List.of();

@@ -3,8 +3,8 @@ package model.game.zombie.factory;
 import data.repository.ZombieRepository;
 import java.util.List;
 import java.util.Random;
+import model.core.MatchSetup;
 import model.enums.ZombieType;
-import model.game.reward.Currency;
 import model.game.zombie.Zombie;
 import model.game.zombie.ZombieParts.Armor;
 import model.game.zombie.ZombieParts.ZombieTemplate;
@@ -13,6 +13,11 @@ import model.game.zombie.behavior.*;
 
 public class ZombieFactory {
   private static final double SHINY_CHANCE = 0.05;
+
+  // Zombies.json سرعت رو به‌صورت واحد/ثانیه میده (مثلا زامبی معمولی 0.185)، ولی move() هر تیک صدا
+  // زده میشه (۱۰ تیک بر ثانیه)؛ بدون این تقسیم، زامبی‌ها ۱۰ برابر سریع‌تر از چیزی که دیتا میگه حرکت
+  // میکردن (رو این باگ یه باگ دیگه هم تو Board بود که هر زامبی هر تیک دوبار move میخورد - جدا فیکس شد)
+  private static final double TICKS_PER_SECOND = 10.0;
 
   private final ZombieRepository repository;
   private final Random random = new Random();
@@ -30,13 +35,16 @@ public class ZombieFactory {
     }
 
     ZombieType type = ZombieTypeResolver.resolve(template);
-    ZombieAction behavior = determineBehavior(template, type);
+    double difficultyMultiplier = difficultyStatMultiplier();
+    ZombieAction behavior = determineBehavior(template, type, difficultyMultiplier);
+
+    int scaledHp = (int) Math.round(resolveBaseHp(template, type) * difficultyMultiplier);
 
     Zombie zombie =
             new Zombie(
                     template.getName(),
-                    resolveBaseHp(template, type),
-                    template.getBaseSpeed(),
+                    Math.max(1, scaledHp),
+                    template.getBaseSpeed() / TICKS_PER_SECOND,
                     row,
                     startX,
                     behavior);
@@ -44,6 +52,14 @@ public class ZombieFactory {
     applyLootDrops(zombie);
 
     return zombie;
+  }
+
+  // dl/3: هر پله فاصله از سختی متوسط (۳)، ۱۵٪ روی HP و دمیج خوردن زامبی اثر میذاره. سرعت/بودجه موج
+  // (WaveGenerator) هم از همین ایده استفاده میکنن؛ نرخ خورشید و سرعت کلی بازی چون به Board/GameManager
+  // مربوطه باید با A هماهنگ بشه.
+  private double difficultyStatMultiplier() {
+    int difficultyLevel = MatchSetup.getInstance().getDifficultyLevel();
+    return Math.max(0.25, 1.0 + (difficultyLevel - 3) * 0.15);
   }
 
   // Zombies.json برای ۴ تا Zomboss مقدار Hitpoints نداره (null -> getBaseHp() صفر برمیگردونه)، یعنی
@@ -64,15 +80,11 @@ public class ZombieFactory {
             || type == ZombieType.ZOMBOSS_DARK;
   }
 
-  // دراپ آیتم: هر زامبی یه مقدار پایه سکه میده، و با شانس کم "درخشان" (shiny) میشه که یه پاداش الماس
-  // اضافه هم بهش اضافه میکنه. اعمال واقعی این جایزه‌ها به یوزر هنوز جایی صدا زده نمیشه - باید موقع
-  // مرگ زامبی تو Board/GameManager چک بشه.
+  // با شانس کم "درخشان" (shiny) میشه؛ زامبی درخشان موقع مرگ پلنت‌فود میده (Board.handleGlowingZombieDrops)
+  // دراپ سکه/الماس/گلدون معمولی (۱۰٪ شانس، مستقل از این) هم موقع مرگ تو Board.handleDeathDrops چک میشه
   private void applyLootDrops(Zombie zombie) {
-    zombie.addLoot(new Currency("COIN", 5));
-
     if (random.nextDouble() < SHINY_CHANCE) {
       zombie.setShiny(true);
-      zombie.addLoot(new Currency("DIAMOND", 1));
     }
   }
 
@@ -90,8 +102,9 @@ public class ZombieFactory {
   // SubmergedZombieAction، یا استفاده مجدد از رفتارهای مشابه مثل TacklerZombieAction/
   // ZombotanyPeashooterAction/RangedDemolisherZombieAction برای زامبی‌هایی که مکانیک واقعیشون تقریبا
   // یکیه).
-  private ZombieAction determineBehavior(ZombieTemplate template, ZombieType type) {
-    double eatDamage = template.getEatDps();
+  private ZombieAction determineBehavior(
+          ZombieTemplate template, ZombieType type, double difficultyMultiplier) {
+    double eatDamage = template.getEatDps() * difficultyMultiplier;
     switch (type) {
       case NORMAL:
       case CONEHEAD:
@@ -104,7 +117,8 @@ public class ZombieFactory {
       case PIANIST:
         return new StandardZombieAction(eatDamage);
       case GARGANTUAR:
-        return new GargantuarAction(template.getBaseHp());
+        // maxHealth باید همون HP اسکیل‌شده با سختی باشه، وگرنه چک "نصف جون" با HP واقعی زامبی نمیخونه
+        return new GargantuarAction((int) Math.round(resolveBaseHp(template, type) * difficultyMultiplier));
       case EXPLORER:
         return new ExplorerZombieAction();
       case ZOMBOTANY_PEASHOOTER:

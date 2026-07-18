@@ -1,16 +1,25 @@
 package model.game;
 
+import data.GameDataManager;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 import model.enums.PlantTag;
+import model.enums.StatusEffect;
+import model.game.TileEffects.IceTrailEffect;
 import model.game.TileEffects.TileEffect;
+import model.game.TileEffects.TombStoneEffect;
 import model.game.plant.Plant;
+import model.game.reward.Currency;
+import model.game.reward.Reward;
 import model.game.zombie.Zombie;
+import model.game.zombie.factory.ZombieFactory;
 
 public class Board {
+  private static final double DEATH_DROP_CHANCE = 0.10;
+
   private final int rows;
   private final int columns;
   private Tile[][] tiles; // این داستان که افکت هارو چجوری باید اضافه بکنیم و ایده ای ندارم
@@ -20,6 +29,7 @@ public class Board {
   private final List<Sun> suns;
   private final List<Projectile> projectiles;
   private final List<Lawnmower> lawnmowers;
+  private final List<Reward> pendingRewards = new ArrayList<>();
 
   private final GameState gameState;
   private int lastSunDropTick;
@@ -55,16 +65,19 @@ public class Board {
   public void updateAll(int currentTick) {
     gameState.update(null, null);
 
-    // تو اینجا این افکت های رو تایل ( الگوی استراتژی ) مثل یخ یا قبر اینارو ، اپدیت میکنیم ولی
-    // ناکامله
+    // تو اینجا این افکت های رو تایل ( الگوی استراتژی ) مثل یخ یا قبر اینارو ، اپدیت میکنیم
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < columns; j++) {
         TileEffect effect = tiles[i][j].getEffect();
         if (effect != null) {
           effect.tick();
+          if (effect instanceof TombStoneEffect tombstone) {
+            tryNecromancy(tombstone, i, j, currentTick);
+          }
         }
       }
     }
+    applyTileHazardsToZombies();
     handleSkySunDrop(currentTick);
 
     for (Plant plant : plants) {
@@ -84,7 +97,45 @@ public class Board {
     handleLawnmowers();
     triggerDeathExplosions();
     handleGlowingZombieDrops();
+    handleDeathDrops();
     cleanupEntities();
+  }
+
+  // گورستان با قابلیت "نکرومنسی": هر necromancyIntervalTicks یه زامبی از دلش زنده میکنه، تا وقتی
+  // که خودش (با شلیک کافی) نابود بشه
+  private void tryNecromancy(TombStoneEffect tombstone, int row, int col, int currentTick) {
+    if (!tombstone.isDueForNecromancy(currentTick)) {
+      return;
+    }
+    ZombieFactory factory = new ZombieFactory(GameDataManager.zombieRepository);
+    Zombie risen = factory.createZombie("ZombieEgyptImpDefault", row, col);
+    if (risen != null) {
+      spawnZombie(risen);
+      System.out.printf("A zombie rises from a grave at (%d, %d)!%n", col + 1, row + 1);
+    }
+    tombstone.markRaised(currentTick);
+  }
+
+  // تایل‌های یخی (Frostbite Caves): زامبی‌ای که روشون وایمیسته کند یا کاملا یخ میزنه، بسته به اینکه
+  // IceTrailEffect چطور ساخته شده باشه
+  private void applyTileHazardsToZombies() {
+    for (Zombie zombie : zombies) {
+      if (zombie.isDead()) {
+        continue;
+      }
+      int col = (int) Math.round(zombie.getX());
+      if (col < 0 || col >= columns || zombie.getRow() < 0 || zombie.getRow() >= rows) {
+        continue;
+      }
+      TileEffect effect = tiles[zombie.getRow()][col].getEffect();
+      if (effect instanceof IceTrailEffect ice && ice.isActive()) {
+        if (ice.isFullFreeze()) {
+          zombie.applyEffect(StatusEffect.FROZEN, 5);
+        } else {
+          zombie.applyEffect(StatusEffect.CHILLED, 5);
+        }
+      }
+    }
   }
 
 
@@ -112,6 +163,55 @@ public class Board {
                   gameState.getPlantFoodCount());
         }
       }
+    }
+  }
+
+  // هر زامبی‌ای که میمیره (چه درخشان چه معمولی) ۱۰٪ شانس داره یه چیزی هم بندازه: سکه، الماس، یا یه
+  // گلدون (کیسه سکه بزرگ‌تر). این جدا از دراپ پلنت‌فود زامبی درخشانه بالاست. جایزه‌ها فقط انباشته
+  // میشن (pendingRewards)؛ اعمال واقعیشون رو یوزر با drainPendingRewards() از بیرون (GameManager)
+  // انجام میشه.
+  private void handleDeathDrops() {
+    for (Zombie zombie : zombies) {
+      if (zombie.isDead() && !zombie.hasDroppedLoot()) {
+        zombie.markLootDropped();
+        if (random.nextDouble() < DEATH_DROP_CHANCE) {
+          rollDeathDrop(zombie);
+        }
+      }
+    }
+  }
+
+  private void rollDeathDrop(Zombie zombie) {
+    int roll = random.nextInt(3);
+    Reward reward;
+    String dropName;
+    if (roll == 0) {
+      reward = new Currency("COIN", 10);
+      dropName = "a coin";
+    } else if (roll == 1) {
+      reward = new Currency("DIAMOND", 1);
+      dropName = "a diamond";
+    } else {
+      reward = new Currency("COIN", 25);
+      dropName = "a pot of coins";
+    }
+    pendingRewards.add(reward);
+    System.out.printf(
+            "Zombie of type %s dropped %s at (%d, %d).%n",
+            zombie.getName(), dropName, Math.round(zombie.getX()), zombie.getRow());
+  }
+
+  public List<Reward> drainPendingRewards() {
+    List<Reward> drained = new ArrayList<>(pendingRewards);
+    pendingRewards.clear();
+    return drained;
+  }
+
+  // برای فصل‌ها که میخوان موقع ساخت مرحله یه خطر (سنگ‌قبر، یخ) رو یه خونه خاص بزارن
+  public void placeTileEffect(int row, int col, TileEffect effect) {
+    Tile tile = getTile(row, col);
+    if (tile != null) {
+      tile.setEffect(effect);
     }
   }
 
@@ -152,27 +252,14 @@ public class Board {
     }
   }
 
+  // فقط زامبی هیپنوتایز شده رو هندل میکنه (تنها موردیه که هیچ ZombieAction ای پوششش نمیده). زامبی‌های
+  // عادی قبلا همینجا دوباره حرکت/خوردن/دمیج به گیاه رو تکرار میکردن - در حالی که خودِ zombie.update()
+  // همین چند خط بالاتر (با ZombieAction اختصاصی هر نوع) این کار رو درست انجام داده بود؛ نتیجه این بود
+  // که هر زامبی بدون مانع هر تیک دوبار move() میخورد (سرعت واقعی ۲ برابر JSON) و گیاه هم علاوه بر
+  // eatDamage واقعی زامبی، یه ۱۰ دمیج ثابت اضافه هم میخورد.
   private void checkZombiePlantCollisions(Zombie zombie, int currentTick) {
     if (zombie.isHypnotized()) {
       checkHypnotizedZombieCollisions(zombie, currentTick);
-      return;
-    }
-
-    Plant targetPlant = getPlantAt(zombie.getRow(), zombie.getX());
-    if (targetPlant != null && !targetPlant.isDead()) {
-      zombie.setEating(true);
-      // اعمال دمیج
-      if (currentTick % 10 == 0) {
-        targetPlant.takeDamage(10);
-        if (targetPlant.isDead()) {
-          System.out.printf(
-                  "Plant %s at (%d, %d) is destroyed.%n",
-                  targetPlant.getName(), targetPlant.getCol(), targetPlant.getRow());
-        }
-      }
-    } else {
-      zombie.setEating(false);
-      zombie.move();
     }
   }
 
@@ -221,6 +308,11 @@ public class Board {
         }
       }
 
+      if (isBlockedByTombstone(p)) {
+        iterator.remove();
+        continue;
+      }
+
       boolean hitRegistered = false;
       for (Zombie zombie : zombies) {
         if (zombie.getRow() == p.getYCoordinate()
@@ -235,6 +327,23 @@ public class Board {
         iterator.remove();
       }
     }
+  }
+
+  // سنگ‌قبر (Dark Ages) اگه هنوز سرپا باشه جلوی تیرهای گیاهی رو میگیره (تیرهای زامبی رو نه، چون
+  // اونا از عقب میان و منطقی نیست قبر جلوشونو بگیره)
+  private boolean isBlockedByTombstone(Projectile p) {
+    if (p.isFromZombie()) {
+      return false;
+    }
+    int row = (int) Math.round(p.getYCoordinate());
+    int col = (int) Math.round(p.getXCoordinate());
+    if (row < 0 || row >= rows || col < 0 || col >= columns) {
+      return false;
+    }
+    TileEffect effect = tiles[row][col].getEffect();
+    return effect instanceof TombStoneEffect tombstone
+            && tombstone.isActive()
+            && tombstone.isBlocksShots();
   }
 
   private void handleLawnmowers() {
@@ -272,6 +381,14 @@ public class Board {
   }
 
   private void cleanupEntities() {
+    for (Zombie zombie : zombies) {
+      if (zombie.isDead()) {
+        System.out.printf(
+                "Zombie of type %s is dead at (%d, %d).%n",
+                zombie.getName(), Math.round(zombie.getX()), zombie.getRow());
+      }
+    }
+
     plants.removeIf(Plant::isDead);
     zombies.removeIf(Zombie::isDead);
     suns.removeIf(Sun::isExpired);

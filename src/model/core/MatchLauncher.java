@@ -33,6 +33,7 @@ public final class MatchLauncher {
     GameManager gameManager = new GameManager();
     gameManager.initializeLevel(ROWS, COLS, buildWaves(stage, season));
     season.applySeasonEffects(gameManager.getBoard().getGameState());
+    season.placeHazards(gameManager.getBoard());
     gameManager.startGame();
 
     GameSession.start(gameManager, Menu.GameMenu);

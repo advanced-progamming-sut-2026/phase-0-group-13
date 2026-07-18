@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import model.enums.StatusEffect;
 import model.game.Board;
-import model.game.reward.Reward;
 import model.game.zombie.ZombieParts.Armor;
 import model.game.zombie.behavior.ZombieAction;
 
@@ -33,7 +32,7 @@ public class Zombie {
 
   private boolean shiny;
   private boolean plantFoodDropped;
-  private final List<Reward> lootDrops;
+  private boolean lootDropped;
 
   private boolean hypnotized;
 
@@ -54,21 +53,16 @@ public class Zombie {
     this.speedMultiplier = 1.0;
     this.shiny = false;
     this.plantFoodDropped = false;
-    this.lootDrops = new ArrayList<>();
+    this.lootDropped = false;
     this.hypnotized = false;
   }
 
-  // مسئولیت خود دراپ‌ها اینجاست (چون به دیتای زامبی وابسته‌ست)؛ اعمال کردنشون رو یوزر بعد از مرگ
-  // زامبی هنوز جایی صدا زده نمیشه (Board.cleanupEntities فعلا فقط زامبی مرده رو حذف میکنه، جایزه‌ای
-  // نمیده) - این قسمت باید تو GameManager/Board وصل بشه.
-  public void addLoot(Reward reward) {
-    if (reward != null) {
-      this.lootDrops.add(reward);
-    }
+  public boolean hasDroppedLoot() {
+    return lootDropped;
   }
 
-  public List<Reward> getLootDrops() {
-    return lootDrops;
+  public void markLootDropped() {
+    this.lootDropped = true;
   }
 
   public boolean isShiny() {

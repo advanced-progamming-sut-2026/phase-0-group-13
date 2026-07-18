@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import model.game.GameState;
 import model.game.Tile;
+import model.enums.ZombieType;
 import model.game.zombie.Zombie;
 import model.game.zombie.ZombieParts.ZombieTemplate;
+import model.game.zombie.ZombieParts.ZombieTypeResolver;
 import model.game.zombie.factory.ZombieFactory;
 import view.MainMenuSubMenus.GameMenuSubMenus.MiniGames.MiniGame;
 
@@ -33,6 +35,10 @@ public abstract class Season {
 
   public abstract List<Tile> generateMap();
 
+  // پیش‌فرض هیچ خطری رو نقشه نمیزاره؛ فصل‌هایی که نیاز دارن (سنگ‌قبر، یخ) این رو override میکنن.
+  // بعد از initializeLevel صدا زده میشه (MatchLauncher)
+  public void placeHazards(model.game.Board board) {}
+
   // چون Zombies.json فیلد جدا برای فصل/چپتر نداره، از روی alias خام زامبی‌ها فیلتر میکنیم (مثلا
   // "ZombieEgyptImpDefault" یا "ZombieIceAgeDodo")؛ همون قراردادی که ZombieTypeResolver هم برای
   // تشخیص نوع زامبی از روی اسم استفاده میکنه
@@ -45,7 +51,7 @@ public abstract class Season {
     ZombieFactory factory = new ZombieFactory(GameDataManager.zombieRepository);
     for (ZombieTemplate template : GameDataManager.zombieRepository.getAll()) {
       String alias = template.getName();
-      if (alias == null) {
+      if (alias == null || isBossTier(template)) {
         continue;
       }
       for (String keyword : keywords) {
@@ -59,6 +65,17 @@ public abstract class Season {
       }
     }
     return result;
+  }
+
+  // باس‌ها (Zomboss) با اینکه ممکنه اسمشون با کلیدواژه فصل مطابقت داشته باشه (مثلا
+  // "ZombieZombossMechEgypt" با "egypt")، نباید تو استخر موج‌های معمولی قرار بگیرن؛ اونا مخصوص یه
+  // مرحله باس‌فایت جدا هستن، نه اسپاون رندوم وسط یه موج عادی
+  private boolean isBossTier(ZombieTemplate template) {
+    ZombieType type = ZombieTypeResolver.resolve(template);
+    return type == ZombieType.ZOMBOSS_EGYPT
+        || type == ZombieType.ZOMBOSS_PIRATE
+        || type == ZombieType.ZOMBOSS_COWBOY
+        || type == ZombieType.ZOMBOSS_DARK;
   }
   
   private boolean matchesAliasSegment(String alias, String keyword) {

@@ -188,3 +188,14 @@ ShopMenuController اضافه و تکمیل شد.
 - ۴ تا `ZOMBOSS` فعلا با `StandardZombieAction` هستن و براشون HP فالبک گذاشته شد.
 - باگ پیدا کردن `Imp` در `GargantuarAction` و `TombRaiserZombieAction` اصلاح شد.
 - باگ `ConcurrentModificationException` در `Board.updateAll` هم رفع شد.
+
+**تاریخ:** ۱۴۰۵/۰۴/۲۵
+
+- فیلتر فصل و موج‌های معمولی اصلاح شد؛ `ZOMBOSS_*`ها از استخر موج عادی حذف شدن.
+- باگ سرعت زامبی‌ها رفع شد؛ `checkZombiePlantCollisions` سبک شد و سرعت JSON هم درست به تیک تبدیل شد.
+- سیستم موج‌ها طبق اسپک بازنویسی شد: بودجه‌محور، سختی پلکانی، پیام‌های جدید، و شرط پیشرفت بر اساس کشتن ۷۵٪ جون موج.
+- `difficultyLevel` روی HP، دمیج و بودجه موج اثر می‌گذارد.
+- هزاردهای تایل واقعی شدن: Tombstone نکرومنسی و بلاک تیر، IceTrail فریز واقعی؛ `DarkAges` و `FrostbiteCaves` هم هزارد می‌گذارند.
+- دراپ زامبی‌ها بازنویسی شد؛ `Board.handleDeathDrops` و `pendingRewards` اضافه شد و سیستم قبلی حذف شد.
+- سیستم مرحله ویژه کامل‌تر شد؛ اینترفیس `SpecialStageRule` گسترش پیدا کرد و `GameManager` از `activeSpecialRule` پشتیبانی می‌کند.
+- ۷ مرحله ویژه جدید اضافه شد: `LockedPlantsRule`، `SaveOurSeedsRule`، `TimedWarRule`، `NightOpsRule`، `DeadLineRule`، `LoveYourPlantsRule` و `PlantWhatYouGetRule`.

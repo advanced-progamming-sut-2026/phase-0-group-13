@@ -11,6 +11,7 @@ import model.game.MatchResult;
 import model.game.ScoreManager;
 import model.game.Sun;
 import model.game.Wave;
+import model.game.minigame.SpecialStageRule;
 import model.game.news.AllNews;
 import model.game.plant.Plant;
 import model.game.quest.Quest;
@@ -33,6 +34,18 @@ public class GameManager {
 
   // اضافه شدن متغیر برای کنترل موج زامبی‌ها
   private boolean zombieWavesStarted = true;
+
+  // null یعنی مرحله عادی، بدون هیچ محدودیت خاصی؛ رفتار موجود دقیقا همون قبلیه. مقدار غیر null یعنی
+  // یکی از ۸ نوع مرحله ویژه فعاله (Locked Plants/Save Our Seeds/Timed War/...)
+  private SpecialStageRule activeSpecialRule;
+
+  public void setSpecialStageRule(SpecialStageRule rule) {
+    this.activeSpecialRule = rule;
+  }
+
+  public SpecialStageRule getSpecialStageRule() {
+    return activeSpecialRule;
+  }
 
   public GameManager() {
     this.board = null;
@@ -81,6 +94,19 @@ public class GameManager {
     currentTick++;
     board.updateAll(currentTick);
 
+    for (model.game.reward.Reward reward : board.drainPendingRewards()) {
+      matchResult.addEarnedReward(reward);
+    }
+
+    if (activeSpecialRule != null) {
+      activeSpecialRule.apply(board.getGameState());
+      if (activeSpecialRule.checkLoseCondition(board)) {
+        endGame();
+        matchResult.markLose();
+        return;
+      }
+    }
+
     if (board.isPlayerLost()) {
       endGame();
       matchResult.markLose();
@@ -96,7 +122,8 @@ public class GameManager {
       }
     }
 
-    if (checkWinCondition()) {
+    boolean specialEarlyWin = activeSpecialRule != null && activeSpecialRule.checkWinCondition(board);
+    if (checkWinCondition() || specialEarlyWin) {
       endGame();
       matchResult.markWin();
       matchResult.calculateRewards();
@@ -105,6 +132,10 @@ public class GameManager {
 
   public boolean placePlant(Plant plant, int row, int col) {
     if (board == null || !running) {
+      return false;
+    }
+
+    if (activeSpecialRule != null && !activeSpecialRule.isPlantAllowed(plant.getName())) {
       return false;
     }
 

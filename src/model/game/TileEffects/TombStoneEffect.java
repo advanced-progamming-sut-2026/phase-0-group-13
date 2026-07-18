@@ -4,10 +4,22 @@ public class TombStoneEffect extends TileEffect {
   private int health;
   private boolean blocksShots;
 
+  private final boolean necromancy;
+  private final int necromancyIntervalTicks;
+  private int lastRaiseTick = -1;
+
   public TombStoneEffect(int health, boolean blocksShots) {
+    this(health, blocksShots, false, 0);
+  }
+
+  // necromancy=true یعنی این سنگ‌قبر هر necromancyIntervalTicks یه زامبی از دلش زنده میکنه (تا وقتی
+  // خودش با شلیک کافی نابود بشه)
+  public TombStoneEffect(int health, boolean blocksShots, boolean necromancy, int necromancyIntervalTicks) {
     super("Tombstone", -1);
     this.health = health;
     this.blocksShots = blocksShots;
+    this.necromancy = necromancy;
+    this.necromancyIntervalTicks = necromancyIntervalTicks;
   }
 
   public void takeDamage(int damage) {
@@ -25,6 +37,21 @@ public class TombStoneEffect extends TileEffect {
     System.out.println("The Tombstone has been completely destroyed!");
     this.blocksShots = false;
     remove();
+  }
+
+  public boolean isDueForNecromancy(int currentTick) {
+    if (!necromancy || !isActive()) {
+      return false;
+    }
+    if (lastRaiseTick == -1) {
+      lastRaiseTick = currentTick;
+      return false;
+    }
+    return currentTick - lastRaiseTick >= necromancyIntervalTicks;
+  }
+
+  public void markRaised(int currentTick) {
+    this.lastRaiseTick = currentTick;
   }
 
   public boolean isBlocksShots() {

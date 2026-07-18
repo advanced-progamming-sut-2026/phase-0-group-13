@@ -1,15 +1,24 @@
 package model.game;
 
+import data.GameDataManager;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
+import model.core.MatchSetup;
+import model.game.zombie.ZombieParts.ZombieTemplate;
 
 public class WaveGenerator {
   private static final int TICKS_PER_SECOND = 10;
   private static final int MAX_WAVES = 10;
   private static final int SPAWN_SPACING_SECONDS = 3;
+  private static final int DEFAULT_LANES = 5;
+  // WavePointCost تو دیتای واقعی بین ۱۰۰ تا ۱۵۰۰ پخش شده (میانگین ~۴۰۰)؛ بودجه پایه رو طوری گذاشتیم
+  // که موج اول معمولا ۲ تا ۴ زامبی داشته باشه، نه فقط یکی
+  private static final int DEFAULT_WAVE_COST = 500;
+  private static final int FALLBACK_ZOMBIE_COST = 100;
+  private static final double DIFFICULTY_GROWTH_PER_WAVE = 0.25;
+  private static final double FINAL_WAVE_MULTIPLIER = 2.0;
+  private static final int MAX_ZOMBIES_PER_WAVE = 60;
 
   private WaveGenerator() {}
 
@@ -18,7 +27,7 @@ public class WaveGenerator {
   }
 
   public static List<Wave> generateDailyScoreGameWaves(int levelNumber, List<String> availableZombieNames) {
-    long dailySeed = System.currentTimeMillis() / 86400000L; 
+    long dailySeed = System.currentTimeMillis() / 86400000L;
     Random dailyRandom = new Random(dailySeed);
     return generateInternal(levelNumber, availableZombieNames, dailyRandom);
   }
@@ -31,37 +40,74 @@ public class WaveGenerator {
     }
 
     int waveCount = Math.min(MAX_WAVES, 3 + levelNumber / 2);
+    double levelMultiplier = levelDifficultyMultiplier(levelNumber);
 
+    double waveDifficulty = 1.0;
     for (int waveNumber = 1; waveNumber <= waveCount; waveNumber++) {
-      boolean isFlagWave = waveNumber == waveCount;
-      int zombieCount = 3 + levelNumber + waveNumber;
-      if (isFlagWave) {
-        zombieCount = (int) Math.round(zombieCount * 1.5);
+      boolean isFinalWave = waveNumber == waveCount;
+
+      // هر موج نسبت به موج قبل ۲۵٪ سخت‌تره؛ موج آخر (پرچم) استثنا: به‌جای ادامه تصاعد، ۲ برابر موج
+      // قبل از خودشه (قرارداد معمول wave های پرچم)
+      if (waveNumber == 1) {
+        waveDifficulty = 1.0;
+      } else if (isFinalWave) {
+        waveDifficulty = waveDifficulty * FINAL_WAVE_MULTIPLIER;
+      } else {
+        waveDifficulty = waveDifficulty * (1.0 + DIFFICULTY_GROWTH_PER_WAVE);
       }
 
-      waves.add(buildWave(waveNumber, zombieCount, availableZombieNames, random));
+      int waveBudget = (int) Math.round(DEFAULT_WAVE_COST * levelMultiplier * waveDifficulty);
+      waves.add(buildWave(waveNumber, isFinalWave, waveBudget, availableZombieNames, random));
     }
 
     return waves;
   }
 
+  // MatchSetup.getDifficultyLevel() معمولا ۱ تا ۵ هست (پیش‌فرض ۳ = متوسط)؛ هر پله فاصله از ۳، ۱۵٪
+  // رو بودجه‌ی موج اثر میذاره. levelNumber هم خودش رو تصاعد بین موج‌ها اثر داره.
+  private static double levelDifficultyMultiplier(int levelNumber) {
+    int difficultyLevel = MatchSetup.getInstance().getDifficultyLevel();
+    double difficultyFactor = 1.0 + (difficultyLevel - 3) * 0.15;
+    double levelFactor = 1.0 + Math.max(0, levelNumber - 1) * 0.05;
+    return Math.max(0.25, difficultyFactor) * levelFactor;
+  }
+
+  // به‌جای انتخاب تعداد ثابت زامبی، یه بودجه (waveCost) داریم و تا وقتی بودجه تموم نشده زامبی رندوم
+  // از استخر انتخاب میکنیم (هرکدوم WavePointCost خودشو از دیتا مصرف میکنه)
   private static Wave buildWave(
-          int waveNumber, int zombieCount, List<String> pool, Random random) {
-    List<String> shuffledPool = new ArrayList<>(pool);
-    java.util.Collections.shuffle(shuffledPool, random);
+          int waveNumber, boolean isFinalWave, int budget, List<String> pool, Random random) {
+    List<Wave.SpawnEntry> spawns = new ArrayList<>();
+    int remainingBudget = budget;
+    int spawnedCount = 0;
 
-    List<String> zombiesToSpawn = new ArrayList<>();
-    Map<String, Integer> spawnDelays = new HashMap<>();
+    while (remainingBudget > 0 && spawnedCount < MAX_ZOMBIES_PER_WAVE) {
+      String zombieName = pool.get(random.nextInt(pool.size()));
+      int cost = resolveWaveCost(zombieName);
 
-    for (int i = 0; i < zombieCount; i++) {
-      String zombieName =
-              i < shuffledPool.size() ? shuffledPool.get(i) : pool.get(random.nextInt(pool.size()));
-      zombiesToSpawn.add(zombieName);
+      if (cost > remainingBudget && spawnedCount > 0) {
+        break;
+      }
 
-      int delay = (i / 2) * SPAWN_SPACING_SECONDS * TICKS_PER_SECOND;
-      spawnDelays.merge(zombieName.toLowerCase(), delay, Math::max);
+      int lane = random.nextInt(DEFAULT_LANES);
+      int delay = (spawnedCount / 2) * SPAWN_SPACING_SECONDS * TICKS_PER_SECOND;
+      spawns.add(new Wave.SpawnEntry(zombieName, lane, delay, cost));
+
+      remainingBudget -= cost;
+      spawnedCount++;
     }
 
-    return new Wave(waveNumber, zombiesToSpawn, spawnDelays);
+    return new Wave(waveNumber, isFinalWave, spawns);
+  }
+
+  private static int resolveWaveCost(String zombieName) {
+    if (GameDataManager.zombieRepository == null) {
+      return FALLBACK_ZOMBIE_COST;
+    }
+    ZombieTemplate template = GameDataManager.zombieRepository.find(zombieName);
+    if (template == null) {
+      return FALLBACK_ZOMBIE_COST;
+    }
+    int cost = template.getWavePointCost();
+    return cost > 0 ? cost : FALLBACK_ZOMBIE_COST;
   }
 }
