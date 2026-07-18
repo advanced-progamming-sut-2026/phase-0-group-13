@@ -49,4 +49,8 @@ public class Sun {
   public double getY() {
     return y;
   }
+
+  public int getTimeToLive() {
+    return timeToLive;
+  }
 }

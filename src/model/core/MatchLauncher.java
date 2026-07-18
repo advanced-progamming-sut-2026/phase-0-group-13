@@ -13,6 +13,15 @@ import model.environment.FrostbiteCavesSeason;
 import model.environment.Season;
 import model.game.Wave;
 import model.game.WaveGenerator;
+import model.game.minigame.ConveyorRule;
+import model.game.minigame.DeadLineRule;
+import model.game.minigame.LockedPlantsRule;
+import model.game.minigame.LoveYourPlantsRule;
+import model.game.minigame.NightOpsRule;
+import model.game.minigame.PlantWhatYouGetRule;
+import model.game.minigame.SaveOurSeedsRule;
+import model.game.minigame.SpecialStageRule;
+import model.game.minigame.TimedWarRule;
 import model.game.zombie.Zombie;
 
 /**
@@ -34,6 +43,7 @@ public final class MatchLauncher {
     gameManager.initializeLevel(ROWS, COLS, buildWaves(stage, season));
     season.applySeasonEffects(gameManager.getBoard().getGameState());
     season.placeHazards(gameManager.getBoard());
+    attachSpecialRule(gameManager, stage);
     gameManager.startGame();
 
     GameSession.start(gameManager, Menu.GameMenu);
@@ -46,6 +56,50 @@ public final class MatchLauncher {
             + gameManager.getTotalWaves()
             + " waves). Type 'show map', 'advance time -t <n> ticks', "
             + "'plant plant -t <type> -l (x,y)', or 'menu exit'.");
+  }
+
+  /**
+   * Levels 2 and 3 of each chapter are special levels; each of the 8 special types appears once
+   * across the adventure. Level 1 is a normal level and level 4 is the boss (next phase).
+   */
+  private static void attachSpecialRule(GameManager gameManager, int stage) {
+    User user = UserManager.getInstance().getCurrentUser();
+    int levelInStage = user != null ? user.getProgress().getCurrentLevel() : 1;
+    List<String> deck = new ArrayList<>(MatchSetup.getInstance().getSelectedPlants());
+
+    SpecialStageRule rule = specialRuleFor(stage, levelInStage, deck);
+    if (rule == null) {
+      return;
+    }
+
+    gameManager.setSpecialStageRule(rule);
+    System.out.println("Special level active: " + rule.getClass().getSimpleName());
+    if (rule instanceof PlantWhatYouGetRule) {
+      // زامبی‌ها تا وقتی بازیکن 'start zombie waves' نزنه وارد نمیشن
+      gameManager.pauseZombieWaves();
+      System.out.println("Plant freely, then type 'start zombie waves' to begin the assault.");
+    }
+  }
+
+  private static SpecialStageRule specialRuleFor(int stage, int levelInStage, List<String> deck) {
+    if (levelInStage != 2 && levelInStage != 3) {
+      return null;
+    }
+    boolean second = levelInStage == 2;
+    switch (stage) {
+      case 1:
+        return second
+            ? new ConveyorRule(deck, 120)
+            : new LockedPlantsRule(deck.subList(0, Math.max(1, deck.size() - 1)));
+      case 2:
+        return second ? new SaveOurSeedsRule() : new TimedWarRule(1200);
+      case 3:
+        return second ? new NightOpsRule() : new DeadLineRule(4);
+      default:
+        return second
+            ? new LoveYourPlantsRule(deck.isEmpty() ? "peashooter" : deck.get(0))
+            : new PlantWhatYouGetRule(deck, 120);
+    }
   }
 
   private static int resolveStageNumber() {

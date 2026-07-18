@@ -21,6 +21,10 @@ import model.game.Lawnmower;
 import model.game.MatchResult;
 import model.game.Sun;
 import model.game.Tile;
+import model.game.TileEffects.IceTrailEffect;
+import model.game.TileEffects.SpikeZoneEffect;
+import model.game.TileEffects.TileEffect;
+import model.game.TileEffects.TombStoneEffect;
 import model.game.plant.Plant;
 import model.game.plant.Factory.PlantFactory;
 import model.game.plant.PlantParts.PlantTemplate;
@@ -210,7 +214,11 @@ public class GamePlayController implements BaseController {
       if (!sun.isExpired()
               && Math.round(sun.getX()) == rc[1]
               && Math.round(sun.getY()) == rc[0]) {
+        boolean quickGrab = sun.getTimeToLive() > 100;
         gm.collectSun(sun);
+        if (quickGrab) {
+          gm.registerCombatEvent(ScoreEvent.SPEED_SUN_COLLECT);
+        }
         return;
       }
     }
@@ -371,11 +379,32 @@ public class GamePlayController implements BaseController {
     if (plant != null && plant.getName() != null && !plant.getName().isEmpty()) {
       return Character.toUpperCase(plant.getName().charAt(0));
     }
+    for (Sun sun : board.getSuns()) {
+      if (!sun.isExpired() && Math.round(sun.getX()) == col && Math.round(sun.getY()) == row) {
+        return '*';
+      }
+    }
+    if (board.isWaterAt(row, col)) {
+      return '~';
+    }
     Tile tile = board.getTile(row, col);
     if (tile != null && tile.getEffect() != null) {
-      return '#';
+      return effectGlyph(tile.getEffect());
     }
     return '.';
+  }
+
+  private char effectGlyph(TileEffect effect) {
+    if (effect instanceof TombStoneEffect) {
+      return 'T';
+    }
+    if (effect instanceof IceTrailEffect) {
+      return 'I';
+    }
+    if (effect instanceof SpikeZoneEffect) {
+      return 'X';
+    }
+    return '#';
   }
 
   private void finishMatch(GameManager gm) {
