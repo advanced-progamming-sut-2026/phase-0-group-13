@@ -1,20 +1,28 @@
 package model.game.zombie.ZombieParts;
 
-public class Armor {
-  private String name;
-  private int currentHealth;
-  private int maxHealth;
-  private boolean isMetallic;
+import model.enums.ArmorType;
 
-  public Armor(String name, int maxHealth, boolean isMetallic) {
+public class Armor {
+  private final String name;
+  private int currentHealth;
+  private final int maxHealth;
+  private final boolean isMetallic;
+  private final ArmorType type;
+
+  public Armor(String name, int maxHealth, boolean isMetallic, ArmorType type) {
     this.name = name;
     this.maxHealth = maxHealth;
     this.currentHealth = maxHealth;
     this.isMetallic = isMetallic;
+    this.type = type;
+  }
+
+  public Armor(String name, int maxHealth, boolean isMetallic) {
+    this(name, maxHealth, isMetallic, null);
   }
 
   public Armor(String name, int maxHealth) {
-    this(name, maxHealth, false);
+    this(name, maxHealth, false, null);
   }
 
   public int takeDamage(int damage) {
@@ -48,5 +56,9 @@ public class Armor {
 
   public boolean isMetallic() {
     return isMetallic;
+  }
+
+  public ArmorType getType() {
+    return type;
   }
 }

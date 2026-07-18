@@ -59,9 +59,9 @@ public class ZombieFactory {
 
   private boolean isZomboss(ZombieType type) {
     return type == ZombieType.ZOMBOSS_EGYPT
-        || type == ZombieType.ZOMBOSS_PIRATE
-        || type == ZombieType.ZOMBOSS_COWBOY
-        || type == ZombieType.ZOMBOSS_DARK;
+            || type == ZombieType.ZOMBOSS_PIRATE
+            || type == ZombieType.ZOMBOSS_COWBOY
+            || type == ZombieType.ZOMBOSS_DARK;
   }
 
   // دراپ آیتم: هر زامبی یه مقدار پایه سکه میده، و با شانس کم "درخشان" (shiny) میشه که یه پاداش الماس
@@ -111,6 +111,9 @@ public class ZombieFactory {
         return new ZombotanyPeashooterAction(150, 10.0);
       case ZOMBOTANY_WALLNUT:
         return new StandardZombieAction(eatDamage);
+      case ZOMBOTANY_JALAPENO:
+      case ZOMBOTANY_SQUASH:
+        return new TacklerZombieAction();
       case FOOTBALLER:
         return new TacklerZombieAction();
       case PARASOL:
@@ -133,8 +136,9 @@ public class ZombieFactory {
         return new DodoRiderZombieAction(eatDamage);
       // زامبی‌هایی که از فاصله به گیاه شلیک میکنن (همون مکانیک زامبوتانی نخودی)
       case HUNTER:
-      case JUGGLER:
         return new ZombotanyPeashooterAction(120, eatDamage);
+      case JUGGLER:
+        return new JesterZombieAction(eatDamage);
       // زامبی‌هایی که از فاصله گیاه رو منفجر/نابود میکنن (همون مکانیک پراسپکتور)
       case TROGLOBITE:
         return new RangedDemolisherZombieAction(80, 2.0);
@@ -162,11 +166,14 @@ public class ZombieFactory {
 
   private void applyArmorLayers(Zombie zombie, ZombieTemplate template) {
     List<Integer> armorHps = repository.resolveArmorHp(template);
+    List<model.enums.ArmorType> armorTypes = repository.resolveArmorTypes(template);
     String n = template.getName() == null ? "" : template.getName().toLowerCase();
     boolean metallic = n.contains("bucket") || n.contains("knight") || n.contains("crown");
 
-    for (int hp : armorHps) {
-      zombie.addArmor(new Armor(template.getName() + " Armor", hp, metallic));
+    for (int i = 0; i < armorHps.size(); i++) {
+      model.enums.ArmorType type = i < armorTypes.size() ? armorTypes.get(i) : null;
+      boolean layerMetallic = metallic || type == model.enums.ArmorType.BUCKET || type == model.enums.ArmorType.HELMET;
+      zombie.addArmor(new Armor(template.getName() + " Armor", armorHps.get(i), layerMetallic, type));
     }
   }
 }

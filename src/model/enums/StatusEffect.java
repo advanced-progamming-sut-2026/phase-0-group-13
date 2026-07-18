@@ -5,5 +5,6 @@ public enum StatusEffect {
   CHILLED,
   POISONED, // مسمومیت
   HYPNOTIZED, // هیپنوتیزم شده
-  BURNED // سوختگی
+  BURNED, // سوختگی
+  OCTOPUS_BIND // گیر افتاده در شاخک اختاپوس
 }
