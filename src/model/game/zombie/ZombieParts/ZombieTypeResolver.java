@@ -44,6 +44,8 @@ public final class ZombieTypeResolver {
 
     if (n.contains("zombotany")) {
       if (n.contains("wallnut") || n.contains("wall-nut")) return ZombieType.ZOMBOTANY_WALLNUT;
+      if (n.contains("jalapeno")) return ZombieType.ZOMBOTANY_JALAPENO;
+      if (n.contains("squash")) return ZombieType.ZOMBOTANY_SQUASH;
       return ZombieType.ZOMBOTANY_PEASHOOTER;
     }
     if (n.contains("armor4") || n.contains("brick")) return ZombieType.BLOCKHEAD;

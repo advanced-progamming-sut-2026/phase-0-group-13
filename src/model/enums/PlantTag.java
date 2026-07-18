@@ -4,7 +4,7 @@ public enum PlantTag {
   DAY,
   NIGHT,
   SHROOM,
-  WRAMP_UP,
+  RAMP_UP,
   PEA,
   ICE,
   FIRE,
@@ -17,5 +17,5 @@ public enum PlantTag {
   TRAP,
   MOVE_ZOMBIES,
   SUN,
-  EXPLOSIVE;
+  EXPLOSIVE
 }

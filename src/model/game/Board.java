@@ -314,6 +314,11 @@ public class Board {
     projectiles.add(p);
   }
 
+
+  public List<Projectile> getProjectiles() {
+    return projectiles;
+  }
+
   public void addSun(Sun s) {
     suns.add(s);
   }

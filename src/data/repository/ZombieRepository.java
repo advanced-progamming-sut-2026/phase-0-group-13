@@ -57,4 +57,17 @@ public class ZombieRepository implements ReadOnlyRepository<Object> {
     }
     return result;
   }
+
+  public List<model.enums.ArmorType> resolveArmorTypes(ZombieTemplate zombie) {
+    List<model.enums.ArmorType> result = new ArrayList<>();
+    if (zombie == null) {
+      return result;
+    }
+    for (String alias : zombie.getArmorRefAliases()) {
+      ZombieTemplate armorDef = armorDefsByAlias.get(alias);
+      String rawType = (armorDef != null && armorDef.objdata != null) ? armorDef.objdata.armorType : null;
+      result.add(model.enums.ArmorType.fromRawName(rawType));
+    }
+    return result;
+  }
 }

@@ -4399,5 +4399,185 @@
         }
       ]
     }
+  },
+  {
+    "aliases": [
+      "ZombieZombotanyPeashooterDefault"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 200,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 270,
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.2,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness2"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombotanyWallnutDefault"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 250,
+      "EatDPS": 0,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 4000,
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.0,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness5"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed1"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombotanyJalapenoDefault"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 200,
+      "EatDPS": 10000,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 270,
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.3,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness2"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombotanySquashDefault"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 200,
+      "EatDPS": 10000,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 270,
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.3,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness2"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
   }
 ]
