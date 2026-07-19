@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import model.Result;
 import model.environment.greenhouse.GreenHouse;
 import model.game.MatchResult;
 import model.game.news.AllNews;
+import model.game.quest.MatchContext;
 import model.game.quest.Quest;
 
 public class User {
@@ -43,6 +46,8 @@ public class User {
   private long lastShopRefreshTime;
   private long lastDailyDealPurchaseTime;
   private int meowPoints;
+  private int winStreakAtMaxDifficulty;
+  public static final int MAX_DIFFICULTY_LEVEL = 5;
 
   public User(String username, String passwordHash, String email, String nickname, String gender) {
     this.username = username;
@@ -91,7 +96,7 @@ public class User {
 
     if (targetId.startsWith("plant_")) {
       String plantName = targetId.substring("plant_".length());
-      unlockPlant(plantName); 
+      unlockPlant(plantName);
 
     } else if (targetId.startsWith("zombie_")) {
       if (!unlockedZombies.contains(targetId)) {
@@ -195,6 +200,7 @@ public class User {
     unlockedPlants.add(key);
     plantLevels.put(key, 1);
     generateNews("plant", key);
+    triggerQuestEvent("PLANT_UNLOCKED", 1);
     return new Result(true, plantName + " unlocked and added to your collection!", key);
   }
 
@@ -304,5 +310,115 @@ public class User {
 
     boostedPlants.add(key);
     return new Result(true, plantName + " free boost stored!", key);
+  }
+
+  private static final Map<String, String[]> QUEST_EVENT_KEYWORDS = buildQuestEventKeywords();
+  private static final Map<String, Integer> DEFAULT_QUEST_TARGETS = buildDefaultQuestTargets();
+
+  private static Map<String, String[]> buildQuestEventKeywords() {
+    Map<String, String[]> map = new HashMap<>();
+    map.put("KILL_ZOMBIE", new String[] {"زامبی", "zombie", "شکست دادن"});
+    map.put("KILL_ZOMBIE_WITH_PLANT", new String[] {"فقط با plant", "only with plant"});
+    map.put("KILL_ZOMBIE_WITH_CACTUS", new String[] {"کاکتوس", "cactus"});
+    map.put("COLLECT_SUN", new String[] {"خورشید", "sun_amount", "sun"});
+    map.put("STAGE_CLEAR", new String[] {"فصل", "chapter", "مرحله", "stage"});
+    map.put("MINIGAME_CLEAR", new String[] {"minigame", "مینی", "mini-game", "mini game"});
+    map.put("PLANT_UNLOCKED", new String[] {"گیاه جدید", "new plant", "unlock plant"});
+    map.put("PLANT_PURCHASED", new String[] {"خرید", "purchase"});
+    return map;
+  }
+
+  private static Map<String, Integer> buildDefaultQuestTargets() {
+    Map<String, Integer> map = new HashMap<>();
+    map.put("KILL_ZOMBIE", 50);
+    map.put("KILL_ZOMBIE_WITH_PLANT", 10);
+    map.put("KILL_ZOMBIE_WITH_CACTUS", 10);
+    map.put("COLLECT_SUN", 3000);
+    map.put("STAGE_CLEAR", 1);
+    map.put("MINIGAME_CLEAR", 1);
+    map.put("PLANT_UNLOCKED", 1);
+    map.put("PLANT_PURCHASED", 1);
+    return map;
+  }
+
+
+
+  public void evaluateContextualQuests(MatchContext context) {
+    if (context == null) {
+      return;
+    }
+    context.setWinStreakAtMaxDifficulty(winStreakAtMaxDifficulty);
+    for (Quest quest : quests) {
+      if (quest.isCompleted()) {
+        continue;
+      }
+      if (quest.checkCondition(context)) {
+        generateNews("quest", quest.getTitle());
+      }
+    }
+  }
+
+  public void updateDifficultyWinStreak(boolean won) {
+    if (won && difficultyLevel >= MAX_DIFFICULTY_LEVEL) {
+      winStreakAtMaxDifficulty++;
+    } else if (!won) {
+      winStreakAtMaxDifficulty = 0;
+    }
+  }
+
+  public int getWinStreakAtMaxDifficulty() {
+    return winStreakAtMaxDifficulty;
+  }
+
+  public void triggerQuestEvent(String eventType, int amount) {
+    if (eventType == null || amount <= 0) {
+      return;
+    }
+    String[] keywords = QUEST_EVENT_KEYWORDS.get(eventType.toUpperCase().trim());
+    if (keywords == null) {
+      return;
+    }
+
+    for (Quest quest : quests) {
+      if (quest.isCompleted()) {
+        continue;
+      }
+      String haystack =
+              ((quest.getCondition() != null ? quest.getCondition() : "")
+                      + " "
+                      + (quest.getCategory() != null ? quest.getCategory() : ""))
+                      .toLowerCase();
+      boolean matches = false;
+      for (String keyword : keywords) {
+        if (haystack.contains(keyword.toLowerCase())) {
+          matches = true;
+          break;
+        }
+      }
+      if (!matches) {
+        continue;
+      }
+
+      double target = resolveQuestTarget(quest, eventType);
+      boolean wasCompleted = quest.isCompleted();
+      quest.addProgress(amount, target);
+      if (!wasCompleted && quest.isCompleted()) {
+        generateNews("quest", quest.getTitle());
+      }
+    }
+  }
+
+  private double resolveQuestTarget(Quest quest, String eventType) {
+    if (quest.getVariable() != null) {
+      Matcher numberMatcher = Pattern.compile("\\d+").matcher(quest.getVariable());
+      if (numberMatcher.find()) {
+        try {
+          return Double.parseDouble(numberMatcher.group());
+        } catch (NumberFormatException ignored) {
+        }
+      }
+    }
+    Integer fallback = DEFAULT_QUEST_TARGETS.get(eventType.toUpperCase().trim());
+    return fallback != null ? fallback : 1;
   }
 }

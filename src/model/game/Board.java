@@ -30,6 +30,11 @@ public class Board {
   private final List<Projectile> projectiles;
   private final List<Lawnmower> lawnmowers;
   private final List<Reward> pendingRewards = new ArrayList<>();
+  private int pendingKillCount;
+  private final List<KillDetail> pendingKillDetails = new ArrayList<>();
+  private int pendingPlantsLostCount;
+
+  public record KillDetail(int row, long column, boolean laneHasUnusedMower) {}
 
   private final GameState gameState;
   private int lastSunDropTick;
@@ -174,11 +179,21 @@ public class Board {
     for (Zombie zombie : zombies) {
       if (zombie.isDead() && !zombie.hasDroppedLoot()) {
         zombie.markLootDropped();
+        pendingKillCount++;
+        pendingKillDetails.add(new KillDetail(
+                zombie.getRow(), Math.round(zombie.getX()), laneHasUnusedMower(zombie.getRow())));
         if (random.nextDouble() < DEATH_DROP_CHANCE) {
           rollDeathDrop(zombie);
         }
       }
     }
+  }
+
+  private boolean laneHasUnusedMower(int row) {
+    if (row < 0 || row >= lawnmowers.size()) {
+      return false;
+    }
+    return lawnmowers.get(row).isActive();
   }
 
   private void rollDeathDrop(Zombie zombie) {
@@ -204,6 +219,18 @@ public class Board {
   public List<Reward> drainPendingRewards() {
     List<Reward> drained = new ArrayList<>(pendingRewards);
     pendingRewards.clear();
+    return drained;
+  }
+
+  public int drainPendingKillCount() {
+    int count = pendingKillCount;
+    pendingKillCount = 0;
+    return count;
+  }
+
+  public List<KillDetail> drainPendingKillDetails() {
+    List<KillDetail> drained = new ArrayList<>(pendingKillDetails);
+    pendingKillDetails.clear();
     return drained;
   }
 
@@ -335,7 +362,7 @@ public class Board {
     if (p.isFromZombie()) {
       return false;
     }
-    int row = (int) Math.round(p.getYCoordinate());
+    int row = Math.round(p.getYCoordinate());
     int col = (int) Math.round(p.getXCoordinate());
     if (row < 0 || row >= rows || col < 0 || col >= columns) {
       return false;
@@ -389,9 +416,21 @@ public class Board {
       }
     }
 
+    for (Plant plant : plants) {
+      if (plant.isDead()) {
+        pendingPlantsLostCount++;
+      }
+    }
+
     plants.removeIf(Plant::isDead);
     zombies.removeIf(Zombie::isDead);
     suns.removeIf(Sun::isExpired);
+  }
+
+  public int drainPendingPlantsLostCount() {
+    int count = pendingPlantsLostCount;
+    pendingPlantsLostCount = 0;
+    return count;
   }
 
   public boolean isWaterAt(int row, int col) {
