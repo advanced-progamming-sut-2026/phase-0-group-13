@@ -21,13 +21,10 @@ import model.game.Lawnmower;
 import model.game.MatchResult;
 import model.game.Sun;
 import model.game.Tile;
-import model.game.TileEffects.IceTrailEffect;
-import model.game.TileEffects.SpikeZoneEffect;
-import model.game.TileEffects.TileEffect;
-import model.game.TileEffects.TombStoneEffect;
 import model.game.plant.Plant;
 import model.game.plant.Factory.PlantFactory;
 import model.game.plant.PlantParts.PlantTemplate;
+import model.game.quest.MatchContext;
 import model.game.zombie.Zombie;
 import model.game.zombie.factory.ZombieFactory;
 
@@ -119,8 +116,30 @@ public class GamePlayController implements BaseController {
     for (int i = 0; i < count && gm.isRunning(); i++) {
       gm.advanceTime();
     }
+    reportZombieKillsToQuests(gm);
+    reportContextualQuestProgress(gm);
     if (!gm.isRunning()) {
       finishMatch(gm);
+    }
+  }
+
+  private void reportContextualQuestProgress(GameManager gm) {
+    User user = UserManager.getInstance().getCurrentUser();
+    if (user == null) {
+      return;
+    }
+    MatchContext context = gm.getMatchContext();
+    user.evaluateContextualQuests(context);
+  }
+
+  private void reportZombieKillsToQuests(GameManager gm) {
+    int killed = gm.drainPendingKillCount();
+    if (killed <= 0) {
+      return;
+    }
+    User user = UserManager.getInstance().getCurrentUser();
+    if (user != null) {
+      user.triggerQuestEvent("KILL_ZOMBIE", killed);
     }
   }
 
@@ -168,7 +187,7 @@ public class GamePlayController implements BaseController {
       System.out.println("error: cannot plant there (tile occupied or not enough sun)");
     }
   }
-  
+
   private int getCurrentPlantLevel(String plantType) {
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) return 1;
@@ -214,10 +233,11 @@ public class GamePlayController implements BaseController {
       if (!sun.isExpired()
               && Math.round(sun.getX()) == rc[1]
               && Math.round(sun.getY()) == rc[0]) {
-        boolean quickGrab = sun.getTimeToLive() > 100;
+        int amount = sun.getAmount();
         gm.collectSun(sun);
-        if (quickGrab) {
-          gm.registerCombatEvent(ScoreEvent.SPEED_SUN_COLLECT);
+        User user = UserManager.getInstance().getCurrentUser();
+        if (user != null) {
+          user.triggerQuestEvent("COLLECT_SUN", amount);
         }
         return;
       }
@@ -379,32 +399,11 @@ public class GamePlayController implements BaseController {
     if (plant != null && plant.getName() != null && !plant.getName().isEmpty()) {
       return Character.toUpperCase(plant.getName().charAt(0));
     }
-    for (Sun sun : board.getSuns()) {
-      if (!sun.isExpired() && Math.round(sun.getX()) == col && Math.round(sun.getY()) == row) {
-        return '*';
-      }
-    }
-    if (board.isWaterAt(row, col)) {
-      return '~';
-    }
     Tile tile = board.getTile(row, col);
     if (tile != null && tile.getEffect() != null) {
-      return effectGlyph(tile.getEffect());
+      return '#';
     }
     return '.';
-  }
-
-  private char effectGlyph(TileEffect effect) {
-    if (effect instanceof TombStoneEffect) {
-      return 'T';
-    }
-    if (effect instanceof IceTrailEffect) {
-      return 'I';
-    }
-    if (effect instanceof SpikeZoneEffect) {
-      return 'X';
-    }
-    return '#';
   }
 
   private void finishMatch(GameManager gm) {
@@ -455,6 +454,9 @@ public class GamePlayController implements BaseController {
     }
 
     user.addMatchResult(result);
+    user.updateDifficultyWinStreak(result.isWon());
+    gm.getMatchContext().setMatchWon(result.isWon());
+    user.evaluateContextualQuests(gm.getMatchContext());
 
     if (result.isWon()) {
       Progress progress = user.getProgress();
@@ -467,6 +469,7 @@ public class GamePlayController implements BaseController {
         }
       }
       System.out.println(progress.advanceAdventure().message());
+      user.triggerQuestEvent("STAGE_CLEAR", 1);
     }
 
     saveUserState();

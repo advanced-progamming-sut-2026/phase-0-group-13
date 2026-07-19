@@ -3,11 +3,11 @@ package model.game;
 import model.enums.SunType;
 
 public class Sun {
-  private int amount;
+  private final int amount;
   private double x;
   private double y;
   private int timeToLive; // به واحد تیک
-  private SunType sunType;
+  private final SunType sunType;
   private boolean isCollected;
 
   public Sun(int amount, int timeToLive, SunType sunType) {
@@ -42,15 +42,15 @@ public class Sun {
     return timeToLive <= 0 || isCollected;
   }
 
+  public int getAmount() {
+    return amount;
+  }
+
   public double getX() {
     return x;
   }
 
   public double getY() {
     return y;
-  }
-
-  public int getTimeToLive() {
-    return timeToLive;
   }
 }

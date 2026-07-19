@@ -274,6 +274,7 @@ public class CollectionMenuController implements BaseController {
     System.out.println(result.message());
 
     if (result.success()) {
+      user.triggerQuestEvent("PLANT_PURCHASED", 1);
       saveState();
     } else {
       user.addCoins(PURCHASE_COST_COINS);

@@ -2,22 +2,27 @@ package data.persistence;
 
 import com.google.gson.Gson;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class JsonSerializer {
   private static final Gson GSON = new Gson();
 
   public void writeToFile(String filePath, Object data) {
+    File target = new File(filePath);
     try {
-      File file = new File(filePath);
-      File parentDir = file.getParentFile();
+      File parentDir = target.getParentFile();
       if (parentDir != null && !parentDir.exists()) {
         parentDir.mkdirs();
       }
-      try (Writer writer = new FileWriter(file)) {
+      File tempDir = parentDir != null ? parentDir : new File(".");
+      File tmpFile = File.createTempFile("userdata", ".tmp", tempDir);
+      try (Writer writer = new FileWriter(tmpFile)) {
         GSON.toJson(data, writer);
       }
-    } catch (IOException e) {
-      e.printStackTrace();
+      Files.move(tmpFile.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    } catch (Exception e) {
+      System.out.println("error: could not save data to " + filePath + " (" + e.getMessage() + ")");
     }
   }
 

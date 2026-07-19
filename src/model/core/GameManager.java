@@ -14,6 +14,7 @@ import model.game.Wave;
 import model.game.minigame.SpecialStageRule;
 import model.game.news.AllNews;
 import model.game.plant.Plant;
+import model.game.quest.MatchContext;
 import model.game.quest.Quest;
 
 public class GameManager {
@@ -31,6 +32,7 @@ public class GameManager {
   private AllNews allnews;
   private List<Quest> quests;
   private AdventureMap adventureMap;
+  private final MatchContext matchContext = new MatchContext();
 
   // اضافه شدن متغیر برای کنترل موج زامبی‌ها
   private boolean zombieWavesStarted = true;
@@ -93,6 +95,19 @@ public class GameManager {
 
     currentTick++;
     board.updateAll(currentTick);
+
+    boolean isNewWave = zombieWavesStarted && currentWaveIndex < waves.size();
+    if (isNewWave) {
+      matchContext.onWaveStarted(currentWaveIndex, currentTick);
+    }
+    for (Board.KillDetail kill : board.drainPendingKillDetails()) {
+      matchContext.onZombieKilled(currentTick, (int) kill.column(), kill.laneHasUnusedMower());
+    }
+    int plantsLostThisTick = board.drainPendingPlantsLostCount();
+    for (int i = 0; i < plantsLostThisTick; i++) {
+      matchContext.onPlantLost();
+    }
+    matchContext.refreshFromBoard(board, currentTick);
 
     for (model.game.reward.Reward reward : board.drainPendingRewards()) {
       matchResult.addEarnedReward(reward);
@@ -160,12 +175,15 @@ public class GameManager {
     }
 
     board.placePlant(plant);
+    matchContext.onSunSpent(plant.getCost());
+    matchContext.onPlantPlaced(plant, row, col);
     return true;
   }
 
   public void collectSun(Sun sun) {
     if (board != null && running) {
       sun.collect(board.getGameState());
+      matchContext.onSunCollected(sun.getAmount());
     }
   }
 
@@ -277,5 +295,13 @@ public class GameManager {
 
   public int getTotalWaves() {
     return waves.size();
+  }
+
+  public int drainPendingKillCount() {
+    return board != null ? board.drainPendingKillCount() : 0;
+  }
+
+  public MatchContext getMatchContext() {
+    return matchContext;
   }
 }
