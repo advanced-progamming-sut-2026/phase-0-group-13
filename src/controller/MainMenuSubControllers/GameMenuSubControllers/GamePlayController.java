@@ -226,23 +226,21 @@ public class GamePlayController implements BaseController {
 
   private void handleCollectSun(GameManager gm, Matcher m) {
     int[] rc = parseCoord(gm.getBoard(), m.group("x"), m.group("y"));
-    if (rc == null) {
+    if (rc == null) return;
+
+    Integer amount = gm.collectSunAt(rc[1], rc[0]);
+
+    if (amount == null) {
+      System.out.println("error: no sun to collect at that tile");
       return;
     }
-    for (Sun sun : gm.getBoard().getSuns()) {
-      if (!sun.isExpired()
-              && Math.round(sun.getX()) == rc[1]
-              && Math.round(sun.getY()) == rc[0]) {
-        int amount = sun.getAmount();
-        gm.collectSun(sun);
-        User user = UserManager.getInstance().getCurrentUser();
-        if (user != null) {
-          user.triggerQuestEvent("COLLECT_SUN", amount);
-        }
-        return;
+
+    if (amount > 0) {
+      User user = UserManager.getInstance().getCurrentUser();
+      if (user != null) {
+        user.triggerQuestEvent("COLLECT_SUN", amount);
       }
     }
-    System.out.println("error: no sun to collect at that tile");
   }
 
   private void handleFeed(GameManager gm, Matcher m) {

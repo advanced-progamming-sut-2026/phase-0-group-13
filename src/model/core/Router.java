@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class Router {
   private static Router instance;
   private BaseController currentController;
-  private Scanner scanner;
+  private final Scanner scanner;
 
   private Router() {
     this.scanner = new Scanner(System.in);
@@ -33,11 +33,9 @@ public class Router {
   }
 
   private void startInputLoop() {
-    while (currentController != null) {
-      if (scanner.hasNextLine()) {
-        String input = scanner.nextLine();
-        currentController.handleinput(input);
-      }
+    while (currentController != null && scanner.hasNextLine()) {
+      String input = scanner.nextLine();
+      currentController.handleinput(input);
     }
   }
 

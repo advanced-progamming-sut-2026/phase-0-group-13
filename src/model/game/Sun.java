@@ -3,20 +3,26 @@ package model.game;
 import model.enums.SunType;
 
 public class Sun {
-  private final int amount;
+  private int amount;
   private double x;
   private double y;
   private int timeToLive; // به واحد تیک
-  private final SunType sunType;
+  private SunType sunType;
   private boolean isCollected;
+  private int fallingTicks; 
 
   public Sun(int amount, int timeToLive, SunType sunType) {
+    this(amount, timeToLive, sunType, false);
+  }
+
+  public Sun(int amount, int timeToLive, SunType sunType, boolean isFalling) {
     this.amount = amount;
     this.timeToLive = timeToLive;
     this.sunType = sunType;
     this.x = 0.0;
     this.y = 0.0;
     this.isCollected = false;
+    this.fallingTicks = isFalling ? 50 : 0;
   }
 
   public void changinCordinate(double x, double y) {
@@ -25,6 +31,15 @@ public class Sun {
   }
 
   public void update(int currentTick) {
+    if (fallingTicks > 0) {
+      fallingTicks--;
+      if (fallingTicks == 0 && sunType == SunType.RADIOACTIVE) {
+        sunType = SunType.NORMAL;
+        amount = 25;
+        System.out.println("Radioactive sun reached the ground and turned into a normal sun.");
+      }
+    }
+
     if (timeToLive > 0 && !isCollected) {
       timeToLive--;
     }
@@ -34,7 +49,7 @@ public class Sun {
     if (!isCollected && timeToLive > 0) {
       this.isCollected = true;
       state.addSun(this.amount);
-      this.timeToLive = 0; // تیک بعدی پخ پخ شه
+      this.timeToLive = 0; // تیک بعدی پاک می‌شود
     }
   }
 
@@ -42,15 +57,12 @@ public class Sun {
     return timeToLive <= 0 || isCollected;
   }
 
-  public int getAmount() {
-    return amount;
-  }
-
-  public double getX() {
-    return x;
-  }
-
-  public double getY() {
-    return y;
-  }
+  public int getAmount() { return amount; }
+  public void setAmount(int amount) { this.amount = amount; }
+  public double getX() { return x; }
+  public double getY() { return y; }
+  public SunType getType() { return sunType; }
+  public void setType(SunType sunType) { this.sunType = sunType; }
+  public boolean isFalling() { return fallingTicks > 0; }
+  public void setCollected(boolean collected) { this.isCollected = collected; }
 }

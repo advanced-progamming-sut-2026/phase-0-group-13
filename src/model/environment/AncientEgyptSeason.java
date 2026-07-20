@@ -11,6 +11,11 @@ public class AncientEgyptSeason extends Season {
   }
 
   @Override
+  public void placeHazards(model.game.Board board) {
+    board.placeRandomTombstones(3, 5, 700);
+  }
+
+  @Override
   public void applySeasonEffects(GameState gameState) {
     gameState.update(gameState.getCurrentWave(), this);
   }

@@ -1,8 +1,6 @@
 package model.game;
-
 import data.GameDataManager;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
@@ -16,61 +14,47 @@ import model.game.reward.Currency;
 import model.game.reward.Reward;
 import model.game.zombie.Zombie;
 import model.game.zombie.factory.ZombieFactory;
-
 public class Board {
   private static final double DEATH_DROP_CHANCE = 0.10;
-
   private final int rows;
   private final int columns;
-  private Tile[][] tiles; // این داستان که افکت هارو چجوری باید اضافه بکنیم و ایده ای ندارم
-
+  private Tile[][] tiles;
   private final List<Zombie> zombies;
   private final List<Plant> plants;
-  private final List<Sun> suns;
+  private final SunManager sunManager; // کلاسی که مدیریت خورشیدها را بر عهده دارد
   private final List<Projectile> projectiles;
   private final List<Lawnmower> lawnmowers;
   private final List<Reward> pendingRewards = new ArrayList<>();
   private int pendingKillCount;
   private final List<KillDetail> pendingKillDetails = new ArrayList<>();
   private int pendingPlantsLostCount;
-
   public record KillDetail(int row, long column, boolean laneHasUnusedMower) {}
-
   private final GameState gameState;
-  private int lastSunDropTick;
   private final Random random;
   private boolean playerLost;
-
   public Board(int rows, int columns) {
     this.rows = rows;
     this.columns = columns;
     this.gameState = new GameState();
     this.zombies = new ArrayList<>();
     this.plants = new ArrayList<>();
-    this.suns = new ArrayList<>();
+    this.sunManager = new SunManager();
     this.projectiles = new ArrayList<>();
     this.lawnmowers = new ArrayList<>();
-    this.lastSunDropTick = 0;
     this.random = new Random();
     initialize();
   }
-
   public void initialize() {
     tiles = new Tile[rows][columns];
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < columns; j++) {
         tiles[i][j] = new Tile();
       }
-      // چمن زن و بزاریم
       lawnmowers.add(new Lawnmower(i));
     }
   }
-
-  // همه چی و اپدیت میکنیم
   public void updateAll(int currentTick) {
     gameState.update(null, null);
-
-    // تو اینجا این افکت های رو تایل ( الگوی استراتژی ) مثل یخ یا قبر اینارو ، اپدیت میکنیم
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < columns; j++) {
         TileEffect effect = tiles[i][j].getEffect();
@@ -83,21 +67,15 @@ public class Board {
       }
     }
     applyTileHazardsToZombies();
-    handleSkySunDrop(currentTick);
-
+    // مدیریت و آپدیت خورشیدها توسط SunManager انجام می‌شود
+    sunManager.update(currentTick, this);
     for (Plant plant : plants) {
       plant.update(currentTick, this);
     }
-
-    // یه کپی جدا میگیریم چون بعضی رفتارها (مثل Gargantuar/TombRaiser) وسط همین حلقه زامبی جدید به
-    // board.spawnZombie اضافه میکنن؛ بدون این کپی، حلقه رو لیست اصلی ConcurrentModificationException
-    // میداد (این باگ قبلا هیچ‌وقت دیده نمیشد چون Gargantuar's imp throw خودش یه باگ دیگه داشت که
-    // silently fail میشد)
     for (Zombie zombie : new ArrayList<>(zombies)) {
       zombie.update(currentTick, this);
       checkZombiePlantCollisions(zombie, currentTick);
     }
-
     handleProjectiles(currentTick);
     handleLawnmowers();
     triggerDeathExplosions();
@@ -105,9 +83,6 @@ public class Board {
     handleDeathDrops();
     cleanupEntities();
   }
-
-  // گورستان با قابلیت "نکرومنسی": هر necromancyIntervalTicks یه زامبی از دلش زنده میکنه، تا وقتی
-  // که خودش (با شلیک کافی) نابود بشه
   private void tryNecromancy(TombStoneEffect tombstone, int row, int col, int currentTick) {
     if (!tombstone.isDueForNecromancy(currentTick)) {
       return;
@@ -120,9 +95,6 @@ public class Board {
     }
     tombstone.markRaised(currentTick);
   }
-
-  // تایل‌های یخی (Frostbite Caves): زامبی‌ای که روشون وایمیسته کند یا کاملا یخ میزنه، بسته به اینکه
-  // IceTrailEffect چطور ساخته شده باشه
   private void applyTileHazardsToZombies() {
     for (Zombie zombie : zombies) {
       if (zombie.isDead()) {
@@ -142,11 +114,8 @@ public class Board {
       }
     }
   }
-
-
   private final model.game.plant.behavior.ExplodeAction deathExplodeAction =
           new model.game.plant.behavior.ExplodeAction(0, 1800, 1);
-
   private void triggerDeathExplosions() {
     for (Plant plant : plants) {
       if (plant.isDead()
@@ -157,7 +126,6 @@ public class Board {
       }
     }
   }
-
   private void handleGlowingZombieDrops() {
     for (Zombie zombie : zombies) {
       if (zombie.isDead() && zombie.isShiny() && !zombie.hasDroppedPlantFood()) {
@@ -170,11 +138,6 @@ public class Board {
       }
     }
   }
-
-  // هر زامبی‌ای که میمیره (چه درخشان چه معمولی) ۱۰٪ شانس داره یه چیزی هم بندازه: سکه، الماس، یا یه
-  // گلدون (کیسه سکه بزرگ‌تر). این جدا از دراپ پلنت‌فود زامبی درخشانه بالاست. جایزه‌ها فقط انباشته
-  // میشن (pendingRewards)؛ اعمال واقعیشون رو یوزر با drainPendingRewards() از بیرون (GameManager)
-  // انجام میشه.
   private void handleDeathDrops() {
     for (Zombie zombie : zombies) {
       if (zombie.isDead() && !zombie.hasDroppedLoot()) {
@@ -188,14 +151,12 @@ public class Board {
       }
     }
   }
-
   private boolean laneHasUnusedMower(int row) {
     if (row < 0 || row >= lawnmowers.size()) {
       return false;
     }
     return lawnmowers.get(row).isActive();
   }
-
   private void rollDeathDrop(Zombie zombie) {
     int roll = random.nextInt(3);
     Reward reward;
@@ -215,36 +176,27 @@ public class Board {
             "Zombie of type %s dropped %s at (%d, %d).%n",
             zombie.getName(), dropName, Math.round(zombie.getX()), zombie.getRow());
   }
-
   public List<Reward> drainPendingRewards() {
     List<Reward> drained = new ArrayList<>(pendingRewards);
     pendingRewards.clear();
     return drained;
   }
-
   public int drainPendingKillCount() {
     int count = pendingKillCount;
     pendingKillCount = 0;
     return count;
   }
-
   public List<KillDetail> drainPendingKillDetails() {
     List<KillDetail> drained = new ArrayList<>(pendingKillDetails);
     pendingKillDetails.clear();
     return drained;
   }
-
-  // برای فصل‌ها که میخوان موقع ساخت مرحله یه خطر (سنگ‌قبر، یخ) رو یه خونه خاص بزارن
   public void placeTileEffect(int row, int col, TileEffect effect) {
     Tile tile = getTile(row, col);
     if (tile != null) {
       tile.setEffect(effect);
     }
   }
-
-  // FIX (GDD Target 2.3 - Dark Ages Necromancy): علاوه بر تایمر دوره‌ای خود tryNecromancy، فصل Dark
-  // Ages این متود رو دقیقا سر شروع هر موج صدا میزنه تا هر سنگ‌قبر سرپا فورا یه زامبی زنده کنه (طبق
-  // GDD: "specific graves must spawn zombies at the start of a wave")
   public void triggerGraveNecromancy(int currentTick) {
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < columns; j++) {
@@ -261,61 +213,11 @@ public class Board {
       }
     }
   }
-
-  private void handleSkySunDrop(int currentTick) {
-    // FIX (GDD Target 2.3 - Dark Ages): طبق GDD هیچ خورشیدی از آسمون نباید تو این فصل بباره
-    if (gameState.isSkySunDisabled()) {
-      return;
-    }
-
-    double t = currentTick / 10.0;
-    double secondsInterval = Math.max(6 + 0.05 * t, 12);
-    int ticksInterval = (int) (secondsInterval * 10);
-
-    if (currentTick - lastSunDropTick >= ticksInterval) {
-      lastSunDropTick = currentTick;
-
-      int targetRow = random.nextInt(rows);
-      int targetCol = random.nextInt(columns);
-
-      int roll = random.nextInt(100);
-      model.enums.SunType type;
-      int amount;
-
-      if (roll < 80) {
-        type = model.enums.SunType.NORMAL;
-        amount = 25;
-      } else if (roll < 95) {
-        type = model.enums.SunType.LARGE;
-        amount = 100;
-      } else {
-        // رادیواکتیو اگه رو زمین برسه مثل خورشید معمولی جمع میشه
-        type = model.enums.SunType.RADIOACTIVE;
-        amount = 25;
-      }
-
-      Sun newSun = new Sun(amount, 150, type);
-      newSun.changinCordinate(targetCol, targetRow);
-      suns.add(newSun);
-
-      System.out.printf(
-              "New %s sun is dropping at position (%d, %d)%n",
-              type.name().toLowerCase(), targetCol + 1, targetRow + 1);
-    }
-  }
-
-  // فقط زامبی هیپنوتایز شده رو هندل میکنه (تنها موردیه که هیچ ZombieAction ای پوششش نمیده). زامبی‌های
-  // عادی قبلا همینجا دوباره حرکت/خوردن/دمیج به گیاه رو تکرار میکردن - در حالی که خودِ zombie.update()
-  // همین چند خط بالاتر (با ZombieAction اختصاصی هر نوع) این کار رو درست انجام داده بود؛ نتیجه این بود
-  // که هر زامبی بدون مانع هر تیک دوبار move() میخورد (سرعت واقعی ۲ برابر JSON) و گیاه هم علاوه بر
-  // eatDamage واقعی زامبی، یه ۱۰ دمیج ثابت اضافه هم میخورد.
   private void checkZombiePlantCollisions(Zombie zombie, int currentTick) {
     if (zombie.isHypnotized()) {
       checkHypnotizedZombieCollisions(zombie, currentTick);
     }
   }
-
-  // زامبی هیپنوتایز شده به جای گیاه‌ها، به سمت راست حرکت میکنه و به بقیه زامبی‌ها آسیب میزنه
   private void checkHypnotizedZombieCollisions(Zombie zombie, int currentTick) {
     Zombie targetZombie = findNearestZombieAhead(zombie);
     if (targetZombie != null && !targetZombie.isDead()) {
@@ -350,7 +252,7 @@ public class Board {
     while (iterator.hasNext()) {
       Projectile p = iterator.next();
       p.move();
-      
+
       if (p.isFromZombie()) {
         Plant plantHere = getPlantAt(Math.round(p.getYCoordinate()), p.getXCoordinate());
         if (plantHere != null && !plantHere.isDead()) {
@@ -371,12 +273,10 @@ public class Board {
           iterator.set(p);
         }
       }
-
       if (isBlockedByTombstone(p)) {
         iterator.remove();
         continue;
       }
-
       boolean hitRegistered = false;
       for (Zombie zombie : zombies) {
         if (zombie.getRow() == p.getYCoordinate()
@@ -386,15 +286,11 @@ public class Board {
           break;
         }
       }
-
       if (hitRegistered || p.getXCoordinate() > columns) {
         iterator.remove();
       }
     }
   }
-
-  // سنگ‌قبر (Dark Ages) اگه هنوز سرپا باشه جلوی تیرهای گیاهی رو میگیره (تیرهای زامبی رو نه، چون
-  // اونا از عقب میان و منطقی نیست قبر جلوشونو بگیره)
   private boolean isBlockedByTombstone(Projectile p) {
     if (p.isFromZombie()) {
       return false;
@@ -409,11 +305,9 @@ public class Board {
             && tombstone.isActive()
             && tombstone.isBlocksShots();
   }
-
   private void handleLawnmowers() {
     for (Lawnmower mower : lawnmowers) {
       if (!mower.isActive()) {
-        // بررسی شرط باخت بازی: ورود زامبی به خانه پس از مصرف شدن چمن‌زن
         for (Zombie z : zombies) {
           if (z.getRow() == mower.getRow() && z.getX() <= -0.5) {
             System.out.println("The zombie ate your brain; LOSER!!!");
@@ -423,27 +317,24 @@ public class Board {
         }
         continue;
       }
-
       for (Zombie z : zombies) {
         if (z.getRow() == mower.getRow() && z.getX() <= 0.0) {
-          mower.setActive(false); // ماشین چمن‌زن یک‌بار مصرف عه
+          mower.setActive(false);
           triggerLawnmowerRow(mower.getRow());
           break;
         }
       }
     }
   }
-
   private void triggerLawnmowerRow(int row) {
     System.out.printf("The lawn mower in the row %d is triggered and killed these zombies:%n", row);
     for (Zombie z : zombies) {
       if (z.getRow() == row) {
-        z.takeDamage(10000, true); // چون 021 عه پوینت کار
+        z.takeDamage(10000, true);
         System.out.println("- " + z.getName());
       }
     }
   }
-
   private void cleanupEntities() {
     for (Zombie zombie : zombies) {
       if (zombie.isDead()) {
@@ -452,38 +343,32 @@ public class Board {
                 zombie.getName(), Math.round(zombie.getX()), zombie.getRow());
       }
     }
-
     for (Plant plant : plants) {
       if (plant.isDead()) {
         pendingPlantsLostCount++;
       }
     }
-
     plants.removeIf(Plant::isDead);
     zombies.removeIf(Zombie::isDead);
-    suns.removeIf(Sun::isExpired);
+    sunManager.cleanupExpiredSuns();
   }
-
   public int drainPendingPlantsLostCount() {
     int count = pendingPlantsLostCount;
     pendingPlantsLostCount = 0;
     return count;
   }
-
   public boolean isWaterAt(int row, int col) {
     if (row < 0 || row >= rows || col < 0 || col >= columns) {
       return false;
     }
     return tiles[row][col].isWater();
   }
-
   public void setWaterAt(int row, int col, boolean water) {
     if (row < 0 || row >= rows || col < 0 || col >= columns) {
       return;
     }
     tiles[row][col].setWater(water);
   }
-
   public Plant getPlantAt(int row, double x) {
     for (Plant p : plants) {
       if (p.getRow() == row && Math.abs(p.getCol() - x) < 0.5) {
@@ -492,8 +377,6 @@ public class Board {
     }
     return null;
   }
-
-
   public Plant getEdiblePlantAt(int row, double x, int currentTick) {
     Plant plant = getPlantAt(row, x);
     if (plant != null && plant.isDisabled(currentTick)) {
@@ -501,8 +384,6 @@ public class Board {
     }
     return plant;
   }
-
-  // برای گیاهایی که وقتی خورده میشن باید به زامبی مهاجم واکنش نشون بدن (مثل رفلکت دمیج)
   public Zombie getZombieAt(int row, double x) {
     for (Zombie z : zombies) {
       if (z.getRow() == row && !z.isDead() && Math.abs(z.getX() - x) < 0.5) {
@@ -511,36 +392,27 @@ public class Board {
     }
     return null;
   }
-
   public void addProjectile(Projectile p) {
     projectiles.add(p);
   }
-
-
   public List<Projectile> getProjectiles() {
     return projectiles;
   }
-
   public void addSun(Sun s) {
-    suns.add(s);
+    sunManager.addSun(s);
   }
-
   public void placePlant(Plant p) {
     plants.add(p);
   }
-
   public void spawnZombie(Zombie z) {
     zombies.add(z);
   }
-
   public int getRows() {
     return rows;
   }
-
   public int getColumns() {
     return columns;
   }
-
   public GameState getGameState() {
     return gameState;
   }
@@ -558,7 +430,6 @@ public class Board {
     return false;
   }
 
-  // برای دسترسی اکشن انفجار به لیست زامبی‌ها
   public List<Zombie> getZombies() {
     return zombies;
   }
@@ -567,32 +438,56 @@ public class Board {
     for (Plant p : plants) {
       if (p.getRow() == row) {
         if (p.getCol() <= currentX && p.getCol() >= (currentX - distanceAhead)) {
-          return p; // گیاه پیدا شد
+          return p;
         }
       }
     }
     return null;
   }
 
-  // ---- Frozen read-only accessors (Person A contract; used by rendering & feature code) ----
-
   public List<Plant> getPlants() {
     return plants;
   }
 
   public List<Sun> getSuns() {
-    return suns;
+    return sunManager.getSuns();
   }
 
   public List<Lawnmower> getLawnmowers() {
     return lawnmowers;
   }
 
-  /** Returns the tile at 0-indexed (row, col), or null if out of bounds. */
   public Tile getTile(int row, int col) {
     if (row < 0 || row >= rows || col < 0 || col >= columns) {
       return null;
     }
     return tiles[row][col];
+  }
+
+  public Integer collectSunAt(int col, int row) {
+    return sunManager.collectSunAt(col, row, this);
+  }
+
+  public void applyAreaDamageToZombies(int centerCol, int centerRow, int radius, int damage) {
+    for (Zombie z : zombies) {
+      if (!z.isDead() && Math.abs(z.getRow() - centerRow) <= radius && Math.abs(z.getX() - centerCol) <= radius) {
+        z.takeDamage(damage, false);
+      }
+    }
+  }
+  public void applyAreaDamageToPlants(int centerCol, int centerRow, int radius, int damage) {
+    for (Plant p : plants) {
+      if (!p.isDead() && Math.abs(p.getRow() - centerRow) <= radius && Math.abs(p.getCol() - centerCol) <= radius) {
+        p.takeDamage(damage);
+      }
+    }
+  }
+  public void placeRandomTombstones(int minCount, int maxCount, int hp) {
+    int count = minCount + random.nextInt(maxCount - minCount + 1);
+    for (int i = 0; i < count; i++) {
+      int col = 4 + random.nextInt(columns - 4);
+      int row = random.nextInt(rows);
+      placeTileEffect(row, col, new TombStoneEffect(hp, true));
+    }
   }
 }

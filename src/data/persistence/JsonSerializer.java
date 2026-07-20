@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
 public class JsonSerializer {
-  private static final Gson GSON = new Gson();
+  private static final Gson GSON = new com.google.gson.GsonBuilder().setPrettyPrinting().create();
 
   public void writeToFile(String filePath, Object data) {
     File target = new File(filePath);
