@@ -46,6 +46,10 @@ public class Sun {
     return amount;
   }
 
+  public int getTimeToLive() {
+    return timeToLive;
+  }
+
   public double getX() {
     return x;
   }

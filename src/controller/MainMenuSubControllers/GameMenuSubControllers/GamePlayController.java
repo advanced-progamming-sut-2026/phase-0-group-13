@@ -234,7 +234,11 @@ public class GamePlayController implements BaseController {
               && Math.round(sun.getX()) == rc[1]
               && Math.round(sun.getY()) == rc[0]) {
         int amount = sun.getAmount();
+        boolean quickGrab = sun.getTimeToLive() > 100;
         gm.collectSun(sun);
+        if (quickGrab) {
+          gm.registerCombatEvent(ScoreEvent.SPEED_SUN_COLLECT);
+        }
         User user = UserManager.getInstance().getCurrentUser();
         if (user != null) {
           user.triggerQuestEvent("COLLECT_SUN", amount);
