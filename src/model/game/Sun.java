@@ -57,12 +57,19 @@ public class Sun {
     return timeToLive <= 0 || isCollected;
   }
 
-  public int getAmount() { return amount; }
-  public void setAmount(int amount) { this.amount = amount; }
-  public double getX() { return x; }
-  public double getY() { return y; }
-  public SunType getType() { return sunType; }
-  public void setType(SunType sunType) { this.sunType = sunType; }
-  public boolean isFalling() { return fallingTicks > 0; }
-  public void setCollected(boolean collected) { this.isCollected = collected; }
+  public int getAmount() {
+    return amount;
+  }
+
+  public int getTimeToLive() {
+    return timeToLive;
+  }
+
+  public double getX() {
+    return x;
+  }
+
+  public double getY() {
+    return y;
+  }
 }
