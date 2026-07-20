@@ -58,7 +58,6 @@ public class SignInMenuController implements BaseController {
       System.out.println(e.getMessage());
     }
   }
-
   private void handleAnswer(String answer) {
     try {
       UserManager.getInstance().verifyRecoveryAnswer(answer);
@@ -66,6 +65,7 @@ public class SignInMenuController implements BaseController {
       System.out.println("Please enter your new password using: 'set new password <password>'");
     } catch (Exception e) {
       System.out.println(e.getMessage());
+      App.setCurrentMenu(Menu.SignInMenu);
     }
   }
 

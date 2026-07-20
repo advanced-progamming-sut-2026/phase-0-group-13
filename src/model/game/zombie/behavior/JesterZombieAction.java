@@ -42,7 +42,7 @@ public class JesterZombieAction implements ZombieAction {
             && incoming.getYCoordinate() == zombie.getRow()
             && Math.abs(incoming.getXCoordinate() - zombie.getX()) <= CATCH_RANGE;
   }
-
+  
   private Projectile buildReflectedProjectile(Projectile incoming, Zombie zombie) {
     return new Projectile(
             (int) eatingDamage,
@@ -56,7 +56,7 @@ public class JesterZombieAction implements ZombieAction {
   }
 
   private void walkOrEat(Zombie zombie, Board board, int currentTick) {
-    Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
+    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
       if (currentTick % 10 == 0) {

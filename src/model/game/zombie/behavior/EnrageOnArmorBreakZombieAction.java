@@ -5,15 +5,21 @@ import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
 public class EnrageOnArmorBreakZombieAction implements ZombieAction {
+  private static final int NORMAL_BITE_INTERVAL_TICKS = 10;
   private final double eatingDamage;
   private final double enragedSpeedMultiplier;
+  private final int enragedBiteIntervalTicks;
   private boolean enraged = false;
 
-  // نیوزپیپر تا وقتی زره‌ش (روزنامه) سرپاست عادی راه میره؛ به محض نابود شدنش، برای همیشه سرعتش
-  // enragedSpeedMultiplier برابر میشه (فعلا برگشت به حالت عادی نداره چون این وضعیت دائمیه)
   public EnrageOnArmorBreakZombieAction(double eatingDamage, double enragedSpeedMultiplier) {
+    this(eatingDamage, enragedSpeedMultiplier, NORMAL_BITE_INTERVAL_TICKS / 2);
+  }
+
+  public EnrageOnArmorBreakZombieAction(
+          double eatingDamage, double enragedSpeedMultiplier, int enragedBiteIntervalTicks) {
     this.eatingDamage = eatingDamage;
     this.enragedSpeedMultiplier = enragedSpeedMultiplier;
+    this.enragedBiteIntervalTicks = Math.max(1, enragedBiteIntervalTicks);
   }
 
   @Override
@@ -24,10 +30,11 @@ public class EnrageOnArmorBreakZombieAction implements ZombieAction {
       System.out.printf("%s lost its newspaper and got enraged!%n", zombie.getName());
     }
 
-    Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
+    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
-      if (currentTick % 10 == 0) {
+      int biteInterval = enraged ? enragedBiteIntervalTicks : NORMAL_BITE_INTERVAL_TICKS;
+      if (currentTick % biteInterval == 0) {
         targetPlant.takeDamage((int) eatingDamage);
       }
     } else {

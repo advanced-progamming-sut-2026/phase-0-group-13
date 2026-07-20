@@ -68,6 +68,10 @@ public class Projectile {
   public void hitZombie(Zombie zombie) {
     if (!isActive || isFromZombie) return;
 
+    if (zombie.isSubmerged() && !lobbed) {
+      return;
+    }
+
     if (lobbed && zombie.hasShieldBlocker()) {
       return;
     }
@@ -95,9 +99,18 @@ public class Projectile {
 
   }
 
-  public void hitPlant(Plant plant) {
+  // FIX (GDD Target 1.4 - Jester Zombie): قبلا این متود اصلا از هیچ‌جا صدا زده نمیشد (پرتابه‌های
+  // زامبی‌محور هیچ‌وقت با گیاه برخورد نمیکردن)، پس افکت المنتال (یخ) هیچ‌وقت به گیاه نمیرسید. حالا هم
+  // دمیج معمولی میزنه و هم - اگه یخی باشه - گیاه رو موقتا فریز میکنه (دقیقا مثل CHILLED زامبی‌ها،
+  // همون مدت ۵۰ تیک)
+  private static final int PLANT_FREEZE_DURATION_TICKS = 50;
+
+  public void hitPlant(Plant plant, int currentTick) {
     if (!isActive || !isFromZombie) return;
     plant.takeDamage(this.damage);
+    if (effect == ProjectileEffect.ICE) {
+      plant.freeze(currentTick, PLANT_FREEZE_DURATION_TICKS);
+    }
     this.isActive = false;
   }
 

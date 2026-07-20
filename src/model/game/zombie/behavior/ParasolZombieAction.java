@@ -21,7 +21,7 @@ public class ParasolZombieAction implements ZombieAction {
     int damageTaken = zombie.getMaxHealth() - zombie.getCurrentHealth();
     zombie.setShieldBlocker(damageTaken < parasolHp);
 
-    Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
+    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
       if (currentTick % 10 == 0) {

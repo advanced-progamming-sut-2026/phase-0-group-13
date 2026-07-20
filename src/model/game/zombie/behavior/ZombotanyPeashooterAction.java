@@ -6,9 +6,9 @@ import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
 public class ZombotanyPeashooterAction implements ZombieAction {
-  private int shootInterval;
+  private final int shootInterval;
   private int lastShootTick;
-  private double eatingDamage;
+  private final double eatingDamage;
 
   public ZombotanyPeashooterAction(int shootInterval, double eatingDamage) {
     this.shootInterval = shootInterval;
@@ -30,7 +30,7 @@ public class ZombotanyPeashooterAction implements ZombieAction {
       System.out.printf("Zombotany Peashooter Zombie fired at row %d!%n", zombie.getRow());
     }
 
-    Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
+    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
 
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);

@@ -35,6 +35,7 @@ public class Zombie {
   private boolean lootDropped;
 
   private boolean hypnotized;
+  private boolean submerged;
 
   public Zombie(
           String name, int health, double speed, int row, double startX, ZombieAction behavior) {
@@ -55,6 +56,7 @@ public class Zombie {
     this.plantFoodDropped = false;
     this.lootDropped = false;
     this.hypnotized = false;
+    this.submerged = false;
   }
 
   public boolean hasDroppedLoot() {
@@ -87,6 +89,14 @@ public class Zombie {
 
   public void setHypnotized(boolean hypnotized) {
     this.hypnotized = hypnotized;
+  }
+
+  public boolean isSubmerged() {
+    return submerged;
+  }
+
+  public void setSubmerged(boolean submerged) {
+    this.submerged = submerged;
   }
 
   public void addArmor(Armor armor) {

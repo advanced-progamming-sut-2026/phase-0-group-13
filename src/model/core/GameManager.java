@@ -41,6 +41,18 @@ public class GameManager {
   // یکی از ۸ نوع مرحله ویژه فعاله (Locked Plants/Save Our Seeds/Timed War/...)
   private SpecialStageRule activeSpecialRule;
 
+  // FIX (GDD Target 2): فصل فعلی مسابقه (Frostbite Caves/Big Wave Beach/Dark Ages/...)؛ برای صدا
+  // زدن season.onTick/onWaveStart هر تیک/شروع موج لازمه. null یعنی فصل خاصی وایر نشده (رفتار قدیمی).
+  private model.environment.Season currentSeason;
+
+  public void setSeason(model.environment.Season season) {
+    this.currentSeason = season;
+  }
+
+  public model.environment.Season getSeason() {
+    return currentSeason;
+  }
+
   public void setSpecialStageRule(SpecialStageRule rule) {
     this.activeSpecialRule = rule;
   }
@@ -92,27 +104,20 @@ public class GameManager {
     if (!running || board == null) {
       return;
     }
-
     currentTick++;
     board.updateAll(currentTick);
-
+    if (currentSeason != null) {
+      board.getGameState().update(board.getGameState().getCurrentWave(), currentSeason);
+      currentSeason.onTick(board, currentTick);
+    }
     boolean isNewWave = zombieWavesStarted && currentWaveIndex < waves.size();
-    if (isNewWave) {
-      matchContext.onWaveStarted(currentWaveIndex, currentTick);
-    }
-    for (Board.KillDetail kill : board.drainPendingKillDetails()) {
+    if (isNewWave) matchContext.onWaveStarted(currentWaveIndex, currentTick);
+    for (Board.KillDetail kill : board.drainPendingKillDetails())
       matchContext.onZombieKilled(currentTick, (int) kill.column(), kill.laneHasUnusedMower());
-    }
     int plantsLostThisTick = board.drainPendingPlantsLostCount();
-    for (int i = 0; i < plantsLostThisTick; i++) {
-      matchContext.onPlantLost();
-    }
+    for (int i = 0; i < plantsLostThisTick; i++) matchContext.onPlantLost();
     matchContext.refreshFromBoard(board, currentTick);
-
-    for (model.game.reward.Reward reward : board.drainPendingRewards()) {
-      matchResult.addEarnedReward(reward);
-    }
-
+    for (model.game.reward.Reward reward : board.drainPendingRewards()) matchResult.addEarnedReward(reward);
     if (activeSpecialRule != null) {
       activeSpecialRule.apply(board.getGameState());
       if (activeSpecialRule.checkLoseCondition(board)) {
@@ -127,16 +132,14 @@ public class GameManager {
       matchResult.markLose();
       return;
     }
-
     if (zombieWavesStarted && currentWaveIndex < waves.size()) {
       Wave currentWave = waves.get(currentWaveIndex);
+      boolean wasStarted = currentWave.isStarted();
       currentWave.update(board);
-
-      if (currentWave.checkCompletion()) {
-        currentWaveIndex++;
-      }
+      if (!wasStarted && currentWave.isStarted() && currentSeason != null)
+        currentSeason.onWaveStart(board, currentWaveIndex, currentTick);
+      if (currentWave.checkCompletion()) currentWaveIndex++;
     }
-
     boolean specialEarlyWin = activeSpecialRule != null && activeSpecialRule.checkWinCondition(board);
     if (checkWinCondition() || specialEarlyWin) {
       endGame();

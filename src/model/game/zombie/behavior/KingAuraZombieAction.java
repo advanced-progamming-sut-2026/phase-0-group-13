@@ -21,14 +21,14 @@ public class KingAuraZombieAction implements ZombieAction {
   public void execute(Zombie zombie, Board board, int currentTick) {
     for (Zombie other : board.getZombies()) {
       if (other != zombie
-          && !other.isDead()
-          && other.getRow() == zombie.getRow()
-          && Math.abs(other.getX() - zombie.getX()) <= range) {
+              && !other.isDead()
+              && other.getRow() == zombie.getRow()
+              && Math.abs(other.getX() - zombie.getX()) <= range) {
         other.setSpeedMultiplier(buffSpeedMultiplier);
       }
     }
 
-    Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
+    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
       if (currentTick % 10 == 0) {

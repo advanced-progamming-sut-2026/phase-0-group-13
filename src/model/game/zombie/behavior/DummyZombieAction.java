@@ -20,12 +20,12 @@ public class DummyZombieAction implements ZombieAction {
   public void execute(Zombie zombie, Board board, int currentTick) {
     if (!warned) {
       System.out.printf(
-          "[NOT IMPLEMENTED] %s (%s) falls back to generic walk/eat behavior%n",
-          zombie.getName(), type);
+              "[NOT IMPLEMENTED] %s (%s) falls back to generic walk/eat behavior%n",
+              zombie.getName(), type);
       warned = true;
     }
 
-    Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
+    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
       if (currentTick % 10 == 0) {

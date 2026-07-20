@@ -5,21 +5,16 @@ import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
 public class WizardZombieAction implements ZombieAction {
-  private final int curseDurationTicks;
-
-  // به‌جای خوردن گیاه، وقتی به یه گیاه میرسه یه بار طلسمش میکنه (Plant.disableUntil) و از کنارش رد
-  // میشه؛ گیاه طلسم‌شده دیگه تا پایان مدت نمیتونه کاری بکنه ولی نمیمیره
-  public WizardZombieAction(int curseDurationTicks) {
-    this.curseDurationTicks = curseDurationTicks;
-  }
-
+  // FIX (GDD Target 1.6 - Wizard Zombie): طلسم دیگه به یه curseDurationTicks ثابت گره نیست؛
+  // Plant.applyCurse(zombie) خودش عمر طلسم رو به زنده بودن این Wizard خاص گره میزنه (در
+  // Plant.isDisabled: اگه curseSource مرده باشه، طلسم فورا باطل میشه)
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
     if (targetPlant != null && !targetPlant.isDead() && !targetPlant.isDisabled(currentTick)) {
-      targetPlant.disableUntil(currentTick + curseDurationTicks);
+      targetPlant.applyCurse(zombie);
       System.out.printf(
-          "%s turned %s into a harmless sheep!%n", zombie.getName(), targetPlant.getName());
+              "%s turned %s into a harmless sheep!%n", zombie.getName(), targetPlant.getName());
     }
 
     zombie.setEating(false);

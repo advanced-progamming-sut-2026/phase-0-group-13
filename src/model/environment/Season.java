@@ -39,6 +39,11 @@ public abstract class Season {
   // بعد از initializeLevel صدا زده میشه (MatchLauncher)
   public void placeHazards(model.game.Board board) {}
 
+
+  public void onTick(model.game.Board board, int currentTick) {}
+
+  public void onWaveStart(model.game.Board board, int waveNumber, int currentTick) {}
+
   // چون Zombies.json فیلد جدا برای فصل/چپتر نداره، از روی alias خام زامبی‌ها فیلتر میکنیم (مثلا
   // "ZombieEgyptImpDefault" یا "ZombieIceAgeDodo")؛ همون قراردادی که ZombieTypeResolver هم برای
   // تشخیص نوع زامبی از روی اسم استفاده میکنه
@@ -73,11 +78,11 @@ public abstract class Season {
   private boolean isBossTier(ZombieTemplate template) {
     ZombieType type = ZombieTypeResolver.resolve(template);
     return type == ZombieType.ZOMBOSS_EGYPT
-        || type == ZombieType.ZOMBOSS_PIRATE
-        || type == ZombieType.ZOMBOSS_COWBOY
-        || type == ZombieType.ZOMBOSS_DARK;
+            || type == ZombieType.ZOMBOSS_PIRATE
+            || type == ZombieType.ZOMBOSS_COWBOY
+            || type == ZombieType.ZOMBOSS_DARK;
   }
-  
+
   private boolean matchesAliasSegment(String alias, String keyword) {
     String lower = alias.toLowerCase();
     String keywordLower = keyword.toLowerCase();

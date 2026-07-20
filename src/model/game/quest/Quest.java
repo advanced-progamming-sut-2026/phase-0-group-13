@@ -99,26 +99,18 @@ public class Quest {
   private static Map<String, ContextCondition> buildContextConditions() {
     Map<String, ContextCondition> map = new java.util.LinkedHashMap<>();
     map.put("صفر خورشید", (q, ctx) -> ctx.getSunSpent() == 0);
-
     map.put("۳۰ ثانیه", (q, ctx) -> ctx.getZombiesKilledInOpeningWindow() >= 10);
-
     map.put("گیاه انفجاری", (q, ctx) -> ctx.getExplosivePlantsPlaced() >= 3);
-
     map.put("به جز ردیف وسط", (q, ctx) -> ctx.isMatchWon() && !ctx.isGardenSymmetricExceptMiddleRow());
-
     map.put("متقارن باشد", (q, ctx) -> ctx.isGardenSymmetric());
-
-
     map.put("برای کشتن زامبی ها استفاده شود", (q, ctx) -> {
       PlantTag family = resolveFamilyTag(q.variable);
       return family != null && ctx.onlyPlacedFamily(family);
     });
-
     map.put("استفاده نشود", (q, ctx) -> {
       PlantTag family = resolveFamilyTag(q.variable);
       return ctx.isMatchWon() && family != null && ctx.neverPlacedFamily(family);
     });
-
     map.put("گیاهان شب", (q, ctx) ->
             ctx.neverPlacedFamily(PlantTag.DAY) && ctx.getPlantFamiliesPlaced().contains(PlantTag.SHROOM));
 
@@ -153,17 +145,52 @@ public class Quest {
 
   private static final Map<String, PlantTag> FAMILY_KEYWORDS = buildFamilyKeywords();
 
+  // FIX (GDD Target 3.1 - Quest Mapper): این متود قبلا خالی بود، پس resolveFamilyTag هیچ‌وقت با
+  // کلیدهای فارسی جیسون (مثل "نخود" برای Pea یا "قارچ" برای Shroom) مچ نمیشد و همیشه null برمیگردوند.
+  // اینجا معادل فارسی هر PlantTag رو ثبت میکنیم (LinkedHashMap تا اگه یه رشته چند کلیدواژه رو
+  // همزمان داشت، اولویت با ورودی زودتره)
   private static Map<String, PlantTag> buildFamilyKeywords() {
-    Map<String, PlantTag> map = new java.util.HashMap<>();
+    Map<String, PlantTag> map = new java.util.LinkedHashMap<>();
+
+    map.put("نخود", PlantTag.PEA);
+    map.put("قارچ", PlantTag.SHROOM);
+    map.put("یخ", PlantTag.ICE);
+    map.put("آتشین", PlantTag.FIRE);
+    map.put("آتش", PlantTag.FIRE);
+    map.put("سمی", PlantTag.POISON);
+    map.put("سم", PlantTag.POISON);
+    map.put("آبزی", PlantTag.WATER);
+    map.put("خورشیدساز", PlantTag.SUN);
+    map.put("تولیدکننده خورشید", PlantTag.SUN);
+    map.put("انفجاری", PlantTag.EXPLOSIVE);
+    map.put("شب", PlantTag.NIGHT);
+    map.put("روز", PlantTag.DAY);
+    map.put("ناحیه‌ای", PlantTag.AOE);
+    map.put("منطقه‌ای", PlantTag.AOE);
+    map.put("تله‌ای", PlantTag.TRAP);
+    map.put("تله", PlantTag.TRAP);
+    map.put("جادویی", PlantTag.MAGIC);
+    map.put("انباشته", PlantTag.STACK);
+    map.put("شارژی", PlantTag.CHARGE);
+    map.put("افزایشی", PlantTag.RAMP_UP);
+    map.put("جابجاکننده زامبی", PlantTag.MOVE_ZOMBIES);
 
     return map;
   }
 
   private static PlantTag resolveFamilyTag(String variable) {
     if (variable == null) return null;
-    String lower = variable.toLowerCase();
+    String trimmed = variable.trim();
+
+    for (Map.Entry<String, PlantTag> entry : FAMILY_KEYWORDS.entrySet()) {
+      if (trimmed.contains(entry.getKey())) {
+        return entry.getValue();
+      }
+    }
+    String lower = trimmed.toLowerCase();
     for (PlantTag tag : PlantTag.values()) {
-      if (lower.contains(tag.name().toLowerCase())) {
+      if (lower.contains(tag.name().toLowerCase())
+              || lower.contains(tag.name().toLowerCase().replace('_', ' '))) {
         return tag;
       }
     }

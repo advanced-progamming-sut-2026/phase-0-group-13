@@ -8,6 +8,7 @@ public class GameState {
   private int currentSun;
   private int plantFoodCount;
   private int elapsedTime; // زمان سپری شده
+  private boolean skySunDisabled;
 
   public GameState() {
     this.currentSun = 50;
@@ -75,6 +76,14 @@ public class GameState {
 
   public int getElapsedTime() {
     return elapsedTime;
+  }
+
+  public boolean isSkySunDisabled() {
+    return skySunDisabled;
+  }
+
+  public void setSkySunDisabled(boolean skySunDisabled) {
+    this.skySunDisabled = skySunDisabled;
   }
 
   // تبدیل تیک به ثانیه

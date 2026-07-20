@@ -45,7 +45,6 @@ public class Wave {
 
   public void update(Board board) {
     if (completed) return;
-
     if (!started) {
       started = true;
       System.out.printf("Wave %d started.%n", waveNumber);
@@ -53,9 +52,7 @@ public class Wave {
         System.out.println("The final wave has come.");
       }
     }
-
     ticksSinceStart++;
-
     ZombieFactory zombieFactory = new ZombieFactory(GameDataManager.zombieRepository);
     Iterator<SpawnEntry> iterator = pendingSpawns.iterator();
     while (iterator.hasNext()) {
@@ -69,8 +66,8 @@ public class Wave {
           spawnedZombies.add(zombie);
           totalStartingHealth += zombie.getMaxHealth();
           System.out.printf(
-              "Zombie %s spawned at wave %d in lane %d which costed %d.%n",
-              entry.zombieName, waveNumber, lane + 1, entry.waveCost);
+                  "Zombie %s spawned at wave %d in lane %d which costed %d.%n",
+                  entry.zombieName, waveNumber, lane + 1, entry.waveCost);
         }
         iterator.remove();
       }
@@ -99,6 +96,10 @@ public class Wave {
 
   public boolean checkCompletion() {
     return completed;
+  }
+
+  public boolean isStarted() {
+    return started;
   }
 
   public int getWaveNumber() {
