@@ -11,9 +11,9 @@ public class SubmergedZombieAction implements ZombieAction {
   private int phaseStartTick = -1;
   private boolean submerged = true;
 
-  // شنا کردن واقعی (بی‌آسیب بودن زیر آب در برابر حمله‌های سطحی) نیاز به تغییر تو Projectile/Board
-  // داره که فعلا نیست؛ اینجا فقط الگوی حرکتی شبیه‌سازی میشه: زیر آب سریع‌تر جلو میره و کاری به گیاه
-  // نداره، رو سطح مثل زامبی عادی گیاه میخوره
+  // شنا کردن واقعی (بی‌آسیب بودن زیر آب در برابر حمله‌های سطحی): با zombie.setSubmerged هر تیک وضعیت
+  // فعلی رو به خود Zombie اطلاع میده؛ Projectile.hitZombie از این پرچم برای معافیت در برابر
+  // شلیک‌های مستقیم استفاده میکنه (فقط پرتابه‌های Lobbed هنوز اثر میکنن)
   public SubmergedZombieAction(int submergedTicks, int surfacedTicks, double eatingDamage) {
     this.submergedTicks = submergedTicks;
     this.surfacedTicks = surfacedTicks;
@@ -32,13 +32,15 @@ public class SubmergedZombieAction implements ZombieAction {
       phaseStartTick = currentTick;
     }
 
+    zombie.setSubmerged(submerged);
+
     if (submerged) {
       zombie.setEating(false);
       zombie.move();
       return;
     }
 
-    Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
+    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
       if (currentTick % 10 == 0) {

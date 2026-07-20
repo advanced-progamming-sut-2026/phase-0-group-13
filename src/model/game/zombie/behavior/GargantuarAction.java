@@ -7,7 +7,7 @@ import model.game.zombie.Zombie;
 import model.game.zombie.factory.ZombieFactory;
 
 public class GargantuarAction implements ZombieAction {
-  private int maxHealth;
+  private final int maxHealth;
   private boolean hasThrownImp;
 
   public GargantuarAction(int maxHealth) {
@@ -24,7 +24,7 @@ public class GargantuarAction implements ZombieAction {
       // "imp" باگ داشت: ZombieRepository.find دقیقا با alias مطابقت میخواد، و همچین اسمی وجود
       // نداره (فقط "ZombieEgyptImpDefault" هست) - قبلا همیشه silently fail میشد
       Zombie imp =
-          factory.createZombie("ZombieEgyptImpDefault", zombie.getRow(), zombie.getX() - 2.0);
+              factory.createZombie("ZombieEgyptImpDefault", zombie.getRow(), zombie.getX() - 2.0);
 
       if (imp != null) {
         board.spawnZombie(imp);
@@ -33,7 +33,7 @@ public class GargantuarAction implements ZombieAction {
       hasThrownImp = true;
     }
 
-    Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
+    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
       if (currentTick % 15 == 0) {

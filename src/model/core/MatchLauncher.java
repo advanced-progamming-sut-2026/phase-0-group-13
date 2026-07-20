@@ -43,6 +43,7 @@ public final class MatchLauncher {
     gameManager.initializeLevel(ROWS, COLS, buildWaves(stage, season));
     season.applySeasonEffects(gameManager.getBoard().getGameState());
     season.placeHazards(gameManager.getBoard());
+    gameManager.setSeason(season);
     attachSpecialRule(gameManager, stage);
     gameManager.startGame();
 
@@ -50,12 +51,12 @@ public final class MatchLauncher {
     App.setCurrentMenu(Menu.GamePlayMenu);
 
     System.out.println(
-        "Battle started: "
-            + season.getName()
-            + " ("
-            + gameManager.getTotalWaves()
-            + " waves). Type 'show map', 'advance time -t <n> ticks', "
-            + "'plant plant -t <type> -l (x,y)', or 'menu exit'.");
+            "Battle started: "
+                    + season.getName()
+                    + " ("
+                    + gameManager.getTotalWaves()
+                    + " waves). Type 'show map', 'advance time -t <n> ticks', "
+                    + "'plant plant -t <type> -l (x,y)', or 'menu exit'.");
   }
 
   /**
@@ -89,16 +90,16 @@ public final class MatchLauncher {
     switch (stage) {
       case 1:
         return second
-            ? new ConveyorRule(deck, 120)
-            : new LockedPlantsRule(deck.subList(0, Math.max(1, deck.size() - 1)));
+                ? new ConveyorRule(deck, 120)
+                : new LockedPlantsRule(deck.subList(0, Math.max(1, deck.size() - 1)));
       case 2:
         return second ? new SaveOurSeedsRule() : new TimedWarRule(1200);
       case 3:
         return second ? new NightOpsRule() : new DeadLineRule(4);
       default:
         return second
-            ? new LoveYourPlantsRule(deck.isEmpty() ? "peashooter" : deck.get(0))
-            : new PlantWhatYouGetRule(deck, 120);
+                ? new LoveYourPlantsRule(deck.isEmpty() ? "peashooter" : deck.get(0))
+                : new PlantWhatYouGetRule(deck, 120);
     }
   }
 
@@ -108,7 +109,7 @@ public final class MatchLauncher {
       return 1;
     }
     String normalized =
-        chapter.trim().toLowerCase().replaceFirst("^(chapter|stage)\\s*[-_ ]?", "").trim();
+            chapter.trim().toLowerCase().replaceFirst("^(chapter|stage)\\s*[-_ ]?", "").trim();
     try {
       return Math.max(1, Integer.parseInt(normalized));
     } catch (NumberFormatException e) {

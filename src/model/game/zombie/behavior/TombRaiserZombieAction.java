@@ -1,18 +1,23 @@
 package model.game.zombie.behavior;
 
-import data.GameDataManager;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import model.game.Board;
+import model.game.TileEffects.TombStoneEffect;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
-import model.game.zombie.factory.ZombieFactory;
 
 public class TombRaiserZombieAction implements ZombieAction {
+  private static final int TOMBSTONE_HEALTH = 400;
+  private static final boolean TOMBSTONE_BLOCKS_SHOTS = false;
+
   private final int raiseInterval;
   private final double eatingDamage;
   private int lastRaiseTick = -1;
+  private final Random random = new Random();
 
-  // مثل GargantuarAction که یه بار Imp پرت میکنه، ولی این هر raiseInterval تیک یه Imp جدید از پشت سر
-  // خودش زنده میکنه (تا وقتی زنده‌س)
+
   public TombRaiserZombieAction(int raiseInterval, double eatingDamage) {
     this.raiseInterval = raiseInterval;
     this.eatingDamage = eatingDamage;
@@ -24,17 +29,11 @@ public class TombRaiserZombieAction implements ZombieAction {
       lastRaiseTick = currentTick;
     }
     if (currentTick - lastRaiseTick >= raiseInterval) {
-      ZombieFactory factory = new ZombieFactory(GameDataManager.zombieRepository);
-      Zombie imp =
-          factory.createZombie("ZombieEgyptImpDefault", zombie.getRow(), zombie.getX() + 1.0);
-      if (imp != null) {
-        board.spawnZombie(imp);
-        System.out.printf("%s raised an Imp from the grave!%n", zombie.getName());
-      }
+      spawnTombstoneOnRandomEmptyTile(board);
       lastRaiseTick = currentTick;
     }
 
-    Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
+    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
       if (currentTick % 10 == 0) {
@@ -44,5 +43,27 @@ public class TombRaiserZombieAction implements ZombieAction {
       zombie.setEating(false);
       zombie.move();
     }
+  }
+
+  private void spawnTombstoneOnRandomEmptyTile(Board board) {
+    List<int[]> emptyTiles = new ArrayList<>();
+    for (int row = 0; row < board.getRows(); row++) {
+      for (int col = 0; col < board.getColumns(); col++) {
+        boolean tileHasPlant = board.getPlantAt(row, col) != null;
+        boolean tileHasEffect =
+                board.getTile(row, col) != null && board.getTile(row, col).getEffect() != null;
+        if (!tileHasPlant && !tileHasEffect) {
+          emptyTiles.add(new int[] {row, col});
+        }
+      }
+    }
+    if (emptyTiles.isEmpty()) {
+      return;
+    }
+    int[] chosen = emptyTiles.get(random.nextInt(emptyTiles.size()));
+    board.placeTileEffect(
+            chosen[0], chosen[1], new TombStoneEffect(TOMBSTONE_HEALTH, TOMBSTONE_BLOCKS_SHOTS));
+    System.out.printf(
+            "A tombstone rises from the ground at (%d, %d)!%n", chosen[1] + 1, chosen[0] + 1);
   }
 }

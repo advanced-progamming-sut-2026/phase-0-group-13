@@ -20,6 +20,7 @@ public class DarkAgesSeason extends Season {
   @Override
   public void applySeasonEffects(GameState gameState) {
     gameState.update(gameState.getCurrentWave(), this);
+    gameState.setSkySunDisabled(true);
   }
 
   @Override
@@ -41,7 +42,11 @@ public class DarkAgesSeason extends Season {
       int row = random.nextInt(board.getRows());
       int col = 2 + random.nextInt(Math.max(1, board.getColumns() - 4));
       board.placeTileEffect(
-          row, col, new TombStoneEffect(TOMBSTONE_HEALTH, true, true, NECROMANCY_INTERVAL_TICKS));
+              row, col, new TombStoneEffect(TOMBSTONE_HEALTH, true, true, NECROMANCY_INTERVAL_TICKS));
     }
+  }
+  @Override
+  public void onWaveStart(Board board, int waveNumber, int currentTick) {
+    board.triggerGraveNecromancy(currentTick);
   }
 }

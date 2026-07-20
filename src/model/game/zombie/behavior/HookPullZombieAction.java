@@ -33,7 +33,7 @@ public class HookPullZombieAction implements ZombieAction {
       lastHookTick = currentTick;
     }
 
-    Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
+    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
       if (currentTick % 10 == 0) {

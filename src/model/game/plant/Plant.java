@@ -34,6 +34,17 @@ public class Plant {
 
   private int disabledUntilTick = -1;
 
+  // FIX (GDD Target 1.6 - Wizard Zombie): قبلا طلسم فقط یه تایمر ثابت بود؛ حالا به عمر خود Wizard
+  // گره خورده - وقتی اون Wizard خاص کشته بشه، طلسم بلافاصله (همون تیک) باطل میشه
+  private boolean cursed = false;
+  private model.game.zombie.Zombie curseSource;
+
+  // FIX (GDD Target 2.1 - Frostbite Caves Ice Winds): سطح یخ‌زدگی تجمعی؛ وقتی به سقف برسه، گیاه
+  // برای مدتی کاملا فریز میشه (نمیتونه تیر بزنه/خورشید بسازه و ...)
+  public static final int MAX_FREEZE_LEVEL = 100;
+  private int freezeLevel = 0;
+  private int frozenUntilTick = -1;
+
   private boolean deathHookFired = false;
 
   public Plant(
@@ -81,6 +92,7 @@ public class Plant {
   public void update(int currentTick, Board board) {
     if (isDead()) return;
     if (currentTick < disabledUntilTick) return;
+    if (isFrozen(currentTick)) return;
 
     if (plantFood != null && plantFood.canExecute()) {
       plantFood.execute(this, board, currentTick);
@@ -92,13 +104,54 @@ public class Plant {
     }
   }
 
-  // برای زامبی‌هایی مثل Wizard که به‌جای خوردن، گیاه رو موقتا از کار میندازن (تبدیل به گوسفند و ...)
+  // FIX (GDD Target 1.6 - Wizard Zombie): طلسم رو به عمر همون زامبی Wizard خاص گره میزنه؛ اگه اون
+  // Wizard بمیره (یا اصلا وجود نداشته باشه)، طلسم فورا باطل میشه، نه با یه تایمر ثابت
+  public void applyCurse(model.game.zombie.Zombie source) {
+    this.cursed = true;
+    this.curseSource = source;
+  }
+
+  public boolean isCursed() {
+    return cursed;
+  }
+
+  // برای گیاه‌هایی مثل Wizard که به‌جای خوردن، گیاه رو موقتا از کار میندازن (تبدیل به گوسفند و ...)
   public void disableUntil(int tick) {
     this.disabledUntilTick = tick;
   }
 
   public boolean isDisabled(int currentTick) {
+    if (cursed) {
+      if (curseSource == null || curseSource.isDead()) {
+        cursed = false;
+        curseSource = null;
+        return false;
+      }
+      return true;
+    }
     return currentTick < disabledUntilTick;
+  }
+
+  public void freeze(int currentTick, int durationTicks) {
+    this.frozenUntilTick = Math.max(frozenUntilTick, currentTick + durationTicks);
+    this.freezeLevel = 0;
+  }
+  public void addFreezeExposure(int amount, int currentTick, int durationTicks) {
+    if (isFrozen(currentTick)) {
+      return;
+    }
+    this.freezeLevel = Math.min(MAX_FREEZE_LEVEL, this.freezeLevel + amount);
+    if (this.freezeLevel >= MAX_FREEZE_LEVEL) {
+      freeze(currentTick, durationTicks);
+    }
+  }
+
+  public boolean isFrozen(int currentTick) {
+    return currentTick < frozenUntilTick;
+  }
+
+  public int getFreezeLevel() {
+    return freezeLevel;
   }
 
   public void applyPlantFood() {

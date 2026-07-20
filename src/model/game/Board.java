@@ -98,7 +98,7 @@ public class Board {
       checkZombiePlantCollisions(zombie, currentTick);
     }
 
-    handleProjectiles();
+    handleProjectiles(currentTick);
     handleLawnmowers();
     triggerDeathExplosions();
     handleGlowingZombieDrops();
@@ -164,7 +164,7 @@ public class Board {
         zombie.markPlantFoodDropped();
         if (gameState.addPlantFood()) {
           System.out.printf(
-                  "The glowing zombie dropeed a plant food; you have %d plant foods now.%n",
+                  "The glowing zombie dropped a plant food; you have %d plant foods now.%n",
                   gameState.getPlantFoodCount());
         }
       }
@@ -242,7 +242,32 @@ public class Board {
     }
   }
 
+  // FIX (GDD Target 2.3 - Dark Ages Necromancy): علاوه بر تایمر دوره‌ای خود tryNecromancy، فصل Dark
+  // Ages این متود رو دقیقا سر شروع هر موج صدا میزنه تا هر سنگ‌قبر سرپا فورا یه زامبی زنده کنه (طبق
+  // GDD: "specific graves must spawn zombies at the start of a wave")
+  public void triggerGraveNecromancy(int currentTick) {
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < columns; j++) {
+        TileEffect effect = tiles[i][j].getEffect();
+        if (effect instanceof TombStoneEffect tombstone && tombstone.isActive()) {
+          ZombieFactory factory = new ZombieFactory(GameDataManager.zombieRepository);
+          Zombie risen = factory.createZombie("ZombieEgyptImpDefault", i, j);
+          if (risen != null) {
+            spawnZombie(risen);
+            System.out.printf("A grave at (%d, %d) rises as the new wave begins!%n", j + 1, i + 1);
+          }
+          tombstone.markRaised(currentTick);
+        }
+      }
+    }
+  }
+
   private void handleSkySunDrop(int currentTick) {
+    // FIX (GDD Target 2.3 - Dark Ages): طبق GDD هیچ خورشیدی از آسمون نباید تو این فصل بباره
+    if (gameState.isSkySunDisabled()) {
+      return;
+    }
+
     double t = currentTick / 10.0;
     double secondsInterval = Math.max(6 + 0.05 * t, 12);
     int ticksInterval = (int) (secondsInterval * 10);
@@ -320,14 +345,26 @@ public class Board {
     return nearest;
   }
 
-  private void handleProjectiles() {
+  private void handleProjectiles(int currentTick) {
     ListIterator<Projectile> iterator = projectiles.listIterator();
     while (iterator.hasNext()) {
       Projectile p = iterator.next();
       p.move();
+      
+      if (p.isFromZombie()) {
+        Plant plantHere = getPlantAt(Math.round(p.getYCoordinate()), p.getXCoordinate());
+        if (plantHere != null && !plantHere.isDead()) {
+          p.hitPlant(plantHere, currentTick);
+          iterator.remove();
+          continue;
+        }
+        if (p.getXCoordinate() < 0) {
+          iterator.remove();
+        }
+        continue;
+      }
 
-
-      if (!p.isFromZombie() && p.getEffect() != Projectile.ProjectileEffect.FIRE) {
+      if (p.getEffect() != Projectile.ProjectileEffect.FIRE) {
         Plant plantHere = getPlantAt(Math.round(p.getYCoordinate()), p.getXCoordinate());
         if (plantHere != null && plantHere.getTags().contains(PlantTag.FIRE)) {
           p = p.ignited();
@@ -454,6 +491,15 @@ public class Board {
       }
     }
     return null;
+  }
+
+
+  public Plant getEdiblePlantAt(int row, double x, int currentTick) {
+    Plant plant = getPlantAt(row, x);
+    if (plant != null && plant.isDisabled(currentTick)) {
+      return null;
+    }
+    return plant;
   }
 
   // برای گیاهایی که وقتی خورده میشن باید به زامبی مهاجم واکنش نشون بدن (مثل رفلکت دمیج)

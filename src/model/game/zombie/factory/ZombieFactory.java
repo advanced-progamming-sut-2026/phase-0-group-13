@@ -114,65 +114,40 @@ public class ZombieFactory {
       case IMP:
       case ARCADE:
       case TURQUOISE:
-      case PIANIST:
-        return new StandardZombieAction(eatDamage);
+      case PIANIST: return new StandardZombieAction(eatDamage);
       case GARGANTUAR:
-        // maxHealth باید همون HP اسکیل‌شده با سختی باشه، وگرنه چک "نصف جون" با HP واقعی زامبی نمیخونه
         return new GargantuarAction((int) Math.round(resolveBaseHp(template, type) * difficultyMultiplier));
-      case EXPLORER:
-        return new ExplorerZombieAction();
-      case ZOMBOTANY_PEASHOOTER:
-        return new ZombotanyPeashooterAction(150, 10.0);
-      case ZOMBOTANY_WALLNUT:
-        return new StandardZombieAction(eatDamage);
+      case EXPLORER: return new ExplorerZombieAction();
+      case ZOMBOTANY_PEASHOOTER: return new ZombotanyPeashooterAction(150, 10.0);
+      case ZOMBOTANY_WALLNUT: return new StandardZombieAction(eatDamage);
       case ZOMBOTANY_JALAPENO:
-      case ZOMBOTANY_SQUASH:
-        return new TacklerZombieAction();
-      case FOOTBALLER:
-        return new TacklerZombieAction();
-      case PARASOL:
-        // parasolHp عدد قراردادیه، دیتای واقعی چتر تو Zombies.json نیست
-        return new ParasolZombieAction(200, eatDamage);
-      case PROSPECTOR:
-        return new RangedDemolisherZombieAction(60, 3.0);
-      case NEWSPAPER:
-        return new EnrageOnArmorBreakZombieAction(eatDamage, 2.0);
-      // زامبی‌هایی که از رو گیاه رد میشن و نابودش میکنن بدون توقف (همون مکانیک Footballer)
+      case ZOMBOTANY_SQUASH: return new TacklerZombieAction();
+      case FOOTBALLER: return new TacklerZombieAction();
+      case PARASOL: return new ParasolZombieAction(200, eatDamage);
+      case PROSPECTOR: return new RangedDemolisherZombieAction(60, 3.0);
+      case NEWSPAPER: return new EnrageOnArmorBreakZombieAction(eatDamage, 2.0);
       case BARREL_ROLLER:
-      case IMP_DRAGON:
-        return new TacklerZombieAction();
-      case RA:
-        return new RaHealAuraZombieAction(100, 50, 2.0, eatDamage);
-      case TOMBRAISER:
-        return new TombRaiserZombieAction(300, eatDamage);
-
-      case DODO_RIDER:
-        return new DodoRiderZombieAction(eatDamage);
+      case IMP_DRAGON: return new TacklerZombieAction();
+      case RA: return new RaHealAuraZombieAction(100, 50, 2.0, eatDamage);
+      case TOMBRAISER: return new TombRaiserZombieAction(300, eatDamage);
+      case DODO_RIDER: return new DodoRiderZombieAction(eatDamage);
       // زامبی‌هایی که از فاصله به گیاه شلیک میکنن (همون مکانیک زامبوتانی نخودی)
-      case HUNTER:
-        return new ZombotanyPeashooterAction(120, eatDamage);
-      case JUGGLER:
-        return new JesterZombieAction(eatDamage);
+      case HUNTER: return new ZombotanyPeashooterAction(120, eatDamage);
+      case JUGGLER: return new JesterZombieAction(eatDamage);
       // زامبی‌هایی که از فاصله گیاه رو منفجر/نابود میکنن (همون مکانیک پراسپکتور)
-      case TROGLOBITE:
-        return new RangedDemolisherZombieAction(80, 2.0);
+      case TROGLOBITE: return new RangedDemolisherZombieAction(80, 2.0);
       case FISHERMAN:
-      case OCTOPUS:
-        return new HookPullZombieAction(70, eatDamage);
-      case SNORKEL:
-        return new SubmergedZombieAction(50, 100, eatDamage);
-      case WIZARD:
-        return new WizardZombieAction(150);
-      case KING:
-        return new KingAuraZombieAction(1.5, 3.0, eatDamage);
+      case OCTOPUS: return new HookPullZombieAction(70, eatDamage);
+      case SNORKEL: return new SubmergedZombieAction(50, 100, eatDamage);
+      case WIZARD: return new WizardZombieAction();
+      case KING: return new KingAuraZombieAction(1.5, 3.0, eatDamage);
       // باس‌ها (Zomboss) فعلا با یه رفتار سنگین ولی عادی اسپاون میشن؛ مکانیک واقعی‌شون (چندفازی بودن،
       // پرتاب موشک/مین، اسپاون مینیون‌های ویژه در طول نبرد) یه انکانتر خاص در سطح GameManager هستش،
       // نه چیزی که با یه ZombieAction تک‌تیکی قابل نمایش باشه
       case ZOMBOSS_EGYPT:
       case ZOMBOSS_PIRATE:
       case ZOMBOSS_COWBOY:
-      case ZOMBOSS_DARK:
-        return new StandardZombieAction(eatDamage);
+      case ZOMBOSS_DARK: return new StandardZombieAction(eatDamage);
       default:
         throw new UnsupportedOperationException("Unknown ZombieType: " + type);
     }

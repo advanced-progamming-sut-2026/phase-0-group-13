@@ -27,7 +27,7 @@ public class StandardZombieAction implements ZombieAction {
       return;
     }
 
-    Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
+    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
 
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
