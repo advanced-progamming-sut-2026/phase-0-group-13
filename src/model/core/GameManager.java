@@ -183,11 +183,15 @@ public class GameManager {
     return true;
   }
 
-  public void collectSun(Sun sun) {
-    if (board != null && running) {
-      sun.collect(board.getGameState());
-      matchContext.onSunCollected(sun.getAmount());
+  public Integer collectSunAt(int col, int row) {
+    if (board == null || !running) {
+      return null;
     }
+    Integer amount = board.collectSunAt(col, row);
+    if (amount != null && amount > 0) {
+      matchContext.onSunCollected(amount);
+    }
+    return amount;
   }
 
   public boolean usePlantFood(Plant targetPlant) {

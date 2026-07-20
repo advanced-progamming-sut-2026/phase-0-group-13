@@ -226,7 +226,12 @@ public class GamePlayController implements BaseController {
 
   private void handleCollectSun(GameManager gm, Matcher m) {
     int[] rc = parseCoord(gm.getBoard(), m.group("x"), m.group("y"));
-    if (rc == null) {
+    if (rc == null) return;
+
+    Integer amount = gm.collectSunAt(rc[1], rc[0]);
+
+    if (amount == null) {
+      System.out.println("error: no sun to collect at that tile");
       return;
     }
     for (Sun sun : gm.getBoard().getSuns()) {
@@ -246,7 +251,6 @@ public class GamePlayController implements BaseController {
         return;
       }
     }
-    System.out.println("error: no sun to collect at that tile");
   }
 
   private void handleFeed(GameManager gm, Matcher m) {
