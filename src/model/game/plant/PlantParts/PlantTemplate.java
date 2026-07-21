@@ -1,5 +1,6 @@
 package model.game.plant.PlantParts;
 
+
 import com.google.gson.annotations.SerializedName;
 
 public class PlantTemplate {
