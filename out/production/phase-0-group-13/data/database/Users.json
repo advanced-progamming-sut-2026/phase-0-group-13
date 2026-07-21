@@ -1,0 +1,168 @@
+[
+  {
+    "gender": "male",
+    "unlockedPlants": [
+      "peashooter",
+      "sunflower",
+      "wall-nut",
+      "potato-mine",
+      "cabbage-pult",
+      "puff-shroom"
+    ],
+    "unlockedZombies": [],
+    "recentGames": [],
+    "unlockedStages": [
+      "stage_1"
+    ],
+    "progress": {
+      "currentStage": 1,
+      "currentLevel": 1,
+      "miniGamesUnlocked": false,
+      "survivalModeUnlocked": false,
+      "unlockedMiniGames": [],
+      "maxClearedStage": 0,
+      "maxClearedLevel": 0
+    },
+    "inventory": {
+      "items": {
+        "pot": 2,
+        "plant_food": 2
+      }
+    },
+    "greenHouse": {
+      "maxCapacity": 20,
+      "pots": [
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        }
+      ]
+    },
+    "newsBox": {
+      "readNews": [],
+      "unreadNews": []
+    },
+    "quests": [],
+    "plantLevels": {
+      "wall-nut": 1,
+      "puff-shroom": 1,
+      "peashooter": 1,
+      "potato-mine": 1,
+      "sunflower": 1,
+      "cabbage-pult": 1
+    },
+    "selectedDeck": [],
+    "boostedPlants": [
+      "wall-nut"
+    ],
+    "username": "testuser",
+    "passwordHash": "88d577bfa453f305f7974aa0b89c034b57fb45c5ecda44684cf2c5d5e71a68c5",
+    "email": "test@domain.com",
+    "nickname": "testnick",
+    "securityQuestionNumber": "1",
+    "securityAnswer": "Fluffy",
+    "coins": 96500,
+    "diamonds": 1984,
+    "difficultyLevel": 3,
+    "lastShopRefreshTime": 1784629202136,
+    "lastDailyDealPurchaseTime": 0,
+    "meowPoints": 0,
+    "winStreakAtMaxDifficulty": 0
+  }
+]

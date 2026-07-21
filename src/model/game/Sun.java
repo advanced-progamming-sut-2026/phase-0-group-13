@@ -9,7 +9,7 @@ public class Sun {
   private int timeToLive; // به واحد تیک
   private SunType sunType;
   private boolean isCollected;
-  private int fallingTicks; 
+  private int fallingTicks;
 
   public Sun(int amount, int timeToLive, SunType sunType) {
     this(amount, timeToLive, sunType, false);
@@ -71,5 +71,20 @@ public class Sun {
 
   public double getY() {
     return y;
+  }
+
+  public SunType getType() {
+    return this.sunType;
+  }
+
+  public boolean isFalling() {
+    return this.fallingTicks > 0;
+  }
+
+  public void setCollected(boolean collected) {
+    this.isCollected = collected;
+    if (collected) {
+      this.timeToLive = 0;
+    }
   }
 }

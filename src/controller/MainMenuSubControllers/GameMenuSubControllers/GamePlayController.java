@@ -238,9 +238,9 @@ public class GamePlayController implements BaseController {
       if (!sun.isExpired()
               && Math.round(sun.getX()) == rc[1]
               && Math.round(sun.getY()) == rc[0]) {
-        int amount = sun.getAmount();
+        amount = sun.getAmount();
         boolean quickGrab = sun.getTimeToLive() > 100;
-        gm.collectSun(sun);
+        sun.collect(gm.getBoard().getGameState());
         if (quickGrab) {
           gm.registerCombatEvent(ScoreEvent.SPEED_SUN_COLLECT);
         }
