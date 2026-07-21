@@ -14,9 +14,9 @@ public class GameMenuView implements BaseMenu {
   @Override
   public void check(Scanner scanner) {
     System.out.println(
-        "Game Menu. Use 'menu enter chapter -c <name>', 'menu greenhouse', "
-            + "'menu travel-log', 'menu leaderboard', 'menu coin-wallet', "
-            + "'menu gem-wallet', 'menu cheat add <count> <coin|diamond>', "
+        "Game Menu. Use 'menu enter chapter -c <name>', 'greenhouse menu', "
+            + "'travel-log menu', 'menu leaderboard', 'coin-wallet menu', "
+            + "'gem-wallet menu', 'menu cheat add <count> <coin|diamond>', "
             + "or 'menu exit'.");
 
     String input = scanner.nextLine();

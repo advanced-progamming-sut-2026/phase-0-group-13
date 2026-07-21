@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum ShopMenuCommands implements Command {
-  List("shop\\s+list"),
+  List("shopping\\s+list"),
   Daily("shop\\s+daily"),
   Buy("shop\\s+buy\\s+-i\\s+(?<itemId>\\S+)\\s+-n\\s+(?<count>\\S+)(\\s+-t\\s+(?<plantType>.+))?");
 

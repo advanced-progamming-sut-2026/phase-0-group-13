@@ -5,11 +5,11 @@ import java.util.regex.Pattern;
 
 public enum GameMenuCommands implements Command {
   EnterChapter("menu\\s+enter\\s+chapter\\s+-c\\s+(?<chapterName>.+)"),
-  GreenHouse("menu\\s+greenhouse"),
-  TravelLog("menu\\s+travel-log"),
+  GreenHouse("greenhouse\\s+menu"),
+  TravelLog("travel-log\\s+menu"),
   LeaderBoard("menu\\s+leaderboard"),
-  CoinWallet("menu\\s+coin-wallet"),
-  GemWallet("menu\\s+gem-wallet"),
+  CoinWallet("coin-wallet\\s+menu"),
+  GemWallet("gem-wallet\\s+menu"),
   CheatAdd("menu\\s+cheat\\s+add\\s+(?<count>\\S+)\\s+(?<currency>coin|diamond)");
 
   private final String pattern;

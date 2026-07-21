@@ -14,7 +14,7 @@ public class ShopView implements BaseMenu {
   @Override
   public void check(Scanner scanner) {
     System.out.println(
-        "Shop Menu. Use 'shop list', 'shop daily', "
+        "Shop Menu. Use 'shopping list', 'shop daily', "
             + "'shop buy -i <itemId> -n <count> [-t <plantType>]', or 'menu exit'.");
 
     String input = scanner.nextLine();
