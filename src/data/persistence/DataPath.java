@@ -17,12 +17,12 @@ public class DataPath {
   }
 
   private void initialize() {
-    registerPath("plants", Paths.get("data/database/plants.json"));
-    registerPath("zombies", Paths.get("data/database/Zombies.json"));
-    registerPath("quests", Paths.get("data/database/Quests.json"));
-    registerPath("games", Paths.get("data/database/Games.json"));
-    registerPath("users", Paths.get("data/database/Users.json"));
-    registerPath("session", Paths.get("data/database/session.json"));
+    registerPath("plants", Paths.get("src/data/database/plants.json"));
+    registerPath("zombies", Paths.get("src/data/database/Zombies.json"));
+    registerPath("quests", Paths.get("src/data/database/Quests.json"));
+    registerPath("games", Paths.get("src/data/database/Games.json"));
+    registerPath("users", Paths.get("src/data/database/Users.json"));
+    registerPath("session", Paths.get("src/data/database/session.json"));
   }
 
   public HashMap<String, Path> getAllPaths() {

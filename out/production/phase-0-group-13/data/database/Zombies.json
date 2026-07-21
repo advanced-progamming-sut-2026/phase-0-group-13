@@ -1,0 +1,4583 @@
+[
+  {
+    "aliases": [
+      "ZombieMummyDefault"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 190,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.4
+      },
+      "Speed": 0.185,
+      "WavePointCost": 100,
+      "Weight": 1000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness1"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieMummyArmor1Default"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 190,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.185,
+      "WavePointCost": 200,
+      "Weight": 3000,
+      "ZombieArmorProps": [
+        "RTID(ConeDefault@ArmorTypes)"
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness3"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieMummyArmor2Default"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 190,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.185,
+      "WavePointCost": 400,
+      "Weight": 4000,
+      "ZombieArmorProps": [
+        "RTID(BucketDefault@ArmorTypes)"
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness5"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieMummyArmor4Default"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 190,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.185,
+      "WavePointCost": 700,
+      "Weight": 3000,
+      "ZombieArmorProps": [
+        "RTID(BrickDefault@ArmorTypes)"
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness6"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieDarkArmor3Default"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 100,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 190,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.185,
+      "WavePointCost": 550,
+      "Weight": 4500,
+      "ZombieArmorProps": [
+        "RTID(ShoulderArmorDefault@ArmorTypes)",
+        "RTID(CrownDefault@ArmorTypes)"
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness6"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "objclass": "ArmorPropertySheet",
+    "aliases": [
+      "ConeDefault"
+    ],
+    "objdata": {
+      "ArmorType": "Cone",
+      "BaseHealth": 370,
+      "ArmorFlags": [
+        "damageable",
+        "droppable",
+        "helm"
+      ],
+      "ArmorLayers": [
+        "zombie_armor_cone_norm",
+        "zombie_armor_cone_damage_01",
+        "zombie_armor_cone_damage_02"
+      ],
+      "ArmorLayerHealth": [
+        0.666,
+        0.333
+      ],
+      "ImpactSoundEvent": "Play_impact_plastic"
+    }
+  },
+  {
+    "objclass": "ArmorPropertySheet",
+    "aliases": [
+      "BucketDefault"
+    ],
+    "objdata": {
+      "ArmorType": "Bucket",
+      "BaseHealth": 1100,
+      "ArmorFlags": [
+        "metallic",
+        "damageable",
+        "droppable",
+        "helm"
+      ],
+      "ArmorLayers": [
+        "zombie_armor_bucket_norm",
+        "zombie_armor_bucket_damage_01",
+        "zombie_armor_bucket_damage_02"
+      ],
+      "ArmorLayerHealth": [
+        0.666,
+        0.333
+      ],
+      "ImpactSoundEvent": "Play_impact_shieldhit"
+    }
+  },
+  {
+    "objclass": "ArmorPropertySheet",
+    "aliases": [
+      "BrickDefault"
+    ],
+    "objdata": {
+      "ArmorType": "Brick",
+      "BaseHealth": 2200,
+      "ArmorFlags": [
+        "damageable",
+        "droppable",
+        "helm"
+      ],
+      "ArmorLayers": [
+        "zombie_armor_brick_norm",
+        "zombie_armor_brick_damage_01",
+        "zombie_armor_brick_damage_02"
+      ],
+      "ArmorLayerHealth": [
+        0.666,
+        0.333
+      ],
+      "ParticleLayerOverride": [
+        "zombie_armor_brick_damage_02",
+        "zombie_armor_brick_damage_02",
+        "zombie_armor_brick_damage_02"
+      ]
+    }
+  },
+  {
+    "objclass": "ArmorPropertySheet",
+    "aliases": [
+      "ShoulderArmorDefault"
+    ],
+    "objdata": {
+      "ArmorType": "ShoulderArmor",
+      "BaseHealth": 1600,
+      "ArmorFlags": [
+        "damageable",
+        "passdamage"
+      ],
+      "ArmorLayers": [
+        "zombie_shoulder_armor_norm",
+        "zombie_shoulder_armor_damage_01",
+        "zombie_shoulder_armor_damage_02"
+      ],
+      "ArmorLayerHealth": [
+        0.666,
+        0.333
+      ],
+      "ImpactSoundEvent": "",
+      "DropSoundEvent": ""
+    }
+  },
+  {
+    "objclass": "ArmorPropertySheet",
+    "aliases": [
+      "CrownDefault"
+    ],
+    "objdata": {
+      "ArmorType": "Crown",
+      "BaseHealth": 1600,
+      "ArmorFlags": [
+        "damageable",
+        "droppable",
+        "metallic",
+        "helm"
+      ],
+      "ArmorLayers": [
+        "zombie_armor_crown_norm",
+        "zombie_armor_crown_damage_01",
+        "zombie_armor_crown_damage_02"
+      ],
+      "ArmorLayerHealth": [
+        0.666,
+        0.333
+      ],
+      "ImpactSoundEvent": "",
+      "DropSoundEvent": ""
+    }
+  },
+  {
+    "objclass": "NewspaperArmorPropertySheet",
+    "aliases": [
+      "NewspaperDefault"
+    ],
+    "objdata": {
+      "ClassName": "NewspaperArmor",
+      "ArmorType": "Newspaper",
+      "BaseHealth": 800,
+      "ArmorFlags": [
+        "damageable"
+      ],
+      "ArmorLayers": [
+        "_zombie_newspaper",
+        "_zombie_newspaper_dmg1",
+        "_zombie_newspaper_dmg2"
+      ],
+      "ArmorLayerHealth": [
+        0.666,
+        0.333
+      ],
+      "FireLayer": "_zombie_newspaper_flame",
+      "ImpactSoundEvent": "Play_Zomb_Modern_Newspaper_Paper_Impact",
+      "DropSoundEvent": ""
+    }
+  },
+  {
+    "aliases": [
+      "ZombieEgyptGargantuar"
+    ],
+    "objclass": "ZombieGargantuarProps",
+    "objdata": {
+      "AlmanacOffset": {
+        "x": -10,
+        "y": 40
+      },
+      "AlmanacScale": 1,
+      "ArmDropFraction": -1,
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 30,
+        "mX": 0,
+        "mY": 10
+      },
+      "CanBeFlickedOff": false,
+      "CanSpawnPlantFood": false,
+      "Cost": 150,
+      "EatDPS": 0,
+      "ExplodesWhenMowed": true,
+      "FlickIsLaneRestricted": true,
+      "GroundTrackName": "ground_swatch",
+      "HealthThresholdToImpAmmoLayers": [
+        {
+          "HealthPercentThrowImp": 0.5,
+          "ProjectileLayersToHide": [
+            "zombie_imp_skull",
+            "zombie_imp_jaw",
+            "Zombie_gargantuar_whiterope",
+            "zombie_imp_arm_inner_lower",
+            "zombie_imp_arm_inner_upper",
+            "zombie_imp_arm_outer_lower",
+            "zombie_imp_arm_outer_upper_01",
+            "zombie_imp_arm_outer_upper_02",
+            "zombie_imp_arms_outer_upper",
+            "zombie_imp_eye",
+            "zombie_imp_eye_sm",
+            "zombie_imp_hand_inner",
+            "zombie_imp_hand_outer",
+            "zombie_imp_leg_inner_lower",
+            "zombie_imp_leg_inner_upper",
+            "zombie_imp_leg_outer_lower",
+            "zombie_imp_leg_outer_upper",
+            "zombie_imp_pupil",
+            "zombie_imp_torso",
+            "zombie_imp_waist",
+            "zombie_imp_toe_outer",
+            "zombie_imp_toe_inner"
+          ]
+        }
+      ],
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 62,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 3600,
+      "HypnoshroomEffectOffset": {
+        "x": 0,
+        "y": 120
+      },
+      "ImpApex": 250,
+      "ImpFlightTime": 1.5,
+      "ImpSpawnOffset": {
+        "x": -100,
+        "y": 2,
+        "z": 115
+      },
+      "ImpTargetColumn": 2,
+      "ImpType": "egypt_imp",
+      "IsValidPinchTarget": false,
+      "MinPosXThrowImp": 400,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "SmashDamage"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.4
+      },
+      "Size": "large",
+      "SkipHeadDropState": true,
+      "SmashDamage": 1500,
+      "SmashDuration": 2,
+      "SoundOnAsh": "Play_Zomb_Global_Gargantuar_Mvmt_Death_Ash",
+      "SoundOnElectrocute": "Play_Zomb_Global_Gargantuar_Mvmt_Shock",
+      "SoundOnIdle": "Play_Zomb_Egypt_Gargantuar_Mvmt_Idle",
+      "Speed": 0.24,
+      "StaticArtImageAsset": "IMAGE_GARGANTUAR",
+      "ThrowImpDuration": 1,
+      "WavePointCost": 1500,
+      "Weight": 3000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness7"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieEgyptImpDefault"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 102,
+        "y": 124
+      },
+      "AttackRect": {
+        "mHeight": 80,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": false,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 80,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 190,
+      "HypnoshroomEffectOffset": {
+        "x": -6,
+        "y": 36
+      },
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 0.8
+      },
+      "Size": "imp",
+      "Speed": 0.22,
+      "WavePointCost": 100,
+      "Weight": 1000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness1"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieRaDefault"
+    ],
+    "objclass": "ZombieRaProps",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 190,
+      "MaxClaimedSunCurrency": 250,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.2,
+      "WavePointCost": 100,
+      "Weight": 700,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness1"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieExplorerDefault"
+    ],
+    "objclass": "ZombieExplorerProps",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 0,
+        "mY": 10
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 5,
+        "mY": 10
+      },
+      "Hitpoints": 250,
+      "MaxTorchReach": 37,
+      "PlantsToEat": {
+        "List": [
+          "frostbonnet",
+          "blazingknight"
+        ],
+        "ListType": "includelist"
+      },
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.4
+      },
+      "Speed": 0.25,
+      "WavePointCost": 250,
+      "Weight": 3000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness2"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieTombRaiserDefault"
+    ],
+    "objclass": "ZombieTombRaiserProps",
+    "objdata": {
+      "# TombRaiser specific properties ": 0,
+      "Ammo": 5,
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 380,
+      "NumberOfTombsToSpawn": 2,
+      "Projectile": "RTID(ZombieBoneDefault@ProjectileTypes)",
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.185,
+      "TimeBetweenCasts": 0,
+      "TimeBetweenRaisings": 6,
+      "WavePointCost": 300,
+      "Weight": 2000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness4"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieIceAgeDodo"
+    ],
+    "objclass": "ZombieIceAgeDodoProps",
+    "objdata": {
+      "AddRandomChanceForJumpPerGridWalked": 0.1,
+      "ArmDropFraction": -1,
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 35,
+        "mX": 5,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "ChillInsteadOfFreeze": true,
+      "CooldownSecondsUntilNextJumpAvailable": 0,
+      "Cost": 150,
+      "EatDPS": 100,
+      "ElectrocutePAMName": "POPANIM_EFFECTS_ZOMBIE_DODO_SHOCK",
+      "GridItemsToFlyOver": {
+        "List": [
+          "slider_down",
+          "slider_up",
+          "slider_down_modern",
+          "slider_up_modern",
+          "lava",
+          "shallowpuddle",
+          "potholepuddle"
+        ],
+        "ListType": "includelist"
+      },
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 46,
+        "mX": 7,
+        "mY": 10
+      },
+      "Hitpoints": 490,
+      "InitialSetRandomChanceForJump": 0,
+      "LandedResetRandomChanceForJump": 0.35,
+      "MaxRandomGridSquaresToFlyOver": 2,
+      "MaximumGridSquaresToFlyOver": 2,
+      "MinRandomGridSquaresToFlyOver": 1,
+      "PlantsToFlyOver": {
+        "List": [
+          "spikeweed",
+          "spikerock",
+          "iceburg",
+          "wallnut",
+          "potatomine",
+          "lavaguava",
+          "endurian",
+          "cactus",
+          "primalwallnut",
+          "primalpotatomine",
+          "escaperoot",
+          "murkadamia",
+          "tombtangler",
+          "vamporcini"
+        ],
+        "ListType": "includelist"
+      },
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.2
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.3,
+      "WavePointCost": 600,
+      "Weight": 3500,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness3"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed4"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieIceAgeHunter"
+    ],
+    "objclass": "ZombieIceAgeHunterProps",
+    "objdata": {
+      "Actions": [
+        "RTID(ZombieIceAgeProjectileAction@ZombieActions)"
+      ],
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "ChillInsteadOfFreeze": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "FarAttackRange": 4,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 700,
+      "NearAttackRange": 1,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.2
+      },
+      "SnowballsPerBarrage": 3,
+      "Speed": 0.12,
+      "WavePointCost": 500,
+      "Weight": 3500,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness4"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed0"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieIceAgeTroglobite"
+    ],
+    "objclass": "ZombieIceAgeTroglobiteProps",
+    "objdata": {
+      "Actions": [
+        "RTID(ZombiePushGridItemAction@ZombieActions)"
+      ],
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "ChillInsteadOfFreeze": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 470,
+      "ImpType": "iceage_imp",
+      "NumberOfIceblocksToSpawnWith": 3,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.185,
+      "WavePointCost": 600,
+      "Weight": 3500,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness4"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieBeachFisherman"
+    ],
+    "objclass": "ZombieBeachFishermanProps",
+    "objdata": {
+      "AllowedLowPlants": [],
+      "ArtCenter": {
+        "x": 110,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 5,
+        "mY": 0
+      },
+      "CanBeFlicked": false,
+      "CanBePlantTossedStrong": false,
+      "CanBePlantTossedWeak": false,
+      "CanSpawnPlantFood": true,
+      "CanSurrender": true,
+      "DiesOutOfWater": true,
+      "CastTimePerGridSquare": 0.08,
+      "CastingAreaHeight": 1,
+      "CastingAreaMaxRange": 8,
+      "CastingAreaMinRange": 2,
+      "Cost": 150,
+      "DelayBeforeReeling": 0.3,
+      "DelayBetweenCasting": 2.5,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": -10,
+        "mY": 10
+      },
+      "Hitpoints": 1000,
+      "MaxTideLoweredPercent": 0.001,
+      "PlantablePlants": [
+        "tanglekelp",
+        "ghostpepper",
+        "guacodile"
+      ],
+      "ReelTimePerGridSquare": 0.05,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.2
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.185,
+      "WavePointCost": 700,
+      "Weight": 2500,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness5"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieBeachOctopus"
+    ],
+    "objclass": "ZombieBeachOctopusProps",
+    "objdata": {
+      "Actions": [
+        "RTID(ZombieOctopusProjectileAction@ZombieActions)"
+      ],
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 910,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.12,
+      "WavePointCost": 900,
+      "Weight": 3500,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness5"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed0"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieBeachSnorkel"
+    ],
+    "objclass": "ZombieBeachSnorkelProps",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 105,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "DamageWhileSubmerged": {
+        "List": [
+          "banana",
+          "ghostpepper",
+          "homingthistle",
+          "chomper",
+          "jalapeno",
+          "cherry_bomb",
+          "squash",
+          "iceburg",
+          "lavaguava",
+          "toadstool",
+          "strawburst",
+          "electricblueberry",
+          "grapeshot",
+          "jackolantern",
+          "cabbagepult",
+          "akee",
+          "melonpult",
+          "kernelpult",
+          "wintermelon",
+          "banana",
+          "phatbeet",
+          "kiwibeast",
+          "homingthistle",
+          "sapfling",
+          "pepperpult",
+          "sporeshroom",
+          "shrinkingviolet",
+          "bloominghearts",
+          "dusklobber",
+          "applemortar",
+          "witchhazel",
+          "missiletoe",
+          "hotdate",
+          "tanglekelp",
+          "blastberry",
+          "solarsage",
+          "guardshroom",
+          "blastspinner",
+          "hammeruit"
+        ],
+        "ListType": "includelist"
+      },
+      "DamageWhileSubmergedPlantfoodOnly": {
+        "List": [
+          "bowlingbulb",
+          "ghostpepper",
+          "homingthistle",
+          "chomper",
+          "fumeshroom",
+          "snapdragon",
+          "coconutcannon",
+          "bloomerang",
+          "spikeweed",
+          "spikerock",
+          "guacodile",
+          "laser_bean",
+          "firepeashooter",
+          "lavaguava",
+          "toadstool",
+          "cabbagepult",
+          "akee",
+          "melonpult",
+          "kernelpult",
+          "wintermelon",
+          "banana",
+          "phatbeet",
+          "kiwibeast",
+          "homingthistle",
+          "coldsnapdragon",
+          "sapfling",
+          "pepperpult",
+          "sporeshroom",
+          "shrinkingviolet",
+          "dandelion",
+          "applemortar",
+          "witchhazel",
+          "parsnip",
+          "missiletoe",
+          "shadowpeashooter",
+          "tanglekelp",
+          "ultomato",
+          "solarsage",
+          "frostbonnet",
+          "devourbloom",
+          "brainstem"
+        ],
+        "ListType": "includelist"
+      },
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 105,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 350,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.4
+      },
+      "Speed": 0.185,
+      "TargetByIncludelist": {
+        "List": [
+          "ghostpepper",
+          "homingthistle",
+          "jalapeno",
+          "cherry_bomb",
+          "squash",
+          "iceburg",
+          "lavaguava",
+          "strawburst",
+          "electricblueberry",
+          "grapeshot",
+          "cabbagepult",
+          "akee",
+          "melonpult",
+          "kernelpult",
+          "wintermelon",
+          "banana",
+          "phatbeet",
+          "kiwibeast",
+          "homingthistle",
+          "sapfling",
+          "pepperpult",
+          "sporeshroom",
+          "shrinkingviolet",
+          "bloominghearts",
+          "dusklobber",
+          "applemortar",
+          "witchhazel",
+          "missiletoe",
+          "hotdate",
+          "tanglekelp",
+          "blastberry",
+          "blastspinner",
+          "frostbonnet",
+          "hammeruit",
+          "devourbloom"
+        ],
+        "ListType": "includelist"
+      },
+      "WavePointCost": 200,
+      "Weight": 3000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness3"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieDarkJugglerDefault"
+    ],
+    "objclass": "ZombieDarkJugglerProps",
+    "objdata": {
+      "AngleAgnosticProjectiles": [
+        "HomingThistleDefault",
+        "HomingThistlePlantfood",
+        "BuduhBoomDefaultProjectile",
+        "ButterDefault"
+      ],
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "CatchArcDegrees": 120,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 420,
+      "JuggleLaunchDelay": 2,
+      "JuggleableProjectiles": [
+        "PeaDefault",
+        "ThreepeaterPeaDefault",
+        "PlantfoodPeaDefault",
+        "FirePeaDefault",
+        "UltraFirePeaDefault",
+        "SnowPeaDefault",
+        "GiantPeaDefault",
+        "GiantFirePeaDefault",
+        "GiantUltraFirePeaDefault",
+        "CannonballDefault",
+        "CabbageDefault",
+        "MelonDefault",
+        "WinterMelonDefault",
+        "KernelDefault",
+        "ButterDefault",
+        "StarFruitShot",
+        "BloomerangDefault",
+        "PlasmaBall",
+        "PuffSporeDefault",
+        "ThrownZombieParticle",
+        "GuacodileDefault",
+        "HomingThistleDefault",
+        "HomingThistlePlantfood",
+        "BowlingBulbDefault",
+        "BowlingBulbDefault2",
+        "BowlingBulbDefault3",
+        "PepperpultDefault",
+        "PepperpultPlantfoodDefault",
+        "XShotShot",
+        "XShotGiantShot",
+        "StingerDefault",
+        "AkeeDefault",
+        "MegaAkeeDefault",
+        "StrawburstProjectileSmall",
+        "StrawburstProjectileMedium",
+        "StrawburstProjectileLarge",
+        "CactusDefault",
+        "CactusPlantfood",
+        "SporeshroomDefault",
+        "GrapeshotDefaultProjectile",
+        "PrimalPeashooterPea",
+        "PrimalPeashooterFirePea",
+        "PrimalPeashooterUltraFirePea",
+        "PrimalPeashooterPlantfoodPea",
+        "PrimalPeashooterPlantfoodFirePea",
+        "PrimalPeashooterPlantfoodUltraFirePea",
+        "NightshadeProjectile",
+        "NightshadeUpgradedProjectile",
+        "NightshadePFProjectile",
+        "BloomingHeartsDefault",
+        "BloomingHeartsPlantfoodDefault",
+        "DusklobberDefault",
+        "AppleMortarDefault",
+        "AppleMortarPlantfoodDefault",
+        "ShadowPeashooterDefault",
+        "PoisonPeaDefault",
+        "SlingPeaDefault",
+        "SlingPeaPlantfoodDefault",
+        "ReincarnationRedPetal",
+        "ReincarnationPinkPetal",
+        "ReincarnationWhitePetal",
+        "AppeasemintProjectileDefault",
+        "BlastberrySecondaryProjectile",
+        "PokraDefault",
+        "PokraPlantfood",
+        "DartichokeLeafDefault",
+        "DartichokeLeafPerfect",
+        "PVineDefault",
+        "ScaredyShroomDefault",
+        "ScaredyShroomPlantfood",
+        "DragonBruitDefault",
+        "DragonBruitPlantfoodDefault",
+        "DragonBabyBruitDefault",
+        "BlazeLeafBlazeWave",
+        "SeashooterProjectileDefault",
+        "CornfettiPopperPlantfood",
+        "CornfettiPopperNormal",
+        "SourshotProjectile",
+        "SourshotPlantfoodProjectile"
+      ],
+      "BounceableProjectiles": [
+        "RTID(BuduhBoomDefaultProjectile@ProjectileTypes)",
+        "RTID(ButterDefault@ProjectileTypes)"
+      ],
+      "ProjectileBounceDistance": 160,
+      "ProjectileBounceHeight": 80,
+      "ProjectileBounceTime": 0.9,
+      "LaunchAcceleration": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "LaunchHeight": {
+        "Max": 50,
+        "Min": 50
+      },
+      "LaunchVelocity": {
+        "x": 500,
+        "y": 0,
+        "z": 0
+      },
+      "MaxProjectilesToJuggle": 1000,
+      "MoveSpeedMultiplierWhileJuggling": 1.1,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.2,
+      "UnthrowableProjectiles": [],
+      "WavePointCost": 450,
+      "Weight": 3500,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness3"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombiePetDefault"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": false,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 300,
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.4
+      },
+      "Speed": 0.1,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness1"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieWizardDefault"
+    ],
+    "objclass": "ZombieDarkWizardProps",
+    "objdata": {
+      "Actions": [
+        "RTID(ZombieDarkWizardZap@ZombieActions)"
+      ],
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 490,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.12,
+      "WavePointCost": 800,
+      "Weight": 3500,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness4"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed0"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieDarkKing"
+    ],
+    "objclass": "ZombieDarkKingProps",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanBeFlicked": false,
+      "CanBeFlickedOff": false,
+      "CanBePlantTossedStrong": false,
+      "CanBePlantTossedWeak": false,
+      "CanSpawnPlantFood": true,
+      "CanSurrender": true,
+      "Cost": 150,
+      "DelayBetweenKnightings": 2.5,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 1000,
+      "KnightHelm": "none",
+      "KnightingAreaX": 4,
+      "KnightingAreaY": 3,
+      "PlantablePlants": [
+        "cherry_bomb",
+        "jalapeno",
+        "powerlily",
+        "iceburg",
+        "empea",
+        "powerplant",
+        "goldleaf",
+        "grapeshot"
+      ],
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.2
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.185,
+      "ValidKnightTargets": [
+        "dark",
+        "dark_armor1",
+        "dark_armor2",
+        "dark_armor3"
+      ],
+      "WavePointCost": 750,
+      "Weight": 2000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness5"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieDarkImpDragonDefault"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 96,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 80,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": false,
+      "Cost": 150,
+      "EatDPS": 100,
+      "FireDamageMultiplier": 0,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 80,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 190,
+      "HypnoshroomEffectOffset": {
+        "x": -6,
+        "y": 36
+      },
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 0.8
+      },
+      "Size": "imp",
+      "Speed": 0.185,
+      "WavePointCost": 150,
+      "Weight": 2000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness1"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieModernAllStarDefault"
+    ],
+    "objclass": "ZombieModernAllStarProps",
+    "objdata": {
+      "ArtCenter": {
+        "x": 100,
+        "y": 123
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 30,
+        "mX": 10,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 42,
+        "mX": 5,
+        "mY": 10
+      },
+      "Hitpoints": 1100,
+      "RunningSpeedScale": 0.5,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "SmashDamage"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 1.2
+      },
+      "SmashDamage": 1500,
+      "Speed": 0.16,
+      "WavePointCost": 1000,
+      "Weight": 3500,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness5"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed5"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieEightiesArcade"
+    ],
+    "objclass": "ZombieEightiesArcadeProps",
+    "objdata": {
+      "Actions": [
+        "RTID(ZombieEightiesArcadePushAction@ZombieActions)"
+      ],
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 490,
+      "JamStyle": "jam_8bit",
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.4
+      },
+      "Speed": 0.19,
+      "WavePointCost": 600,
+      "Weight": 1000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness4"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "GridItemEightiesArcadeCabinet"
+    ],
+    "objclass": "GridItemEightiesArcadeCabinetProps",
+    "objdata": {
+      "BreakEffect": "POPANIM_EFFECTS_80S_ARCADE_CABINET_BREAK",
+      "CanBeMowed": true,
+      "DamagePhases": {
+        "Phases": [
+          {
+            "Layers": [
+              "arcade_cabinet_damage0",
+              "arcade_cabinet_active_damage0"
+            ],
+            "StartAtHealthPercent": 0.9
+          },
+          {
+            "Layers": [
+              "arcade_cabinet_damage1",
+              "arcade_cabinet_active_damage1"
+            ],
+            "StartAtHealthPercent": 0.75
+          },
+          {
+            "Layers": [
+              "arcade_cabinet_damage2",
+              "arcade_cabinet_active_damage2"
+            ],
+            "StartAtHealthPercent": 0.6
+          },
+          {
+            "Layers": [
+              "arcade_cabinet_damage3",
+              "arcade_cabinet_active_damage3"
+            ],
+            "StartAtHealthPercent": 0.4
+          },
+          {
+            "Layers": [
+              "arcade_cabinet_damage4",
+              "arcade_cabinet_active_damage4"
+            ],
+            "StartAtHealthPercent": 0.2
+          },
+          {
+            "Layers": [
+              "arcade_cabinet_damage5",
+              "arcade_cabinet_active_damage5"
+            ],
+            "StartAtHealthPercent": 0
+          }
+        ]
+      },
+      "Hitpoints": 600,
+      "Height": "ground",
+      "InitialPause": {
+        "Max": 3,
+        "Min": 1
+      },
+      "JamStyle": "jam_8bit",
+      "PlantingRestrictions": {
+        "BlockedPlantingReason": "PLANTING_NOT_ON_ARCADE_MACHINE",
+        "List": [],
+        "ListType": "includelist"
+      },
+      "PopAnim": "POPANIM_EFFECTS_80S_ARCADE_CABINET",
+      "PopAnimDeathAnim": "death",
+      "PopAnimRenderOffset": {
+        "x": 105,
+        "y": 115
+      },
+      "PopAnimRigClass": "GridItemEightiesArcadeCabinetAnimRig",
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        }
+      ],
+      "TimeAfterZombieCreationWhereCabinetDoesNotMove": 2,
+      "TimeBetweenSpawns": {
+        "Max": 12,
+        "Min": 10
+      },
+      "ZombieSpawnPointOffset": -20,
+      "ZombieTypesToSpawn": [
+        {
+          "Weight": 60,
+          "ZombieTypeName": "eighties_8bit"
+        },
+        {
+          "Weight": 30,
+          "ZombieTypeName": "eighties_8bit_armor1"
+        },
+        {
+          "Weight": 10,
+          "ZombieTypeName": "eighties_8bit_armor2"
+        }
+      ]
+    }
+  },
+  {
+    "objclass": "ZombiePushGridItemActionDefinition",
+    "aliases": [
+      "ZombieEightiesArcadePushAction"
+    ],
+    "objdata": {
+      "PushableGridItems": {
+        "ListType": "includelist",
+        "List": [
+          "eightiesarcadecabinet"
+        ]
+      },
+      "PushBlockingGridItems": {
+        "ListType": "excludelist",
+        "List": [
+          "lilypad",
+          "powertile_alpha",
+          "powertile_beta",
+          "powertile_gamma",
+          "powertile_delta",
+          "powertile_epsilon",
+          "sap",
+          "plantfoodsap",
+          "lava",
+          "goldtile",
+          "wisp",
+          "bombegranateseeds",
+          "score_2x_tile",
+          "score_3x_tile",
+          "score_5x_tile",
+          "poison_tile",
+          "butter",
+          "shallowpuddle",
+          "potholepuddle",
+          "plantshallowpuddle"
+        ]
+      },
+      "NotSquashedPlants": {
+        "ListType": "includelist",
+        "List": [
+          "potatomine",
+          "primalpotatomine"
+        ]
+      },
+      "RelocationDuration": 0.5,
+      "PushRectangle": {
+        "mX": 15,
+        "mY": 0,
+        "mWidth": 65,
+        "mHeight": 95
+      }
+    }
+  },
+  {
+    "aliases": [
+      "ZombieLostCityJaneDefault"
+    ],
+    "objclass": "ZombieLostCityJaneProps",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "BounceableProjectiles": [
+        "RTID(CabbageDefault@ProjectileTypes)",
+        "RTID(MegaCabbageDefault@ProjectileTypes)",
+        "RTID(KernelDefault@ProjectileTypes)",
+        "RTID(ButterDefault@ProjectileTypes)",
+        "RTID(MelonDefault@ProjectileTypes)",
+        "RTID(MegaMelonDefault@ProjectileTypes)",
+        "RTID(WinterMelonDefault@ProjectileTypes)",
+        "RTID(WinterMegaMelonDefault@ProjectileTypes)",
+        "RTID(PepperpultDefault@ProjectileTypes)",
+        "RTID(PepperpultPlantfoodDefault@ProjectileTypes)",
+        "RTID(AkeeDefault@ProjectileTypes)",
+        "RTID(MegaAkeeDefault@ProjectileTypes)",
+        "RTID(SporeshroomDefault@ProjectileTypes)",
+        "RTID(MegaSporeshroomDefault@ProjectileTypes)",
+        "RTID(BloomingHeartsDefault@ProjectileTypes)",
+        "RTID(BloomingHeartsPlantfoodDefault@ProjectileTypes)",
+        "RTID(DusklobberDefault@ProjectileTypes)",
+        "RTID(AppleMortarDefault@ProjectileTypes)",
+        "RTID(AppleMortarPlantfoodDefault@ProjectileTypes)",
+        "RTID(SlingPeaDefault@ProjectileTypes)",
+        "RTID(SlingPeaPlantfoodDefault@ProjectileTypes)",
+        "RTID(BlastberrySecondaryProjectile@ProjectileTypes)",
+        "RTID(BoomberryMainProjectile@ProjectileTypes)",
+        "RTID(BoomberrySecondaryProjectile@ProjectileTypes)",
+        "RTID(BuduhBoomDefaultProjectile@ProjectileTypes)",
+        "RTID(DragonBruitDefault@ProjectileTypes)",
+        "RTID(DragonBruitPlantfoodDefault@ProjectileTypes)",
+        "RTID(DragonBabyBruitDefault@ProjectileTypes)"
+      ],
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 115,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 350,
+      "ProjectileBounceDistance": 160,
+      "ProjectileBounceHeight": 120,
+      "ProjectileBounceTime": 0.9,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 20,
+        "y": 0,
+        "z": 1.2
+      },
+      "ShadowScaling": {
+        "x": 1.4,
+        "y": 1
+      },
+      "Speed": 0.25,
+      "WavePointCost": 200,
+      "Weight": 3000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness3"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieCrystalSkullDefault"
+    ],
+    "objclass": "ZombieCrystalSkullProps",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "ChargingTime": 5,
+      "ChargingTimeDecrementPerFiveSun": 0.2,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 250,
+      "LaserBeamDamage": 4001,
+      "LaserBeamLength": 220,
+      "LaserCooldownTime": 5,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "LaserBeamDamage"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 10,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.185,
+      "WavePointCost": 500,
+      "Weight": 3000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness3"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieProspectorDefault"
+    ],
+    "objclass": "ZombieProspectorProps",
+    "objdata": {
+      "Apex": 250,
+      "ArtCenter": {
+        "x": 100,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 190,
+      "LaunchCountdown": 10,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.16,
+      "StunTime": 2.5,
+      "TimeToTravel": 1.5,
+      "WavePointCost": 200,
+      "Weight": 3000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness1"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed1"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombiePianoDefault"
+    ],
+    "objclass": "ZombiePianoProps",
+    "objdata": {
+      "ArtCenter": {
+        "x": 100,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 110,
+        "mWidth": 75,
+        "mX": -20,
+        "mY": 10
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 4000,
+      "FastMoveSpeed": 0.4,
+      "GroundTrackName": "none",
+      "HitRect": {
+        "mHeight": 110,
+        "mWidth": 75,
+        "mX": -31,
+        "mY": 10
+      },
+      "Hitpoints": 840,
+      "NormalDeathWhenMowed": true,
+      "PlantsWhichBreakPianoOnCollision": {
+        "List": [
+          "spikeweed",
+          "spikerock",
+          "cactus",
+          "iceweed"
+        ],
+        "ListType": "includelist"
+      },
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.12,
+      "StreetCriticalSize": {
+        "x": 3,
+        "y": 1
+      },
+      "StreetOffset": {
+        "x": -2,
+        "y": -1
+      },
+      "StreetSize": {
+        "x": 3,
+        "y": 2
+      },
+      "WavePointCost": 450,
+      "Weight": 2000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness5"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed0"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieModernNewspaperDefault"
+    ],
+    "objclass": "ZombieModernNewspaperProps",
+    "objdata": {
+      "ArtCenter": {
+        "x": 100,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 150,
+      "EatDPS": 200,
+      "EnragedDamageScale": 4,
+      "EnragedSpeedScale": 4,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 460,
+      "ScaledProps": [
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "Hitpoints"
+        },
+        {
+          "Arg1": 1.3,
+          "Arg2": 0.05,
+          "Formula": "standard",
+          "Key": "EatDPS"
+        },
+        {
+          "Formula": "constant",
+          "Key": "Speed"
+        },
+        {
+          "Formula": "constant",
+          "Key": "WavePointCost"
+        }
+      ],
+      "ShadowOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.22,
+      "WavePointCost": 700,
+      "Weight": 4000,
+      "ZombieArmorProps": [
+        "RTID(NewspaperDefault@ArmorTypes)"
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness5"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombossMechEgypt"
+    ],
+    "objclass": "ZombieZombossMechEgyptProps",
+    "objdata": {
+      "# Egypt Zomboss properties": 0,
+      "# Zomboss properties": 0,
+      "AlmanacOffset": {
+        "x": 10,
+        "y": 80
+      },
+      "AlmanacScale": 1,
+      "ArmDropFraction": -1,
+      "ArtCenter": {
+        "x": 30,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 125,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "BoneProjectileType": "RTID(ZombieBoneDefault@ProjectileTypes)",
+      "CanBeFlicked": false,
+      "CanBePlantTossedStrong": false,
+      "CanBePlantTossedWeak": false,
+      "CanSpawnPlantFood": false,
+      "CanTriggerZombieWin": false,
+      "CrosshairAnimation": "missile_lock_reticle",
+      "CrosshairPopAnim": "POPANIM_EFFECTS_ZOMBOSS_MISSILE_EXPLOSION_EGYPT",
+      "FoeEatDamageReflectPct": 0.5,
+      "GridExtents": {
+        "mX": 3,
+        "mY": 2
+      },
+      "GroundTrackName": "ground_swatch",
+      "HideDuringIntro": true,
+      "HitRect": {
+        "mHeight": 340,
+        "mWidth": 115,
+        "mX": 30,
+        "mY": 10
+      },
+      "IsValidPinchTarget": false,
+      "MaxColumn": 7,
+      "MinColumn": 5,
+      "NumRocketGravestones": 2,
+      "PowerUpDamageModifier": 0.25,
+      "RocketAnimation": "missile",
+      "RocketExplosionAnimation": "missile_explosion",
+      "ScoreOverride": 25000,
+      "ShadowOffset": {
+        "x": 55,
+        "y": -50,
+        "z": 0.8
+      },
+      "ShadowScaling": {
+        "x": 4.5,
+        "y": 4.5
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.1,
+      "SquashGridItems": false,
+      "SquashZombies": true,
+      "Stages": [
+        {
+          "Actions": [
+            "RTID(ZombossEgyptWalk1@ZombieActions)",
+            "RTID(ZombossEgyptSpawn1@ZombieActions)",
+            "RTID(ZombossEgyptRush1@ZombieActions)",
+            "RTID(ZombossEgyptFire1@ZombieActions)"
+          ],
+          "AnimRateModifier": 1,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 0,
+          "DamageIndexHalf": 0,
+          "HitPoints": 4000,
+          "IdleTime": {
+            "Max": 1,
+            "Min": 0.5
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 4
+        },
+        {
+          "Actions": [
+            "RTID(ZombossEgyptWalk2@ZombieActions)",
+            "RTID(ZombossEgyptSpawn2@ZombieActions)",
+            "RTID(ZombossEgyptRush2@ZombieActions)",
+            "RTID(ZombossEgyptFire2@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.1,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 3,
+          "DamageIndexHalf": 3,
+          "HitPoints": 8000,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.5
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 3.5
+        },
+        {
+          "Actions": [
+            "RTID(ZombossEgyptWalk3@ZombieActions)",
+            "RTID(ZombossEgyptSpawn3@ZombieActions)",
+            "RTID(ZombossEgyptRush3@ZombieActions)",
+            "RTID(ZombossEgyptFire3@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.25,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 6,
+          "DamageIndexHalf": 6,
+          "HitPoints": 6500,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.2
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 3
+        }
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness8"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombossMechPirate"
+    ],
+    "objclass": "ZombieZombossMechPirateProps",
+    "objdata": {
+      "# Zomboss properties": 0,
+      "AlmanacOffset": {
+        "x": 10,
+        "y": 80
+      },
+      "AlmanacScale": 0.9,
+      "ArmDropFraction": -1,
+      "ArtCenter": {
+        "x": 30,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 125,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanBeFlicked": false,
+      "CanBePlantTossedStrong": false,
+      "CanBePlantTossedWeak": false,
+      "CanSpawnPlantFood": false,
+      "CanTriggerZombieWin": false,
+      "CrosshairAnimation": "missile_lock_reticle",
+      "CrosshairPopAnim": "POPANIM_EFFECTS_ZOMBOSS_MISSILE_EXPLOSION_PIRATE",
+      "FoeEatDamageReflectPct": 0.5,
+      "GridExtents": {
+        "mX": 3,
+        "mY": 2
+      },
+      "GroundTrackName": "ground_swatch",
+      "HideDuringIntro": true,
+      "HitRect": {
+        "mHeight": 340,
+        "mWidth": 115,
+        "mX": 30,
+        "mY": 10
+      },
+      "IsValidPinchTarget": false,
+      "MaxColumn": 7,
+      "MinColumn": 5,
+      "PowerUpDamageModifier": 0.25,
+      "RocketAnimation": "missile",
+      "RocketExplosionAnimation": "missile_explosion",
+      "ShadowOffset": {
+        "x": 55,
+        "y": -50,
+        "z": 0.8
+      },
+      "ShadowScaling": {
+        "x": 4.5,
+        "y": 4.5
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.1,
+      "SquashGridItems": false,
+      "SquashZombies": true,
+      "Stages": [
+        {
+          "Actions": [
+            "RTID(ZombossPirateWalk1@ZombieActions)",
+            "RTID(ZombossPirateSpawn1@ZombieActions)",
+            "RTID(ZombossPirateImpCannon1@ZombieActions)"
+          ],
+          "AnimRateModifier": 1,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 0,
+          "DamageIndexHalf": 0,
+          "HitPoints": 5500,
+          "IdleTime": {
+            "Max": 1,
+            "Min": 0.5
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 4
+        },
+        {
+          "Actions": [
+            "RTID(ZombossPirateWalk2@ZombieActions)",
+            "RTID(ZombossPirateSpawn2@ZombieActions)",
+            "RTID(ZombossPirateRush2@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.1,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 3,
+          "DamageIndexHalf": 3,
+          "HitPoints": 10000,
+          "IdleTime": {
+            "Max": 1,
+            "Min": 0.5
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 3
+        },
+        {
+          "Actions": [
+            "RTID(ZombossPirateSpawn3@ZombieActions)",
+            "RTID(ZombossPirateRush3@ZombieActions)",
+            "RTID(ZombossPirateImpCannon3@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.25,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 6,
+          "DamageIndexHalf": 6,
+          "HitPoints": 11000,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.2
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 2
+        }
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness8"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombossMechPirate2"
+    ],
+    "objclass": "ZombieZombossMechPirateProps",
+    "objdata": {
+      "# Zomboss properties": 0,
+      "AlmanacOffset": {
+        "x": 10,
+        "y": 80
+      },
+      "AlmanacScale": 0.9,
+      "ArmDropFraction": -1,
+      "ArtCenter": {
+        "x": 30,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 125,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanBeFlicked": false,
+      "CanBePlantTossedStrong": false,
+      "CanBePlantTossedWeak": false,
+      "CanSpawnPlantFood": false,
+      "CanTriggerZombieWin": false,
+      "CrosshairAnimation": "missile_lock_reticle",
+      "CrosshairPopAnim": "POPANIM_EFFECTS_ZOMBOSS_MISSILE_EXPLOSION_PIRATE",
+      "FoeEatDamageReflectPct": 0.5,
+      "GridExtents": {
+        "mX": 3,
+        "mY": 2
+      },
+      "GroundTrackName": "ground_swatch",
+      "HideDuringIntro": true,
+      "HitRect": {
+        "mHeight": 340,
+        "mWidth": 115,
+        "mX": 30,
+        "mY": 10
+      },
+      "IsValidPinchTarget": false,
+      "MaxColumn": 7,
+      "MinColumn": 5,
+      "PowerUpDamageModifier": 0.25,
+      "RocketAnimation": "missile",
+      "RocketExplosionAnimation": "missile_explosion",
+      "ShadowOffset": {
+        "x": 55,
+        "y": -50,
+        "z": 0.8
+      },
+      "ShadowScaling": {
+        "x": 4.5,
+        "y": 4.5
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.1,
+      "SquashGridItems": false,
+      "SquashZombies": true,
+      "Stages": [
+        {
+          "Actions": [
+            "RTID(ZombossPirateRush3@ZombieActions)",
+            "RTID(ZombossPirateSpawn2@ZombieActions)",
+            "RTID(ZombossPirateImpCannon2@ZombieActions)"
+          ],
+          "AnimRateModifier": 1,
+          "ChilledDurationFromFrozen": 5,
+          "DamageIndexFull": 0,
+          "DamageIndexHalf": 0,
+          "HitPoints": 1000,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.3
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 2
+        },
+        {
+          "Actions": [
+            "RTID(ZombossPirateSpawn4@ZombieActions)",
+            "RTID(ZombossPirateRush4@ZombieActions)",
+            "RTID(ZombossPirateImpCannon5@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.1,
+          "ChilledDurationFromFrozen": 5,
+          "DamageIndexFull": 3,
+          "DamageIndexHalf": 3,
+          "HitPoints": 5000,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.3
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 1.5
+        },
+        {
+          "Actions": [
+            "RTID(ZombossPirateSpawn5@ZombieActions)",
+            "RTID(ZombossPirateRush5@ZombieActions)",
+            "RTID(ZombossPirateImpCannon6@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.25,
+          "ChilledDurationFromFrozen": 5,
+          "DamageIndexFull": 6,
+          "DamageIndexHalf": 6,
+          "HitPoints": 11000,
+          "IdleTime": {
+            "Max": 0.3,
+            "Min": 0.1
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 1
+        }
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness8"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombossMechBattlezPirate"
+    ],
+    "objclass": "ZombieZombossMechPirateProps",
+    "objdata": {
+      "# Zomboss properties": 0,
+      "AlmanacOffset": {
+        "x": 10,
+        "y": 80
+      },
+      "AlmanacScale": 0.9,
+      "ArmDropFraction": -1,
+      "ArtCenter": {
+        "x": 30,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 125,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanBeFlicked": false,
+      "CanBePlantTossedStrong": false,
+      "CanBePlantTossedWeak": false,
+      "CanSpawnPlantFood": false,
+      "CanTriggerZombieWin": false,
+      "CrosshairAnimation": "missile_lock_reticle",
+      "CrosshairPopAnim": "POPANIM_EFFECTS_ZOMBOSS_MISSILE_EXPLOSION_PIRATE",
+      "FoeEatDamageReflectPct": 0.5,
+      "GridExtents": {
+        "mX": 3,
+        "mY": 2
+      },
+      "GroundTrackName": "ground_swatch",
+      "HideDuringIntro": true,
+      "HitRect": {
+        "mHeight": 340,
+        "mWidth": 115,
+        "mX": 30,
+        "mY": 10
+      },
+      "IsValidPinchTarget": false,
+      "MaxColumn": 7,
+      "MinColumn": 5,
+      "PowerUpDamageModifier": 0.25,
+      "RocketAnimation": "missile",
+      "RocketExplosionAnimation": "missile_explosion",
+      "ShadowOffset": {
+        "x": 55,
+        "y": -50,
+        "z": 0.8
+      },
+      "ShadowScaling": {
+        "x": 4.5,
+        "y": 4.5
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.1,
+      "SquashGridItems": false,
+      "SquashZombies": true,
+      "UnlimitedStages": {
+        "UseUnlimitedStages": true,
+        "DefinedScores": [
+          10000,
+          20000,
+          30000,
+          40000,
+          50000,
+          60000,
+          70000,
+          80000
+        ],
+        "DefinedStagesToInterpolate": [
+          3,
+          3
+        ],
+        "PostDefinedStages": {
+          "HitPoints": 5000,
+          "Score": 10000
+        }
+      },
+      "ConditionImmunities": [
+        {
+          "Condition": "chill",
+          "Percent": 0.1
+        },
+        {
+          "Condition": "stun",
+          "Percent": 0.1
+        },
+        {
+          "Condition": "invisibleslow",
+          "Percent": 0
+        },
+        {
+          "Condition": "stalled",
+          "Percent": 0.1
+        },
+        {
+          "Condition": "sapped"
+        },
+        {
+          "Condition": "poisoned"
+        },
+        {
+          "Condition": "decaypoison"
+        },
+        {
+          "Condition": "shrinking"
+        },
+        {
+          "Condition": "shrunken"
+        },
+        {
+          "Condition": "contagiouspoison"
+        },
+        {
+          "Condition": "dazeystunned",
+          "Percent": 0.1
+        },
+        {
+          "Condition": "stackableslow"
+        },
+        {
+          "Condition": "sweetheartslow"
+        }
+      ],
+      "Stages": [
+        {
+          "Actions": [
+            "RTID(ZombossBattlezPirateWalk1@ZombieActions)",
+            "RTID(ZombossBattlezPirateSpawn1@ZombieActions)",
+            "RTID(ZombossBattlezPirateSpawn2@ZombieActions)",
+            "RTID(ZombossBattlezPirateSpawn6@ZombieActions)",
+            "RTID(ZombossBattlezPirateRush1@ZombieActions)",
+            "RTID(ZombossBattlezPirateImpCannon1@ZombieActions)"
+          ],
+          "AnimRateModifier": 1,
+          "ChilledDurationFromFrozen": 2,
+          "SlowDurationFromStun": 1.5,
+          "DamageIndexFull": 0,
+          "DamageIndexHalf": 0,
+          "HitPoints": 5000,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.3
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 1
+        },
+        {
+          "Actions": [
+            "RTID(ZombossBattlezPirateWalk1@ZombieActions)",
+            "RTID(ZombossBattlezPirateSpawn3@ZombieActions)",
+            "RTID(ZombossBattlezPirateSpawn4@ZombieActions)",
+            "RTID(ZombossBattlezPirateSpawn5@ZombieActions)",
+            "RTID(ZombossBattlezPirateSpawn6@ZombieActions)",
+            "RTID(ZombossBattlezPirateRush2@ZombieActions)",
+            "RTID(ZombossBattlezPirateImpCannon2@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.5,
+          "ChilledDurationFromFrozen": 1.5,
+          "SlowDurationFromStun": 1,
+          "DamageIndexFull": 0,
+          "DamageIndexHalf": 0,
+          "HitPoints": 20000,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.3
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 0.75
+        },
+        {
+          "Actions": [
+            "RTID(ZombossBattlezPirateSpawn3@ZombieActions)",
+            "RTID(ZombossBattlezPirateSpawn4@ZombieActions)",
+            "RTID(ZombossBattlezPirateSpawn5@ZombieActions)",
+            "RTID(ZombossBattlezPirateSpawn6@ZombieActions)",
+            "RTID(ZombossBattlezPirateRush3@ZombieActions)",
+            "RTID(ZombossBattlezPirateImpCannon3@ZombieActions)"
+          ],
+          "AnimRateModifier": 2,
+          "ChilledDurationFromFrozen": 1,
+          "SlowDurationFromStun": 0.5,
+          "DamageIndexFull": 6,
+          "DamageIndexHalf": 6,
+          "HitPoints": 35000,
+          "IdleTime": {
+            "Max": 0.3,
+            "Min": 0.1
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 0.5
+        }
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness8"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombossMechCowboy"
+    ],
+    "objclass": "ZombieZombossMechCowboyProps",
+    "objdata": {
+      "# Zomboss properties": 0,
+      "AlmanacOffset": {
+        "x": 10,
+        "y": 80
+      },
+      "AlmanacScale": 0.9,
+      "ArmDropFraction": -1,
+      "ArtCenter": {
+        "x": 30,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 125,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanBeFlicked": false,
+      "CanBePlantTossedStrong": false,
+      "CanBePlantTossedWeak": false,
+      "CanSpawnPlantFood": false,
+      "CanTriggerZombieWin": false,
+      "CrosshairAnimation": "missile_lock_reticle",
+      "CrosshairPopAnim": "POPANIM_EFFECTS_ZOMBOSS_MISSILE_EXPLOSION_COWBOY",
+      "FoeEatDamageReflectPct": 0.5,
+      "GridExtents": {
+        "mX": 3,
+        "mY": 2
+      },
+      "GroundTrackName": "ground_swatch",
+      "HideDuringIntro": true,
+      "HitRect": {
+        "mHeight": 340,
+        "mWidth": 115,
+        "mX": 30,
+        "mY": 10
+      },
+      "IsValidPinchTarget": false,
+      "MaxColumn": 7,
+      "MinColumn": 5,
+      "PowerUpDamageModifier": 0.25,
+      "RocketAnimation": "missile",
+      "RocketExplosionAnimation": "missile_explosion",
+      "ShadowOffset": {
+        "x": 55,
+        "y": -50,
+        "z": 0.8
+      },
+      "ShadowScaling": {
+        "x": 4.5,
+        "y": 4.5
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.1,
+      "SquashGridItems": false,
+      "SquashZombies": true,
+      "Stages": [
+        {
+          "Actions": [
+            "RTID(ZombossCowboyWalk1@ZombieActions)",
+            "RTID(ZombossCowboySpawn1@ZombieActions)",
+            "RTID(ZombossCowboyFire1@ZombieActions)"
+          ],
+          "AnimRateModifier": 1,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 0,
+          "DamageIndexHalf": 2,
+          "HitPoints": 6500,
+          "IdleTime": {
+            "Max": 1,
+            "Min": 0.5
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 4
+        },
+        {
+          "Actions": [
+            "RTID(ZombossCowboySpawn2@ZombieActions)",
+            "RTID(ZombossCowboyRush2@ZombieActions)",
+            "RTID(ZombossCowboyFire2@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.1,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 3,
+          "DamageIndexHalf": 4,
+          "HitPoints": 10000,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.3
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 3
+        },
+        {
+          "Actions": [
+            "RTID(ZombossCowboySpawn3@ZombieActions)",
+            "RTID(ZombossCowboyRush3@ZombieActions)",
+            "RTID(ZombossCowboyFire3@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.25,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 5,
+          "DamageIndexHalf": 6,
+          "HitPoints": 9000,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.2
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 2
+        }
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness8"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombossMechCowboy2"
+    ],
+    "objclass": "ZombieZombossMechCowboyProps",
+    "objdata": {
+      "# Zomboss properties": 0,
+      "AlmanacOffset": {
+        "x": 10,
+        "y": 80
+      },
+      "AlmanacScale": 0.9,
+      "ArmDropFraction": -1,
+      "ArtCenter": {
+        "x": 30,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 125,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanBeFlicked": false,
+      "CanBePlantTossedStrong": false,
+      "CanBePlantTossedWeak": false,
+      "CanSpawnPlantFood": false,
+      "CanTriggerZombieWin": false,
+      "CrosshairAnimation": "missile_lock_reticle",
+      "CrosshairPopAnim": "POPANIM_EFFECTS_ZOMBOSS_MISSILE_EXPLOSION_COWBOY",
+      "FoeEatDamageReflectPct": 0.5,
+      "GridExtents": {
+        "mX": 3,
+        "mY": 2
+      },
+      "GroundTrackName": "ground_swatch",
+      "HideDuringIntro": true,
+      "HitRect": {
+        "mHeight": 340,
+        "mWidth": 115,
+        "mX": 30,
+        "mY": 10
+      },
+      "IsValidPinchTarget": false,
+      "MaxColumn": 7,
+      "MinColumn": 5,
+      "PowerUpDamageModifier": 0.25,
+      "RocketAnimation": "missile",
+      "RocketExplosionAnimation": "missile_explosion",
+      "ShadowOffset": {
+        "x": 55,
+        "y": -50,
+        "z": 0.8
+      },
+      "ShadowScaling": {
+        "x": 4.5,
+        "y": 4.5
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.1,
+      "SquashGridItems": false,
+      "SquashZombies": true,
+      "Stages": [
+        {
+          "Actions": [
+            "RTID(ZombossCowboy2Rush2@ZombieActions)",
+            "RTID(ZombossCowboy2Spawn1@ZombieActions)",
+            "RTID(ZombossCowboy2Fire1@ZombieActions)"
+          ],
+          "AnimRateModifier": 2,
+          "ChilledDurationFromFrozen": 7,
+          "DamageIndexFull": 0,
+          "DamageIndexHalf": 2,
+          "HitPoints": 8000,
+          "IdleTime": {
+            "Max": 1,
+            "Min": 0.5
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 2,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 3
+        },
+        {
+          "Actions": [
+            "RTID(ZombossCowboy2Spawn2@ZombieActions)",
+            "RTID(ZombossCowboy2Rush2@ZombieActions)",
+            "RTID(ZombossCowboy2Fire2@ZombieActions)"
+          ],
+          "AnimRateModifier": 2.5,
+          "ChilledDurationFromFrozen": 7,
+          "DamageIndexFull": 3,
+          "DamageIndexHalf": 4,
+          "HitPoints": 12000,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.3
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.5,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 2
+        },
+        {
+          "Actions": [
+            "RTID(ZombossCowboy2Spawn3@ZombieActions)",
+            "RTID(ZombossCowboy2Rush3@ZombieActions)",
+            "RTID(ZombossCowboy2Fire3@ZombieActions)"
+          ],
+          "AnimRateModifier": 3,
+          "ChilledDurationFromFrozen": 7,
+          "DamageIndexFull": 5,
+          "DamageIndexHalf": 6,
+          "HitPoints": 10000,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.2
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1.25,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 1
+        }
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness8"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombossMechBattlezCowboy"
+    ],
+    "objclass": "ZombieZombossMechCowboyProps",
+    "objdata": {
+      "# Zomboss properties": 0,
+      "AlmanacOffset": {
+        "x": 10,
+        "y": 80
+      },
+      "AlmanacScale": 0.9,
+      "ArmDropFraction": -1,
+      "ArtCenter": {
+        "x": 30,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 125,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanBeFlicked": false,
+      "CanBePlantTossedStrong": false,
+      "CanBePlantTossedWeak": false,
+      "CanSpawnPlantFood": false,
+      "CanTriggerZombieWin": false,
+      "CrosshairAnimation": "missile_lock_reticle",
+      "CrosshairPopAnim": "POPANIM_EFFECTS_ZOMBOSS_MISSILE_EXPLOSION_COWBOY",
+      "FoeEatDamageReflectPct": 0.5,
+      "GridExtents": {
+        "mX": 3,
+        "mY": 2
+      },
+      "GroundTrackName": "ground_swatch",
+      "HideDuringIntro": true,
+      "HitRect": {
+        "mHeight": 340,
+        "mWidth": 115,
+        "mX": 30,
+        "mY": 10
+      },
+      "IsValidPinchTarget": false,
+      "MaxColumn": 7,
+      "MinColumn": 5,
+      "PowerUpDamageModifier": 0.25,
+      "RocketAnimation": "missile",
+      "RocketExplosionAnimation": "missile_explosion",
+      "ShadowOffset": {
+        "x": 55,
+        "y": -50,
+        "z": 0.8
+      },
+      "ShadowScaling": {
+        "x": 4.5,
+        "y": 4.5
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.1,
+      "SquashGridItems": false,
+      "SquashZombies": true,
+      "UnlimitedStages": {
+        "UseUnlimitedStages": true,
+        "DefinedScores": [
+          10000,
+          20000,
+          30000,
+          40000,
+          50000,
+          60000,
+          70000,
+          80000
+        ],
+        "DefinedStagesToInterpolate": [
+          3,
+          3
+        ],
+        "PostDefinedStages": {
+          "HitPoints": 2500,
+          "Score": 10000
+        }
+      },
+      "ConditionImmunities": [
+        {
+          "Condition": "chill",
+          "Percent": 0.1
+        },
+        {
+          "Condition": "freeze"
+        },
+        {
+          "Condition": "stun",
+          "Percent": 0.1
+        },
+        {
+          "Condition": "invisibleslow",
+          "Percent": 0
+        },
+        {
+          "Condition": "stalled",
+          "Percent": 0.1
+        },
+        {
+          "Condition": "sapped"
+        },
+        {
+          "Condition": "poisoned"
+        },
+        {
+          "Condition": "decaypoison"
+        },
+        {
+          "Condition": "shrinking"
+        },
+        {
+          "Condition": "shrunken"
+        },
+        {
+          "Condition": "contagiouspoison"
+        },
+        {
+          "Condition": "dazeystunned",
+          "Percent": 0.1
+        },
+        {
+          "Condition": "stackableslow"
+        },
+        {
+          "Condition": "sweetheartslow"
+        }
+      ],
+      "Stages": [
+        {
+          "Actions": [
+            "RTID(ZombossBattlezCowboyRush2@ZombieActions)",
+            "RTID(ZombossBattlezCowboySpawn1@ZombieActions)",
+            "RTID(ZombossBattlezCowboySpawn1a@ZombieActions)",
+            "RTID(ZombossBattlezCowboyFire1@ZombieActions)"
+          ],
+          "AnimRateModifier": 2,
+          "ChilledDurationFromFrozen": 2,
+          "SlowDurationFromStun": 1.5,
+          "DamageIndexFull": 0,
+          "DamageIndexHalf": 0,
+          "HitPoints": 4000,
+          "IdleTime": {
+            "Max": 1.25,
+            "Min": 0.5
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 1
+        },
+        {
+          "Actions": [
+            "RTID(ZombossBattlezCowboySpawn2@ZombieActions)",
+            "RTID(ZombossBattlezCowboyRush2@ZombieActions)",
+            "RTID(ZombossBattlezCowboySpawn1a@ZombieActions)",
+            "RTID(ZombossBattlezCowboyFire2@ZombieActions)"
+          ],
+          "AnimRateModifier": 2.5,
+          "ChilledDurationFromFrozen": 1.5,
+          "SlowDurationFromStun": 1,
+          "DamageIndexFull": 5,
+          "DamageIndexHalf": 5,
+          "HitPoints": 11500,
+          "IdleTime": {
+            "Max": 1,
+            "Min": 0.3
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 0.75
+        },
+        {
+          "Actions": [
+            "RTID(ZombossBattlezCowboySpawn3@ZombieActions)",
+            "RTID(ZombossBattlezCowboyRush3@ZombieActions)",
+            "RTID(ZombossBattlezCowboySpawn1a@ZombieActions)",
+            "RTID(ZombossBattlezCowboyFire3@ZombieActions)"
+          ],
+          "AnimRateModifier": 3,
+          "ChilledDurationFromFrozen": 1,
+          "SlowDurationFromStun": 0.5,
+          "DamageIndexFull": 6,
+          "DamageIndexHalf": 6,
+          "HitPoints": 19000,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.2
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 0.5
+        }
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness8"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombossMechRiftCowboy"
+    ],
+    "objclass": "ZombieZombossMechCowboyProps",
+    "objdata": {
+      "# Zomboss properties": 0,
+      "AlmanacOffset": {
+        "x": 10,
+        "y": 80
+      },
+      "AlmanacScale": 0.9,
+      "ArmDropFraction": -1,
+      "ArtCenter": {
+        "x": 30,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 125,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanBeFlicked": false,
+      "CanBePlantTossedStrong": false,
+      "CanBePlantTossedWeak": false,
+      "CanSpawnPlantFood": false,
+      "CanTriggerZombieWin": false,
+      "CrosshairAnimation": "missile_lock_reticle",
+      "CrosshairPopAnim": "POPANIM_EFFECTS_ZOMBOSS_MISSILE_EXPLOSION_COWBOY",
+      "FoeEatDamageReflectPct": 0.5,
+      "GridExtents": {
+        "mX": 3,
+        "mY": 2
+      },
+      "GroundTrackName": "ground_swatch",
+      "HideDuringIntro": true,
+      "HitRect": {
+        "mHeight": 340,
+        "mWidth": 115,
+        "mX": 30,
+        "mY": 10
+      },
+      "IsValidPinchTarget": false,
+      "MaxColumn": 7,
+      "MinColumn": 5,
+      "PowerUpDamageModifier": 0.25,
+      "RocketAnimation": "missile",
+      "RocketExplosionAnimation": "missile_explosion",
+      "ShadowOffset": {
+        "x": 55,
+        "y": -50,
+        "z": 0.8
+      },
+      "ShadowScaling": {
+        "x": 4.5,
+        "y": 4.5
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.1,
+      "SquashGridItems": false,
+      "SquashZombies": true,
+      "UnlimitedStages": {
+        "UseUnlimitedStages": true,
+        "DefinedScores": [
+          10000,
+          20000,
+          30000,
+          40000,
+          50000,
+          60000,
+          70000,
+          80000
+        ],
+        "DefinedStagesToInterpolate": [
+          3,
+          3
+        ],
+        "PostDefinedStages": {
+          "HitPoints": 2500,
+          "Score": 10000
+        }
+      },
+      "ConditionImmunities": [
+        {
+          "Condition": "chill",
+          "Percent": 0.1
+        },
+        {
+          "Condition": "freeze"
+        },
+        {
+          "Condition": "stun",
+          "Percent": 0.1
+        },
+        {
+          "Condition": "invisibleslow",
+          "Percent": 0
+        },
+        {
+          "Condition": "stalled",
+          "Percent": 0.1
+        },
+        {
+          "Condition": "sapped"
+        },
+        {
+          "Condition": "poisoned"
+        },
+        {
+          "Condition": "decaypoison"
+        },
+        {
+          "Condition": "shrinking"
+        },
+        {
+          "Condition": "shrunken"
+        },
+        {
+          "Condition": "contagiouspoison"
+        },
+        {
+          "Condition": "dazeystunned",
+          "Percent": 0.1
+        },
+        {
+          "Condition": "stackableslow"
+        },
+        {
+          "Condition": "sweetheartslow"
+        }
+      ],
+      "Stages": [
+        {
+          "Actions": [
+            "RTID(ZombossRiftCowboyRush2@ZombieActions)",
+            "RTID(ZombossRiftCowboySpawn1@ZombieActions)",
+            "RTID(ZombossRiftCowboySpawn1a@ZombieActions)",
+            "RTID(ZombossRiftCowboyFire1@ZombieActions)"
+          ],
+          "AnimRateModifier": 2,
+          "ChilledDurationFromFrozen": 2,
+          "SlowDurationFromStun": 1.5,
+          "DamageIndexFull": 0,
+          "DamageIndexHalf": 0,
+          "HitPoints": 4000,
+          "IdleTime": {
+            "Max": 1.25,
+            "Min": 0.5
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 1
+        },
+        {
+          "Actions": [
+            "RTID(ZombossRiftCowboySpawn2@ZombieActions)",
+            "RTID(ZombossRiftCowboyRush2@ZombieActions)",
+            "RTID(ZombossRiftCowboySpawn1a@ZombieActions)",
+            "RTID(ZombossRiftCowboyFire2@ZombieActions)"
+          ],
+          "AnimRateModifier": 2.5,
+          "ChilledDurationFromFrozen": 1.5,
+          "SlowDurationFromStun": 1,
+          "DamageIndexFull": 5,
+          "DamageIndexHalf": 5,
+          "HitPoints": 11500,
+          "IdleTime": {
+            "Max": 1,
+            "Min": 0.3
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 0.75
+        },
+        {
+          "Actions": [
+            "RTID(ZombossRiftCowboySpawn3@ZombieActions)",
+            "RTID(ZombossRiftCowboyRush3@ZombieActions)",
+            "RTID(ZombossRiftCowboySpawn1a@ZombieActions)",
+            "RTID(ZombossRiftCowboyFire3@ZombieActions)"
+          ],
+          "AnimRateModifier": 3,
+          "ChilledDurationFromFrozen": 1,
+          "SlowDurationFromStun": 0.5,
+          "DamageIndexFull": 6,
+          "DamageIndexHalf": 6,
+          "HitPoints": 19000,
+          "IdleTime": {
+            "Max": 0.5,
+            "Min": 0.2
+          },
+          "RetreatAction": "RTID(ZombossRetreatJump@ZombieActions)",
+          "StunDamageScale": 1,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 0.5
+        }
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness8"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombossMechDark"
+    ],
+    "objclass": "ZombieZombossMechDarkProps",
+    "objdata": {
+      "# Dark Zomboss Properties": 0,
+      "# Zomboss properties": 0,
+      "AlmanacOffset": {
+        "x": 25,
+        "y": 80
+      },
+      "AlmanacScale": 0.9,
+      "ArmDropFraction": -1,
+      "ArtCenter": {
+        "x": 30,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 125,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanBeFlicked": false,
+      "CanBePlantTossedStrong": false,
+      "CanBePlantTossedWeak": false,
+      "CanSpawnPlantFood": false,
+      "CanTriggerZombieWin": false,
+      "CrosshairAnimation": "missile_lock_reticle",
+      "CrosshairPopAnim": "POPANIM_EFFECTS_ZOMBOSS_MISSILE_EXPLOSION_DARK",
+      "FoeEatDamageReflectPct": 0.5,
+      "GridExtents": {
+        "mX": 3,
+        "mY": 2
+      },
+      "GroundTrackName": "ground_swatch",
+      "HideDuringIntro": true,
+      "HitRect": {
+        "mHeight": 340,
+        "mWidth": 115,
+        "mX": 30,
+        "mY": 10
+      },
+      "IsValidPinchTarget": false,
+      "MagnetStunDuration": 2,
+      "MaxColumn": 7,
+      "MinColumn": 1,
+      "PowerUpDamageModifier": 0.25,
+      "RocketAnimation": "missile",
+      "RocketExplosionAnimation": "missile_explosion",
+      "ShadowOffset": {
+        "x": 55,
+        "y": -50,
+        "z": 0.8
+      },
+      "ShadowScaling": {
+        "x": 4.5,
+        "y": 4.5
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.1,
+      "SquashGridItems": false,
+      "SquashZombies": true,
+      "Stages": [
+        {
+          "Actions": [
+            "RTID(ZombossDarkWalk1@ZombieActions)",
+            "RTID(ZombossDarkSpawn1@ZombieActions)",
+            "RTID(ZombossDarkFireBreath1@ZombieActions)",
+            "RTID(ZombossDarkFireballs1@ZombieActions)"
+          ],
+          "AnimRateModifier": 1,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 0,
+          "DamageIndexHalf": 0,
+          "HitPoints": 7000,
+          "IdleTime": {
+            "Max": 2.5,
+            "Min": 1.5
+          },
+          "RetreatAction": "RTID(ZombossDarkWalk1@ZombieActions)",
+          "StunDamageScale": 1.25,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 3
+        },
+        {
+          "Actions": [
+            "RTID(ZombossDarkWalk1@ZombieActions)",
+            "RTID(ZombossDarkSpawn2@ZombieActions)",
+            "RTID(ZombossDarkFireBreath2@ZombieActions)",
+            "RTID(ZombossDarkFireballs2@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.1,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 3,
+          "DamageIndexHalf": 3,
+          "HitPoints": 9000,
+          "IdleTime": {
+            "Max": 2,
+            "Min": 1
+          },
+          "RetreatAction": "RTID(ZombossDarkWalk1@ZombieActions)",
+          "StunDamageScale": 1.25,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 2.5
+        },
+        {
+          "Actions": [
+            "RTID(ZombossDarkWalk1@ZombieActions)",
+            "RTID(ZombossDarkSpawn3@ZombieActions)",
+            "RTID(ZombossDarkFireBreath3@ZombieActions)",
+            "RTID(ZombossDarkFireballs3@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.25,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 6,
+          "DamageIndexHalf": 6,
+          "HitPoints": 11000,
+          "IdleTime": {
+            "Max": 1.5,
+            "Min": 0.75
+          },
+          "RetreatAction": "RTID(ZombossDarkWalk1@ZombieActions)",
+          "StunDamageScale": 1.25,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 2
+        }
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness8"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombossMechDark2"
+    ],
+    "objclass": "ZombieZombossMechDarkProps",
+    "objdata": {
+      "# Dark Zomboss Properties": 0,
+      "# Zomboss properties": 0,
+      "AlmanacOffset": {
+        "x": 10,
+        "y": 80
+      },
+      "AlmanacScale": 0.9,
+      "ArmDropFraction": -1,
+      "ArtCenter": {
+        "x": 30,
+        "y": 130
+      },
+      "AttackRect": {
+        "mHeight": 125,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanBeFlicked": false,
+      "CanBePlantTossedStrong": false,
+      "CanBePlantTossedWeak": false,
+      "CanSpawnPlantFood": false,
+      "CanTriggerZombieWin": false,
+      "CrosshairAnimation": "missile_lock_reticle",
+      "CrosshairPopAnim": "POPANIM_EFFECTS_ZOMBOSS_MISSILE_EXPLOSION_DARK",
+      "FoeEatDamageReflectPct": 0.5,
+      "GridExtents": {
+        "mX": 3,
+        "mY": 2
+      },
+      "GroundTrackName": "ground_swatch",
+      "HideDuringIntro": true,
+      "HitRect": {
+        "mHeight": 340,
+        "mWidth": 115,
+        "mX": 30,
+        "mY": 10
+      },
+      "IsValidPinchTarget": false,
+      "MagnetStunDuration": 2,
+      "MaxColumn": 7,
+      "MinColumn": 1,
+      "PowerUpDamageModifier": 0.25,
+      "RocketAnimation": "missile",
+      "RocketExplosionAnimation": "missile_explosion",
+      "ShadowOffset": {
+        "x": 55,
+        "y": -50,
+        "z": 0.8
+      },
+      "ShadowScaling": {
+        "x": 4.5,
+        "y": 4.5
+      },
+      "SkipHeadDropState": true,
+      "Speed": 0.1,
+      "SquashGridItems": false,
+      "SquashZombies": true,
+      "Stages": [
+        {
+          "Actions": [
+            "RTID(ZombossDarkWalk1@ZombieActions)",
+            "RTID(ZombossDarkSpawn1@ZombieActions)",
+            "RTID(ZombossDarkFireBreath1@ZombieActions)",
+            "RTID(ZombossDarkFireballs1@ZombieActions)"
+          ],
+          "AnimRateModifier": 1,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 0,
+          "DamageIndexHalf": 0,
+          "HitPoints": 7000,
+          "IdleTime": {
+            "Max": 2.5,
+            "Min": 1.5
+          },
+          "RetreatAction": "RTID(ZombossDarkWalk1@ZombieActions)",
+          "StunDamageScale": 1.25,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 3
+        },
+        {
+          "Actions": [
+            "RTID(ZombossDarkWalk1@ZombieActions)",
+            "RTID(ZombossDarkSpawn2@ZombieActions)",
+            "RTID(ZombossDarkFireBreath2@ZombieActions)",
+            "RTID(ZombossDarkFireballs2@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.1,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 3,
+          "DamageIndexHalf": 3,
+          "HitPoints": 9000,
+          "IdleTime": {
+            "Max": 2,
+            "Min": 1
+          },
+          "RetreatAction": "RTID(ZombossDarkWalk1@ZombieActions)",
+          "StunDamageScale": 1.25,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 2.5
+        },
+        {
+          "Actions": [
+            "RTID(ZombossDarkWalk1@ZombieActions)",
+            "RTID(ZombossDarkSpawn3@ZombieActions)",
+            "RTID(ZombossDarkFireBreath3@ZombieActions)",
+            "RTID(ZombossDarkFireballs3@ZombieActions)"
+          ],
+          "AnimRateModifier": 1.25,
+          "ChilledDurationFromFrozen": 10,
+          "DamageIndexFull": 6,
+          "DamageIndexHalf": 6,
+          "HitPoints": 11000,
+          "IdleTime": {
+            "Max": 1.5,
+            "Min": 0.75
+          },
+          "RetreatAction": "RTID(ZombossDarkWalk1@ZombieActions)",
+          "StunDamageScale": 1.25,
+          "StunStaggerBackMovement": 80,
+          "StunStaggerBackTime": 0.4,
+          "StunTime": 2
+        }
+      ],
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness8"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombotanyPeashooterDefault"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 200,
+      "EatDPS": 100,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 270,
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.2,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness2"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombotanyWallnutDefault"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 250,
+      "EatDPS": 0,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 4000,
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.0,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness5"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed1"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombotanyJalapenoDefault"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 200,
+      "EatDPS": 10000,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 270,
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.3,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness2"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieZombotanySquashDefault"
+    ],
+    "objclass": "ZombiePropertySheet",
+    "objdata": {
+      "ArtCenter": {
+        "x": 90,
+        "y": 125
+      },
+      "AttackRect": {
+        "mHeight": 95,
+        "mWidth": 20,
+        "mX": 15,
+        "mY": 0
+      },
+      "CanSpawnPlantFood": true,
+      "Cost": 200,
+      "EatDPS": 10000,
+      "GroundTrackName": "ground_swatch",
+      "HitRect": {
+        "mHeight": 95,
+        "mWidth": 32,
+        "mX": 10,
+        "mY": 10
+      },
+      "Hitpoints": 270,
+      "ShadowOffset": {
+        "x": 5,
+        "y": 0,
+        "z": 1.2
+      },
+      "Speed": 0.3,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness2"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  }
+]

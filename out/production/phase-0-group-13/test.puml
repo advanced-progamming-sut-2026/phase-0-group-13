@@ -1,0 +1,833 @@
+classDiagram
+
+class controller.MainMenuControllers {
+    +void initController()
+    +void handleinput(String)
+    +void exit()
+}
+
+class model.enums.Commands.CollectionMenuCommands {
+    <<enumeration>>
+    ShowPlants
+    ShowAllPlants
+    ShowZombies
+    ShowAllZombies
+    ShowPlant
+    ShowZombie
+    UpgradePlant
+    PurchasePlant
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class model.quest.Quest {
+    -String questName
+    +void start()
+    +void finish()
+}
+
+class view.MainMenuSubMenus.NewsMenuView {
+    +void check(Scanner)
+}
+
+class data.persistence.DataPath {
+    -HashMap~String,Path~ allPaths$
+    -DataPath instance$
+    -void initialize()
+    +DataPath getInstance()$
+    +HashMap~String,Path~ getAllPaths()
+    +Path getPath(String)
+    +void registerPath(String,Path)
+}
+
+class model.account.User {
+    -String username
+    -String passwordHash
+    -String email
+    +void register()
+    +void login()
+    +void changePassword()
+}
+
+class model.enums.Commands.ProfileMenuCommands {
+    <<enumeration>>
+    ChangeUserName
+    ChangeNickName
+    ChangeEmail
+    ChangePassword
+    ShowInfo
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class model.enums.ZombieType {
+    <<enumeration>>
+    NORMAL
+    CONEHEAD
+    BUCKETHEAD
+    GARGANTUAR
+    JALAPENO
+    SQUASH
+    WALL_NUT
+}
+
+class data.repository.ReadOnlyRepository {
+    <<interface>>
+    ~Type findById(int)
+    ~List~Type~ findAll()
+}
+
+class view.SignInMenuView {
+    +void check(Scanner)
+}
+
+class model.zombie.SquashZombie {
+    +void move()
+    +void attack()
+    +void takeDamage()
+}
+
+class model.plant.MeleeAttackerPlant {
+    +void strike()
+}
+
+class model.enums.Commands.Command {
+    <<interface>>
+    ~java.util.regex.Matcher getMatcher(String)
+}
+
+class model.util.Validator {
+    +boolean isValidUserName(String)
+    +boolean isValidPassword(String)
+    +boolean isValidEmail(String)
+}
+
+class data.persistence.JsonSerializer {
+    -Gson gson$
+    +void writeToFile(String,Object)
+    +Type readFromFile(String,Class~Type~)
+}
+
+class model.zombie.ConeheadZombie {
+    +void move()
+    +void attack()
+    +void takeDamage()
+}
+
+class model.plant.StrikeThroughPlant {
+    +void pierce()
+}
+
+class model.core.Session {
+    -User currentUser
+    -boolean stayLoggedIn
+    -boolean authenticated
+    +void login()
+    +void logout()
+    +void restoreSession()
+    +boolean isAuthenticated()
+    +User getCurrentUser()
+}
+
+class data.repository.PlantRepository {
+    -List~Object~ plants
+    +Object findById(int)
+    +List~Object~ findAll()
+}
+
+class controller.BaseController {
+    <<interface>>
+    ~void initController()
+    ~void handleinput(String)
+    ~void exit()
+}
+
+class model.score.Score {
+    -int scoreValue
+    -String username
+    +void setScore(int)
+    +int getScoreValue()
+}
+
+class view.MainMenuSubMenus.ThreadMenuView {
+    +void check(Scanner)
+}
+
+class model.plant.LobberPlant {
+    +void lob()
+}
+
+class model.reward.Inventory {
+    -Map~String,Object~ items
+    +void addItem(String)
+}
+
+class model.shop.ShopItem {
+    -String id
+    -int price
+    -int stock
+    -PlantType plantType
+    +int getPrice()
+    +boolean isAvailable()
+}
+
+class data.persistence.SaveManager {
+    -SaveGameRepository saveRepository
+    -JsonSerializer jsonSerializer
+    +void saveCurrentGame(int)
+    +void loadGame(int)
+}
+
+class model.enums.Menu {
+    <<enumeration>>
+    MainMenu
+    GameMenu
+    SignInMenu
+    SignUpMenu
+    -BaseMenu menu
+    +void checkCommand(Scanner)
+}
+
+class model.zombie.BaseZombie {
+    -String type
+    -int health
+    -double speed
+    +void move()
+    +void attack()
+    +void takeDamage()
+    +String getType()
+    +int getHealth()
+    +double getSpeed()
+    #void setType(String)
+    #void setHealth(int)
+    #void setSpeed(double)
+}
+
+class view.MiniGame.MiniGameView {
+    +void check(Scanner)
+}
+
+class model.enums.Commands.SignUpMenuCommands {
+    <<enumeration>>
+    Register
+    PickQuestion
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class model.game.Board {
+    -int rows
+    -int columns
+    -Tile[][] tiles
+    +void initialize()
+    +void placePlant()
+    +void spawnZombie()
+    +int getRows()
+    +int getColumns()
+}
+
+class view.PlantSelectionMenuView {
+    +void check(Scanner)
+}
+
+class model.minigame.MiniGame {
+    <<abstract>>
+    -boolean started
+    -int score
+    +void start()
+    +void end()
+    +boolean checkWinCondition()*
+    +int getScore()
+}
+
+class model.plant.MintPlanet {
+    +void refresh()
+}
+
+class model.plant.ExplosivePlant {
+    +void explode()
+}
+
+class model.TimeObservers.Makingsun {
+    +void onTick()
+    +void update()
+}
+
+class data.repository.LeaderBoardRepository {
+    -List~Object~ entries
+    +void save(Object)
+    +void update(Object)
+    +void delete(Object)
+    +Object findById(int)
+    +List~Object~ findAll()
+}
+
+class model.enums.Commands.SettingsMenuCommands {
+    <<enumeration>>
+    ChangeDifficulty
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class model.plant.HomingPlant {
+    +void homeToTarget()
+}
+
+class model.account.Progress {
+    -int passedLevels
+    -int completedMiniGames
+    -int highScore
+    +void passLevel()
+    +void completeMiniGame()
+    +void updateHighScore()
+}
+
+class Main {
+    +void main(String[])$
+}
+
+class model.util.PasswordHash {
+    +String hashPassword(String)$
+    +boolean verifyPassword(String,String)$
+}
+
+class model.greenhouse.PlantUpgrade {
+    -String fromPlant
+    -String toPlant
+    -int requiredSun
+    +void applyUpgrade()
+}
+
+class view.MainMenuSubMenus.ProfileMenuView {
+    +void check(Scanner)
+}
+
+class model.enums.Commands.ScoreBoardMenuCommands {
+    <<enumeration>>
+    SortByLastPassedLevel
+    SortByMiniGames
+    SortByDailyQuests
+    SortByQuests
+    SortByHighScore
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class view.BaseMenu {
+    <<interface>>
+    ~void check(Scanner)
+}
+
+class model.plant.ShooterPlant {
+    +void shoot()
+}
+
+class view.MainMenuSubMenus.GameMenuView {
+    +void check(Scanner)
+}
+
+class model.TimeObservers.Observer {
+    <<interface>>
+    ~void update()
+}
+
+class view.MainMenuSubMenus.GameMenuSubMenus.ScoreBoardMenuView {
+    +void check(Scanner)
+}
+
+class controller.MiniGameController {
+    +void initController()
+    +void handleinput(String)
+    +void exit()
+}
+
+class controller.SignUpMenuController {
+    +void initController()
+    +void handleinput(String)
+    +void exit()
+}
+
+class data.repository.CrudRepository {
+    <<interface>>
+    ~void save(Type)
+    ~void update(Type)
+    ~void delete(Type)
+}
+
+class model.account.PlayerProfile {
+    -String nickname
+    -String gender
+    -Progress progress
+    +void showInfo()
+    +void changeNickname()
+    +void changeEmail()
+}
+
+class model.zombie.NormalZombie {
+    +void move()
+    +void attack()
+    +void takeDamage()
+}
+
+class model.enums.Commands.MainMenuCommands {
+    <<enumeration>>
+    Logout
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class model.plant.Factory.PlantFactory {
+    +Object createPlant(String)
+}
+
+class model.enums.Commands.GameMenuCommands {
+    <<enumeration>>
+    EnterChapter
+    GreenHouse
+    TravelLog
+    LeaderBoard
+    CoinWallet
+    GemWallet
+    CheatAdd
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class view.MainMenuSubMenus.GameMenuSubMenus.GreenHouseView {
+    +void check(Scanner)
+}
+
+class model.core.Router {
+    -Menu currentMenu
+    -Menu previousMenu
+    -Router instance$
+    +Router getInstance()$
+    +Menu getCurrentMenu()
+    +Menu getPreviousMenu()
+    +void enterMenu()
+    +void enterMenu(Menu)
+    +void exitMenu()
+    +void exitMenu(Menu)
+    +void showCurrentMenu()
+}
+
+class view.AppView {
+    +void run()$
+}
+
+class model.zombie.BucketheadZombie {
+    +void move()
+    +void attack()
+    +void takeDamage()
+}
+
+class model.reward.Unlockable {
+    -String targetId
+    -boolean unlocked
+    +void unlock()
+}
+
+class controller.MainMenuSubControllers.MiniGames.MiniGameController {
+    +void initController()
+    +void handleinput(String)
+    +void exit()
+}
+
+class model.plant.WallNutsPlant {
+    +void absorbDamage()
+}
+
+class model.core.GameManager {
+    -Board board
+    -int sunAmount
+    -int plantFoodCount
+    -boolean running
+    +void startGame()
+    +void advanceTime()
+    +void endGame()
+    +int getSunAmount()
+    +int getPlantFoodCount()
+}
+
+class view.MainMenuSubMenus.GameMenuSubMenus.QuestView {
+    +void check(Scanner)
+}
+
+class model.zombie.GargantuarZombie {
+    +void move()
+    +void attack()
+    +void takeDamage()
+}
+
+class controller.MainMenuSubControllers.GameMenuController {
+    +void initController()
+    +void handleinput(String)
+    +void exit()
+}
+
+class data.repository.ZombieRepository {
+    -List~Object~ zombies
+    +Object findById(int)
+    +List~Object~ findAll()
+}
+
+class model.enums.Commands.PlantSelectionMenuCommands {
+    <<enumeration>>
+    ShowAllPlants
+    ShowAvailablePlants
+    AddPlant
+    RemovePlant
+    BoostPlant
+    StartGame
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class model.reward.Currency {
+    -int coins
+    -int diamonds
+    +void addCoins(int)
+    +void addDiamonds(int)
+}
+
+class controller.MainMenuSubControllers.NewsMenuController {
+    +void initController()
+    +void handleinput(String)
+    +void exit()
+}
+
+class controller.MainMenuSubControllers.GameMenuSubControllers.ScoreBoardMenuController {
+    +void initController()
+    +void handleinput(String)
+    +void exit()
+}
+
+class model.plant.SunProducerPlant {
+    +void produceSun()
+}
+
+class model.game.MatchResult {
+    -boolean won
+    -int score
+    -int rewardCoins
+    +void markWin()
+    +void markLose()
+    +void calculateRewards()
+    +boolean isWon()
+    +int getScore()
+    +int getRewardCoins()
+}
+
+class model.util.InputParser {
+    +String[] tokenize(String)
+    +String extractFlagValue(String,String)
+    +String normalize(String)
+}
+
+class model.enums.Commands.GamePlayMenuCommands {
+    <<enumeration>>
+    AdvanceTime
+    CollectSun
+    ShowSunAmount
+    CheatAddSuns
+    ReleaseTheNuke
+    PlantPlant
+    CheatRemoveCooldown
+    PluckPlant
+    FeedPlant
+    CheatAddPlantFood
+    ShowMap
+    ShowPlantsStatus
+    ShowTileStatus
+    CheatSpawnZombie
+    StartZombieWaves
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class data.repository.UserRepository {
+    -List~Object~ users
+    +void save(Object)
+    +void update(Object)
+    +void delete(Object)
+    +Object findById(int)
+    +List~Object~ findAll()
+}
+
+class controller.MainMenuSubControllers.SettingMenuController {
+    +void initController()
+    +void handleinput(String)
+    +void exit()
+}
+
+class model.enums.PlantType {
+    <<enumeration>>
+    PEASHOOTER
+    REPEATER
+    SUNFLOWER
+    WALL_NUT
+    TNT
+    MINT
+    WALL_NUTS
+    CABBAGE_PULT
+    MELON_PULT
+    MELON
+    FUMESHROOM
+}
+
+class model.shop.Shop {
+    +void listItems()
+    +void buyItem(String,int,String)
+}
+
+class view.MainMenuSubMenus.SettingsMenuView {
+    +void check(Scanner)
+}
+
+class model.greenhouse.GreenHouse {
+    -int capacity
+    +void showAllPlants()
+    +void collectPlant()
+}
+
+class model.zombie.JalapenoZombie {
+    +void move()
+    +void attack()
+    +void takeDamage()
+}
+
+class controller.SignInMenuController {
+    +void initController()
+    +void handleinput(String)
+    +void exit()
+}
+
+class model.enums.AppStation {
+    <<enumeration>>
+    SIGN_UP
+    SIGN_IN
+    MAIN_MENU
+    GAME_MENU
+    COLLECTION_MENU
+    SHOP_MENU
+    GREENHOUSE_MENU
+    NEWS_MENU
+    PROFILE_MENU
+    SETTINGS_MENU
+    QUEST_MENU
+    SCORE_BOARD_MENU
+    LEADERBOARD_MENU
+}
+
+class model.enums.Commands.MenuCommands {
+    <<enumeration>>
+    EnterMenu
+    ShowCurrentMenu
+    ExitMenu
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class model.enums.Commands.ShopMenuCommands {
+    <<enumeration>>
+    List
+    Daily
+    Buy
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class model.game.TileEffects.TileEffect {
+    -String name
+    -int duration
+    -boolean active
+    +void apply()
+    +void tick()
+    +void remove()
+}
+
+class model.Result {
+    -boolean success
+    -String message
+    -Object object
+    +boolean success()
+    +Object getObject()
+    +String message()
+    +void setSuccess(boolean)
+    +void setMessage(String)
+}
+
+class view.MainMenuSubMenus.GameMenuSubMenus.ShopView {
+    +void check(Scanner)
+}
+
+class view.CollectionMenuView {
+    +void check(Scanner)
+}
+
+class model.core.App {
+    +boolean shouldExit$
+    -Menu currentMenu$
+    +Menu getCurrentMenu()$
+    +void setCurrentMenu(Menu)$
+}
+
+class model.reward.Reward {
+    <<abstract>>
+    +void apply()*
+}
+
+class model.enums.Commands.SignInMenuCommands {
+    <<enumeration>>
+    Login
+    ForgetPassword
+    Answer
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class model.game.TileEffects.TombStoneEffect {
+    -int health
+    -boolean blocksShots
+    +void takeDamage()
+    +void breakStone()
+    +boolean isBlocksShots()
+}
+
+class view.MainMenuView {
+    +void check(Scanner)
+}
+
+class model.zombie.WallNutZombie {
+    +void move()
+    +void attack()
+    +void takeDamage()
+}
+
+class model.plant.ModifierPlant {
+    +void modify()
+}
+
+class model.enums.Commands.NewsMenuCommands {
+    <<enumeration>>
+    ShowUnread
+    ShowAll
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class view.MainMenuSubMenus.GameMenuSubMenus.MiniGames.MiniGame {
+    +void check(Scanner)
+}
+
+class data.repository.SaveGameRepository {
+    -List~Object~ saves
+    +void save(Object)
+    +void update(Object)
+    +void delete(Object)
+    +Object findById(int)
+    +List~Object~ findAll()
+}
+
+class model.enums.Commands.QuestMenuCommands {
+    <<enumeration>>
+    TravelLogPage
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+class model.plant.BasePlant {
+    <<abstract>>
+    -int health
+    -int cost
+    +int getHealth()
+    +void setHealth(int)
+    +int getCost()
+    +void setCost(int)
+    +void act()*
+}
+
+class model.game.Tile {
+    -BasePlant plant
+    -BaseZombie zombie
+    -TileEffect effect
+    +void addPlant()
+    +void addZombie()
+    +void clearTile()
+}
+
+class controller.MainMenuSubControllers.ProfileMenuController {
+    +void initController()
+    +void handleinput(String)
+    +void exit()
+}
+
+class view.SignUpMenuView {
+    +void check(Scanner)
+}
+
+class model.zombie.SunSpawnerZombie {
+    +void move()
+    +void attack()
+    +void takeDamage()
+}
+
+class model.score.LeaderBoard {
+    -List~Score~ scores
+    +void addScore(Score)
+    +List~Score~ getScores()
+}
+
+class model.enums.Commands.GreenHouseMenuCommands {
+    <<enumeration>>
+    ShowGreenHouse
+    PlantPot
+    Collect
+    Grow
+    EnterShop
+    -String pattern
+    +Matcher getMatcher(String)
+}
+
+controller.BaseController <|.. controller.MainMenuControllers
+view.BaseMenu <|.. view.MainMenuSubMenus.NewsMenuView
+view.BaseMenu <|.. view.SignInMenuView
+model.zombie.BaseZombie <|-- model.zombie.SquashZombie
+model.zombie.BaseZombie <|-- model.zombie.ConeheadZombie
+data.repository.ReadOnlyRepository <|.. data.repository.PlantRepository
+view.BaseMenu <|.. view.MainMenuSubMenus.ThreadMenuView
+view.BaseMenu <|.. view.MiniGame.MiniGameView
+view.BaseMenu <|.. view.PlantSelectionMenuView
+model.TimeObservers.Observer <|.. model.TimeObservers.Makingsun
+data.repository.CrudRepository <|.. data.repository.LeaderBoardRepository
+view.BaseMenu <|.. view.MainMenuSubMenus.ProfileMenuView
+view.BaseMenu <|.. view.MainMenuSubMenus.GameMenuView
+view.BaseMenu <|.. view.MainMenuSubMenus.GameMenuSubMenus.ScoreBoardMenuView
+controller.BaseController <|.. controller.MiniGameController
+controller.BaseController <|.. controller.SignUpMenuController
+data.repository.ReadOnlyRepository <|-- data.repository.CrudRepository
+model.zombie.BaseZombie <|-- model.zombie.NormalZombie
+view.BaseMenu <|.. view.MainMenuSubMenus.GameMenuSubMenus.GreenHouseView
+model.zombie.BaseZombie <|-- model.zombie.BucketheadZombie
+controller.BaseController <|.. controller.MainMenuSubControllers.MiniGames.MiniGameController
+view.BaseMenu <|.. view.MainMenuSubMenus.GameMenuSubMenus.QuestView
+model.zombie.BaseZombie <|-- model.zombie.GargantuarZombie
+controller.BaseController <|.. controller.MainMenuSubControllers.GameMenuController
+data.repository.ReadOnlyRepository <|.. data.repository.ZombieRepository
+controller.BaseController <|.. controller.MainMenuSubControllers.NewsMenuController
+controller.BaseController <|.. controller.MainMenuSubControllers.GameMenuSubControllers.ScoreBoardMenuController
+data.repository.CrudRepository <|.. data.repository.UserRepository
+controller.BaseController <|.. controller.MainMenuSubControllers.SettingMenuController
+view.BaseMenu <|.. view.MainMenuSubMenus.SettingsMenuView
+model.zombie.BaseZombie <|-- model.zombie.JalapenoZombie
+controller.BaseController <|.. controller.SignInMenuController
+view.BaseMenu <|.. view.MainMenuSubMenus.GameMenuSubMenus.ShopView
+view.BaseMenu <|.. view.CollectionMenuView
+model.game.TileEffects.TileEffect <|-- model.game.TileEffects.TombStoneEffect
+view.BaseMenu <|.. view.MainMenuView
+model.zombie.BaseZombie <|-- model.zombie.WallNutZombie
+view.BaseMenu <|.. view.MainMenuSubMenus.GameMenuSubMenus.MiniGames.MiniGame
+data.repository.CrudRepository <|.. data.repository.SaveGameRepository
+controller.BaseController <|.. controller.MainMenuSubControllers.ProfileMenuController
+view.BaseMenu <|.. view.SignUpMenuView
+model.zombie.BaseZombie <|-- model.zombie.SunSpawnerZombie
