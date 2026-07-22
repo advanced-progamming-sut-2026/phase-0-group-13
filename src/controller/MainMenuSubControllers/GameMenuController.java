@@ -19,10 +19,10 @@ public class GameMenuController implements BaseController {
   public void handleinput(String command) {
     Matcher matcher;
 
-    if ((matcher = MenuCommands.EnterMenu.getMatcher(command)) != null) {
-      handleEnterMenu(matcher.group("menuName").trim().toLowerCase());
-    } else if ((matcher = GameMenuCommands.EnterChapter.getMatcher(command)) != null) {
+    if ((matcher = GameMenuCommands.EnterChapter.getMatcher(command)) != null) {
       handleEnterChapter(matcher.group("chapterName"));
+    } else if ((matcher = MenuCommands.EnterMenu.getMatcher(command)) != null) {
+      handleEnterMenu(matcher.group("menuName").trim().toLowerCase());
     } else if (GameMenuCommands.GreenHouse.getMatcher(command) != null) {
       App.setCurrentMenu(Menu.GreenHouseMenu);
     } else if (GameMenuCommands.TravelLog.getMatcher(command) != null) {
@@ -113,7 +113,8 @@ public class GameMenuController implements BaseController {
   }
 
   private void handleCheatAdd(String countStr, String currency) {
-    if (UserManager.getInstance().getCurrentUser() == null) {
+    User currentUser = UserManager.getInstance().getCurrentUser();
+    if (currentUser == null) {
       System.out.println("error: no user logged in");
       return;
     }
@@ -123,6 +124,15 @@ public class GameMenuController implements BaseController {
       count = Integer.parseInt(countStr);
     } catch (NumberFormatException e) {
       System.out.println("error: invalid count");
+      return;
+    }
+
+    if (currency.equalsIgnoreCase("coin")) {
+      currentUser.addCoins(count);
+    } else if (currency.equalsIgnoreCase("diamond")) {
+      currentUser.addDiamonds(count);
+    } else {
+      System.out.println("error: invalid currency");
       return;
     }
 

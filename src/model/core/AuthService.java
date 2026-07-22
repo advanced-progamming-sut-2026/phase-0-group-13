@@ -8,6 +8,7 @@ import model.Result;
 public class AuthService {
   private static final String SPECIAL_CHARS = "?><,\"';:\\/|][}{+=)(*&^%$#!";
   private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9-]+$");
+
   public static String hashPassword(String password) {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-256");

@@ -68,7 +68,7 @@ public class MainMenuControllers implements BaseController {
   private void handleLogout() {
     UserManager.getInstance().logout();
     System.out.println("Logged out successfully.");
-    App.setCurrentMenu(Menu.SignUpMenu);
+    App.setCurrentMenu(Menu.SignInMenu);
   }
 
   @Override

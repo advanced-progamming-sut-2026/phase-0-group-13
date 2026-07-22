@@ -15,6 +15,7 @@ public class UserManager {
   private final String usersFilePath;
   private User currentUser;
   private User recoveryUser;
+  private User pendingUser;
   private boolean isStayLoggedIn = false;
 
   private UserManager() {
@@ -55,11 +56,8 @@ public class UserManager {
     if (!genderCheck.success()) throw new Exception(genderCheck.message());
 
     String hashedPass = AuthService.hashPassword(password);
-    User newUser = new User(username, hashedPass, email, nickname, gender);
 
-    users.add(newUser);
-
-    saveUsersToJSON();
+    this.pendingUser = new User(username, hashedPass, email, nickname, gender);
   }
 
   public void loginUser(String username, String password, boolean stayLoggedIn) throws Exception {
@@ -100,11 +98,16 @@ public class UserManager {
   }
 
   public void setSecurityQuestionForLatestUser(String qNumber, String answer) throws Exception {
-    if (users.isEmpty()) throw new Exception("error: no user registered yet");
+    if (this.pendingUser == null) {
+      throw new Exception("error: no pending registration — please register first");
+    }
 
-    User latestUser = users.get(users.size() - 1);
-    latestUser.setSecurityQuestion(qNumber, answer);
+    this.pendingUser.setSecurityQuestion(qNumber, answer);
+
+    this.users.add(this.pendingUser);
     saveUsersToJSON();
+
+    this.pendingUser = null;
   }
 
   public String initiatePasswordRecovery(String username, String email) throws Exception {
