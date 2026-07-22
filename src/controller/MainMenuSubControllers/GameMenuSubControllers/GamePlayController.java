@@ -456,6 +456,11 @@ public class GamePlayController implements BaseController {
     gm.getMatchContext().setMatchWon(result.isWon());
     user.evaluateContextualQuests(gm.getMatchContext());
 
+    // Credit coins/diamonds/pots that zombies dropped during the match.
+    for (model.game.reward.Reward earned : result.getEarnedRewards()) {
+      earned.apply(user);
+    }
+
     if (result.isWon()) {
       Progress progress = user.getProgress();
       model.Result reward =
