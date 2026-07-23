@@ -15,7 +15,7 @@ public enum GamePlayMenuCommands implements Command {
   FeedPlant("feed\\s+plant\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),
   CheatAddPlantFood("cheat\\s+add-plant-food"),
   ShowMap("show\\s+map"),
-  ShowPlantsStatus("show\\s+plant\\s+status"),
+  ShowPlantsStatus("show\\s+plants?\\s+status"),
   ShowTileStatus("show\\s+tile\\s+status\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),
   ZombiesInfo("zombies\\s+info"),
   CheatSpawnZombie(

@@ -24,7 +24,7 @@ public class ProduceSunAction implements PlantAction {
 
       System.out.printf(
           "Plant %s produced a sun at (%d, %d).%n",
-          plant.getName(), plant.getCol(), plant.getRow());
+          plant.getName(), plant.getCol() + 1, plant.getRow() + 1);
     }
   }
 }

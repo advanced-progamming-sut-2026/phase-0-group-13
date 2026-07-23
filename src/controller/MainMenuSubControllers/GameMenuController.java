@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import model.account.AdventureMap;
 import model.account.User;
 import model.core.App;
+import model.core.MatchLauncher;
 import model.core.MatchSetup;
 import model.enums.Commands.GameMenuCommands;
 import model.enums.Commands.MenuCommands;
@@ -83,6 +84,16 @@ public class GameMenuController implements BaseController {
 
     user.clearDeck();
     MatchSetup.getInstance().setTargetChapter(chapterName);
+
+    int levelInStage = user.getProgress().getCurrentLevel();
+    if (MatchLauncher.skipsPlantSelection(stageNumber, levelInStage)) {
+      // مرحله نوار نقاله: انتخاب گیاه ندارد، خود نوار گیاه تحویل می‌دهد
+      MatchSetup.getInstance().setSelectedPlants(user.getUnlockedPlants());
+      System.out.println(
+          "Entering " + chapterName + ". Conveyor level: the belt delivers your plants!");
+      MatchLauncher.launch();
+      return;
+    }
 
     System.out.println(
         "Entering " + chapterName + ". Choose your plants for the Seed Bank before starting.");

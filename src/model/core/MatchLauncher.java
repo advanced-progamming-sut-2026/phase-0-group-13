@@ -130,7 +130,11 @@ public final class MatchLauncher {
     }
   }
 
+  private static final int EARLY_LEVEL_MAX_ZOMBIE_HP = 600;
+  private static final int EARLY_LEVEL_THRESHOLD = 2;
+
   private static List<Wave> buildWaves(int stage, Season season) {
+    int level = levelNumber(stage);
     List<String> zombieNames = new ArrayList<>();
     for (Zombie zombie : season.getAvailableZombies()) {
       if (zombie.getName() != null && !zombieNames.contains(zombie.getName())) {
@@ -144,7 +148,34 @@ public final class MatchLauncher {
         }
       }
     }
-    return WaveGenerator.generate(levelNumber(stage), zombieNames);
+
+    List<String> pool = filterPoolForLevel(level, season, zombieNames);
+    return WaveGenerator.generate(level, pool);
+  }
+
+  /** Intro levels should not spawn boss-tier zombies (Gargantuar, mechs, ...). */
+  private static List<String> filterPoolForLevel(
+      int level, Season season, List<String> zombieNames) {
+    if (level > EARLY_LEVEL_THRESHOLD) {
+      return zombieNames;
+    }
+    List<String> gentle = new ArrayList<>();
+    for (Zombie zombie : season.getAvailableZombies()) {
+      if (zombie.getName() != null
+          && zombie.getMaxHealth() <= EARLY_LEVEL_MAX_ZOMBIE_HP
+          && !gentle.contains(zombie.getName())) {
+        gentle.add(zombie.getName());
+      }
+    }
+    return gentle.isEmpty() ? zombieNames : gentle;
+  }
+
+  /**
+   * The Conveyor Belt special level (chapter 1, level 2) skips plant selection entirely: the belt
+   * delivers plants on its own, so entering it launches the battle directly.
+   */
+  public static boolean skipsPlantSelection(int stage, int levelInStage) {
+    return stage == 1 && levelInStage == 2;
   }
 
   /** Overall level index across chapters, used to scale wave difficulty. */

@@ -8,7 +8,10 @@ public class MatchResult {
   private boolean won;
   private int score;
   private int rewardCoins;
-  private final List<Reward> earnedRewards = new ArrayList<>();
+
+  // transient: فقط وضعیت حین مچه؛ آخر مچ به کیف پول اعمال میشه. اگه توی Users.json ذخیره بشه
+  // Gson موقع لود نمی‌تونه اینترفیس Reward رو بسازه و کل دیتابیس یوزرها می‌پره
+  private transient List<Reward> earnedRewards = new ArrayList<>();
 
   public void markWin() {
     won = true;
@@ -24,13 +27,17 @@ public class MatchResult {
   // اعمال واقعی این جایزه‌ها رو یوزر (calculateRewards/applyScoresToUser) هنوز کار GamePlayController
   // موقع پایان مچه
   public void addEarnedReward(Reward reward) {
-    if (reward != null) {
-      earnedRewards.add(reward);
+    if (reward == null) {
+      return;
     }
+    if (earnedRewards == null) {
+      earnedRewards = new ArrayList<>();
+    }
+    earnedRewards.add(reward);
   }
 
   public List<Reward> getEarnedRewards() {
-    return earnedRewards;
+    return earnedRewards != null ? earnedRewards : new ArrayList<>();
   }
 
   public boolean isWon() {
