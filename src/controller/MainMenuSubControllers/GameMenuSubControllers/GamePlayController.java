@@ -115,11 +115,21 @@ public class GamePlayController implements BaseController {
     }
     for (int i = 0; i < count && gm.isRunning(); i++) {
       gm.advanceTime();
+      printGameLogs(gm);
     }
     reportZombieKillsToQuests(gm);
     reportContextualQuestProgress(gm);
     if (!gm.isRunning()) {
       finishMatch(gm);
+    }
+  }
+
+  private void printGameLogs(GameManager gm) {
+    List<String> logs = gm.pollLogs();
+    if (logs != null && !logs.isEmpty()) {
+      for (String log : logs) {
+        System.out.println("📢 " + log);
+      }
     }
   }
 
@@ -169,8 +179,7 @@ public class GamePlayController implements BaseController {
 
     Plant plant = null;
     try {
-      plant =
-              new PlantFactory(GameDataManager.plantRepository).createPlant(type, rc[0], rc[1], userLevel);
+      plant = new PlantFactory(GameDataManager.plantRepository).createPlant(type, rc[0], rc[1], userLevel);
     } catch (RuntimeException e) {
       System.out.println("error: could not build plant '" + type + "'");
       return;
@@ -300,7 +309,6 @@ public class GamePlayController implements BaseController {
     }
     System.out.println("Nuke released. Zombies wiped: " + killed);
     if (killed >= 2) {
-
       gm.registerCombatEvent(ScoreEvent.SIMULTANEOUS_KILL);
     }
   }
@@ -370,38 +378,67 @@ public class GamePlayController implements BaseController {
       }
     }
   }
-
   private void renderMap(GameManager gm) {
     Board board = gm.getBoard();
-    System.out.printf(
-            "=== Wave %d/%d | Sun: %d | Plant Food: %d ===%n",
-            gm.getCurrentWaveIndex() + 1, gm.getTotalWaves(), gm.getSunAmount(),
-            gm.getPlantFoodCount());
+    System.out.println("\n=========================================================================================");
+    System.out.printf("  🌊 Wave: %d/%d | ☀️ Sun: %d | 🧪 Plant Food: %d%n",
+            gm.getCurrentWaveIndex() + 1, gm.getTotalWaves(), gm.getSunAmount(), gm.getPlantFoodCount());
+    System.out.println("=========================================================================================");
+
+    System.out.println("       1        2        3        4        5        6        7        8        9");
+    System.out.println("   +--------+--------+--------+--------+--------+--------+--------+--------+--------+");
+
     for (int row = 0; row < board.getRows(); row++) {
-      StringBuilder line = new StringBuilder();
+      StringBuilder entityLine = new StringBuilder(" " + (row + 1) + " |");
+      StringBuilder healthLine = new StringBuilder("   |");
+
       for (int col = 0; col < board.getColumns(); col++) {
-        line.append('[').append(cellGlyph(board, row, col)).append(']');
+        String[] cellData = getCellDetails(board, row, col);
+        entityLine.append(String.format(" %-6s |", cellData[0]));
+        healthLine.append(String.format(" %-6s |", cellData[1]));
       }
-      String mower = board.getLawnmowers().get(row).isActive() ? "mower" : "used";
-      System.out.println(line + "  " + mower);
+
+      String mower = board.getLawnmowers().get(row).isActive() ? "🚜 MOWER" : "❌ USED";
+      System.out.println(entityLine.toString() + "  " + mower);
+      System.out.println(healthLine.toString());
+      System.out.println("   +--------+--------+--------+--------+--------+--------+--------+--------+--------+");
     }
+    System.out.println("Guide: Z=Zombie, P=Plant, #=Tile Effect (gravestone/water) | Bottom Numbers: HP");
   }
 
-  private char cellGlyph(Board board, int row, int col) {
+  private String[] getCellDetails(Board board, int row, int col) {
+    StringBuilder entities = new StringBuilder();
+    StringBuilder healths = new StringBuilder();
+
     for (Zombie z : board.getZombies()) {
       if (z.getRow() == row && Math.round(z.getX()) == col) {
-        return 'Z';
+        entities.append("Z");
+        healths.append(z.getCurrentHealth());
+        break;
       }
     }
+
     Plant plant = board.getPlantAt(row, col);
     if (plant != null && plant.getName() != null && !plant.getName().isEmpty()) {
-      return Character.toUpperCase(plant.getName().charAt(0));
+      if (entities.length() > 0) {
+        entities.append("/");
+        healths.append("/");
+      }
+      entities.append(Character.toUpperCase(plant.getName().charAt(0)));
+      healths.append(plant.getCurrentHealth());
     }
+
     Tile tile = board.getTile(row, col);
-    if (tile != null && tile.getEffect() != null) {
-      return '#';
+    if (entities.length() == 0 && tile != null && tile.getEffect() != null) {
+      entities.append("#");
     }
-    return '.';
+
+    if (entities.length() == 0) {
+      entities.append(".");
+      healths.append("-");
+    }
+
+    return new String[]{entities.toString(), healths.toString()};
   }
 
   private void finishMatch(GameManager gm) {
@@ -446,7 +483,6 @@ public class GamePlayController implements BaseController {
     gm.getScoreManager().applyScoresToUser(user);
 
     if (gm.isBonusMatch()) {
-
       saveUserState();
       return;
     }
@@ -456,7 +492,6 @@ public class GamePlayController implements BaseController {
     gm.getMatchContext().setMatchWon(result.isWon());
     user.evaluateContextualQuests(gm.getMatchContext());
 
-    // Credit coins/diamonds/pots that zombies dropped during the match.
     for (model.game.reward.Reward earned : result.getEarnedRewards()) {
       earned.apply(user);
     }

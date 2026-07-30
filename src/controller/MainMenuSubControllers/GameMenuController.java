@@ -121,6 +121,10 @@ public class GameMenuController implements BaseController {
       return;
     }
     System.out.println("Your " + currency + " balance will be shown here.");
+    if (currency.equalsIgnoreCase("coin"))
+    System.out.println(UserManager.getInstance().getCurrentUser().getCoins() + " coins.");
+    if (currency.equalsIgnoreCase("diamond"))
+      System.out.println(UserManager.getInstance().getCurrentUser().getDiamonds() + " diamonds.");
   }
 
   private void handleCheatAdd(String countStr, String currency) {

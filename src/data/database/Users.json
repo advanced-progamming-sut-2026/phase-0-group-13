@@ -1,0 +1,386 @@
+[
+  {
+    "gender": "male",
+    "unlockedPlants": [
+      "peashooter",
+      "sunflower",
+      "wall-nut",
+      "potato-mine",
+      "cabbage-pult",
+      "puff-shroom"
+    ],
+    "unlockedZombies": [],
+    "recentGames": [],
+    "unlockedStages": [
+      "stage_1"
+    ],
+    "progress": {
+      "currentStage": 1,
+      "currentLevel": 1,
+      "miniGamesUnlocked": false,
+      "survivalModeUnlocked": false,
+      "unlockedMiniGames": [],
+      "maxClearedStage": 0,
+      "maxClearedLevel": 0
+    },
+    "inventory": {
+      "items": {
+        "pot": 2,
+        "seed_wall-nut": 10
+      }
+    },
+    "greenHouse": {
+      "maxCapacity": 20,
+      "pots": [
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        }
+      ]
+    },
+    "newsBox": {
+      "readNews": [],
+      "unreadNews": []
+    },
+    "quests": [
+      {
+        "نام کوئست ها": "آفتاب گیر روزانه",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "جمع آوری sun_amount واحد خورشید در طول یک روز",
+        "نوع پاداش": "sun_amount / ۱۰۰ سکه",
+        "اولویت": "متوسط",
+        "متغیر": "3000-4000-5000",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "شکارچی chapter",
+        "دسته بندی": "اصلی",
+        "شرط تکمیلی": "شکست دادن ۵۰ زامبی از فصل chapter",
+        "نوع پاداش": "۱۰ پک دانه",
+        "اولویت": "بالا",
+        "متغیر": "هرکدام از فصل‌های بازی",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "plant باز حرفه‌ای",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "ده تا زامبی را فقط با plant بکش",
+        "نوع پاداش": "گیاه جدید شانسی",
+        "اولویت": "بالا",
+        "متغیر": "هر گیاهی که قابلیت کشتن دارد",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "only cactus",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "ده تا زامبی را فقط با کاکتوس بکش",
+        "نوع پاداش": "۲۰ الماس (Gem)",
+        "اولویت": "بالا",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "گیاه خوار اقتصادی",
+        "دسته بندی": "اصلی",
+        "شرط تکمیلی": "پیروزی در یک مرحله بدون از دست دادن بیش از n گیاه",
+        "نوع پاداش": "۲۰ - n پک دانه",
+        "اولویت": "بالا",
+        "متغیر": "0-1-2-3-4-5",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "استاد دفاع",
+        "دسته بندی": "چالش (Epic)",
+        "شرط تکمیلی": "اتمام یک مرحله دقیقا با صفر خورشید",
+        "نوع پاداش": "۲۰۰ الماس (Gem)",
+        "اولویت": "بحرانی",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "سرعت عمل",
+        "دسته بندی": "اصلی",
+        "شرط تکمیلی": "کشتن ۱۰ زامبی در کمتر از ۳۰ ثانیه از شروع موج اول حمله زامبی ها",
+        "نوع پاداش": "۵۰۰ سکه (Coin)",
+        "اولویت": "متوسط",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "تخریب گر حرفه ای",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "استفاده از ۳ گیاه انفجاری در یک مرحله",
+        "نوع پاداش": "۱۰۰ سکه (Coin)",
+        "اولویت": "کم",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "تقارن",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "باغچه بازی در نهایت باید متقارن باشد",
+        "نوع پاداش": "۵۰۰ سکه (Coin)",
+        "اولویت": "بالا",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "کشتار خانوادگی",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "تنها از گیاهان family_type برای کشتن زامبی ها استفاده شود",
+        "نوع پاداش": "۱۰۰۰ سکه",
+        "اولویت": "متوسط",
+        "متغیر": "خانواده‌ی گیاهان",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "شکوفایی در محدودیت‌ها",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "برای برد در مرحله از هیچ گیاهی از خانواده family_type استفاده نشود",
+        "نوع پاداش": "۱۰۰ الماس (Gem)",
+        "اولویت": "بالا",
+        "متغیر": "خانواده‌ی گیاهان",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "شب یا صبح",
+        "دسته بندی": "چالش (Epic)",
+        "شرط تکمیلی": "تبه پایان رساندن بازی روز با گیاهان شب (mushroom ها)",
+        "نوع پاداش": "۲۰ الماس (Gem)",
+        "اولویت": "بالا",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "برد پشت برد",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "۵ مرحله را پشت سر هم با بیشترین سختی ببر",
+        "نوع پاداش": "۵۰۰۰ سکه(Coin)",
+        "اولویت": "متوسط",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "تقریبا پیروز",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "۱۰ زامبی را در ستون اول ردیفی بکش که چمن‌زن ندارد",
+        "نوع پاداش": "۳۰۰ سکه(Coin)",
+        "اولویت": "متوسط",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "OCD نَمَنَ",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "در حالتی مرحله را ببر که هیچ تقارنی در باغچه وجود ندارد (به جز ردیف وسط)",
+        "نوع پاداش": "۸۰۰ سکه(Coin)",
+        "اولویت": "متوسط",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "روز ابری",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "یک مرحله را تنها با ۳ تا گیاه تولیدکننده خورشید بزن",
+        "نوع پاداش": "۱۰ الماس (Gem)",
+        "اولویت": "بالا",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "یه ستون کمتر",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "یک مرحله را در صورتی ببرد که در ستون nام گیاهی نکاشته باشد",
+        "نوع پاداش": "۱۰ الماس (Gem)",
+        "اولویت": "بالا",
+        "متغیر": "تعداد ستون‌ها",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "سطر بی دفاع",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "یک مرحله را در صورتی ببرد که سطر nام را هیچ گیاهی نکاشته باشد",
+        "نوع پاداش": "۲۰ الماس (Gem)",
+        "اولویت": "بالا",
+        "متغیر": "تعداد سطرها",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "صلیب بی دفاع",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": " یک مرحله را در صورتی ببرد که ستون و ردیف nام خالی باشد",
+        "نوع پاداش": "۲۵ الماس (Gem)",
+        "اولویت": "بالا",
+        "متغیر": "مینیمم تعداد سطر و ستون",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      },
+      {
+        "نام کوئست ها": "وقت چمن‌زنی",
+        "دسته بندی": "روزانه",
+        "شرط تکمیلی": "تنها با استفاده از ماشین چمن‌زنی زامبی‌ها را از بین ببر",
+        "نوع پاداش": "۱۵ الماس (Gem)",
+        "اولویت": "بالا",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false
+      }
+    ],
+    "plantLevels": {
+      "wall-nut": 1,
+      "puff-shroom": 1,
+      "peashooter": 1,
+      "potato-mine": 1,
+      "sunflower": 1,
+      "cabbage-pult": 1
+    },
+    "selectedDeck": [
+      "peashooter",
+      "sunflower",
+      "wall-nut",
+      "potato-mine",
+      "cabbage-pult",
+      "puff-shroom"
+    ],
+    "boostedPlants": [
+      "wall-nut",
+      "sunflower"
+    ],
+    "username": "bazdar",
+    "passwordHash": "f7abcaa4a82f56092bb176d7facc8a190f6c2b9752f0d1dd0bc3eef7b4b2117b",
+    "email": "bazdar@gmail.com",
+    "nickname": "amirbaz",
+    "securityQuestionNumber": "5",
+    "securityAnswer": "tehran",
+    "coins": 4400,
+    "diamonds": 88,
+    "difficultyLevel": 3,
+    "lastShopRefreshTime": 1785429724566,
+    "lastDailyDealPurchaseTime": 1785430298408,
+    "meowPoints": 0,
+    "winStreakAtMaxDifficulty": 0
+  }
+]

@@ -9,7 +9,6 @@ import model.game.plant.PlantParts.PlantTemplate;
 import model.game.plant.behavior.PlantAction;
 
 public class Plant {
-  private final int id;
   private final String name;
   private int currentHealth;
   private final int maxHealth;
@@ -23,53 +22,27 @@ public class Plant {
 
   private final PlantCategory category;
   private final EnumSet<PlantTag> tags;
-  // حس میکنم tags بی فایده اس کلا وجودش و تاثیر خاصی نداره انچنان
-  // بودنش بیهودس
-
   private final PlantAction behavior;
   private final PlantFood plantFood;
   private int lastActionTick;
 
-  private final boolean isBoosted;
-
   private int disabledUntilTick = -1;
-
-  // FIX (GDD Target 1.6 - Wizard Zombie): قبلا طلسم فقط یه تایمر ثابت بود؛ حالا به عمر خود Wizard
-  // گره خورده - وقتی اون Wizard خاص کشته بشه، طلسم بلافاصله (همون تیک) باطل میشه
   private boolean cursed = false;
   private model.game.zombie.Zombie curseSource;
 
-  // FIX (GDD Target 2.1 - Frostbite Caves Ice Winds): سطح یخ‌زدگی تجمعی؛ وقتی به سقف برسه، گیاه
-  // برای مدتی کاملا فریز میشه (نمیتونه تیر بزنه/خورشید بسازه و ...)
   public static final int MAX_FREEZE_LEVEL = 100;
   private int freezeLevel = 0;
   private int frozenUntilTick = -1;
 
   private boolean deathHookFired = false;
 
-  public Plant(
-          PlantTemplate template,
-          int row,
-          int col,
-          PlantCategory category,
-          EnumSet<PlantTag> tags,
-          PlantAction behavior,
-          PlantFood plantFood) {
+  public Plant(PlantTemplate template, int row, int col, PlantCategory category, EnumSet<PlantTag> tags,
+               PlantAction behavior, PlantFood plantFood) {
     this(template, row, col, category, tags, behavior, plantFood, 1, template.baseHp, template.cost);
   }
 
-  public Plant(
-          PlantTemplate template,
-          int row,
-          int col,
-          PlantCategory category,
-          EnumSet<PlantTag> tags,
-          PlantAction behavior,
-          PlantFood plantFood,
-          int level,
-          int maxHealth,
-          int cost) {
-    this.id = template.id;
+  public Plant(PlantTemplate template, int row, int col, PlantCategory category, EnumSet<PlantTag> tags,
+               PlantAction behavior, PlantFood plantFood, int level, int maxHealth, int cost) {
     this.name = template.name;
     this.maxHealth = maxHealth;
     this.currentHealth = maxHealth;
@@ -78,21 +51,16 @@ public class Plant {
     this.tags = tags;
     this.behavior = behavior;
     this.plantFood = plantFood;
-
     this.row = row;
     this.col = col;
     this.x = col;
     this.y = row;
-
     this.lastActionTick = 0;
     this.level = level;
-    this.isBoosted = false;
   }
 
   public void update(int currentTick, Board board) {
-    if (isDead()) return;
-    if (currentTick < disabledUntilTick) return;
-    if (isFrozen(currentTick)) return;
+    if (isDead() || currentTick < disabledUntilTick || isFrozen(currentTick)) return;
 
     if (plantFood != null && plantFood.canExecute()) {
       plantFood.execute(this, board, currentTick);
@@ -104,8 +72,6 @@ public class Plant {
     }
   }
 
-  // FIX (GDD Target 1.6 - Wizard Zombie): طلسم رو به عمر همون زامبی Wizard خاص گره میزنه؛ اگه اون
-  // Wizard بمیره (یا اصلا وجود نداشته باشه)، طلسم فورا باطل میشه، نه با یه تایمر ثابت
   public void applyCurse(model.game.zombie.Zombie source) {
     this.cursed = true;
     this.curseSource = source;
@@ -115,7 +81,6 @@ public class Plant {
     return cursed;
   }
 
-  // برای گیاه‌هایی مثل Wizard که به‌جای خوردن، گیاه رو موقتا از کار میندازن (تبدیل به گوسفند و ...)
   public void disableUntil(int tick) {
     this.disabledUntilTick = tick;
   }
@@ -136,10 +101,10 @@ public class Plant {
     this.frozenUntilTick = Math.max(frozenUntilTick, currentTick + durationTicks);
     this.freezeLevel = 0;
   }
+
   public void addFreezeExposure(int amount, int currentTick, int durationTicks) {
-    if (isFrozen(currentTick)) {
-      return;
-    }
+    if (isFrozen(currentTick)) return;
+
     this.freezeLevel = Math.min(MAX_FREEZE_LEVEL, this.freezeLevel + amount);
     if (this.freezeLevel >= MAX_FREEZE_LEVEL) {
       freeze(currentTick, durationTicks);
@@ -150,16 +115,13 @@ public class Plant {
     return currentTick < frozenUntilTick;
   }
 
-  public int getFreezeLevel() {
-    return freezeLevel;
-  }
+  public int getFreezeLevel() { return freezeLevel; }
 
   public void applyPlantFood() {
     if (plantFood != null) {
       plantFood.activate();
     } else {
-      System.out.println(
-              "Warning: " + name + " has no Plant Food effect configured; feed ignored.");
+      System.out.println("Warning: " + name + " has no Plant Food effect configured; feed ignored.");
     }
   }
 
@@ -168,77 +130,29 @@ public class Plant {
   }
 
   public void heal(int amount) {
-    if (amount > 0) {
-      this.currentHealth = Math.min(maxHealth, this.currentHealth + amount);
-    }
+    if (amount > 0) this.currentHealth = Math.min(maxHealth, this.currentHealth + amount);
   }
 
-  public int getMaxHealth() {
-    return maxHealth;
+  public void changeCoordinate(double deltaX, double deltaY) {
+    this.x += deltaX;
+    this.y += deltaY;
   }
 
-  public int getLevel() {
-    return level;
-  }
+  public void markDeathHookFired() { this.deathHookFired = true; }
+  public boolean hasDeathHookFired() { return deathHookFired; }
 
-  public PlantCategory getCategory() {
-    return category;
-  }
-
-  public EnumSet<PlantTag> getTags() {
-    return tags;
-  }
-
-  public boolean hasDeathHookFired() {
-    return deathHookFired;
-  }
-
-  public void markDeathHookFired() {
-    this.deathHookFired = true;
-  }
-
-  public void changinCordinate(double x, double y) {
-    this.x += x;
-    this.y += y;
-  }
-
-  public boolean isDead() {
-    return this.currentHealth <= 0;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public int getCurrentHealth() {
-    return currentHealth;
-  }
-
-  public int getCost() {
-    return cost;
-  }
-
-  public int getRow() {
-    return row;
-  }
-
-  public int getCol() {
-    return col;
-  }
-
-  public double getX() {
-    return x;
-  }
-
-  public double getY() {
-    return y;
-  }
-
-  public int getLastActionTick() {
-    return lastActionTick;
-  }
-
-  public void setLastActionTick(int tick) {
-    this.lastActionTick = tick;
-  }
+  public boolean isDead() { return this.currentHealth <= 0; }
+  public String getName() { return name; }
+  public int getCurrentHealth() { return currentHealth; }
+  public int getMaxHealth() { return maxHealth; }
+  public int getCost() { return cost; }
+  public int getLevel() { return level; }
+  public PlantCategory getCategory() { return category; }
+  public EnumSet<PlantTag> getTags() { return tags; }
+  public int getRow() { return row; }
+  public int getCol() { return col; }
+  public double getX() { return x; }
+  public double getY() { return y; }
+  public int getLastActionTick() { return lastActionTick; }
+  public void setLastActionTick(int tick) { this.lastActionTick = tick; }
 }

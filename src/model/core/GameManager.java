@@ -4,18 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import model.account.AdventureMap;
 import model.enums.ScoreEvent;
 import model.game.Board;
 import model.game.MatchResult;
 import model.game.ScoreManager;
-import model.game.Sun;
 import model.game.Wave;
 import model.game.minigame.SpecialStageRule;
-import model.game.news.AllNews;
 import model.game.plant.Plant;
 import model.game.quest.MatchContext;
-import model.game.quest.Quest;
 
 public class GameManager {
 
@@ -29,37 +25,22 @@ public class GameManager {
   private final Map<String, Integer> lastPlantedTick = new HashMap<>();
   private boolean cooldownsDisabled;
   private boolean bonusMatch;
-  private AllNews allnews;
-  private List<Quest> quests;
-  private AdventureMap adventureMap;
   private final MatchContext matchContext = new MatchContext();
 
-  // اضافه شدن متغیر برای کنترل موج زامبی‌ها
   private boolean zombieWavesStarted = true;
-
-  // null یعنی مرحله عادی، بدون هیچ محدودیت خاصی؛ رفتار موجود دقیقا همون قبلیه. مقدار غیر null یعنی
-  // یکی از ۸ نوع مرحله ویژه فعاله (Locked Plants/Save Our Seeds/Timed War/...)
   private SpecialStageRule activeSpecialRule;
+  private model.environment.Season currentSeason;private List<String> eventLogs = new ArrayList<>();
 
-  // FIX (GDD Target 2): فصل فعلی مسابقه (Frostbite Caves/Big Wave Beach/Dark Ages/...)؛ برای صدا
-  // زدن season.onTick/onWaveStart هر تیک/شروع موج لازمه. null یعنی فصل خاصی وایر نشده (رفتار قدیمی).
-  private model.environment.Season currentSeason;
-
-  public void setSeason(model.environment.Season season) {
-    this.currentSeason = season;
+  public void addLog(String message) {
+    eventLogs.add(message);
   }
 
-  public model.environment.Season getSeason() {
-    return currentSeason;
+  public List<String> pollLogs() {
+    List<String> currentLogs = new ArrayList<>(eventLogs);
+    eventLogs.clear();
+    return currentLogs;
   }
 
-  public void setSpecialStageRule(SpecialStageRule rule) {
-    this.activeSpecialRule = rule;
-  }
-
-  public SpecialStageRule getSpecialStageRule() {
-    return activeSpecialRule;
-  }
 
   public GameManager() {
     this.board = null;
@@ -68,16 +49,12 @@ public class GameManager {
     this.currentWaveIndex = 0;
     this.running = false;
     this.matchResult = new MatchResult();
-    this.allnews = new AllNews(null);
   }
 
+
   public GameManager(Board board) {
+    this() ;
     this.board = board;
-    this.currentTick = 0;
-    this.waves = new ArrayList<>();
-    this.currentWaveIndex = 0;
-    this.running = false;
-    this.matchResult = new MatchResult();
   }
 
   public void initializeLevel(int rows, int cols, List<Wave> levelWaves) {
@@ -88,84 +65,118 @@ public class GameManager {
     this.matchResult = new MatchResult();
   }
 
-  public void startGame() {
-    running = true;
-  }
+  public void startGame() { running = true; }
+  public void startZombieWaves() { this.zombieWavesStarted = true; }
+  public void pauseZombieWaves() { this.zombieWavesStarted = false; }
 
-  public void startZombieWaves() {
-    this.zombieWavesStarted = true;
-  }
+  public void setSeason(model.environment.Season season) { this.currentSeason = season; }
+  public model.environment.Season getSeason() { return currentSeason; }
 
-  public void pauseZombieWaves() {
-    this.zombieWavesStarted = false;
-  }
+  public void setSpecialStageRule(SpecialStageRule rule) { this.activeSpecialRule = rule; }
+  public SpecialStageRule getSpecialStageRule() { return activeSpecialRule; }
 
   public void advanceTime() {
-    if (!running || board == null) {
+    if (!running || board == null) return;
+
+    currentTick++;
+    updateBoardAndSeason();
+    processBoardEvents();
+
+    if (checkLoseCondition()) {
+      endGame(false);
       return;
     }
-    currentTick++;
+
+    processWaveUpdates();
+
+    if (checkWinCondition()) {
+      endGame(true);
+    }
+  }
+
+  private void updateBoardAndSeason() {
     board.updateAll(currentTick);
     if (currentSeason != null) {
       board.getGameState().update(board.getGameState().getCurrentWave(), currentSeason);
       currentSeason.onTick(board, currentTick);
     }
-    boolean isNewWave = zombieWavesStarted && currentWaveIndex < waves.size();
-    if (isNewWave) matchContext.onWaveStarted(currentWaveIndex, currentTick);
-    for (Board.KillDetail kill : board.drainPendingKillDetails())
-      matchContext.onZombieKilled(currentTick, (int) kill.column(), kill.laneHasUnusedMower());
-    int plantsLostThisTick = board.drainPendingPlantsLostCount();
-    for (int i = 0; i < plantsLostThisTick; i++) matchContext.onPlantLost();
-    matchContext.refreshFromBoard(board, currentTick);
-    for (model.game.reward.Reward reward : board.drainPendingRewards()) matchResult.addEarnedReward(reward);
-    if (activeSpecialRule != null) {
-      activeSpecialRule.apply(board.getGameState());
-      if (activeSpecialRule.checkLoseCondition(board)) {
-        endGame();
-        matchResult.markLose();
-        return;
-      }
+  }
+
+  private void processBoardEvents() {
+    if (zombieWavesStarted && currentWaveIndex < waves.size()) {
+      matchContext.onWaveStarted(currentWaveIndex, currentTick);
     }
 
-    if (board.isPlayerLost()) {
-      endGame();
-      matchResult.markLose();
-      return;
+    for (Board.KillDetail kill : board.drainPendingKillDetails()) {
+      matchContext.onZombieKilled(currentTick, (int) kill.column(), kill.laneHasUnusedMower());
     }
+
+    int plantsLostThisTick = board.drainPendingPlantsLostCount();
+    for (int i = 0; i < plantsLostThisTick; i++) {
+      matchContext.onPlantLost();
+    }
+
+    matchContext.refreshFromBoard(board, currentTick);
+
+    for (model.game.reward.Reward reward : board.drainPendingRewards()) {
+      matchResult.addEarnedReward(reward);
+    }
+  }
+
+  private void processWaveUpdates() {
     if (zombieWavesStarted && currentWaveIndex < waves.size()) {
       Wave currentWave = waves.get(currentWaveIndex);
       boolean wasStarted = currentWave.isStarted();
       currentWave.update(board);
-      if (!wasStarted && currentWave.isStarted() && currentSeason != null)
+
+      if (!wasStarted && currentWave.isStarted() && currentSeason != null) {
         currentSeason.onWaveStart(board, currentWaveIndex, currentTick);
-      if (currentWave.checkCompletion()) currentWaveIndex++;
+      }
+      if (currentWave.checkCompletion()) {
+        currentWaveIndex++;
+      }
     }
+  }
+
+  private boolean checkLoseCondition() {
+    if (activeSpecialRule != null) {
+      activeSpecialRule.apply(board.getGameState());
+      if (activeSpecialRule.checkLoseCondition(board)) {
+        return true;
+      }
+    }
+    return board.isPlayerLost();
+  }
+
+  private boolean checkWinCondition() {
     boolean specialEarlyWin = activeSpecialRule != null && activeSpecialRule.checkWinCondition(board);
-    if (checkWinCondition() || specialEarlyWin) {
-      endGame();
+    if (currentWaveIndex >= waves.size() && board.getZombies().isEmpty()) {
+      return true;
+    }
+    return specialEarlyWin;
+  }
+
+  public void endGame(boolean isWin) {
+    running = false;
+    if (isWin) {
       matchResult.markWin();
       matchResult.calculateRewards();
+      System.out.println("Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.");
+    } else {
+      matchResult.markLose();
+      System.out.println("The zombie ate your brain; LOSER !!!");
     }
   }
 
   public boolean placePlant(Plant plant, int row, int col) {
-    if (board == null || !running) {
-      return false;
-    }
+    if (board == null || !running) return false;
+    if (activeSpecialRule != null && !activeSpecialRule.isPlantAllowed(plant.getName())) return false;
+    if (row < 0 || row >= board.getRows() || col < 0 || col >= board.getColumns()) return false;
 
-    if (activeSpecialRule != null && !activeSpecialRule.isPlantAllowed(plant.getName())) {
-      return false;
-    }
-
-    if (row < 0 || row >= board.getRows() || col < 0 || col >= board.getColumns()) {
-      return false;
-    }
-
-    model.game.plant.Plant existingPlant = board.getPlantAt(row, col);
+    Plant existingPlant = board.getPlantAt(row, col);
     boolean plantIsAquatic = plant.getTags().contains(model.enums.PlantTag.WATER);
 
     if (board.isWaterAt(row, col) && !plantIsAquatic) {
-
       if (existingPlant == null || !existingPlant.getTags().contains(model.enums.PlantTag.WATER)) {
         return false;
       }
@@ -173,9 +184,7 @@ public class GameManager {
       return false;
     }
 
-    if (!board.getGameState().deductSun(plant.getCost())) {
-      return false;
-    }
+    if (!board.getGameState().deductSun(plant.getCost())) return false;
 
     board.placePlant(plant);
     matchContext.onSunSpent(plant.getCost());
@@ -184,111 +193,34 @@ public class GameManager {
   }
 
   public Integer collectSunAt(int col, int row) {
-    if (board == null || !running) {
-      return null;
-    }
+    if (board == null || !running) return null;
     Integer amount = board.collectSunAt(col, row);
-    if (amount != null && amount > 0) {
-      matchContext.onSunCollected(amount);
-    }
+    if (amount != null && amount > 0) matchContext.onSunCollected(amount);
     return amount;
   }
 
   public boolean usePlantFood(Plant targetPlant) {
-    if (board == null || !running) {
-      return false;
-    }
-
+    if (board == null || !running) return false;
     if (board.getGameState().usePlantFood()) {
       targetPlant.applyPlantFood();
       System.out.printf("Plant Food used on %s!%n", targetPlant.getName());
       return true;
     }
-
     System.out.println("Error: No Plant Food available!");
     return false;
   }
 
-  private boolean checkWinCondition() {
-    if (currentWaveIndex >= waves.size()) {
-      return board.getZombies().isEmpty();
-    }
-    return false;
-  }
-
-  public boolean isGameOver() {
-    return !running;
-  }
-
-  public void endGame() {
-    running = false;
-    System.out.println("Game ended.");
-  }
-
-  public Board getBoard() {
-    return board;
-  }
-
-  public int getSunAmount() {
-    return board != null ? board.getGameState().getCurrentSun() : 0;
-  }
-
-  public int getPlantFoodCount() {
-    return board != null ? board.getGameState().getPlantFoodCount() : 0;
-  }
-
-  public int getCurrentTick() {
-    return currentTick;
-  }
-
-  public boolean isRunning() {
-    return running;
-  }
-
-  public MatchResult getMatchResult() {
-    return matchResult;
-  }
-
-  public ScoreManager getScoreManager() {
-    return scoreManager;
-  }
-
-  public void registerCombatEvent(ScoreEvent event) {
-    registerCombatEvent(event, 1);
-  }
-
-  public void registerCombatEvent(ScoreEvent event, int multiplier) {
-    if (!running || event == null) {
-      return;
-    }
-    scoreManager.triggerEvent(event, multiplier);
-  }
-
-  public boolean isBonusMatch() {
-    return bonusMatch;
-  }
-
-  public void setBonusMatch(boolean bonusMatch) {
-    this.bonusMatch = bonusMatch;
-  }
-
-
   public int ticksUntilPlantReady(String plantType, int rechargeSeconds) {
-    if (cooldownsDisabled || plantType == null) {
-      return 0;
-    }
+    if (cooldownsDisabled || plantType == null) return 0;
     Integer last = lastPlantedTick.get(plantType.toLowerCase());
-    if (last == null) {
-      return 0;
-    }
+    if (last == null) return 0;
+
     int readyAt = last + rechargeSeconds * 10;
     return Math.max(0, readyAt - currentTick);
   }
 
   public void recordPlanting(String plantType) {
-    if (plantType != null) {
-      lastPlantedTick.put(plantType.toLowerCase(), currentTick);
-    }
+    if (plantType != null) lastPlantedTick.put(plantType.toLowerCase(), currentTick);
   }
 
   public void disableCooldowns() {
@@ -296,19 +228,25 @@ public class GameManager {
     lastPlantedTick.clear();
   }
 
-  public int getCurrentWaveIndex() {
-    return currentWaveIndex;
+  public Board getBoard() { return board; }
+  public int getSunAmount() { return board != null ? board.getGameState().getCurrentSun() : 0; }
+  public int getPlantFoodCount() { return board != null ? board.getGameState().getPlantFoodCount() : 0; }
+  public int getCurrentTick() { return currentTick; }
+  public boolean isRunning() { return running; }
+  public MatchResult getMatchResult() { return matchResult; }
+  public ScoreManager getScoreManager() { return scoreManager; }
+  public boolean isBonusMatch() { return bonusMatch; }
+  public void setBonusMatch(boolean bonusMatch) { this.bonusMatch = bonusMatch; }
+  public int getCurrentWaveIndex() { return currentWaveIndex; }
+  public int getTotalWaves() { return waves.size(); }
+  public int drainPendingKillCount() { return board != null ? board.drainPendingKillCount() : 0; }
+  public MatchContext getMatchContext() { return matchContext; }
+
+  public void registerCombatEvent(ScoreEvent event) { registerCombatEvent(event, 1); }
+  public void registerCombatEvent(ScoreEvent event, int multiplier) {
+    if (!running || event == null) return;
+    scoreManager.triggerEvent(event, multiplier);
   }
 
-  public int getTotalWaves() {
-    return waves.size();
-  }
-
-  public int drainPendingKillCount() {
-    return board != null ? board.drainPendingKillCount() : 0;
-  }
-
-  public MatchContext getMatchContext() {
-    return matchContext;
-  }
+  public boolean isGameOver() { return !running; }
 }

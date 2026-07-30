@@ -15,37 +15,30 @@ public class Zombie {
   private int currentHealth;
   private final int maxHealth;
   private final double speed;
-
   private final int row;
   private double x;
   private double y;
 
   private final List<Armor> armors;
   private final ZombieAction behavior;
-
-  private boolean isEating;
   private final Map<StatusEffect, Integer> activeEffects;
 
-
+  private boolean isEating;
   private boolean shieldBlocker;
   private double speedMultiplier;
-
   private boolean shiny;
   private boolean plantFoodDropped;
   private boolean lootDropped;
-
   private boolean hypnotized;
   private boolean submerged;
 
-  public Zombie(
-          String name, int health, double speed, int row, double startX, ZombieAction behavior) {
+  public Zombie(String name, int health, double speed, int row, double startX, ZombieAction behavior) {
     this.name = name;
     this.maxHealth = health;
     this.currentHealth = health;
     this.speed = speed;
     this.row = row;
     this.x = startX;
-
     this.armors = new ArrayList<>();
     this.behavior = behavior;
     this.isEating = false;
@@ -59,61 +52,11 @@ public class Zombie {
     this.submerged = false;
   }
 
-  public boolean hasDroppedLoot() {
-    return lootDropped;
-  }
-
-  public void markLootDropped() {
-    this.lootDropped = true;
-  }
-
-  public boolean isShiny() {
-    return shiny;
-  }
-
-  public void setShiny(boolean shiny) {
-    this.shiny = shiny;
-  }
-
-  public boolean hasDroppedPlantFood() {
-    return plantFoodDropped;
-  }
-
-  public void markPlantFoodDropped() {
-    this.plantFoodDropped = true;
-  }
-
-  public boolean isHypnotized() {
-    return hypnotized;
-  }
-
-  public void setHypnotized(boolean hypnotized) {
-    this.hypnotized = hypnotized;
-  }
-
-  public boolean isSubmerged() {
-    return submerged;
-  }
-
-  public void setSubmerged(boolean submerged) {
-    this.submerged = submerged;
-  }
-
-  public void addArmor(Armor armor) {
-    if (armor != null) {
-      this.armors.add(armor);
-    }
-  }
-
   public void update(int currentTick, Board board) {
     if (isDead()) return;
-
     processEffects();
-
-    if (!activeEffects.containsKey(StatusEffect.FROZEN)) {
-      if (behavior != null) {
-        behavior.execute(this, board, currentTick);
-      }
+    if (!activeEffects.containsKey(StatusEffect.FROZEN) && behavior != null) {
+      behavior.execute(this, board, currentTick);
     }
   }
 
@@ -130,7 +73,7 @@ public class Zombie {
       }
 
       if (entry.getKey() == StatusEffect.POISONED) {
-        this.currentHealth -= 2;
+        takeDamage(2, true); // Fixed: Safely clamp health instead of direct modification
       }
     }
   }
@@ -140,25 +83,6 @@ public class Zombie {
       double actualSpeed = activeEffects.containsKey(StatusEffect.CHILLED) ? speed / 2.0 : speed;
       double direction = hypnotized ? 1.0 : -1.0;
       this.x += direction * actualSpeed * speedMultiplier;
-    }
-  }
-
-  public void setSpeedMultiplier(double speedMultiplier) {
-    this.speedMultiplier = speedMultiplier;
-  }
-
-  public boolean hasIntactArmor() {
-    for (Armor armor : armors) {
-      if (!armor.isDestroyed()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public void heal(int amount) {
-    if (amount > 0) {
-      this.currentHealth = Math.min(maxHealth, currentHealth + amount);
     }
   }
 
@@ -173,72 +97,54 @@ public class Zombie {
           if (remainingDamage <= 0) break;
         }
       }
-      if (remainingDamage > 0) {
-        this.currentHealth -= remainingDamage;
-      }
+      if (remainingDamage > 0) this.currentHealth -= remainingDamage;
     }
     this.currentHealth = Math.max(0, this.currentHealth);
+  }
+
+  public void heal(int amount) {
+    if (amount > 0) this.currentHealth = Math.min(maxHealth, currentHealth + amount);
   }
 
   public void applyEffect(StatusEffect effect, int durationInTicks) {
     this.activeEffects.put(effect, durationInTicks);
   }
 
-
   public void extinguishFrozenStatus() {
     activeEffects.remove(StatusEffect.FROZEN);
     activeEffects.remove(StatusEffect.CHILLED);
   }
 
-  public boolean hasShieldBlocker() {
-    return shieldBlocker;
+  public boolean hasIntactArmor() {
+    for (Armor armor : armors) {
+      if (!armor.isDestroyed()) return true;
+    }
+    return false;
   }
 
-  public void setShieldBlocker(boolean shieldBlocker) {
-    this.shieldBlocker = shieldBlocker;
-  }
-
-  public boolean isDead() {
-    return this.currentHealth <= 0;
-  }
-
-  public double getX() {
-    return x;
-  }
-
-  public double getY() {
-    return y;
-  }
-
-  public int getRow() {
-    return row;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public int getCurrentHealth() {
-    return currentHealth;
-  }
-
-  public int getMaxHealth() {
-    return maxHealth;
-  }
-
-  public boolean isEating() {
-    return isEating;
-  }
-
-  public void setEating(boolean eating) {
-    this.isEating = eating;
-  }
-
-  public List<Armor> getArmors() {
-    return armors;
-  }
-
-  public Map<StatusEffect, Integer> getActiveEffects() {
-    return activeEffects;
-  }
+  public void addArmor(Armor armor) { if (armor != null) this.armors.add(armor); }
+  public boolean hasDroppedLoot() { return lootDropped; }
+  public void markLootDropped() { this.lootDropped = true; }
+  public boolean isShiny() { return shiny; }
+  public void setShiny(boolean shiny) { this.shiny = shiny; }
+  public boolean hasDroppedPlantFood() { return plantFoodDropped; }
+  public void markPlantFoodDropped() { this.plantFoodDropped = true; }
+  public boolean isHypnotized() { return hypnotized; }
+  public void setHypnotized(boolean hypnotized) { this.hypnotized = hypnotized; }
+  public boolean isSubmerged() { return submerged; }
+  public void setSubmerged(boolean submerged) { this.submerged = submerged; }
+  public void setSpeedMultiplier(double speedMultiplier) { this.speedMultiplier = speedMultiplier; }
+  public boolean hasShieldBlocker() { return shieldBlocker; }
+  public void setShieldBlocker(boolean shieldBlocker) { this.shieldBlocker = shieldBlocker; }
+  public boolean isDead() { return this.currentHealth <= 0; }
+  public double getX() { return x; }
+  public double getY() { return y; }
+  public int getRow() { return row; }
+  public String getName() { return name; }
+  public int getCurrentHealth() { return currentHealth; }
+  public int getMaxHealth() { return maxHealth; }
+  public boolean isEating() { return isEating; }
+  public void setEating(boolean eating) { this.isEating = eating; }
+  public List<Armor> getArmors() { return armors; }
+  public Map<StatusEffect, Integer> getActiveEffects() { return activeEffects; }
 }

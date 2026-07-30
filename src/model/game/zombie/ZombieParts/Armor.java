@@ -30,35 +30,18 @@ public class Armor {
 
     if (currentHealth >= damage) {
       currentHealth -= damage;
-      return 0; // زره مقاومت کرد
+      return 0;
     } else {
       int remainingDamage = damage - currentHealth;
-      currentHealth = 0; // زره نابود شد
-      return remainingDamage; // خروج دمیج اضافی
+      currentHealth = 0;
+      return remainingDamage;
     }
   }
 
-  public boolean isDestroyed() {
-    return currentHealth <= 0;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public int getCurrentHealth() {
-    return currentHealth;
-  }
-
-  public int getMaxHealth() {
-    return maxHealth;
-  }
-
-  public boolean isMetallic() {
-    return isMetallic;
-  }
-
-  public ArmorType getType() {
-    return type;
-  }
+  public boolean isDestroyed() { return currentHealth <= 0; }
+  public String getName() { return name; }
+  public int getCurrentHealth() { return currentHealth; }
+  public int getMaxHealth() { return maxHealth; }
+  public boolean isMetallic() { return isMetallic; }
+  public ArmorType getType() { return type; }
 }
