@@ -14,6 +14,7 @@ public enum GamePlayMenuCommands implements Command {
   PluckPlant("pluck\\s+plant\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),
   FeedPlant("feed\\s+plant\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),
   CheatAddPlantFood("cheat\\s+add-plant-food"),
+  CheatUnlockAllPlants("cheat\\s+unlock-all-plants"),
   ShowMap("show\\s+map"),
   ShowPlantsStatus("show\\s+plants?\\s+status"),
   ShowTileStatus("show\\s+tile\\s+status\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),

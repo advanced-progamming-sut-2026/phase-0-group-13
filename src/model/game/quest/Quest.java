@@ -1,7 +1,9 @@
 package model.game.quest;
 
 import com.google.gson.annotations.SerializedName;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import model.account.User;
@@ -9,22 +11,22 @@ import model.enums.PlantTag;
 
 public class Quest {
 
-  @SerializedName("نام کوئست ها")
+  @SerializedName("Quest Name")
   public String title;
 
-  @SerializedName("دسته بندی")
+  @SerializedName("Category")
   private String category;
 
-  @SerializedName("شرط تکمیلی")
+  @SerializedName("Completion Condition")
   private String condition;
 
-  @SerializedName("نوع پاداش")
+  @SerializedName("Reward")
   private String rewardType;
 
-  @SerializedName("اولویت")
+  @SerializedName("Priority")
   private String priority;
 
-  @SerializedName("متغیر")
+  @SerializedName("Variable")
   private String variable;
 
   private double progressOfQuest;
@@ -59,9 +61,14 @@ public class Quest {
   public double getProgressOfQuest() { return progressOfQuest; }
   public boolean isRewardClaimed() { return rewardClaimed; }
 
+  private double questTarget;
+
+  public double getQuestTarget() { return questTarget; }
+
   public void addProgress(double amount, double target) {
     if (isCompleted) return;
 
+    this.questTarget = target;
     progressOfQuest += amount;
     if (progressOfQuest >= target) {
       progressOfQuest = target;
@@ -84,9 +91,9 @@ public class Quest {
   // they depend on the state of the match as a whole, not on a stream of discrete events. This
   // engine reads that state from a MatchContext instead.
   //
-  // Every entry below matches a distinctive substring of the Persian "شرط تکمیلی" (condition)
-  // field from Quests.json against a predicate over MatchContext. This mirrors the keyword-match
-  // style already used by User.QUEST_EVENT_KEYWORDS, just condition-based instead of event-based.
+  // Every entry below matches a distinctive substring of the "Completion Condition" field from
+  // Quests.json against a predicate over MatchContext. This mirrors the keyword-match style
+  // already used by User.QUEST_EVENT_KEYWORDS, just condition-based instead of event-based.
   // ===========================================================================================
 
   @FunctionalInterface
@@ -94,48 +101,79 @@ public class Quest {
     boolean test(Quest quest, MatchContext context);
   }
 
+  private static final int KILL_GOAL = 10;
+  private static final int EXPLOSIVE_GOAL = 3;
+  private static final int SUN_PRODUCER_GOAL = 3;
+  private static final int WIN_STREAK_GOAL = 5;
+
   private static final Map<String, ContextCondition> CONTEXT_CONDITIONS = buildContextConditions();
 
   private static Map<String, ContextCondition> buildContextConditions() {
     Map<String, ContextCondition> map = new java.util.LinkedHashMap<>();
-    map.put("صفر خورشید", (q, ctx) -> ctx.getSunSpent() == 0);
-    map.put("۳۰ ثانیه", (q, ctx) -> ctx.getZombiesKilledInOpeningWindow() >= 10);
-    map.put("گیاه انفجاری", (q, ctx) -> ctx.getExplosivePlantsPlaced() >= 3);
-    map.put("به جز ردیف وسط", (q, ctx) -> ctx.isMatchWon() && !ctx.isGardenSymmetricExceptMiddleRow());
-    map.put("متقارن باشد", (q, ctx) -> ctx.isGardenSymmetric());
-    map.put("برای کشتن زامبی ها استفاده شود", (q, ctx) -> {
-      PlantTag family = resolveFamilyTag(q.variable);
-      return family != null && ctx.onlyPlacedFamily(family);
-    });
-    map.put("استفاده نشود", (q, ctx) -> {
+
+    map.put("using only the cactus", (q, ctx) ->
+            ctx.getTotalZombiesKilled() >= KILL_GOAL && ctx.onlyPlacedPlant("cactus"));
+
+    map.put("using only plant", (q, ctx) ->
+            ctx.getTotalZombiesKilled() >= KILL_GOAL && ctx.placedExactlyOnePlantType());
+
+    map.put("only the lawn mower", (q, ctx) -> ctx.onlyMowerKills());
+
+    map.put("zero sun spent", (q, ctx) -> ctx.isMatchWon() && ctx.getSunSpent() == 0);
+
+    map.put("within 30 seconds", (q, ctx) -> ctx.getZombiesKilledInOpeningWindow() >= KILL_GOAL);
+
+    map.put("explosive plants", (q, ctx) -> ctx.getExplosivePlantsPlaced() >= EXPLOSIVE_GOAL);
+
+    map.put("no symmetry", (q, ctx) ->
+            ctx.isMatchWon()
+                    && ctx.getPlantsPlacedCount() > 0
+                    && !ctx.isGardenSymmetricExceptMiddleRow());
+
+    map.put("must be symmetric", (q, ctx) ->
+            ctx.getPlantsPlacedCount() > 0 && ctx.isGardenSymmetric());
+
+    map.put("without using any plant of the", (q, ctx) -> {
       PlantTag family = resolveFamilyTag(q.variable);
       return ctx.isMatchWon() && family != null && ctx.neverPlacedFamily(family);
     });
-    map.put("گیاهان شب", (q, ctx) ->
-            ctx.neverPlacedFamily(PlantTag.DAY) && ctx.getPlantFamiliesPlaced().contains(PlantTag.SHROOM));
 
-    map.put("پشت سر هم", (q, ctx) -> ctx.getWinStreakAtMaxDifficulty() >= 5);
+    map.put("Use only plants of the", (q, ctx) -> {
+      PlantTag family = resolveFamilyTag(q.variable);
+      return family != null
+              && ctx.getTotalZombiesKilled() > 0
+              && ctx.onlyPlacedFamily(family);
+    });
 
-    map.put("چمن‌زن ندارد", (q, ctx) -> ctx.getZombiesKilledAtColumnZeroWithNoMower() >= 10);
+    map.put("night plants", (q, ctx) ->
+            ctx.isMatchWon()
+                    && ctx.neverPlacedFamily(PlantTag.DAY)
+                    && ctx.getPlantFamiliesPlaced().contains(PlantTag.SHROOM));
 
-    map.put("گیاه تولیدکننده خورشید", (q, ctx) -> ctx.isMatchWon() && ctx.getSunProducerPlantsPlaced() == 3);
+    map.put("levels in a row", (q, ctx) -> ctx.getWinStreakAtMaxDifficulty() >= WIN_STREAK_GOAL);
 
-    map.put("ستون و ردیف", (q, ctx) -> {
+    map.put("with no lawn mower", (q, ctx) ->
+            ctx.getZombiesKilledAtColumnZeroWithNoMower() >= KILL_GOAL);
+
+    map.put("sun-producing plants", (q, ctx) ->
+            ctx.isMatchWon() && ctx.getSunProducerPlantsPlaced() == SUN_PRODUCER_GOAL);
+
+    map.put("both column n and row n", (q, ctx) -> {
       int n = extractFirstNumber(q.variable);
       return ctx.isMatchWon() && n > 0 && ctx.isColumnEmpty(n - 1) && ctx.isRowEmpty(n - 1);
     });
 
-    map.put("در ستون", (q, ctx) -> {
+    map.put("in column n", (q, ctx) -> {
       int n = extractFirstNumber(q.variable);
       return ctx.isMatchWon() && n > 0 && ctx.isColumnEmpty(n - 1);
     });
 
-    map.put("سطر", (q, ctx) -> {
+    map.put("in row n", (q, ctx) -> {
       int n = extractFirstNumber(q.variable);
       return ctx.isMatchWon() && n > 0 && ctx.isRowEmpty(n - 1);
     });
 
-    map.put("از دست دادن بیش از", (q, ctx) -> {
+    map.put("without losing more than", (q, ctx) -> {
       int n = extractFirstNumber(q.variable);
       return ctx.isMatchWon() && ctx.getPlantsLost() <= Math.max(n, 0);
     });
@@ -145,49 +183,44 @@ public class Quest {
 
   private static final Map<String, PlantTag> FAMILY_KEYWORDS = buildFamilyKeywords();
 
-  // FIX (GDD Target 3.1 - Quest Mapper): این متود قبلا خالی بود، پس resolveFamilyTag هیچ‌وقت با
-  // کلیدهای فارسی جیسون (مثل "نخود" برای Pea یا "قارچ" برای Shroom) مچ نمیشد و همیشه null برمیگردوند.
-  // اینجا معادل فارسی هر PlantTag رو ثبت میکنیم (LinkedHashMap تا اگه یه رشته چند کلیدواژه رو
-  // همزمان داشت، اولویت با ورودی زودتره)
   private static Map<String, PlantTag> buildFamilyKeywords() {
     Map<String, PlantTag> map = new java.util.LinkedHashMap<>();
 
-    map.put("نخود", PlantTag.PEA);
-    map.put("قارچ", PlantTag.SHROOM);
-    map.put("یخ", PlantTag.ICE);
-    map.put("آتشین", PlantTag.FIRE);
-    map.put("آتش", PlantTag.FIRE);
-    map.put("سمی", PlantTag.POISON);
-    map.put("سم", PlantTag.POISON);
-    map.put("آبزی", PlantTag.WATER);
-    map.put("خورشیدساز", PlantTag.SUN);
-    map.put("تولیدکننده خورشید", PlantTag.SUN);
-    map.put("انفجاری", PlantTag.EXPLOSIVE);
-    map.put("شب", PlantTag.NIGHT);
-    map.put("روز", PlantTag.DAY);
-    map.put("ناحیه‌ای", PlantTag.AOE);
-    map.put("منطقه‌ای", PlantTag.AOE);
-    map.put("تله‌ای", PlantTag.TRAP);
-    map.put("تله", PlantTag.TRAP);
-    map.put("جادویی", PlantTag.MAGIC);
-    map.put("انباشته", PlantTag.STACK);
-    map.put("شارژی", PlantTag.CHARGE);
-    map.put("افزایشی", PlantTag.RAMP_UP);
-    map.put("جابجاکننده زامبی", PlantTag.MOVE_ZOMBIES);
+    map.put("pea", PlantTag.PEA);
+    map.put("mushroom", PlantTag.SHROOM);
+    map.put("shroom", PlantTag.SHROOM);
+    map.put("ice", PlantTag.ICE);
+    map.put("frost", PlantTag.ICE);
+    map.put("fire", PlantTag.FIRE);
+    map.put("poison", PlantTag.POISON);
+    map.put("water", PlantTag.WATER);
+    map.put("aquatic", PlantTag.WATER);
+    map.put("sun-producing", PlantTag.SUN);
+    map.put("sun", PlantTag.SUN);
+    map.put("explosive", PlantTag.EXPLOSIVE);
+    map.put("night", PlantTag.NIGHT);
+    map.put("day", PlantTag.DAY);
+    map.put("area", PlantTag.AOE);
+    map.put("aoe", PlantTag.AOE);
+    map.put("trap", PlantTag.TRAP);
+    map.put("magic", PlantTag.MAGIC);
+    map.put("stack", PlantTag.STACK);
+    map.put("charge", PlantTag.CHARGE);
+    map.put("ramp", PlantTag.RAMP_UP);
+    map.put("move", PlantTag.MOVE_ZOMBIES);
 
     return map;
   }
 
   private static PlantTag resolveFamilyTag(String variable) {
     if (variable == null) return null;
-    String trimmed = variable.trim();
+    String lower = variable.trim().toLowerCase();
 
     for (Map.Entry<String, PlantTag> entry : FAMILY_KEYWORDS.entrySet()) {
-      if (trimmed.contains(entry.getKey())) {
+      if (lower.contains(entry.getKey())) {
         return entry.getValue();
       }
     }
-    String lower = trimmed.toLowerCase();
     for (PlantTag tag : PlantTag.values()) {
       if (lower.contains(tag.name().toLowerCase())
               || lower.contains(tag.name().toLowerCase().replace('_', ' '))) {
@@ -222,25 +255,34 @@ public class Quest {
     return false;
   }
 
+  public boolean isContextual() {
+    if (condition == null) return false;
+    for (String key : CONTEXT_CONDITIONS.keySet()) {
+      if (condition.contains(key)) return true;
+    }
+    return false;
+  }
+
+  private static final Random REWARD_RANDOM = new Random();
+
   public void claimReward(User user) {
     if (!isCompleted || rewardClaimed) return;
 
     if (rewardType != null) {
       String rtLower = rewardType.toLowerCase();
-      int amount = extractNumber(rewardType);
+      int amount = resolveRewardAmount();
 
-      if (rtLower.contains("الماس") || rtLower.contains("gem")) {
+      if (rtLower.contains("gem") || rtLower.contains("diamond")) {
         user.addDiamonds(amount > 0 ? amount : 1);
-      } else if (rtLower.contains("سکه") || rtLower.contains("coin")) {
+      } else if (rtLower.contains("coin")) {
         user.addCoins(amount > 0 ? amount : 100);
-      }
-      else if (rtLower.contains("پک دانه") || rtLower.contains("seed")) {
-        String target = (variable != null && !variable.trim().isEmpty()) ? variable.trim() : "random";
-        user.getInventory().addItem("seed_" + target, amount > 0 ? amount : 1);
-      } else if (rtLower.contains("غذا") || rtLower.contains("food")) {
+      } else if (rtLower.contains("seed")) {
+        user.getInventory().addItem("seed_" + resolveSeedTarget(user), amount > 0 ? amount : 1);
+      } else if (rtLower.contains("plant food")) {
         user.getInventory().addItem("plant_food", amount > 0 ? amount : 1);
-      }
-      else if (rtLower.contains("آنلاک") || rtLower.contains("unlock") || rtLower.contains("باز کردن")) {
+      } else if (rtLower.contains("new plant")) {
+        unlockRandomPlant(user);
+      } else if (rtLower.contains("unlock")) {
         if (variable != null && !variable.trim().isEmpty()) {
           user.unlockItem(variable.trim());
         }
@@ -249,7 +291,45 @@ public class Quest {
     rewardClaimed = true;
   }
 
+  private int resolveRewardAmount() {
+    if (rewardType != null && rewardType.toLowerCase().contains("sun_amount")) {
+      int sunTarget = extractFirstNumber(variable);
+      int divisor = extractFirstNumber(rewardType);
+      if (sunTarget > 0 && divisor > 0) {
+        return Math.max(1, sunTarget / divisor);
+      }
+    }
+    return extractNumber(rewardType);
+  }
+
+  private String resolveSeedTarget(User user) {
+    if (variable != null && user.hasUnlockedPlant(variable.trim())) {
+      return variable.trim().toLowerCase();
+    }
+    List<String> owned = user.getUnlockedPlants();
+    if (owned.isEmpty()) {
+      return "random";
+    }
+    return owned.get(REWARD_RANDOM.nextInt(owned.size()));
+  }
+
+  private void unlockRandomPlant(User user) {
+    if (data.GameDataManager.plantRepository == null) {
+      return;
+    }
+    List<model.game.plant.PlantParts.PlantTemplate> locked =
+            data.GameDataManager.plantRepository.getAll().stream()
+                    .filter(t -> t.name != null && !user.hasUnlockedPlant(t.name))
+                    .toList();
+    if (locked.isEmpty()) {
+      return;
+    }
+    String plantName = locked.get(REWARD_RANDOM.nextInt(locked.size())).name;
+    System.out.println(user.unlockPlant(plantName).message());
+  }
+
   private int extractNumber(String text) {
+    if (text == null) return 0;
     try {
       String numberOnly = text.replaceAll("[^0-9]", "");
       return numberOnly.isEmpty() ? 0 : Integer.parseInt(numberOnly);

@@ -148,7 +148,8 @@ public class Projectile {
       return this;
     }
     Projectile lit =
-            new Projectile(damage, speed, xCoordinate, yCoordinate, ProjectileEffect.FIRE, piercing, lobbed, isFromZombie);
+            new Projectile(damage, speed,
+                    xCoordinate, yCoordinate, ProjectileEffect.FIRE, piercing, lobbed, isFromZombie);
     lit.alreadyHit.addAll(this.alreadyHit);
     return lit;
   }

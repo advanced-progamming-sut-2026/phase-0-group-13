@@ -176,7 +176,8 @@ public class User {
   public long getLastShopRefreshTime() { return lastShopRefreshTime; }
   public void setLastShopRefreshTime(long lastShopRefreshTime) { this.lastShopRefreshTime = lastShopRefreshTime; }
   public long getLastDailyDealPurchaseTime() { return lastDailyDealPurchaseTime; }
-  public void setLastDailyDealPurchaseTime(long lastDailyDealPurchaseTime) { this.lastDailyDealPurchaseTime = lastDailyDealPurchaseTime; }
+  public void setLastDailyDealPurchaseTime(long lastDailyDealPurchaseTime) {
+    this.lastDailyDealPurchaseTime = lastDailyDealPurchaseTime; }
   public int getMeowPoints() { return meowPoints; }
 
   public void addMeowPoints(int amount) {
@@ -312,27 +313,27 @@ public class User {
     return new Result(true, plantName + " free boost stored!", key);
   }
 
+  private static final String[] QUEST_EVENT_PRIORITY = {
+    "MINIGAME_CLEAR", "PLANT_UNLOCKED", "PLANT_PURCHASED", "COLLECT_SUN", "STAGE_CLEAR", "KILL_ZOMBIE"
+  };
+
   private static final Map<String, String[]> QUEST_EVENT_KEYWORDS = buildQuestEventKeywords();
   private static final Map<String, Integer> DEFAULT_QUEST_TARGETS = buildDefaultQuestTargets();
 
   private static Map<String, String[]> buildQuestEventKeywords() {
     Map<String, String[]> map = new HashMap<>();
-    map.put("KILL_ZOMBIE", new String[] {"زامبی", "zombie", "شکست دادن"});
-    map.put("KILL_ZOMBIE_WITH_PLANT", new String[] {"فقط با plant", "only with plant"});
-    map.put("KILL_ZOMBIE_WITH_CACTUS", new String[] {"کاکتوس", "cactus"});
-    map.put("COLLECT_SUN", new String[] {"خورشید", "sun_amount", "sun"});
-    map.put("STAGE_CLEAR", new String[] {"فصل", "chapter", "مرحله", "stage"});
-    map.put("MINIGAME_CLEAR", new String[] {"minigame", "مینی", "mini-game", "mini game"});
-    map.put("PLANT_UNLOCKED", new String[] {"گیاه جدید", "new plant", "unlock plant"});
-    map.put("PLANT_PURCHASED", new String[] {"خرید", "purchase"});
+    map.put("KILL_ZOMBIE", new String[] {"defeat", "zombie"});
+    map.put("COLLECT_SUN", new String[] {"sun_amount", "collect"});
+    map.put("STAGE_CLEAR", new String[] {"clear a chapter", "clear a stage", "beat a level"});
+    map.put("MINIGAME_CLEAR", new String[] {"mini-game", "mini game", "minigame"});
+    map.put("PLANT_UNLOCKED", new String[] {"unlock a new plant", "unlock plant"});
+    map.put("PLANT_PURCHASED", new String[] {"purchase", "buy a plant"});
     return map;
   }
 
   private static Map<String, Integer> buildDefaultQuestTargets() {
     Map<String, Integer> map = new HashMap<>();
     map.put("KILL_ZOMBIE", 50);
-    map.put("KILL_ZOMBIE_WITH_PLANT", 10);
-    map.put("KILL_ZOMBIE_WITH_CACTUS", 10);
     map.put("COLLECT_SUN", 3000);
     map.put("STAGE_CLEAR", 1);
     map.put("MINIGAME_CLEAR", 1);
@@ -341,7 +342,46 @@ public class User {
     return map;
   }
 
+  private static String resolveEventType(Quest quest) {
+    if (quest.getCondition() == null || quest.isContextual()) {
+      return null;
+    }
+    String haystack =
+            (quest.getCondition() + " " + (quest.getCategory() != null ? quest.getCategory() : ""))
+                    .toLowerCase();
 
+    for (String eventType : QUEST_EVENT_PRIORITY) {
+      for (String keyword : QUEST_EVENT_KEYWORDS.get(eventType)) {
+        if (haystack.contains(keyword.toLowerCase())) {
+          return eventType;
+        }
+      }
+    }
+    return null;
+  }
+
+
+
+  public void seedQuestsIfNeeded(List<Quest> templates) {
+    if (templates == null || templates.isEmpty()) {
+      return;
+    }
+    boolean broken = false;
+    for (Quest quest : quests) {
+      if (quest == null || quest.getTitle() == null || quest.getCondition() == null) {
+        broken = true;
+        break;
+      }
+    }
+    if (!quests.isEmpty() && !broken) {
+      return;
+    }
+
+    quests.clear();
+    for (Quest template : templates) {
+      quests.add(new Quest(template));
+    }
+  }
 
   public void evaluateContextualQuests(MatchContext context) {
     if (context == null) {
@@ -374,35 +414,19 @@ public class User {
     if (eventType == null || amount <= 0) {
       return;
     }
-    String[] keywords = QUEST_EVENT_KEYWORDS.get(eventType.toUpperCase().trim());
-    if (keywords == null) {
+    String normalizedEvent = eventType.toUpperCase().trim();
+    if (!QUEST_EVENT_KEYWORDS.containsKey(normalizedEvent)) {
       return;
     }
 
     for (Quest quest : quests) {
-      if (quest.isCompleted()) {
-        continue;
-      }
-      String haystack =
-              ((quest.getCondition() != null ? quest.getCondition() : "")
-                      + " "
-                      + (quest.getCategory() != null ? quest.getCategory() : ""))
-                      .toLowerCase();
-      boolean matches = false;
-      for (String keyword : keywords) {
-        if (haystack.contains(keyword.toLowerCase())) {
-          matches = true;
-          break;
-        }
-      }
-      if (!matches) {
+      if (quest.isCompleted() || !normalizedEvent.equals(resolveEventType(quest))) {
         continue;
       }
 
-      double target = resolveQuestTarget(quest, eventType);
-      boolean wasCompleted = quest.isCompleted();
+      double target = resolveQuestTarget(quest, normalizedEvent);
       quest.addProgress(amount, target);
-      if (!wasCompleted && quest.isCompleted()) {
+      if (quest.isCompleted()) {
         generateNews("quest", quest.getTitle());
       }
     }

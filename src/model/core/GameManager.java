@@ -24,6 +24,7 @@ public class GameManager {
   private final ScoreManager scoreManager = new ScoreManager();
   private final Map<String, Integer> lastPlantedTick = new HashMap<>();
   private boolean cooldownsDisabled;
+  private boolean freePlanting;
   private boolean bonusMatch;
   private final MatchContext matchContext = new MatchContext();
 
@@ -108,7 +109,8 @@ public class GameManager {
     }
 
     for (Board.KillDetail kill : board.drainPendingKillDetails()) {
-      matchContext.onZombieKilled(currentTick, (int) kill.column(), kill.laneHasUnusedMower());
+      matchContext.onZombieKilled(
+              currentTick, (int) kill.column(), kill.laneHasUnusedMower(), kill.killedByMower());
     }
 
     int plantsLostThisTick = board.drainPendingPlantsLostCount();
@@ -164,7 +166,7 @@ public class GameManager {
       System.out.println("Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.");
     } else {
       matchResult.markLose();
-      System.out.println("The zombie ate your brain; LOSER !!!");
+      System.out.println("The zombie ate your brain; LOSER!!!");
     }
   }
 
@@ -184,10 +186,12 @@ public class GameManager {
       return false;
     }
 
-    if (!board.getGameState().deductSun(plant.getCost())) return false;
+    if (!freePlanting) {
+      if (!board.getGameState().deductSun(plant.getCost())) return false;
+      matchContext.onSunSpent(plant.getCost());
+    }
 
     board.placePlant(plant);
-    matchContext.onSunSpent(plant.getCost());
     matchContext.onPlantPlaced(plant, row, col);
     return true;
   }
@@ -226,6 +230,14 @@ public class GameManager {
   public void disableCooldowns() {
     cooldownsDisabled = true;
     lastPlantedTick.clear();
+  }
+
+  public void enableFreePlanting() {
+    freePlanting = true;
+  }
+
+  public boolean isFreePlanting() {
+    return freePlanting;
   }
 
   public Board getBoard() { return board; }

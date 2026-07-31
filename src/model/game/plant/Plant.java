@@ -60,7 +60,7 @@ public class Plant {
   }
 
   public void update(int currentTick, Board board) {
-    if (isDead() || currentTick < disabledUntilTick || isFrozen(currentTick)) return;
+    if (isDead() || isDisabled(currentTick) || isFrozen(currentTick)) return;
 
     if (plantFood != null && plantFood.canExecute()) {
       plantFood.execute(this, board, currentTick);

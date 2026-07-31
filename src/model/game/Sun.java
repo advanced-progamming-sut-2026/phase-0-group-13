@@ -3,13 +3,15 @@ package model.game;
 import model.enums.SunType;
 
 public class Sun {
+  public static final int INFINITE_LIFETIME = -1;
+
   private int amount;
   private double x;
   private double y;
   private int timeToLive; // به واحد تیک
   private SunType sunType;
   private boolean isCollected;
-  private int fallingTicks; 
+  private int fallingTicks;
 
   public Sun(int amount, int timeToLive, SunType sunType) {
     this(amount, timeToLive, sunType, false);
@@ -33,10 +35,13 @@ public class Sun {
   public void update(int currentTick) {
     if (fallingTicks > 0) {
       fallingTicks--;
-      if (fallingTicks == 0 && sunType == SunType.RADIOACTIVE) {
-        sunType = SunType.NORMAL;
-        amount = 25;
-        System.out.println("Radioactive sun reached the ground and turned into a normal sun.");
+      if (fallingTicks == 0) {
+        System.out.printf(
+                "Sun reached the ground at position (%d, %d)%n", (int) x + 1, (int) y + 1);
+        if (sunType == SunType.RADIOACTIVE) {
+          sunType = SunType.NORMAL;
+          amount = 25;
+        }
       }
     }
 
@@ -46,7 +51,7 @@ public class Sun {
   }
 
   public void collect(GameState state) {
-    if (!isCollected && timeToLive > 0) {
+    if (!isCollected && !isExpired()) {
       this.isCollected = true;
       state.addSun(this.amount);
       this.timeToLive = 0; // تیک بعدی پاک می‌شود
@@ -54,7 +59,10 @@ public class Sun {
   }
 
   public boolean isExpired() {
-    return timeToLive <= 0 || isCollected;
+    if (isCollected) {
+      return true;
+    }
+    return timeToLive != INFINITE_LIFETIME && timeToLive <= 0;
   }
 
   public int getAmount() { return amount; }

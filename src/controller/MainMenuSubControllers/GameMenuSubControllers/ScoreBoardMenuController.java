@@ -125,8 +125,7 @@ public class ScoreBoardMenuController implements BaseController {
     for (Quest quest : user.getQuests()) {
       if (quest.isCompleted()
               && quest.getCategory() != null
-              && (quest.getCategory().toLowerCase().contains("daily")
-              || quest.getCategory().contains("روزانه"))) {
+              && quest.getCategory().toLowerCase().contains("daily")) {
         count++;
       }
     }

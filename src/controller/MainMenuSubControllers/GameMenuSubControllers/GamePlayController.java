@@ -88,6 +88,8 @@ public class GamePlayController implements BaseController {
     } else if (GamePlayMenuCommands.CheatRemoveCooldown.getMatcher(command) != null) {
       gm.disableCooldowns();
       System.out.println("All plant cooldowns cleared.");
+    } else if (GamePlayMenuCommands.CheatUnlockAllPlants.getMatcher(command) != null) {
+      handleUnlockAllPlants(gm);
     } else if (GamePlayMenuCommands.ReleaseTheNuke.getMatcher(command) != null) {
       handleNuke(gm);
     } else if (GamePlayMenuCommands.StartZombieWaves.getMatcher(command) != null) {
@@ -128,7 +130,7 @@ public class GamePlayController implements BaseController {
     List<String> logs = gm.pollLogs();
     if (logs != null && !logs.isEmpty()) {
       for (String log : logs) {
-        System.out.println("📢 " + log);
+        System.out.println("[event] " + log);
       }
     }
   }
@@ -299,6 +301,70 @@ public class GamePlayController implements BaseController {
     }
   }
 
+  private void handleUnlockAllPlants(GameManager gm) {
+    if (GameDataManager.plantRepository == null) {
+      System.out.println("error: plant data is not loaded");
+      return;
+    }
+
+    User user = UserManager.getInstance().getCurrentUser();
+    List<PlantTemplate> catalogue = GameDataManager.plantRepository.getAll();
+    List<String> everyPlant = new java.util.ArrayList<>();
+    java.util.Set<String> alreadyOwned = new java.util.HashSet<>();
+
+    if (user != null) {
+      for (String owned : user.getUnlockedPlants()) {
+        alreadyOwned.add(normalizePlantKey(owned));
+      }
+    }
+
+    int newlyUnlocked = 0;
+    for (PlantTemplate template : catalogue) {
+      if (template.name == null || template.name.isBlank()) {
+        continue;
+      }
+      everyPlant.add(template.name.toLowerCase());
+
+      if (user != null && alreadyOwned.add(normalizePlantKey(template.name))) {
+        user.unlockPlant(template.name);
+        newlyUnlocked++;
+      }
+    }
+
+    MatchSetup.getInstance().setSelectedPlants(everyPlant);
+    gm.disableCooldowns();
+    gm.enableFreePlanting();
+    saveUserState();
+
+    System.out.println("=== DEBUG: all plants unlocked ===");
+    System.out.printf(
+            "  %d plants available (%d newly added to your collection)%n",
+            everyPlant.size(), newlyUnlocked);
+    System.out.println("  sun cost      : waived for the rest of this match");
+    System.out.println("  recharge      : disabled");
+    System.out.println("  seed bank     : now lists every plant ('show plants status')");
+    System.out.println("  plant anything: plant plant -t <name> -l (x, y)");
+    warnIfSpecialRuleRestrictsPlanting(gm);
+  }
+
+  private void warnIfSpecialRuleRestrictsPlanting(GameManager gm) {
+    model.game.minigame.SpecialStageRule rule = gm.getSpecialStageRule();
+    if (rule == null || rule.isPlantAllowed("peashooter")) {
+      return;
+    }
+    System.out.println(
+            "  note          : this is a special level ("
+                    + rule.getClass().getSimpleName()
+                    + ") and it still restricts which plants may be placed.");
+    System.out.println(
+            "                  Run this cheat on a normal level (level 1 of a chapter) to place"
+                    + " every plant.");
+  }
+
+  private String normalizePlantKey(String name) {
+    return name == null ? "" : name.toLowerCase().replaceAll("[^a-z0-9]", "");
+  }
+
   private void handleNuke(GameManager gm) {
     int killed = 0;
     for (Zombie z : gm.getBoard().getZombies()) {
@@ -326,7 +392,11 @@ public class GamePlayController implements BaseController {
       }
       int remaining = gm.ticksUntilPlantReady(name, adjustedRechargeSeconds(template, getCurrentPlantLevel(name)));
       String state = remaining == 0 ? "ready" : String.format("ready in %.1fs", remaining / 10.0);
-      System.out.printf("  %s - cost %d sun - %s%n", template.name, template.cost, state);
+      String cost =
+              gm.isFreePlanting()
+                      ? String.format("cost %d sun (FREE)", template.cost)
+                      : String.format("cost %d sun", template.cost);
+      System.out.printf("  %-20s - %-22s - %s%n", template.name, cost, state);
     }
   }
 
@@ -378,32 +448,72 @@ public class GamePlayController implements BaseController {
       }
     }
   }
+  private static final int CELL_TEXT_WIDTH = 6;
+  private static final String ROW_PREFIX_PAD = "     ";
+
   private void renderMap(GameManager gm) {
     Board board = gm.getBoard();
-    System.out.println("\n=========================================================================================");
-    System.out.printf("  🌊 Wave: %d/%d | ☀️ Sun: %d | 🧪 Plant Food: %d%n",
-            gm.getCurrentWaveIndex() + 1, gm.getTotalWaves(), gm.getSunAmount(), gm.getPlantFoodCount());
-    System.out.println("=========================================================================================");
+    String separator = buildSeparator(board.getColumns());
 
-    System.out.println("       1        2        3        4        5        6        7        8        9");
-    System.out.println("   +--------+--------+--------+--------+--------+--------+--------+--------+--------+");
+    System.out.println();
+    System.out.println(separator);
+    System.out.printf(
+            "  Wave: %d/%d   |   Sun: %d   |   Plant Food: %d/%d   |   Time: %.1fs%n",
+            Math.min(gm.getCurrentWaveIndex() + 1, Math.max(gm.getTotalWaves(), 1)),
+            gm.getTotalWaves(),
+            gm.getSunAmount(),
+            gm.getPlantFoodCount(),
+            model.game.GameState.MAX_PLANT_FOOD,
+            gm.getCurrentTick() / 10.0);
+    System.out.println(separator);
+
+    System.out.println(buildColumnHeader(board.getColumns()));
+    System.out.println(buildGridLine(board.getColumns()));
+
+    String cellFormat = " %-" + CELL_TEXT_WIDTH + "s |";
 
     for (int row = 0; row < board.getRows(); row++) {
-      StringBuilder entityLine = new StringBuilder(" " + (row + 1) + " |");
-      StringBuilder healthLine = new StringBuilder("   |");
+      StringBuilder entityLine = new StringBuilder(String.format(" %-3d|", row + 1));
+      StringBuilder healthLine = new StringBuilder("    |");
 
       for (int col = 0; col < board.getColumns(); col++) {
         String[] cellData = getCellDetails(board, row, col);
-        entityLine.append(String.format(" %-6s |", cellData[0]));
-        healthLine.append(String.format(" %-6s |", cellData[1]));
+        entityLine.append(String.format(cellFormat, cellData[0]));
+        healthLine.append(String.format(cellFormat, cellData[1]));
       }
 
-      String mower = board.getLawnmowers().get(row).isActive() ? "🚜 MOWER" : "❌ USED";
-      System.out.println(entityLine.toString() + "  " + mower);
-      System.out.println(healthLine.toString());
-      System.out.println("   +--------+--------+--------+--------+--------+--------+--------+--------+--------+");
+      String mower = board.getLawnmowers().get(row).isActive() ? "  [MOWER]" : "  [ used]";
+      System.out.println(entityLine + mower);
+      System.out.println(healthLine);
+      System.out.println(buildGridLine(board.getColumns()));
     }
-    System.out.println("Guide: Z=Zombie, P=Plant, #=Tile Effect (gravestone/water) | Bottom Numbers: HP");
+
+    System.out.println(
+            "Legend: Z?=zombie   P?=plant   ~=water   +=gravestone   .=empty tile"
+                    + "   (? = first letter of the name)");
+    System.out.println(
+            "        Second line of every row is the current HP."
+                    + " Coordinates are (column, row), both 1-indexed.");
+  }
+
+  private String buildSeparator(int columns) {
+    return "=".repeat(ROW_PREFIX_PAD.length() + columns * (CELL_TEXT_WIDTH + 3));
+  }
+
+  private String buildColumnHeader(int columns) {
+    StringBuilder header = new StringBuilder(ROW_PREFIX_PAD + " ");
+    for (int col = 1; col <= columns; col++) {
+      header.append(String.format("%-" + (CELL_TEXT_WIDTH + 3) + "s", col));
+    }
+    return header.toString();
+  }
+
+  private String buildGridLine(int columns) {
+    StringBuilder line = new StringBuilder("    +");
+    for (int col = 0; col < columns; col++) {
+      line.append("-".repeat(CELL_TEXT_WIDTH + 2)).append("+");
+    }
+    return line.toString();
   }
 
   private String[] getCellDetails(Board board, int row, int col) {
@@ -411,8 +521,8 @@ public class GamePlayController implements BaseController {
     StringBuilder healths = new StringBuilder();
 
     for (Zombie z : board.getZombies()) {
-      if (z.getRow() == row && Math.round(z.getX()) == col) {
-        entities.append("Z");
+      if (z.getRow() == row && Math.round(z.getX()) == col && !z.isDead()) {
+        entities.append("Z").append(initialOf(z.getName()));
         healths.append(z.getCurrentHealth());
         break;
       }
@@ -424,21 +534,39 @@ public class GamePlayController implements BaseController {
         entities.append("/");
         healths.append("/");
       }
-      entities.append(Character.toUpperCase(plant.getName().charAt(0)));
+      entities.append("P").append(initialOf(plant.getName()));
       healths.append(plant.getCurrentHealth());
     }
 
     Tile tile = board.getTile(row, col);
-    if (entities.length() == 0 && tile != null && tile.getEffect() != null) {
-      entities.append("#");
+    if (entities.length() == 0 && tile != null) {
+      if (tile.isWater()) {
+        entities.append("~");
+      } else if (tile.getEffect() != null) {
+        entities.append("+");
+      }
     }
 
     if (entities.length() == 0) {
       entities.append(".");
+    }
+    if (healths.length() == 0) {
       healths.append("-");
     }
 
-    return new String[]{entities.toString(), healths.toString()};
+    return new String[] {entities.toString(), healths.toString()};
+  }
+
+  private char initialOf(String name) {
+    if (name == null || name.isEmpty()) {
+      return '?';
+    }
+    String trimmed = name;
+    if (trimmed.regionMatches(true, 0, "Zombie", 0, "Zombie".length())
+            && trimmed.length() > "Zombie".length()) {
+      trimmed = trimmed.substring("Zombie".length());
+    }
+    return trimmed.isEmpty() ? '?' : Character.toUpperCase(trimmed.charAt(0));
   }
 
   private void finishMatch(GameManager gm) {

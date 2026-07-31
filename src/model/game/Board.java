@@ -28,7 +28,9 @@ public class Board {
   private int pendingKillCount;
   private final List<KillDetail> pendingKillDetails = new ArrayList<>();
   private int pendingPlantsLostCount;
-  public record KillDetail(int row, long column, boolean laneHasUnusedMower) {}
+  private final java.util.Set<Zombie> mowerVictims =
+          java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+  public record KillDetail(int row, long column, boolean laneHasUnusedMower, boolean killedByMower) {}
   private final GameState gameState;
   private final Random random;
   private boolean playerLost;
@@ -144,7 +146,10 @@ public class Board {
         zombie.markLootDropped();
         pendingKillCount++;
         pendingKillDetails.add(new KillDetail(
-                zombie.getRow(), Math.round(zombie.getX()), laneHasUnusedMower(zombie.getRow())));
+                zombie.getRow(),
+                Math.round(zombie.getX()),
+                laneHasUnusedMower(zombie.getRow()),
+                mowerVictims.contains(zombie)));
         if (random.nextDouble() < DEATH_DROP_CHANCE) {
           rollDeathDrop(zombie);
         }
@@ -157,24 +162,41 @@ public class Board {
     }
     return lawnmowers.get(row).isActive();
   }
+  private static final int COIN_DROP_AMOUNT = 50;
+  private int droppedCoins;
+  private int droppedDiamonds;
+  private int droppedPots;
+
   private void rollDeathDrop(Zombie zombie) {
     int roll = random.nextInt(3);
     Reward reward;
     String dropName;
+    int runningTotal;
+    String unit;
+
     if (roll == 0) {
-      reward = new Currency("COIN", 10);
-      dropName = "a coin";
+      reward = new Currency("COIN", COIN_DROP_AMOUNT);
+      dropName = "coin";
+      droppedCoins += COIN_DROP_AMOUNT;
+      runningTotal = droppedCoins;
+      unit = "coins";
     } else if (roll == 1) {
       reward = new Currency("DIAMOND", 1);
-      dropName = "a diamond";
+      dropName = "diamond";
+      droppedDiamonds += 1;
+      runningTotal = droppedDiamonds;
+      unit = "diamonds";
     } else {
-      reward = new Currency("COIN", 25);
-      dropName = "a pot of coins";
+      reward = new model.game.reward.Inventory("pot", 1);
+      dropName = "pot";
+      droppedPots += 1;
+      runningTotal = droppedPots;
+      unit = "pots";
     }
+
     pendingRewards.add(reward);
     System.out.printf(
-            "Zombie of type %s dropped %s at (%d, %d).%n",
-            zombie.getName(), dropName, Math.round(zombie.getX()), zombie.getRow());
+            "A zombie dropped a %s; you have %d %s now.%n", dropName, runningTotal, unit);
   }
   public List<Reward> drainPendingRewards() {
     List<Reward> drained = new ArrayList<>(pendingRewards);
@@ -327,10 +349,12 @@ public class Board {
     }
   }
   private void triggerLawnmowerRow(int row) {
-    System.out.printf("The lawn mower in the row %d is triggered and killed these zombies:%n", row);
+    System.out.printf(
+            "The lawn mower in the row %d is triggered and killed these zombies:%n", row + 1);
     for (Zombie z : zombies) {
-      if (z.getRow() == row) {
+      if (z.getRow() == row && !z.isDead()) {
         z.takeDamage(10000, true);
+        mowerVictims.add(z);
         System.out.println("- " + z.getName());
       }
     }
@@ -340,16 +364,20 @@ public class Board {
       if (zombie.isDead()) {
         System.out.printf(
                 "Zombie of type %s is dead at (%d, %d).%n",
-                zombie.getName(), Math.round(zombie.getX()), zombie.getRow());
+                zombie.getName(), Math.round(zombie.getX()) + 1, zombie.getRow() + 1);
       }
     }
     for (Plant plant : plants) {
       if (plant.isDead()) {
         pendingPlantsLostCount++;
+        System.out.printf(
+                "Plant %s at (%d, %d) is destroyed.%n",
+                plant.getName(), plant.getCol() + 1, plant.getRow() + 1);
       }
     }
     plants.removeIf(Plant::isDead);
     zombies.removeIf(Zombie::isDead);
+    mowerVictims.clear();
     sunManager.cleanupExpiredSuns();
   }
   public int drainPendingPlantsLostCount() {
@@ -406,6 +434,17 @@ public class Board {
   }
   public void spawnZombie(Zombie z) {
     zombies.add(z);
+    registerZombieAsSeen(z);
+  }
+
+  private void registerZombieAsSeen(Zombie z) {
+    if (z == null || z.getName() == null) {
+      return;
+    }
+    model.account.User user = data.persistence.UserManager.getInstance().getCurrentUser();
+    if (user != null) {
+      user.unlockItem("zombie_" + z.getName().toLowerCase());
+    }
   }
   public int getRows() {
     return rows;

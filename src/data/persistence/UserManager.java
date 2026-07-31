@@ -79,6 +79,7 @@ public class UserManager {
     }
 
     this.currentUser = foundUser;
+    seedQuests(foundUser);
     this.isStayLoggedIn = stayLoggedIn;
     if (stayLoggedIn) {
       saveSessionToDisk(username);
@@ -194,6 +195,7 @@ public class UserManager {
     for (User u : users) {
       if (u.getUsername().equals(savedUsername)) {
         this.currentUser = u;
+        seedQuests(u);
         this.isStayLoggedIn = true;
         return true;
       }
@@ -201,6 +203,13 @@ public class UserManager {
 
     clearSessionFromDisk();
     return false;
+  }
+
+  private void seedQuests(User user) {
+    if (user == null || data.GameDataManager.questRepository == null) {
+      return;
+    }
+    user.seedQuestsIfNeeded(data.GameDataManager.questRepository.getAll());
   }
 
   public boolean isStayLoggedIn() {

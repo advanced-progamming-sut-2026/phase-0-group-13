@@ -70,19 +70,10 @@ public class QuestMenuController implements BaseController {
 
   private void ensureQuestsInitialized() {
     User user = UserManager.getInstance().getCurrentUser();
-    if (user == null || !user.getQuests().isEmpty()) {
+    if (user == null || GameDataManager.questRepository == null) {
       return;
     }
-
-    List<Quest> templates =
-            GameDataManager.questRepository != null ? GameDataManager.questRepository.getAll() : null;
-    if (templates == null) {
-      return;
-    }
-
-    for (Quest template : templates) {
-      user.getQuests().add(new Quest(template));
-    }
+    user.seedQuestsIfNeeded(GameDataManager.questRepository.getAll());
   }
 
   private void handleShowQuests(String pageName) {
@@ -119,36 +110,40 @@ public class QuestMenuController implements BaseController {
   }
 
   private int priorityRank(Quest quest) {
-    if (quest.getPriority() == null) return 6;
+    if (quest.getPriority() == null) return 5;
     String p = quest.getPriority().toLowerCase();
 
-    if (p.contains("بحرانی") || p.contains("critical")) return 1;
-    if (p.contains("بالا") || p.contains("high")) return 2;
-    if (p.contains("متوسط") || p.contains("medium")) return 3;
-    if (p.contains("کم") || p.contains("low")) return 4;
-    if (p.contains("روزانه") || p.contains("daily")) return 5;
-    return 6;
+    if (p.contains("critical")) return 1;
+    if (p.contains("high")) return 2;
+    if (p.contains("medium")) return 3;
+    if (p.contains("low")) return 4;
+    return 5;
   }
 
   private void printQuest(Quest quest) {
-    String status;
-    if (quest.isCompleted() && quest.isRewardClaimed()) {
-      status = "claimed";
-    } else if (quest.isCompleted()) {
-      status = "completed - reward unclaimed";
-    } else {
-      status = "in progress (" + quest.getProgressOfQuest() + ")";
-    }
+    System.out.printf(
+            "  [%-8s] %-26s | %s%n",
+            quest.getPriority() != null ? quest.getPriority() : "-",
+            quest.getTitle(),
+            quest.getCategory() != null ? quest.getCategory() : "general");
+    System.out.println("      goal   : " + quest.getCondition());
+    System.out.println("      reward : " + quest.getRewardType());
+    System.out.println("      status : " + describeStatus(quest));
+  }
 
-    System.out.println(
-            "  "
-                    + quest.getTitle()
-                    + " ["
-                    + (quest.getCategory() != null ? quest.getCategory() : "general")
-                    + "] - "
-                    + quest.getCondition()
-                    + " - "
-                    + status);
+  private String describeStatus(Quest quest) {
+    if (quest.isCompleted() && quest.isRewardClaimed()) {
+      return "completed - reward claimed";
+    }
+    if (quest.isCompleted()) {
+      return "COMPLETED - claim it with: claim quest -t " + quest.getTitle();
+    }
+    if (quest.getQuestTarget() > 0) {
+      return String.format(
+              "in progress (%d/%d)",
+              (int) quest.getProgressOfQuest(), (int) quest.getQuestTarget());
+    }
+    return "not started";
   }
 
   private void handleClaimQuest(String title) {

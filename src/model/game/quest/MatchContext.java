@@ -2,6 +2,7 @@ package model.game.quest;
 
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import model.enums.PlantTag;
 import model.game.Board;
@@ -19,12 +20,15 @@ public final class MatchContext {
   private int totalZombiesKilled;
   private int zombiesKilledInOpeningWindow;
   private int zombiesKilledAtColumnZeroWithNoMower;
+  private int zombiesKilledByMower;
 
   private int plantsPlacedCount;
   private int explosivePlantsPlaced;
   private int sunProducerPlantsPlaced;
   private int plantsLost;
   private final Set<PlantTag> plantFamiliesPlaced = EnumSet.noneOf(PlantTag.class);
+  private final Set<PlantTag> commonTagsAcrossPlacedPlants = EnumSet.allOf(PlantTag.class);
+  private final Set<String> plantNamesPlaced = new LinkedHashSet<>();
   private final Set<Integer> plantedColumns = new HashSet<>();
   private final Set<Integer> plantedRows = new HashSet<>();
 
@@ -72,8 +76,18 @@ public final class MatchContext {
     plantedRows.add(row);
     plantedColumns.add(col);
     plantFamiliesPlaced.addAll(plant.getTags());
-    if (plant.getTags().contains(PlantTag.EXPLOSIVE)) explosivePlantsPlaced++;
-    if (plant.getTags().contains(PlantTag.SUN)) sunProducerPlantsPlaced++;
+    commonTagsAcrossPlacedPlants.retainAll(plant.getTags());
+    if (plant.getName() != null) {
+      plantNamesPlaced.add(plant.getName().toLowerCase().trim());
+    }
+    if (plant.getCategory() == model.enums.PlantCategory.EXPLOSIVE
+            || plant.getTags().contains(PlantTag.EXPLOSIVE)) {
+      explosivePlantsPlaced++;
+    }
+    if (plant.getCategory() == model.enums.PlantCategory.SUN_PRODUCER
+            || plant.getTags().contains(PlantTag.SUN)) {
+      sunProducerPlantsPlaced++;
+    }
   }
 
   public void onPlantLost() {
@@ -87,13 +101,16 @@ public final class MatchContext {
   }
 
 
-  public void onZombieKilled(int tick, int column, boolean laneHasUnusedMower) {
+  public void onZombieKilled(int tick, int column, boolean laneHasUnusedMower, boolean killedByMower) {
     totalZombiesKilled++;
     if (firstWaveStartTick >= 0 && tick - firstWaveStartTick <= OPENING_WINDOW_TICKS) {
       zombiesKilledInOpeningWindow++;
     }
     if (column == 0 && !laneHasUnusedMower) {
       zombiesKilledAtColumnZeroWithNoMower++;
+    }
+    if (killedByMower) {
+      zombiesKilledByMower++;
     }
   }
 
@@ -135,6 +152,7 @@ public final class MatchContext {
   public int getTotalZombiesKilled() { return totalZombiesKilled; }
   public int getZombiesKilledInOpeningWindow() { return zombiesKilledInOpeningWindow; }
   public int getZombiesKilledAtColumnZeroWithNoMower() { return zombiesKilledAtColumnZeroWithNoMower; }
+  public int getZombiesKilledByMower() { return zombiesKilledByMower; }
   public int getPlantsPlacedCount() { return plantsPlacedCount; }
   public int getExplosivePlantsPlaced() { return explosivePlantsPlaced; }
   public int getSunProducerPlantsPlaced() { return sunProducerPlantsPlaced; }
@@ -153,12 +171,29 @@ public final class MatchContext {
   }
 
   public boolean onlyPlacedFamily(PlantTag family) {
-    return !plantFamiliesPlaced.isEmpty()
-        && plantFamiliesPlaced.size() == 1
-        && plantFamiliesPlaced.contains(family);
+    if (plantsPlacedCount == 0 || !plantFamiliesPlaced.contains(family)) {
+      return false;
+    }
+    return commonTagsAcrossPlacedPlants.contains(family);
   }
 
   public boolean neverPlacedFamily(PlantTag family) {
     return !plantFamiliesPlaced.contains(family);
   }
+
+  public boolean onlyMowerKills() {
+    return zombiesKilledByMower > 0 && zombiesKilledByMower == totalZombiesKilled;
+  }
+
+  public boolean placedExactlyOnePlantType() {
+    return plantNamesPlaced.size() == 1;
+  }
+
+  public boolean onlyPlacedPlant(String plantName) {
+    return plantName != null
+        && plantNamesPlaced.size() == 1
+        && plantNamesPlaced.contains(plantName.toLowerCase().trim());
+  }
+
+  public Set<String> getPlantNamesPlaced() { return plantNamesPlaced; }
 }
