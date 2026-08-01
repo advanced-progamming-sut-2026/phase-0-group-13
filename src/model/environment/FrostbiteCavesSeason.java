@@ -36,6 +36,11 @@ public class FrostbiteCavesSeason extends Season {
   }
 
   @Override
+  public String getBossZombieName() {
+    return "ZombieZombossMechCowboy";
+  }
+
+  @Override
   public List<Tile> generateMap() {
     return plainGrid();
   }

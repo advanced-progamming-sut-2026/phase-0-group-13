@@ -25,7 +25,12 @@ public class DarkAgesSeason extends Season {
 
   @Override
   public List<Zombie> getAvailableZombies() {
-    return zombiesByAliasKeyword("dark");
+    return zombiesByAliasKeyword("dark", "piano");
+  }
+
+  @Override
+  public String getBossZombieName() {
+    return "ZombieZombossMechDark";
   }
 
   @Override

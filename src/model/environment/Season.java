@@ -10,16 +10,12 @@ import model.game.zombie.Zombie;
 import model.game.zombie.ZombieParts.ZombieTemplate;
 import model.game.zombie.ZombieParts.ZombieTypeResolver;
 import model.game.zombie.factory.ZombieFactory;
-import view.MainMenuSubMenus.GameMenuSubMenus.MiniGames.MiniGame;
 
 public abstract class Season {
   protected static final int DEFAULT_ROWS = 5;
   protected static final int DEFAULT_COLUMNS = 9;
 
   protected String name;
-  private List<Zombie> availableZombies;
-  private List<Stage> stages;
-  private List<MiniGame> miniGames;
 
   public String getName() {
     return name;
@@ -39,6 +35,10 @@ public abstract class Season {
   // بعد از initializeLevel صدا زده میشه (MatchLauncher)
   public void placeHazards(model.game.Board board) {}
 
+
+  public String getBossZombieName() {
+    return null;
+  }
 
   public void onTick(model.game.Board board, int currentTick) {}
 

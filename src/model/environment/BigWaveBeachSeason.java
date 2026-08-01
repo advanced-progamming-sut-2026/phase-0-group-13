@@ -29,6 +29,11 @@ public class BigWaveBeachSeason extends Season {
   }
 
   @Override
+  public String getBossZombieName() {
+    return "ZombieZombossMechPirate";
+  }
+
+  @Override
   public List<Tile> generateMap() {
     // خونه‌های آب (برای Lily Pad و گیاهان شناور) هنوز تو Tile مدل نشدن؛ فعلا شبکه معمولی برمیگردونیم
     return plainGrid();

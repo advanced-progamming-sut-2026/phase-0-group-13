@@ -1,6 +1,8 @@
 package model.game.zombie.behavior;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import model.game.Board;
 import model.game.Projectile;
 import model.game.plant.Plant;
@@ -23,6 +25,8 @@ public class JesterZombieAction implements ZombieAction {
   }
 
   private void reflectIncomingProjectiles(Zombie zombie, Board board) {
+    // addProjectile وسط پیمایش همون لیست، ConcurrentModificationException میداد
+    List<Projectile> reflected = new ArrayList<>();
     Iterator<Projectile> iterator = board.getProjectiles().iterator();
     while (iterator.hasNext()) {
       Projectile incoming = iterator.next();
@@ -30,8 +34,11 @@ public class JesterZombieAction implements ZombieAction {
         continue;
       }
       iterator.remove();
-      board.addProjectile(buildReflectedProjectile(incoming, zombie));
+      reflected.add(buildReflectedProjectile(incoming, zombie));
       System.out.printf("%s juggled a projectile back at the plants!%n", zombie.getName());
+    }
+    for (Projectile projectile : reflected) {
+      board.addProjectile(projectile);
     }
   }
 

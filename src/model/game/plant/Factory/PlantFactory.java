@@ -177,6 +177,20 @@ public class PlantFactory {
     return matcher.find() ? Integer.parseInt(matcher.group(1)) : fallback;
   }
 
+  private static final Pattern PARALLEL_LANES =
+          Pattern.compile("(\\d+)\\s+parallel\\s+lanes", Pattern.CASE_INSENSITIVE);
+
+  private int parseLaneSpread(String abilityText) {
+    if (abilityText == null) {
+      return 0;
+    }
+    Matcher matcher = PARALLEL_LANES.matcher(abilityText);
+    if (!matcher.find()) {
+      return 0;
+    }
+    return Math.max(0, (Integer.parseInt(matcher.group(1)) - 1) / 2);
+  }
+
   private Projectile.ProjectileEffect resolveProjectileEffect(EnumSet<PlantTag> tags) {
     if (tags.contains(PlantTag.FIRE)) return Projectile.ProjectileEffect.FIRE;
     if (tags.contains(PlantTag.ICE)) return Projectile.ProjectileEffect.ICE;
@@ -187,18 +201,133 @@ public class PlantFactory {
   private PlantAction determineBehavior(
           PlantCategory category, int interval, int damage, EnumSet<PlantTag> tags,
           PlantTemplate template) {
+    // نعناع‌ها تو دیتا با دسته‌ی خانواده‌ی خودشون ثبت شدن، پس فقط از روی اسم قابل تشخیصن
+    if (isMint(template.name)) {
+      return new MintAction(5 * TICKS_PER_SECOND);
+    }
+    int power = category == PlantCategory.SUN_PRODUCER
+            ? parseSunAmount(template.baseAbility, 25) : damage;
+    if (tags.contains(PlantTag.RAMP_UP)) {
+      return buildGrowthBehavior(category, interval, power, tags, template);
+    }
+    return baseBehaviorFor(category, interval, power, tags, template, 0);
+  }
+
+  // power برای تولیدکننده‌های خورشید یعنی مقدار خورشید و برای بقیه یعنی دمیج
+  private PlantAction baseBehaviorFor(
+          PlantCategory category, int interval, int power, EnumSet<PlantTag> tags,
+          PlantTemplate template, int stageIndex) {
     return switch (category) {
-      case SUN_PRODUCER -> new ProduceSunAction(interval, parseSunAmount(template.baseAbility, 25));
-      case SHOOTER -> new ShootForwardAction(interval, damage, resolveProjectileEffect(tags));
-      case STRIKE_THROUGH -> new ShootForwardAction(interval, damage, resolveProjectileEffect(tags), true);
-      case LOBBER -> new LobAction(interval, damage, tags.contains(PlantTag.AOE), resolveProjectileEffect(tags));
-      case MELEE -> new MeleeAction(interval, damage);
-      case HOMING -> new HomingAction(interval, damage);
-      case EXPLOSIVE -> determineExplosiveBehavior(damage, tags, template);
+      case SUN_PRODUCER -> new ProduceSunAction(interval, power);
+      case SHOOTER -> buildShooter(interval, power, tags, false, template);
+      case STRIKE_THROUGH -> buildShooter(interval, power, tags, true, template);
+      case LOBBER -> new LobAction(interval, power, tags.contains(PlantTag.AOE), resolveProjectileEffect(tags));
+      case MELEE -> new MeleeAction(interval, power, tags.contains(PlantTag.AOE) ? 1 + stageIndex : 0);
+      case HOMING -> new HomingAction(interval, power);
+      case EXPLOSIVE -> determineExplosiveBehavior(power, tags, template);
       case WALL_NUT -> determineWallNutBehavior(tags, template.name);
-      case MODIFIER, MINT -> new DummyPlantAction("Category " + category + " has no real behavior class yet");
+      case MODIFIER, MINT -> determineModifierBehavior(template);
       default -> throw new UnsupportedOperationException("Unknown PlantCategory: " + category);
     };
+  }
+
+  private ShootForwardAction buildShooter(int interval, int power, EnumSet<PlantTag> tags,
+          boolean piercing, PlantTemplate template) {
+    ShootForwardAction action = new ShootForwardAction(interval, power,
+            resolveProjectileEffect(tags), piercing, parseLaneSpread(template.baseAbility));
+    action.setDirections(parseFiringDirections(template.baseAbility));
+    return action;
+  }
+
+  private boolean isMint(String name) {
+    return name != null && name.toLowerCase().endsWith("-mint");
+  }
+
+  private PlantAction determineModifierBehavior(PlantTemplate template) {
+    String name = template.name == null ? "" : template.name.toLowerCase();
+    if (name.contains("hypno")) {
+      return new HypnoShroomAction();
+    }
+    // افکت Torchwood و Lily Pad رو Board و GameManager اعمال میکنن، پس رفتار تیکی لازم ندارن
+    return null;
+  }
+
+  private PlantAction buildGrowthBehavior(
+          PlantCategory category, int interval, int power, EnumSet<PlantTag> tags,
+          PlantTemplate template) {
+    int[] stageValues = parseStageValues(
+            category == PlantCategory.SUN_PRODUCER ? template.baseAbility : template.damage);
+    if (stageValues.length < 2) {
+      return baseBehaviorFor(category, interval, power, tags, template, 0);
+    }
+    int[] stageStartTicks = parseStageStartTicks(template.baseAbility, stageValues.length);
+    // بونوس لِوِل روی مقدار مرحله‌ی اول حساب شده؛ همون اختلاف رو به بقیه‌ی مرحله‌ها هم میدیم
+    int levelBonus = power - stageValues[0];
+    PlantAction[] stages = new PlantAction[stageValues.length];
+    for (int i = 0; i < stageValues.length; i++) {
+      stages[i] = baseBehaviorFor(
+              category, interval, Math.max(0, stageValues[i] + levelBonus), tags, template, i);
+    }
+    return new GrowthStageAction(stages, stageStartTicks);
+  }
+
+  private static final Pattern STAGE_VALUES = Pattern.compile("(\\d+(?:/\\d+)+)");
+
+  private int[] parseStageValues(String text) {
+    if (text == null) {
+      return new int[0];
+    }
+    Matcher matcher = STAGE_VALUES.matcher(text);
+    if (!matcher.find()) {
+      return new int[0];
+    }
+    String[] parts = matcher.group(1).split("/");
+    int[] values = new int[parts.length];
+    for (int i = 0; i < parts.length; i++) {
+      values[i] = Integer.parseInt(parts[i]);
+    }
+    return values;
+  }
+
+  private static final Pattern STAGE_TIME =
+          Pattern.compile("Stg\\s*(\\d+)\\s*:\\s*(\\d+)\\s*s", Pattern.CASE_INSENSITIVE);
+
+  // "To Stg2: 24s | To Stg3: 72s" یعنی مرحله‌ها از تیک 0، 240 و 720 بعد از کاشت شروع میشن
+  private int[] parseStageStartTicks(String abilityText, int stageCount) {
+    int[] startTicks = new int[stageCount];
+    if (abilityText == null) {
+      return startTicks;
+    }
+    Matcher matcher = STAGE_TIME.matcher(abilityText);
+    while (matcher.find()) {
+      int stage = Integer.parseInt(matcher.group(1));
+      if (stage >= 1 && stage <= stageCount) {
+        startTicks[stage - 1] = Integer.parseInt(matcher.group(2)) * TICKS_PER_SECOND;
+      }
+    }
+    return startTicks;
+  }
+
+  private static final int[][] DIAGONAL_DIRECTIONS = {{1, -1}, {1, 1}, {-1, -1}, {-1, 1}};
+  private static final int[][] STAR_DIRECTIONS = {{1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}};
+  private static final int[][] SPLIT_DIRECTIONS = {{1, 0}, {-1, 0}, {-1, 0}};
+
+  // null یعنی همون شلیک مستقیم به جلو
+  private int[][] parseFiringDirections(String abilityText) {
+    if (abilityText == null) {
+      return null;
+    }
+    String text = abilityText.toLowerCase();
+    if (text.contains("diagonal")) {
+      return DIAGONAL_DIRECTIONS;
+    }
+    if (text.contains("star-shaped")) {
+      return STAR_DIRECTIONS;
+    }
+    if (text.contains("backward")) {
+      return SPLIT_DIRECTIONS;
+    }
+    return null;
   }
 
   private PlantAction determineExplosiveBehavior(
@@ -239,12 +368,15 @@ public class PlantFactory {
 
   private PlantFood determinePlantFood(
           PlantTemplate template, PlantCategory category, int interval, int damage, EnumSet<PlantTag> tags) {
+    if (isMint(template.name)) {
+      return null;
+    }
     return switch (category) {
       case SUN_PRODUCER ->
               new PlantFood(1, new ProduceSunAction(1, parseSunAmount(template.plantFoodEffect, 150)));
       case SHOOTER, STRIKE_THROUGH ->
-              new PlantFood(150,
-                      new ShootForwardAction(Math.max(1, interval / 3), damage * 2, resolveProjectileEffect(tags)));
+              new PlantFood(150, buildShooter(Math.max(1, interval / 3), damage * 2, tags,
+                      category == PlantCategory.STRIKE_THROUGH, template));
       case LOBBER ->
               new PlantFood(150,
                       new LobAction(Math.max(1, interval / 3), damage * 2, true, resolveProjectileEffect(tags)));

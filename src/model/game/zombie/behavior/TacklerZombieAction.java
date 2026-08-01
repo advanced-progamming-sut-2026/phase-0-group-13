@@ -5,6 +5,15 @@ import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
 public class TacklerZombieAction implements ZombieAction {
+  private final boolean selfDestructs;
+
+  public TacklerZombieAction() {
+    this(false);
+  }
+
+  public TacklerZombieAction(boolean selfDestructs) {
+    this.selfDestructs = selfDestructs;
+  }
 
   // برخلاف زامبی معمولی، این یکی (All-Star/Footballer) اصلا وایمیسته گیاه رو نمیخوره؛ همینجوری در
   // حرکت از روش رد میشه و نابودش میکنه
@@ -14,6 +23,11 @@ public class TacklerZombieAction implements ZombieAction {
     if (targetPlant != null && !targetPlant.isDead()) {
       targetPlant.takeDamage(10000);
       System.out.printf("%s tackled through %s!%n", zombie.getName(), targetPlant.getName());
+      if (selfDestructs) {
+        zombie.takeDamage(zombie.getMaxHealth(), true);
+        System.out.printf("%s was destroyed along with it.%n", zombie.getName());
+        return;
+      }
     }
 
     zombie.setEating(false);

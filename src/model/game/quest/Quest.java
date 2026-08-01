@@ -110,7 +110,13 @@ public class Quest {
 
   private static Map<String, ContextCondition> buildContextConditions() {
     Map<String, ContextCondition> map = new java.util.LinkedHashMap<>();
+    putCombatConditions(map);
+    putGardenConditions(map);
+    putProgressConditions(map);
+    return map;
+  }
 
+  private static void putCombatConditions(Map<String, ContextCondition> map) {
     map.put("using only the cactus", (q, ctx) ->
             ctx.getTotalZombiesKilled() >= KILL_GOAL && ctx.onlyPlacedPlant("cactus"));
 
@@ -124,7 +130,9 @@ public class Quest {
     map.put("within 30 seconds", (q, ctx) -> ctx.getZombiesKilledInOpeningWindow() >= KILL_GOAL);
 
     map.put("explosive plants", (q, ctx) -> ctx.getExplosivePlantsPlaced() >= EXPLOSIVE_GOAL);
+  }
 
+  private static void putGardenConditions(Map<String, ContextCondition> map) {
     map.put("no symmetry", (q, ctx) ->
             ctx.isMatchWon()
                     && ctx.getPlantsPlacedCount() > 0
@@ -149,7 +157,9 @@ public class Quest {
             ctx.isMatchWon()
                     && ctx.neverPlacedFamily(PlantTag.DAY)
                     && ctx.getPlantFamiliesPlaced().contains(PlantTag.SHROOM));
+  }
 
+  private static void putProgressConditions(Map<String, ContextCondition> map) {
     map.put("levels in a row", (q, ctx) -> ctx.getWinStreakAtMaxDifficulty() >= WIN_STREAK_GOAL);
 
     map.put("with no lawn mower", (q, ctx) ->
@@ -177,8 +187,6 @@ public class Quest {
       int n = extractFirstNumber(q.variable);
       return ctx.isMatchWon() && ctx.getPlantsLost() <= Math.max(n, 0);
     });
-
-    return map;
   }
 
   private static final Map<String, PlantTag> FAMILY_KEYWORDS = buildFamilyKeywords();

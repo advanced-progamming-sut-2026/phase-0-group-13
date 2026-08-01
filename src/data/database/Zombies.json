@@ -4463,7 +4463,7 @@
       },
       "CanSpawnPlantFood": true,
       "Cost": 250,
-      "EatDPS": 0,
+      "EatDPS": 100,
       "GroundTrackName": "ground_swatch",
       "HitRect": {
         "mHeight": 95,
@@ -4477,7 +4477,7 @@
         "y": 0,
         "z": 1.2
       },
-      "Speed": 0.0,
+      "Speed": 0.09,
       "ZombieStats": [
         {
           "Type": "toughness",
@@ -4568,6 +4568,75 @@
         "z": 1.2
       },
       "Speed": 0.3,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness2"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed3"
+        }
+      ]
+    }
+  },
+  {
+    "objclass": "ArmorPropertySheet",
+    "aliases": [
+      "BarrelDefault"
+    ],
+    "objdata": {
+      "ArmorType": "Barrel",
+      "BaseHealth": 600,
+      "ArmorFlags": [
+        "damageable"
+      ],
+      "ArmorLayers": [
+        "zombie_armor_barrel_norm"
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieDarkTurquoiseDefault"
+    ],
+    "objclass": "ZombieTurquoisePropertySheet",
+    "objdata": {
+      "CanSpawnPlantFood": true,
+      "Cost": 175,
+      "EatDPS": 100,
+      "Hitpoints": 500,
+      "Speed": 0.16,
+      "WavePointCost": 500,
+      "Weight": 1000,
+      "ZombieStats": [
+        {
+          "Type": "toughness",
+          "Value": "toughness3"
+        },
+        {
+          "Type": "speed",
+          "Value": "speed2"
+        }
+      ]
+    }
+  },
+  {
+    "aliases": [
+      "ZombieDarkBarrelRollerDefault"
+    ],
+    "objclass": "ZombieBarrelRollerPropertySheet",
+    "objdata": {
+      "CanSpawnPlantFood": true,
+      "Cost": 175,
+      "EatDPS": 100,
+      "Hitpoints": 350,
+      "Speed": 0.19,
+      "WavePointCost": 550,
+      "Weight": 1000,
+      "ZombieArmorProps": [
+        "RTID(BarrelDefault@ArmorTypes)"
+      ],
       "ZombieStats": [
         {
           "Type": "toughness",

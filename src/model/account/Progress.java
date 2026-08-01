@@ -47,6 +47,9 @@ public class Progress {
     String unlockMessage = "";
     if (this.currentStage == 2 && this.currentLevel == 1 && !miniGamesUnlocked) {
       this.miniGamesUnlocked = true;
+      unlockMiniGame("vasebreaker");
+      unlockMiniGame("wallnut_bowling");
+      unlockMiniGame("i_zombie");
       unlockMessage = "  Mini-Games mode has been unlocked!";
     } else if (this.currentStage == 3 && this.currentLevel == 1 && !survivalModeUnlocked) {
       this.survivalModeUnlocked = true;

@@ -177,13 +177,15 @@ public class GameManager {
 
     Plant existingPlant = board.getPlantAt(row, col);
     boolean plantIsAquatic = plant.getTags().contains(model.enums.PlantTag.WATER);
+    boolean stacking = false;
 
     if (board.isWaterAt(row, col) && !plantIsAquatic) {
       if (existingPlant == null || !existingPlant.getTags().contains(model.enums.PlantTag.WATER)) {
         return false;
       }
     } else if (existingPlant != null) {
-      return false;
+      if (!canStackOn(plant, existingPlant)) return false;
+      stacking = true;
     }
 
     if (!freePlanting) {
@@ -191,8 +193,39 @@ public class GameManager {
       matchContext.onSunSpent(plant.getCost());
     }
 
+    if (stacking) {
+      return stackOnto(plant, existingPlant, row, col);
+    }
+
     board.placePlant(plant);
     matchContext.onPlantPlaced(plant, row, col);
+    return true;
+  }
+
+  // تگ stack یعنی یا روی هم‌نوع خودش سوار میشه (Pea Pod) یا پوسته‌ی محافظ بقیه‌ست (Pumpkin)
+  private boolean canStackOn(Plant plant, Plant existingPlant) {
+    if (!plant.getTags().contains(model.enums.PlantTag.STACK)) {
+      return false;
+    }
+    if (plant.getName().equalsIgnoreCase(existingPlant.getName())) {
+      return existingPlant.getStackCount() < Plant.MAX_STACK;
+    }
+    return plant.getCategory() == model.enums.PlantCategory.WALL_NUT
+            && existingPlant.getShield() == null;
+  }
+
+  private boolean stackOnto(Plant plant, Plant existingPlant, int row, int col) {
+    if (plant.getName().equalsIgnoreCase(existingPlant.getName())) {
+      existingPlant.addStack();
+      System.out.printf("%s now has %d heads stacked at (%d, %d).%n",
+              existingPlant.getName(), existingPlant.getStackCount(), col + 1, row + 1);
+      return true;
+    }
+    existingPlant.setShield(plant);
+    board.placePlant(plant);
+    matchContext.onPlantPlaced(plant, row, col);
+    System.out.printf("%s now shields %s at (%d, %d).%n",
+            plant.getName(), existingPlant.getName(), col + 1, row + 1);
     return true;
   }
 

@@ -18,7 +18,9 @@ public class Projectile {
   private final int damage;
   private final double speed;
   private double xCoordinate;
-  private final int yCoordinate;
+  private double yCoordinate;
+  private int stepCol = 1;
+  private int stepRow = 0;
   private final boolean isFromZombie;
   private boolean isActive;
   private final ProjectileEffect effect;
@@ -61,7 +63,8 @@ public class Projectile {
 
   public void move() {
     if (isActive) {
-      this.xCoordinate += speed;
+      this.xCoordinate += speed * stepCol;
+      this.yCoordinate += speed * stepRow;
     }
   }
 
@@ -114,12 +117,21 @@ public class Projectile {
     this.isActive = false;
   }
 
+  public int getDamage() {
+    return damage;
+  }
+
+  public void setDirection(int stepCol, int stepRow) {
+    this.stepCol = stepCol;
+    this.stepRow = stepRow;
+  }
+
   public double getXCoordinate() {
     return xCoordinate;
   }
 
   public int getYCoordinate() {
-    return yCoordinate;
+    return (int) Math.round(yCoordinate);
   }
 
   public boolean isFromZombie() {
@@ -149,7 +161,8 @@ public class Projectile {
     }
     Projectile lit =
             new Projectile(damage, speed,
-                    xCoordinate, yCoordinate, ProjectileEffect.FIRE, piercing, lobbed, isFromZombie);
+                    xCoordinate, getYCoordinate(), ProjectileEffect.FIRE, piercing, lobbed, isFromZombie);
+    lit.setDirection(stepCol, stepRow);
     lit.alreadyHit.addAll(this.alreadyHit);
     return lit;
   }

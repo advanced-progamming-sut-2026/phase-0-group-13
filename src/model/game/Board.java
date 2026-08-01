@@ -6,6 +6,7 @@ import java.util.ListIterator;
 import java.util.Random;
 import model.enums.PlantTag;
 import model.enums.StatusEffect;
+import model.game.TileEffects.BarrelEffect;
 import model.game.TileEffects.IceTrailEffect;
 import model.game.TileEffects.TileEffect;
 import model.game.TileEffects.TombStoneEffect;
@@ -15,7 +16,6 @@ import model.game.reward.Reward;
 import model.game.zombie.Zombie;
 import model.game.zombie.factory.ZombieFactory;
 public class Board {
-  private static final double DEATH_DROP_CHANCE = 0.10;
   private final int rows;
   private final int columns;
   private Tile[][] tiles;
@@ -24,7 +24,7 @@ public class Board {
   private final SunManager sunManager; // کلاسی که مدیریت خورشیدها را بر عهده دارد
   private final List<Projectile> projectiles;
   private final List<Lawnmower> lawnmowers;
-  private final List<Reward> pendingRewards = new ArrayList<>();
+  private final LootDropper lootDropper;
   private int pendingKillCount;
   private final List<KillDetail> pendingKillDetails = new ArrayList<>();
   private int pendingPlantsLostCount;
@@ -44,6 +44,7 @@ public class Board {
     this.projectiles = new ArrayList<>();
     this.lawnmowers = new ArrayList<>();
     this.random = new Random();
+    this.lootDropper = new LootDropper(this.random);
     initialize();
   }
   public void initialize() {
@@ -65,6 +66,9 @@ public class Board {
           if (effect instanceof TombStoneEffect tombstone) {
             tryNecromancy(tombstone, i, j, currentTick);
           }
+          if (effect instanceof BarrelEffect barrel) {
+            tryBarrelBurst(barrel, i, j);
+          }
         }
       }
     }
@@ -78,6 +82,7 @@ public class Board {
       zombie.update(currentTick, this);
       checkZombiePlantCollisions(zombie, currentTick);
     }
+    retireDepartedHypnotizedZombies();
     handleProjectiles(currentTick);
     handleLawnmowers();
     triggerDeathExplosions();
@@ -96,6 +101,25 @@ public class Board {
       System.out.printf("A zombie rises from a grave at (%d, %d)!%n", col + 1, row + 1);
     }
     tombstone.markRaised(currentTick);
+  }
+  private void tryBarrelBurst(BarrelEffect barrel, int row, int col) {
+    if (barrel.isActive() || barrel.hasBurst()) {
+      return;
+    }
+    barrel.markBurst();
+    spawnImpsFromBarrel(row, col);
+  }
+
+  public void spawnImpsFromBarrel(int row, double col) {
+    ZombieFactory factory = new ZombieFactory(GameDataManager.zombieRepository);
+    for (int i = 0; i < 2; i++) {
+      Zombie imp = factory.createZombie("ZombieEgyptImpDefault", row, col);
+      if (imp != null) {
+        spawnZombie(imp);
+      }
+    }
+    System.out.printf("The barrel burst open at (%d, %d) and two imps tumbled out!%n",
+            (int) Math.round(col) + 1, row + 1);
   }
   private void applyTileHazardsToZombies() {
     for (Zombie zombie : zombies) {
@@ -128,6 +152,16 @@ public class Board {
       }
     }
   }
+  // وگرنه Wave همچنان جونشون رو حساب میکنه و موج بعدی هیچ‌وقت شروع نمیشه
+  private void retireDepartedHypnotizedZombies() {
+    for (Zombie zombie : zombies) {
+      if (zombie.isHypnotized() && !zombie.isDead() && zombie.getX() > columns) {
+        System.out.printf("%s marched off the lawn and left the battle.%n", zombie.getName());
+        zombie.takeDamage(zombie.getMaxHealth(), true);
+        zombie.markLootDropped();
+      }
+    }
+  }
   private void handleGlowingZombieDrops() {
     for (Zombie zombie : zombies) {
       if (zombie.isDead() && zombie.isShiny() && !zombie.hasDroppedPlantFood()) {
@@ -144,15 +178,16 @@ public class Board {
     for (Zombie zombie : zombies) {
       if (zombie.isDead() && !zombie.hasDroppedLoot()) {
         zombie.markLootDropped();
+        if (zombie.getBehavior() != null) {
+          zombie.getBehavior().onDeath(zombie, this);
+        }
         pendingKillCount++;
         pendingKillDetails.add(new KillDetail(
                 zombie.getRow(),
                 Math.round(zombie.getX()),
                 laneHasUnusedMower(zombie.getRow()),
                 mowerVictims.contains(zombie)));
-        if (random.nextDouble() < DEATH_DROP_CHANCE) {
-          rollDeathDrop(zombie);
-        }
+        lootDropper.rollFor(zombie);
       }
     }
   }
@@ -162,46 +197,8 @@ public class Board {
     }
     return lawnmowers.get(row).isActive();
   }
-  private static final int COIN_DROP_AMOUNT = 50;
-  private int droppedCoins;
-  private int droppedDiamonds;
-  private int droppedPots;
-
-  private void rollDeathDrop(Zombie zombie) {
-    int roll = random.nextInt(3);
-    Reward reward;
-    String dropName;
-    int runningTotal;
-    String unit;
-
-    if (roll == 0) {
-      reward = new Currency("COIN", COIN_DROP_AMOUNT);
-      dropName = "coin";
-      droppedCoins += COIN_DROP_AMOUNT;
-      runningTotal = droppedCoins;
-      unit = "coins";
-    } else if (roll == 1) {
-      reward = new Currency("DIAMOND", 1);
-      dropName = "diamond";
-      droppedDiamonds += 1;
-      runningTotal = droppedDiamonds;
-      unit = "diamonds";
-    } else {
-      reward = new model.game.reward.Inventory("pot", 1);
-      dropName = "pot";
-      droppedPots += 1;
-      runningTotal = droppedPots;
-      unit = "pots";
-    }
-
-    pendingRewards.add(reward);
-    System.out.printf(
-            "A zombie dropped a %s; you have %d %s now.%n", dropName, runningTotal, unit);
-  }
   public List<Reward> drainPendingRewards() {
-    List<Reward> drained = new ArrayList<>(pendingRewards);
-    pendingRewards.clear();
-    return drained;
+    return lootDropper.drainPendingRewards();
   }
   public int drainPendingKillCount() {
     int count = pendingKillCount;
@@ -308,7 +305,8 @@ public class Board {
           break;
         }
       }
-      if (hitRegistered || p.getXCoordinate() > columns) {
+      if (hitRegistered || p.getXCoordinate() > columns || p.getXCoordinate() < -1
+              || p.getYCoordinate() < 0 || p.getYCoordinate() >= rows) {
         iterator.remove();
       }
     }
@@ -323,6 +321,10 @@ public class Board {
       return false;
     }
     TileEffect effect = tiles[row][col].getEffect();
+    if (effect instanceof BarrelEffect barrel && barrel.isActive()) {
+      barrel.takeDamage(p.getDamage());
+      return true;
+    }
     return effect instanceof TombStoneEffect tombstone
             && tombstone.isActive()
             && tombstone.isBlocksShots();
@@ -332,7 +334,6 @@ public class Board {
       if (!mower.isActive()) {
         for (Zombie z : zombies) {
           if (z.getRow() == mower.getRow() && z.getX() <= -0.5) {
-            System.out.println("The zombie ate your brain; LOSER!!!");
             playerLost = true;
             return;
           }

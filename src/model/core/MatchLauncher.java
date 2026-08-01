@@ -13,6 +13,7 @@ import model.environment.FrostbiteCavesSeason;
 import model.environment.Season;
 import model.game.Wave;
 import model.game.WaveGenerator;
+import model.game.minigame.BossStageRule;
 import model.game.minigame.ConveyorRule;
 import model.game.minigame.DeadLineRule;
 import model.game.minigame.LockedPlantsRule;
@@ -64,11 +65,13 @@ public final class MatchLauncher {
    * across the adventure. Level 1 is a normal level and level 4 is the boss (next phase).
    */
   private static void attachSpecialRule(GameManager gameManager, int stage) {
-    User user = UserManager.getInstance().getCurrentUser();
-    int levelInStage = user != null ? user.getProgress().getCurrentLevel() : 1;
+    int levelInStage = currentLevelInStage();
     List<String> deck = new ArrayList<>(MatchSetup.getInstance().getSelectedPlants());
+    String bossName = gameManager.getSeason() == null ? null : gameManager.getSeason().getBossZombieName();
 
-    SpecialStageRule rule = specialRuleFor(stage, levelInStage, deck);
+    SpecialStageRule rule = levelInStage == BOSS_LEVEL_IN_STAGE && bossName != null
+            ? new BossStageRule(bossName)
+            : specialRuleFor(stage, levelInStage, deck);
     if (rule == null) {
       return;
     }
@@ -80,6 +83,13 @@ public final class MatchLauncher {
       gameManager.pauseZombieWaves();
       System.out.println("Plant freely, then type 'start zombie waves' to begin the assault.");
     }
+  }
+
+  private static final int BOSS_LEVEL_IN_STAGE = 4;
+
+  private static int currentLevelInStage() {
+    User user = UserManager.getInstance().getCurrentUser();
+    return user != null ? user.getProgress().getCurrentLevel() : 1;
   }
 
   private static SpecialStageRule specialRuleFor(int stage, int levelInStage, List<String> deck) {
@@ -150,7 +160,15 @@ public final class MatchLauncher {
     }
 
     List<String> pool = filterPoolForLevel(level, season, zombieNames);
-    return WaveGenerator.generate(level, pool);
+    List<Wave> waves = WaveGenerator.generate(level, pool);
+
+    // مرحله‌ی آخر هر فصل با یه موج اضافه که فقط زامباس توشه تموم میشه
+    if (currentLevelInStage() == BOSS_LEVEL_IN_STAGE && season.getBossZombieName() != null) {
+      List<Wave.SpawnEntry> spawns = new ArrayList<>();
+      spawns.add(new Wave.SpawnEntry(season.getBossZombieName(), ROWS / 2, 0, 1000));
+      waves.add(new Wave(waves.size() + 1, true, spawns));
+    }
+    return waves;
   }
 
   /** Intro levels should not spawn boss-tier zombies (Gargantuar, mechs, ...). */

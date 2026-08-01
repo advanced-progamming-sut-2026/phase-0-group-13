@@ -15,7 +15,7 @@ public class Zombie {
   private int currentHealth;
   private final int maxHealth;
   private final double speed;
-  private final int row;
+  private int row;
   private double x;
   private double y;
 
@@ -64,15 +64,16 @@ public class Zombie {
     Iterator<Map.Entry<StatusEffect, Integer>> it = activeEffects.entrySet().iterator();
     while (it.hasNext()) {
       Map.Entry<StatusEffect, Integer> entry = it.next();
+      StatusEffect effect = entry.getKey();
       int remainingTicks = entry.getValue() - 1;
 
       if (remainingTicks <= 0) {
         it.remove();
       } else {
-        activeEffects.put(entry.getKey(), remainingTicks);
+        entry.setValue(remainingTicks);
       }
 
-      if (entry.getKey() == StatusEffect.POISONED) {
+      if (effect == StatusEffect.POISONED) {
         takeDamage(2, true); // Fixed: Safely clamp health instead of direct modification
       }
     }
@@ -140,6 +141,8 @@ public class Zombie {
   public double getX() { return x; }
   public double getY() { return y; }
   public int getRow() { return row; }
+  public void setRow(int row) { this.row = row; }
+  public ZombieAction getBehavior() { return behavior; }
   public String getName() { return name; }
   public int getCurrentHealth() { return currentHealth; }
   public int getMaxHealth() { return maxHealth; }

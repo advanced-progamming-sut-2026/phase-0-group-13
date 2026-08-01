@@ -26,6 +26,11 @@ public class AncientEgyptSeason extends Season {
   }
 
   @Override
+  public String getBossZombieName() {
+    return "ZombieZombossMechEgypt";
+  }
+
+  @Override
   public List<Tile> generateMap() {
     return plainGrid();
   }

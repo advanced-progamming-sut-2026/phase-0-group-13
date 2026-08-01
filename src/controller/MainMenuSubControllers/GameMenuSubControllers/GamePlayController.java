@@ -61,7 +61,7 @@ public class GamePlayController implements BaseController {
     } else if ((m = GamePlayMenuCommands.ShowTileStatus.getMatcher(command)) != null) {
       handleTileStatus(gm, m);
     } else if ((m = GamePlayMenuCommands.CheatAddSuns.getMatcher(command)) != null) {
-      handleCheatAddSuns(gm, m);
+      GamePlayCheatHandler.addSuns(gm, parseInt(m.group("count")));
     } else if ((m = GamePlayMenuCommands.CheatSpawnZombie.getMatcher(command)) != null) {
       handleSpawnZombie(gm, m);
     } else {
@@ -72,7 +72,7 @@ public class GamePlayController implements BaseController {
 
   private boolean dispatchNoArg(String command, GameManager gm) {
     if (GamePlayMenuCommands.ShowMap.getMatcher(command) != null) {
-      renderMap(gm);
+      view.BoardRenderer.render(gm);
     } else if (GamePlayMenuCommands.ShowSunAmount.getMatcher(command) != null) {
       System.out.println("Sun: " + gm.getSunAmount());
     } else if (GamePlayMenuCommands.ShowPlantsStatus.getMatcher(command) != null) {
@@ -89,9 +89,10 @@ public class GamePlayController implements BaseController {
       gm.disableCooldowns();
       System.out.println("All plant cooldowns cleared.");
     } else if (GamePlayMenuCommands.CheatUnlockAllPlants.getMatcher(command) != null) {
-      handleUnlockAllPlants(gm);
+      GamePlayCheatHandler.unlockAllPlants(gm);
+      saveUserState();
     } else if (GamePlayMenuCommands.ReleaseTheNuke.getMatcher(command) != null) {
-      handleNuke(gm);
+      GamePlayCheatHandler.releaseTheNuke(gm);
     } else if (GamePlayMenuCommands.StartZombieWaves.getMatcher(command) != null) {
       try {
         gm.startZombieWaves();
@@ -267,116 +268,13 @@ public class GamePlayController implements BaseController {
     gm.usePlantFood(plant);
   }
 
-  private void handleCheatAddSuns(GameManager gm, Matcher m) {
-    int count = parseInt(m.group("count"));
-    if (count <= 0) {
-      System.out.println("error: count must be a positive number");
-      return;
-    }
-    gm.getBoard().getGameState().addSun(count);
-    System.out.println("Added " + count + " suns.");
-  }
 
   private void handleSpawnZombie(GameManager gm, Matcher m) {
     int[] rc = parseCoord(gm.getBoard(), m.group("x"), m.group("y"));
     if (rc == null) {
       return;
     }
-    if (GameDataManager.zombieRepository == null) {
-      System.out.println("error: zombie data is not loaded");
-      return;
-    }
-    String type = m.group("zombieType").trim();
-    try {
-      Zombie zombie =
-              new ZombieFactory(GameDataManager.zombieRepository).createZombie(type, rc[0], rc[1]);
-      if (zombie == null) {
-        System.out.println("error: unknown zombie type '" + type + "'");
-        return;
-      }
-      gm.getBoard().spawnZombie(zombie);
-      System.out.println("Spawned zombie " + type + ".");
-    } catch (RuntimeException e) {
-      System.out.println("error: could not spawn zombie (data unavailable)");
-    }
-  }
-
-  private void handleUnlockAllPlants(GameManager gm) {
-    if (GameDataManager.plantRepository == null) {
-      System.out.println("error: plant data is not loaded");
-      return;
-    }
-
-    User user = UserManager.getInstance().getCurrentUser();
-    List<PlantTemplate> catalogue = GameDataManager.plantRepository.getAll();
-    List<String> everyPlant = new java.util.ArrayList<>();
-    java.util.Set<String> alreadyOwned = new java.util.HashSet<>();
-
-    if (user != null) {
-      for (String owned : user.getUnlockedPlants()) {
-        alreadyOwned.add(normalizePlantKey(owned));
-      }
-    }
-
-    int newlyUnlocked = 0;
-    for (PlantTemplate template : catalogue) {
-      if (template.name == null || template.name.isBlank()) {
-        continue;
-      }
-      everyPlant.add(template.name.toLowerCase());
-
-      if (user != null && alreadyOwned.add(normalizePlantKey(template.name))) {
-        user.unlockPlant(template.name);
-        newlyUnlocked++;
-      }
-    }
-
-    MatchSetup.getInstance().setSelectedPlants(everyPlant);
-    gm.disableCooldowns();
-    gm.enableFreePlanting();
-    saveUserState();
-
-    System.out.println("=== DEBUG: all plants unlocked ===");
-    System.out.printf(
-            "  %d plants available (%d newly added to your collection)%n",
-            everyPlant.size(), newlyUnlocked);
-    System.out.println("  sun cost      : waived for the rest of this match");
-    System.out.println("  recharge      : disabled");
-    System.out.println("  seed bank     : now lists every plant ('show plants status')");
-    System.out.println("  plant anything: plant plant -t <name> -l (x, y)");
-    warnIfSpecialRuleRestrictsPlanting(gm);
-  }
-
-  private void warnIfSpecialRuleRestrictsPlanting(GameManager gm) {
-    model.game.minigame.SpecialStageRule rule = gm.getSpecialStageRule();
-    if (rule == null || rule.isPlantAllowed("peashooter")) {
-      return;
-    }
-    System.out.println(
-            "  note          : this is a special level ("
-                    + rule.getClass().getSimpleName()
-                    + ") and it still restricts which plants may be placed.");
-    System.out.println(
-            "                  Run this cheat on a normal level (level 1 of a chapter) to place"
-                    + " every plant.");
-  }
-
-  private String normalizePlantKey(String name) {
-    return name == null ? "" : name.toLowerCase().replaceAll("[^a-z0-9]", "");
-  }
-
-  private void handleNuke(GameManager gm) {
-    int killed = 0;
-    for (Zombie z : gm.getBoard().getZombies()) {
-      if (!z.isDead()) {
-        z.takeDamage(1_000_000, true);
-        killed++;
-      }
-    }
-    System.out.println("Nuke released. Zombies wiped: " + killed);
-    if (killed >= 2) {
-      gm.registerCombatEvent(ScoreEvent.SIMULTANEOUS_KILL);
-    }
+    GamePlayCheatHandler.spawnZombie(gm, m.group("zombieType").trim(), rc[0], rc[1]);
   }
 
   private void handlePlantsStatus(GameManager gm) {
@@ -448,127 +346,6 @@ public class GamePlayController implements BaseController {
       }
     }
   }
-  private static final int CELL_TEXT_WIDTH = 6;
-  private static final String ROW_PREFIX_PAD = "     ";
-
-  private void renderMap(GameManager gm) {
-    Board board = gm.getBoard();
-    String separator = buildSeparator(board.getColumns());
-
-    System.out.println();
-    System.out.println(separator);
-    System.out.printf(
-            "  Wave: %d/%d   |   Sun: %d   |   Plant Food: %d/%d   |   Time: %.1fs%n",
-            Math.min(gm.getCurrentWaveIndex() + 1, Math.max(gm.getTotalWaves(), 1)),
-            gm.getTotalWaves(),
-            gm.getSunAmount(),
-            gm.getPlantFoodCount(),
-            model.game.GameState.MAX_PLANT_FOOD,
-            gm.getCurrentTick() / 10.0);
-    System.out.println(separator);
-
-    System.out.println(buildColumnHeader(board.getColumns()));
-    System.out.println(buildGridLine(board.getColumns()));
-
-    String cellFormat = " %-" + CELL_TEXT_WIDTH + "s |";
-
-    for (int row = 0; row < board.getRows(); row++) {
-      StringBuilder entityLine = new StringBuilder(String.format(" %-3d|", row + 1));
-      StringBuilder healthLine = new StringBuilder("    |");
-
-      for (int col = 0; col < board.getColumns(); col++) {
-        String[] cellData = getCellDetails(board, row, col);
-        entityLine.append(String.format(cellFormat, cellData[0]));
-        healthLine.append(String.format(cellFormat, cellData[1]));
-      }
-
-      String mower = board.getLawnmowers().get(row).isActive() ? "  [MOWER]" : "  [ used]";
-      System.out.println(entityLine + mower);
-      System.out.println(healthLine);
-      System.out.println(buildGridLine(board.getColumns()));
-    }
-
-    System.out.println(
-            "Legend: Z?=zombie   P?=plant   ~=water   +=gravestone   .=empty tile"
-                    + "   (? = first letter of the name)");
-    System.out.println(
-            "        Second line of every row is the current HP."
-                    + " Coordinates are (column, row), both 1-indexed.");
-  }
-
-  private String buildSeparator(int columns) {
-    return "=".repeat(ROW_PREFIX_PAD.length() + columns * (CELL_TEXT_WIDTH + 3));
-  }
-
-  private String buildColumnHeader(int columns) {
-    StringBuilder header = new StringBuilder(ROW_PREFIX_PAD + " ");
-    for (int col = 1; col <= columns; col++) {
-      header.append(String.format("%-" + (CELL_TEXT_WIDTH + 3) + "s", col));
-    }
-    return header.toString();
-  }
-
-  private String buildGridLine(int columns) {
-    StringBuilder line = new StringBuilder("    +");
-    for (int col = 0; col < columns; col++) {
-      line.append("-".repeat(CELL_TEXT_WIDTH + 2)).append("+");
-    }
-    return line.toString();
-  }
-
-  private String[] getCellDetails(Board board, int row, int col) {
-    StringBuilder entities = new StringBuilder();
-    StringBuilder healths = new StringBuilder();
-
-    for (Zombie z : board.getZombies()) {
-      if (z.getRow() == row && Math.round(z.getX()) == col && !z.isDead()) {
-        entities.append("Z").append(initialOf(z.getName()));
-        healths.append(z.getCurrentHealth());
-        break;
-      }
-    }
-
-    Plant plant = board.getPlantAt(row, col);
-    if (plant != null && plant.getName() != null && !plant.getName().isEmpty()) {
-      if (entities.length() > 0) {
-        entities.append("/");
-        healths.append("/");
-      }
-      entities.append("P").append(initialOf(plant.getName()));
-      healths.append(plant.getCurrentHealth());
-    }
-
-    Tile tile = board.getTile(row, col);
-    if (entities.length() == 0 && tile != null) {
-      if (tile.isWater()) {
-        entities.append("~");
-      } else if (tile.getEffect() != null) {
-        entities.append("+");
-      }
-    }
-
-    if (entities.length() == 0) {
-      entities.append(".");
-    }
-    if (healths.length() == 0) {
-      healths.append("-");
-    }
-
-    return new String[] {entities.toString(), healths.toString()};
-  }
-
-  private char initialOf(String name) {
-    if (name == null || name.isEmpty()) {
-      return '?';
-    }
-    String trimmed = name;
-    if (trimmed.regionMatches(true, 0, "Zombie", 0, "Zombie".length())
-            && trimmed.length() > "Zombie".length()) {
-      trimmed = trimmed.substring("Zombie".length());
-    }
-    return trimmed.isEmpty() ? '?' : Character.toUpperCase(trimmed.charAt(0));
-  }
-
   private void finishMatch(GameManager gm) {
     MatchResult result = gm.getMatchResult();
 
@@ -579,11 +356,6 @@ public class GamePlayController implements BaseController {
     if (gm.isBonusMatch()) {
       System.out.println(
               "Game Bonus finished! MyoPoints earned this run: " + gm.getScoreManager().getCurrentMatchScore());
-    } else if (result.isWon()) {
-      System.out.println(
-              "Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.");
-    } else {
-      System.out.println("You lost the battle.");
     }
 
     applyProgression(gm, result);
@@ -635,6 +407,7 @@ public class GamePlayController implements BaseController {
         }
       }
       System.out.println(progress.advanceAdventure().message());
+      user.unlockItem("stage_" + progress.getCurrentStage());
       user.triggerQuestEvent("STAGE_CLEAR", 1);
     }
 

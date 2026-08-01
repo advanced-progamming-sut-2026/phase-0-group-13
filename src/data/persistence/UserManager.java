@@ -100,7 +100,7 @@ public class UserManager {
 
   public void setSecurityQuestionForLatestUser(String qNumber, String answer) throws Exception {
     if (this.pendingUser == null) {
-      throw new Exception("error: no pending registration — please register first");
+      throw new Exception("error: no pending registration - please register first");
     }
 
     this.pendingUser.setSecurityQuestion(qNumber, answer);

@@ -11,6 +11,7 @@ import model.core.GameSession;
 import model.core.MatchSetup;
 import model.enums.Menu;
 import model.enums.MiniGameType;
+import model.game.minigame.arcade.BeghouledEngine;
 import model.game.minigame.arcade.IZombieEngine;
 import model.game.minigame.arcade.VasebreakerEngine;
 import model.game.minigame.arcade.WallnutBowlingEngine;
@@ -31,10 +32,15 @@ public class MiniGameController implements BaseController {
           Pattern.compile("(?i)^roll\\s+(?<nut>walnut|explode-o-nut|giant-walnut)\\s+(?<lane>\\d+)$");
   private final Pattern advancePattern =
           Pattern.compile("(?i)^advance\\s+time\\s+(?<count>\\d+)\\s+ticks?$");
+  private final Pattern swapPlantPattern =
+          Pattern.compile("(?i)^swap\\s+plant\\s+(?<x1>\\d+)\\s+(?<y1>\\d+)\\s+(?<x2>\\d+)\\s+(?<y2>\\d+)$");
+  private final Pattern upgradePlantPattern =
+          Pattern.compile("(?i)^upgrade\\s+plant\\s+(?<type>[\\w-]+)$");
 
   private VasebreakerEngine vasebreaker;
   private WallnutBowlingEngine bowling;
   private IZombieEngine izombie;
+  private BeghouledEngine beghouled;
   private MiniGameType activeType;
   private int activeLevel;
   private boolean finalized;
@@ -44,9 +50,6 @@ public class MiniGameController implements BaseController {
     activeType = MatchSetup.getInstance().getCurrentMiniGame();
     activeLevel = MatchSetup.getInstance().getMiniGameLevel();
     finalized = false;
-
-    System.out.println("--- Mini-Game Started ---");
-    System.out.println("Mode: " + activeType + " | Level: " + activeLevel);
 
     switch (activeType) {
       case VASEBREAKER:
@@ -66,6 +69,12 @@ public class MiniGameController implements BaseController {
         System.out.println("Command: 'place zombie <type> <x> <y>'.");
         System.out.println(izombie.renderMap());
         break;
+      case BEGHOULED:
+        beghouled = new BeghouledEngine(activeLevel);
+        System.out.println("Line up three or more matching plants to earn sun and clear the lawn.");
+        System.out.println("Commands: 'swap plant <x1> <y1> <x2> <y2>', 'upgrade plant <name>'.");
+        System.out.println(beghouled.renderMap());
+        break;
       default:
         System.out.println("error: unsupported mini-game type: " + activeType);
         break;
@@ -78,6 +87,10 @@ public class MiniGameController implements BaseController {
       System.out.println("error: no active mini-game. Return to the Game Menu.");
       exit();
       return;
+    }
+
+    if (activeType != MatchSetup.getInstance().getCurrentMiniGame()) {
+      initController();
     }
 
     Matcher m;
@@ -103,6 +116,16 @@ public class MiniGameController implements BaseController {
     } else if ((m = rollWalnutPattern.matcher(command)).matches()) {
       if (checkType(MiniGameType.WALLNUT_BOWLING)) {
         handleRollWalnut(m);
+        checkForEnd();
+      }
+    } else if ((m = swapPlantPattern.matcher(command)).matches()) {
+      if (checkType(MiniGameType.BEGHOULED)) {
+        handleSwapPlant(m);
+        checkForEnd();
+      }
+    } else if ((m = upgradePlantPattern.matcher(command)).matches()) {
+      if (checkType(MiniGameType.BEGHOULED)) {
+        System.out.println(beghouled.upgrade(m.group("type")));
         checkForEnd();
       }
     } else if (command.equalsIgnoreCase("exit")) {
@@ -139,6 +162,9 @@ public class MiniGameController implements BaseController {
       case I_ZOMBIE:
         izombie.tick();
         break;
+      case BEGHOULED:
+        beghouled.tick();
+        break;
       default:
         break;
     }
@@ -149,8 +175,17 @@ public class MiniGameController implements BaseController {
       case VASEBREAKER -> vasebreaker.isFinished();
       case WALLNUT_BOWLING -> bowling.isFinished();
       case I_ZOMBIE -> izombie.isFinished();
+      case BEGHOULED -> beghouled.isFinished();
       default -> true;
     };
+  }
+
+  private void handleSwapPlant(Matcher m) {
+    int x1 = Integer.parseInt(m.group("x1")) - 1;
+    int y1 = Integer.parseInt(m.group("y1")) - 1;
+    int x2 = Integer.parseInt(m.group("x2")) - 1;
+    int y2 = Integer.parseInt(m.group("y2")) - 1;
+    System.out.println(beghouled.swap(y1, x1, y2, x2));
   }
 
   private void handleSmashVase(Matcher m) {
@@ -189,6 +224,7 @@ public class MiniGameController implements BaseController {
       case VASEBREAKER -> System.out.print(vasebreaker.renderMap());
       case WALLNUT_BOWLING -> System.out.print(bowling.renderMap());
       case I_ZOMBIE -> System.out.print(izombie.renderMap());
+      case BEGHOULED -> System.out.print(beghouled.renderMap());
       default -> System.out.println("--- Mini-Game Map (" + activeType + ") ---");
     }
   }
@@ -203,6 +239,7 @@ public class MiniGameController implements BaseController {
       case VASEBREAKER -> vasebreaker.isWon();
       case WALLNUT_BOWLING -> bowling.isWon();
       case I_ZOMBIE -> izombie.isWon();
+      case BEGHOULED -> beghouled.isWon();
       default -> false;
     };
 
@@ -247,6 +284,7 @@ public class MiniGameController implements BaseController {
     vasebreaker = null;
     bowling = null;
     izombie = null;
+    beghouled = null;
     App.setCurrentMenu(back);
   }
 }

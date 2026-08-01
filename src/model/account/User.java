@@ -185,7 +185,20 @@ public class User {
   }
 
   public boolean hasUnlockedPlant(String plantName) {
-    return plantName != null && unlockedPlants.contains(plantName.toLowerCase().trim());
+    if (plantName == null) {
+      return false;
+    }
+    String key = normalizePlantKey(plantName);
+    for (String owned : unlockedPlants) {
+      if (normalizePlantKey(owned).equals(key)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static String normalizePlantKey(String plantName) {
+    return plantName.toLowerCase().replaceAll("[^a-z0-9]", "");
   }
 
   public Result unlockPlant(String plantName) {

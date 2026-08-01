@@ -70,13 +70,19 @@ public class ZombieFactory {
   private ZombieAction determineBehavior(ZombieTemplate template, ZombieType type, double diffMultiplier) {
     double eatDamage = template.getEatDps() * diffMultiplier;
     return switch (type) {
-      case NORMAL, CONEHEAD, BUCKETHEAD, KNIGHT, BLOCKHEAD, IMP, ARCADE, TURQUOISE,
-           PIANIST, ZOMBOTANY_WALLNUT, ZOMBOSS_EGYPT, ZOMBOSS_PIRATE, ZOMBOSS_COWBOY,
-           ZOMBOSS_DARK -> new StandardZombieAction(eatDamage);
+      case NORMAL, CONEHEAD, BUCKETHEAD, KNIGHT, BLOCKHEAD, IMP, ARCADE,
+           ZOMBOTANY_WALLNUT -> new StandardZombieAction(eatDamage);
+      case ZOMBOSS_EGYPT, ZOMBOSS_PIRATE, ZOMBOSS_COWBOY, ZOMBOSS_DARK ->
+              new ZombossAction(120, 1800, eatDamage);
+      case TURQUOISE -> new TurquoiseZombieAction(50, 10);
+      case PIANIST -> new PianistZombieAction(60);
+      case BARREL_ROLLER -> new BarrelRollerZombieAction(eatDamage);
       case GARGANTUAR -> new GargantuarAction((int) Math.round(resolveBaseHp(template, type) * diffMultiplier));
       case EXPLORER -> new ExplorerZombieAction();
       case ZOMBOTANY_PEASHOOTER, HUNTER -> new ZombotanyPeashooterAction(150, 10.0);
-      case ZOMBOTANY_JALAPENO, ZOMBOTANY_SQUASH, FOOTBALLER, BARREL_ROLLER, IMP_DRAGON -> new TacklerZombieAction();
+      case ZOMBOTANY_JALAPENO -> new ZombotanyJalapenoAction(100);
+      case ZOMBOTANY_SQUASH -> new TacklerZombieAction(true);
+      case FOOTBALLER, IMP_DRAGON -> new TacklerZombieAction();
       case PARASOL -> new ParasolZombieAction(200, eatDamage);
       case PROSPECTOR -> new RangedDemolisherZombieAction(60, 3.0);
       case NEWSPAPER -> new EnrageOnArmorBreakZombieAction(eatDamage, 2.0);

@@ -36,6 +36,10 @@ public class Plant {
 
   private boolean deathHookFired = false;
 
+  public static final int MAX_STACK = 5;
+  private int stackCount = 1;
+  private Plant shield;
+
   public Plant(PlantTemplate template, int row, int col, PlantCategory category, EnumSet<PlantTag> tags,
                PlantAction behavior, PlantFood plantFood) {
     this(template, row, col, category, tags, behavior, plantFood, 1, template.baseHp, template.cost);
@@ -126,8 +130,27 @@ public class Plant {
   }
 
   public void takeDamage(int damage) {
+    if (shield != null) {
+      if (!shield.isDead()) {
+        shield.takeDamage(damage);
+        return;
+      }
+      shield = null;
+    }
     this.currentHealth = Math.max(0, this.currentHealth - damage);
   }
+
+  public boolean addStack() {
+    if (stackCount >= MAX_STACK) {
+      return false;
+    }
+    stackCount++;
+    return true;
+  }
+
+  public int getStackCount() { return stackCount; }
+  public Plant getShield() { return shield; }
+  public void setShield(Plant shield) { this.shield = shield; }
 
   public void heal(int amount) {
     if (amount > 0) this.currentHealth = Math.min(maxHealth, this.currentHealth + amount);
