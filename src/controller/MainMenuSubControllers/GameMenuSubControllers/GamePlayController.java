@@ -576,14 +576,10 @@ public class GamePlayController implements BaseController {
       gm.registerCombatEvent(ScoreEvent.WAVE_CLEARED_NO_LOSS);
     }
 
+    // پیام برد/باخت را خود GameManager.endGame چاپ می‌کند؛ اینجا فقط پیام مخصوص بازی امتیازی
     if (gm.isBonusMatch()) {
       System.out.println(
               "Game Bonus finished! MyoPoints earned this run: " + gm.getScoreManager().getCurrentMatchScore());
-    } else if (result.isWon()) {
-      System.out.println(
-              "Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.");
-    } else {
-      System.out.println("You lost the battle.");
     }
 
     applyProgression(gm, result);
