@@ -36,7 +36,9 @@ public class PlantWhatYouGetRule extends MiniGame implements SpecialStageRule {
 
   @Override
   public boolean isPlantAllowed(String plantName) {
-    return currentOffer != null && currentOffer.equalsIgnoreCase(plantName);
+    return currentOffer != null && plantName != null
+            && model.account.User.normalizePlantKey(currentOffer)
+            .equals(model.account.User.normalizePlantKey(plantName));
   }
 
   public String getCurrentOffer() {

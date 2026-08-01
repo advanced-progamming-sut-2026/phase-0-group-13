@@ -4,23 +4,25 @@ import model.game.Board;
 import model.game.GameState;
 
 public class SaveOurSeedsRule extends MiniGame implements SpecialStageRule {
-  private int lastKnownPlantCount = -1;
+  private java.util.List<model.game.plant.Plant> protectedPlants;
 
   @Override
   public void apply(GameState gameState) {}
 
-  // اگه هر گیاهی از دست بره (خورده بشه یا حتی pluck بشه)، باخت فوریه. لحظه اولی که این چک صدا زده
-  // میشه فقط شمارش اولیه رو ثبت میکنه، هنوز باخت حساب نمیشه
+  // فقط گیاه‌های محافظت‌شده (همون‌هایی که موقع اولین چک رو زمین بودن) باخت رو رقم میزنن؛ گیاهی که
+  // خود بازیکن بعدا کاشته و از بین رفته (مثل بمب گیلاس بعد از انفجار) شرط باخت نیست
   @Override
   public boolean checkLoseCondition(Board board) {
-    int currentCount = board.getPlants().size();
-    if (lastKnownPlantCount == -1) {
-      lastKnownPlantCount = currentCount;
+    if (protectedPlants == null) {
+      protectedPlants = new java.util.ArrayList<>(board.getPlants());
       return false;
     }
-    boolean lost = currentCount < lastKnownPlantCount;
-    lastKnownPlantCount = currentCount;
-    return lost;
+    for (model.game.plant.Plant plant : protectedPlants) {
+      if (plant.isDead()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

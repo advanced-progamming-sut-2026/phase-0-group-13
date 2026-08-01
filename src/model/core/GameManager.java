@@ -9,6 +9,7 @@ import model.game.Board;
 import model.game.MatchResult;
 import model.game.ScoreManager;
 import model.game.Wave;
+import model.game.minigame.ConveyorRule;
 import model.game.minigame.SpecialStageRule;
 import model.game.plant.Plant;
 import model.game.quest.MatchContext;
@@ -97,8 +98,16 @@ public class GameManager {
 
   private void updateBoardAndSeason() {
     board.updateAll(currentTick);
+    if (activeSpecialRule != null) {
+      activeSpecialRule.apply(board.getGameState());
+      if (activeSpecialRule instanceof ConveyorRule conveyor) {
+        String delivered = conveyor.consumeReadyPlant();
+        if (delivered != null) {
+          System.out.printf("The conveyor belt delivered a %s.%n", delivered);
+        }
+      }
+    }
     if (currentSeason != null) {
-      board.getGameState().update(board.getGameState().getCurrentWave(), currentSeason);
       currentSeason.onTick(board, currentTick);
     }
   }
@@ -142,7 +151,6 @@ public class GameManager {
 
   private boolean checkLoseCondition() {
     if (activeSpecialRule != null) {
-      activeSpecialRule.apply(board.getGameState());
       if (activeSpecialRule.checkLoseCondition(board)) {
         return true;
       }

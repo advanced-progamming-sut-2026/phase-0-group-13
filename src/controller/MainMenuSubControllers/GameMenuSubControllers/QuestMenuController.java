@@ -21,7 +21,7 @@ import model.game.quest.Quest;
 public class QuestMenuController implements BaseController {
 
   private static final List<String> AVAILABLE_MINI_GAMES =
-          List.of("vasebreaker", "wallnut_bowling", "i_zombie");
+          List.of("vasebreaker", "wallnut_bowling", "i_zombie", "beghouled", "zombotany");
 
   @Override
   public void initController() {

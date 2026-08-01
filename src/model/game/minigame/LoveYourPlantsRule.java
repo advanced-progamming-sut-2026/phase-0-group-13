@@ -7,7 +7,8 @@ public class LoveYourPlantsRule extends MiniGame implements SpecialStageRule {
 
   // کل مرحله فقط یه نوع گیاه قابل کاشتنه
   public LoveYourPlantsRule(String belovedPlant) {
-    this.belovedPlantLower = belovedPlant == null ? "" : belovedPlant.toLowerCase();
+    this.belovedPlantLower =
+            belovedPlant == null ? "" : model.account.User.normalizePlantKey(belovedPlant);
   }
 
   @Override
@@ -15,7 +16,8 @@ public class LoveYourPlantsRule extends MiniGame implements SpecialStageRule {
 
   @Override
   public boolean isPlantAllowed(String plantName) {
-    return plantName != null && plantName.toLowerCase().equals(belovedPlantLower);
+    return plantName != null
+            && model.account.User.normalizePlantKey(plantName).equals(belovedPlantLower);
   }
 
   @Override

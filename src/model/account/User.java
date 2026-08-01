@@ -82,7 +82,7 @@ public class User {
     this.unlockedPlants.add("puff-shroom");
 
     for (String plant : this.unlockedPlants) {
-      this.plantLevels.put(plant, 1);
+      this.plantLevels.put(normalizePlantKey(plant), 1);
     }
 
     this.unlockedStages.add("stage_1");
@@ -197,7 +197,7 @@ public class User {
     return false;
   }
 
-  private static String normalizePlantKey(String plantName) {
+  public static String normalizePlantKey(String plantName) {
     return plantName.toLowerCase().replaceAll("[^a-z0-9]", "");
   }
 
@@ -207,12 +207,12 @@ public class User {
     }
 
     String key = plantName.toLowerCase().trim();
-    if (unlockedPlants.contains(key)) {
+    if (hasUnlockedPlant(key)) {
       return new Result(false, "You already own " + plantName + "!", null);
     }
 
     unlockedPlants.add(key);
-    plantLevels.put(key, 1);
+    plantLevels.put(normalizePlantKey(key), 1);
     generateNews("plant", key);
     triggerQuestEvent("PLANT_UNLOCKED", 1);
     return new Result(true, plantName + " unlocked and added to your collection!", key);
@@ -222,14 +222,14 @@ public class User {
     if (plantName == null || !hasUnlockedPlant(plantName)) {
       return 0;
     }
-    return plantLevels.getOrDefault(plantName.toLowerCase().trim(), 1);
+    return plantLevels.getOrDefault(normalizePlantKey(plantName), 1);
   }
 
   public void setPlantLevel(String plantName, int level) {
     if (plantName == null) {
       return;
     }
-    plantLevels.put(plantName.toLowerCase().trim(), level);
+    plantLevels.put(normalizePlantKey(plantName), level);
   }
 
   public Result addToDeck(String plantName) {

@@ -50,6 +50,8 @@ public class Progress {
       unlockMiniGame("vasebreaker");
       unlockMiniGame("wallnut_bowling");
       unlockMiniGame("i_zombie");
+      unlockMiniGame("beghouled");
+      unlockMiniGame("zombotany");
       unlockMessage = "  Mini-Games mode has been unlocked!";
     } else if (this.currentStage == 3 && this.currentLevel == 1 && !survivalModeUnlocked) {
       this.survivalModeUnlocked = true;

@@ -9,7 +9,7 @@ public enum GamePlayMenuCommands implements Command {
   ShowSunAmount("show\\s+sun\\s+amount"),
   CheatAddSuns("cheat\\s+add\\s+-n\\s+(?<count>\\S+)\\s+suns"),
   ReleaseTheNuke("release\\s+the\\s+nuke"),
-  PlantPlant("plant\\s+plant\\s+-t\\s+(?<type>\\S+)\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),
+  PlantPlant("plant\\s+plant\\s+-t\\s+(?<type>.+?)\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),
   CheatRemoveCooldown("cheat\\s+remove-cooldown"),
   PluckPlant("pluck\\s+plant\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),
   FeedPlant("feed\\s+plant\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),

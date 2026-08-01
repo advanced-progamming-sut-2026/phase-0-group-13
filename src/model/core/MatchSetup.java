@@ -30,6 +30,10 @@ public class MatchSetup {
     return instance;
   }
 
+  public static void reset() {
+    instance = null;
+  }
+
   public void setTargetChapter(String targetChapter) {
     this.targetChapter = targetChapter;
     this.currentMiniGame = MiniGameType.NONE;

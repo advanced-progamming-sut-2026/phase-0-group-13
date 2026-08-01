@@ -305,7 +305,7 @@ public class Board {
           break;
         }
       }
-      if (hitRegistered || p.getXCoordinate() > columns || p.getXCoordinate() < -1
+      if ((hitRegistered && !p.isPiercing()) || p.getXCoordinate() > columns || p.getXCoordinate() < -1
               || p.getYCoordinate() < 0 || p.getYCoordinate() >= rows) {
         iterator.remove();
       }

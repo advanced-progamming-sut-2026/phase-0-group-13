@@ -6,7 +6,7 @@ import model.game.plant.PlantParts.PlantTemplate;
 
 public class NightOpsRule extends MiniGame implements SpecialStageRule {
   @Override
-  public void apply(GameState gameState) {}
+  public void apply(GameState gameState) { gameState.setSkySunDisabled(true); }
 
   // فقط گیاهان شبانه (تگ Night) یا قارچ‌ها (که ذاتا شبانه‌ان) قابل کاشتنن
   @Override

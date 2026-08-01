@@ -92,7 +92,7 @@ public class ProfileMenuController implements BaseController {
     System.out.println("Coins: " + user.getCoins());
     System.out.println("Diamonds: " + user.getDiamonds());
     System.out.println("Levels cleared: " + clearedLevels);
-    System.out.println("Highest myopoint: 0");
+    System.out.println("Highest myopoint: " + user.getMeowPoints());
   }
 
   @Override

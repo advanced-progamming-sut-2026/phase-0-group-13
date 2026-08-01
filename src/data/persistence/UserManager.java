@@ -167,6 +167,7 @@ public class UserManager {
   public void logout() {
     this.currentUser = null;
     this.isStayLoggedIn = false;
+    model.core.MatchSetup.reset();
     clearSessionFromDisk();
   }
 

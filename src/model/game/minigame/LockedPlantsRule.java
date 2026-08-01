@@ -13,7 +13,7 @@ public class LockedPlantsRule extends MiniGame implements SpecialStageRule {
     this.allowedPlantsLower = new HashSet<>();
     for (String plant : allowedPlants) {
       if (plant != null) {
-        allowedPlantsLower.add(plant.toLowerCase());
+        allowedPlantsLower.add(model.account.User.normalizePlantKey(plant));
       }
     }
   }
@@ -23,7 +23,8 @@ public class LockedPlantsRule extends MiniGame implements SpecialStageRule {
 
   @Override
   public boolean isPlantAllowed(String plantName) {
-    return plantName != null && allowedPlantsLower.contains(plantName.toLowerCase());
+    return plantName != null
+            && allowedPlantsLower.contains(model.account.User.normalizePlantKey(plantName));
   }
 
   @Override
