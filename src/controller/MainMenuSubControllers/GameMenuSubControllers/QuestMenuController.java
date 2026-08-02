@@ -190,8 +190,14 @@ public class QuestMenuController implements BaseController {
 
     System.out.println("--- Mini-Games ---");
     for (String name : AVAILABLE_MINI_GAMES) {
-      boolean unlocked = progress.isMiniGameUnlocked(name);
-      System.out.println("  " + name + " - " + (unlocked ? "unlocked" : "locked"));
+      if (!progress.isMiniGameUnlocked(name)) {
+        System.out.println("  " + name + " - locked");
+        continue;
+      }
+      int cleared = progress.getClearedMiniGameLevel(name);
+      System.out.printf("  %-16s - unlocked | levels cleared: %d/%d%s%n",
+              name, cleared, Progress.MINI_GAME_LEVELS,
+              cleared < Progress.MINI_GAME_LEVELS ? "  (next: level " + (cleared + 1) + ")" : "  DONE");
     }
   }
 

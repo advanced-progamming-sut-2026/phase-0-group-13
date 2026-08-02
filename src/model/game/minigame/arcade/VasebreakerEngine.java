@@ -198,6 +198,9 @@ public final class VasebreakerEngine {
     if (match == null) {
       return "error: no fresh " + plantName + " seed packet available";
     }
+    if (!smashed[row][col]) {
+      return "error: there is still an unbroken vase there - smash it first";
+    }
     for (ArcadePlant p : plants) {
       if (p.row == row && p.col == col) {
         return "error: that tile is already occupied";

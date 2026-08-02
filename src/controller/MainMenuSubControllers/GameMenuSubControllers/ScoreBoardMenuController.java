@@ -105,11 +105,8 @@ public class ScoreBoardMenuController implements BaseController {
   }
 
   private int miniGamesCleared(User user) {
-    int count = 0;
-    for (String stage : user.getUnlockedStages()) {
-      if (stage.startsWith("minigame_")) count++;
-    }
-    return count;
+    // مجموع مراحل پاس‌شدهٔ مینی‌گیم‌ها (هر مینی‌گیم ۳ مرحله دارد)
+    return user.getProgress().getTotalMiniGameLevelsCleared();
   }
 
   private int completedQuests(User user) {

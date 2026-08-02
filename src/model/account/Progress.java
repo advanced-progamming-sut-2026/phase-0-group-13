@@ -1,6 +1,8 @@
 package model.account;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import model.Result;
 
@@ -13,6 +15,9 @@ public class Progress {
 
   private Set<String> unlockedMiniGames;
 
+  /** بالاترین مرحله‌ای که از هر مینی‌گیم پاس شده (اسم مینی‌گیم → مرحله). */
+  private Map<String, Integer> clearedMiniGameLevels;
+
   private int maxClearedStage;
   private int maxClearedLevel;
 
@@ -24,6 +29,46 @@ public class Progress {
     this.miniGamesUnlocked = false;
     this.survivalModeUnlocked = false;
     this.unlockedMiniGames = new HashSet<>();
+    this.clearedMiniGameLevels = new HashMap<>();
+  }
+
+  public static final int MINI_GAME_LEVELS = 3;
+
+  /** بعد از برد در یک مینی‌گیم، بالاترین مرحلهٔ پاس‌شده را ثبت می‌کند. */
+  public boolean recordMiniGameCleared(String miniGameName, int level) {
+    if (miniGameName == null || level < 1) {
+      return false;
+    }
+    if (clearedMiniGameLevels == null) {
+      clearedMiniGameLevels = new HashMap<>();
+    }
+    String key = miniGameName.toLowerCase().trim();
+    int best = clearedMiniGameLevels.getOrDefault(key, 0);
+    if (level <= best) {
+      return false;
+    }
+    clearedMiniGameLevels.put(key, level);
+    return true;
+  }
+
+  /** بالاترین مرحلهٔ پاس‌شدهٔ یک مینی‌گیم (۰ یعنی هنوز هیچ مرحله‌ای پاس نشده). */
+  public int getClearedMiniGameLevel(String miniGameName) {
+    if (clearedMiniGameLevels == null || miniGameName == null) {
+      return 0;
+    }
+    return clearedMiniGameLevels.getOrDefault(miniGameName.toLowerCase().trim(), 0);
+  }
+
+  /** مجموع مراحل پاس‌شدهٔ همهٔ مینی‌گیم‌ها (برای لیدربورد). */
+  public int getTotalMiniGameLevelsCleared() {
+    if (clearedMiniGameLevels == null) {
+      return 0;
+    }
+    int total = 0;
+    for (int level : clearedMiniGameLevels.values()) {
+      total += level;
+    }
+    return total;
   }
 
   public Result advanceAdventure() {

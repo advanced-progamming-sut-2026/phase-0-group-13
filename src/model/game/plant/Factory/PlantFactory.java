@@ -263,6 +263,10 @@ public class PlantFactory {
     ShootForwardAction action = new ShootForwardAction(interval, power,
             resolveProjectileEffect(tags), piercing, parseLaneSpread(template.baseAbility));
     action.setDirections(parseFiringDirections(template.baseAbility));
+    // گیاهانی مثل Bowling Bulb تیرهایشان بین ردیف‌ها کمانه می‌کند
+    if (mentions(template.baseAbility, "ricochet")) {
+      action.setRicochet(parseVanishSeconds(template.baseAbility) * TICKS_PER_SECOND);
+    }
     return action;
   }
 

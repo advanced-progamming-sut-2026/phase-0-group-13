@@ -14,6 +14,7 @@ public class ShootForwardAction implements PlantAction {
   private final boolean piercing;
   private final int laneSpread;
   private int[][] directions = FORWARD_ONLY;
+  private int ricochetLifeTicks;
 
   public ShootForwardAction(int actionInterval, int damage, Projectile.ProjectileEffect effect,
                             boolean piercing, int laneSpread) {
@@ -40,6 +41,11 @@ public class ShootForwardAction implements PlantAction {
     this.directions = directions == null || directions.length == 0 ? FORWARD_ONLY : directions;
   }
 
+  /** تیرهای این گیاه مثل Bowling Bulb بین ردیف‌ها کمانه می‌کنند. */
+  public void setRicochet(int lifeTicks) {
+    this.ricochetLifeTicks = Math.max(0, lifeTicks);
+  }
+
   @Override
   public void execute(Plant plant, Board board, int currentTick) {
     if (currentTick - plant.getLastActionTick() < actionInterval) {
@@ -58,6 +64,11 @@ public class ShootForwardAction implements PlantAction {
           Projectile projectile =
                   new Projectile(damage, 0.5, plant.getCol(), row, effect, piercing, false, false);
           projectile.setDirection(direction[0], direction[1]);
+          if (ricochetLifeTicks > 0) {
+            // گلوله‌های کمانه‌کننده به صورت مورب حرکت می‌کنند تا از دیواره‌ها برگردند
+            projectile.setDirection(direction[0], direction[1] != 0 ? direction[1] : 1);
+            projectile.makeBouncing(ricochetLifeTicks);
+          }
           board.addProjectile(projectile);
         }
       }

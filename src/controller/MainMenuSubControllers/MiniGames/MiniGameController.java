@@ -264,6 +264,19 @@ public class MiniGameController implements BaseController {
     user.addMeowPoints(MEOW_POINTS_ON_WIN);
     System.out.println("Reward: +" + coinReward + " coins, +" + MEOW_POINTS_ON_WIN + " MyoPoints.");
 
+    // ثبت مرحلهٔ پاس‌شده تا پیشرفت مینی‌گیم در لیست و لیدربورد دیده شود
+    String key = activeType.name().toLowerCase();
+    if (user.getProgress().recordMiniGameCleared(key, activeLevel)) {
+      int cleared = user.getProgress().getClearedMiniGameLevel(key);
+      System.out.printf("Mini-game progress: %s %d/%d levels cleared.%n",
+              key, cleared, model.account.Progress.MINI_GAME_LEVELS);
+      if (cleared < model.account.Progress.MINI_GAME_LEVELS) {
+        System.out.println("Next up: level " + (cleared + 1) + "!");
+      } else {
+        System.out.println("You have mastered " + key + "!");
+      }
+    }
+
     user.triggerQuestEvent("MINIGAME_CLEAR", 1);
   }
 
