@@ -35,3 +35,7 @@ sourceSets {
         }
     }
 }
+// اجازه می‌دهد ورودی کیبورد به برنامه برسد وقتی از طریق Gradle اجرا می‌شود
+tasks.withType(JavaExec).configureEach {
+    standardInput = System.in
+}
