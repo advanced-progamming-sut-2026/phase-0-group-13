@@ -11,6 +11,7 @@ public interface SpecialStageRule {
     return true;
   }
 
+  default boolean restrictsSelection() { return false; }
   // پیش‌فرض: شرط باخت اضافه‌ای نداره (شرط عادی بازی خودش جدا چک میشه)
   default boolean checkLoseCondition(Board board) {
     return false;

@@ -9,7 +9,6 @@ import model.game.Board;
 import model.game.MatchResult;
 import model.game.ScoreManager;
 import model.game.Wave;
-import model.game.minigame.ConveyorRule;
 import model.game.minigame.SpecialStageRule;
 import model.game.plant.Plant;
 import model.game.quest.MatchContext;
@@ -33,9 +32,6 @@ public class GameManager {
   private SpecialStageRule activeSpecialRule;
   private model.environment.Season currentSeason;private List<String> eventLogs = new ArrayList<>();
 
-  public void addLog(String message) {
-    eventLogs.add(message);
-  }
 
   public List<String> pollLogs() {
     List<String> currentLogs = new ArrayList<>(eventLogs);
@@ -100,12 +96,6 @@ public class GameManager {
     board.updateAll(currentTick);
     if (activeSpecialRule != null) {
       activeSpecialRule.apply(board.getGameState());
-      if (activeSpecialRule instanceof ConveyorRule conveyor) {
-        String delivered = conveyor.consumeReadyPlant();
-        if (delivered != null) {
-          System.out.printf("The conveyor belt delivered a %s.%n", delivered);
-        }
-      }
     }
     if (currentSeason != null) {
       currentSeason.onTick(board, currentTick);
@@ -187,6 +177,9 @@ public class GameManager {
     boolean plantIsAquatic = plant.getTags().contains(model.enums.PlantTag.WATER);
     boolean stacking = false;
 
+    if (plantIsAquatic && !board.isWaterAt(row, col)) {
+      return false;
+    }
     if (board.isWaterAt(row, col) && !plantIsAquatic) {
       if (existingPlant == null || !existingPlant.getTags().contains(model.enums.PlantTag.WATER)) {
         return false;
@@ -301,5 +294,4 @@ public class GameManager {
     scoreManager.triggerEvent(event, multiplier);
   }
 
-  public boolean isGameOver() { return !running; }
 }

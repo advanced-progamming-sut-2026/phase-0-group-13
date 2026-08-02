@@ -37,7 +37,7 @@ public class LobAction implements PlantAction {
     }
 
     plant.setLastActionTick(currentTick);
-    System.out.printf("Plant %s lobbed a %s projectile at row %d!%n", plant.getName(), effect, plant.getRow());
+    System.out.printf("Plant %s lobbed a %s projectile at row %d!%n", plant.getName(), effect, plant.getRow() + 1);
   }
 
   private void applyDamage(Zombie zombie) {

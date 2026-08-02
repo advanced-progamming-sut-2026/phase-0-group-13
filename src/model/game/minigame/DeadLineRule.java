@@ -12,6 +12,7 @@ public class DeadLineRule extends MiniGame implements SpecialStageRule {
     this.deadlineColumn = deadlineColumn;
   }
 
+  public int getDeadlineColumn() { return deadlineColumn; }
   @Override
   public void apply(GameState gameState) {}
 

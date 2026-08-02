@@ -19,14 +19,12 @@ import model.enums.ScoreEvent;
 import model.game.Board;
 import model.game.Lawnmower;
 import model.game.MatchResult;
-import model.game.Sun;
 import model.game.Tile;
 import model.game.plant.Plant;
 import model.game.plant.Factory.PlantFactory;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.game.quest.MatchContext;
 import model.game.zombie.Zombie;
-import model.game.zombie.factory.ZombieFactory;
 
 public class GamePlayController implements BaseController {
   @Override
@@ -195,6 +193,7 @@ public class GamePlayController implements BaseController {
       gm.recordPlanting(type);
       System.out.printf("Planted %s at (%s, %s).%n", type, m.group("x"), m.group("y"));
       activateBoostIfAny(plant, type);
+      if (gm.getSpecialStageRule() instanceof model.game.minigame.ConveyorRule c) c.consumeReadyPlant();
     } else {
       System.out.println("error: cannot plant there (tile occupied or not enough sun)");
     }
@@ -227,7 +226,7 @@ public class GamePlayController implements BaseController {
     if (rc == null) {
       return;
     }
-    Plant plant = gm.getBoard().getPlantAt(rc[0], rc[1]);
+    Plant plant = gm.getBoard().getTopPlantAt(rc[0], rc[1]);
     if (plant == null) {
       System.out.println("error: no plant at that tile");
       return;
@@ -260,7 +259,7 @@ public class GamePlayController implements BaseController {
     if (rc == null) {
       return;
     }
-    Plant plant = gm.getBoard().getPlantAt(rc[0], rc[1]);
+    Plant plant = gm.getBoard().getTopPlantAt(rc[0], rc[1]);
     if (plant == null) {
       System.out.println("error: no plant at that tile");
       return;
@@ -304,7 +303,7 @@ public class GamePlayController implements BaseController {
       return;
     }
     Board board = gm.getBoard();
-    Plant plant = board.getPlantAt(rc[0], rc[1]);
+    Plant plant = board.getTopPlantAt(rc[0], rc[1]);
     Tile tile = board.getTile(rc[0], rc[1]);
     System.out.printf("Tile (%s, %s):%n", m.group("x"), m.group("y"));
     System.out.println(

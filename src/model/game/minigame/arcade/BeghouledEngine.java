@@ -446,9 +446,6 @@ public final class BeghouledEngine {
     return won;
   }
 
-  public boolean isLost() {
-    return lost;
-  }
 
   public boolean isFinished() {
     return won || lost;
@@ -458,6 +455,21 @@ public final class BeghouledEngine {
     return sun;
   }
 
+  public static java.util.Collection<Upgrade> getUpgrades() {return UPGRADES.values();}
+  public PlantKind getPlantAt(int row, int col) {
+    return grid[row][col];
+  }
+  public boolean isCraterAt(int row, int col) {
+    return crater[row][col];
+  }
+  public int getZombieHealthAt(int row, int col) {
+    for (LaneZombie zombie : zombies) {
+      if (zombie.row == row && (int) Math.round(zombie.column) == col && !zombie.isDead()) {
+        return zombie.health;
+      }
+    }
+    return -1;
+  }
   public int getMatchesMade() {
     return matchesMade;
   }
@@ -466,39 +478,4 @@ public final class BeghouledEngine {
     return matchTarget;
   }
 
-  public String renderMap() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("--- Beghouled: Level ").append(level).append(" | Sun: ").append(sun)
-            .append(" | Matches: ").append(matchesMade).append('/').append(matchTarget)
-            .append(" ---\n");
-
-    for (int row = 0; row < ROWS; row++) {
-      StringBuilder line = new StringBuilder();
-      for (int col = 0; col < COLS; col++) {
-        char glyph = crater[row][col] ? '#' : (grid[row][col] == null ? '.' : grid[row][col].glyph);
-        for (LaneZombie zombie : zombies) {
-          if (!zombie.isDead() && zombie.row == row && (int) Math.round(zombie.column) == col) {
-            glyph = 'Z';
-            break;
-          }
-        }
-        line.append('[').append(glyph).append(']');
-      }
-      sb.append("Row ").append(row + 1).append(": ").append(line).append('\n');
-    }
-
-    sb.append("Legend: ");
-    for (PlantKind kind : PlantKind.values()) {
-      sb.append(kind.glyph).append('=').append(kind.label).append("  ");
-    }
-    sb.append("#=crater  Z=zombie\n");
-
-    sb.append("Upgrades: ");
-    for (Upgrade upgrade : UPGRADES.values()) {
-      sb.append(upgrade.from.label).append("->").append(upgrade.to.label)
-              .append('(').append(upgrade.cost).append(") ");
-    }
-    sb.append('\n');
-    return sb.toString();
-  }
 }

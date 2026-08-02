@@ -1,23 +1,27 @@
 package model.game.minigame;
 
+import model.game.Board;
 import model.game.GameState;
+import model.game.quest.MatchContext;
 
 public class LoveYourPlantsRule extends MiniGame implements SpecialStageRule {
-  private final String belovedPlantLower;
+  private final int lossBudget;
+  private final MatchContext context;
 
-  // کل مرحله فقط یه نوع گیاه قابل کاشتنه
-  public LoveYourPlantsRule(String belovedPlant) {
-    this.belovedPlantLower =
-            belovedPlant == null ? "" : model.account.User.normalizePlantKey(belovedPlant);
+  // طبق داک: اگه به تعداد مشخصی گیاه از دست بره (خورده بشه یا نابود بشه) مرحله باخته میشه
+  public LoveYourPlantsRule(int lossBudget, MatchContext context) {
+    this.lossBudget = lossBudget;
+    this.context = context;
   }
 
   @Override
   public void apply(GameState gameState) {}
 
+  public int getLossBudget() { return lossBudget; }
+
   @Override
-  public boolean isPlantAllowed(String plantName) {
-    return plantName != null
-            && model.account.User.normalizePlantKey(plantName).equals(belovedPlantLower);
+  public boolean checkLoseCondition(Board board) {
+    return context != null && context.getPlantsLost() >= lossBudget;
   }
 
   @Override

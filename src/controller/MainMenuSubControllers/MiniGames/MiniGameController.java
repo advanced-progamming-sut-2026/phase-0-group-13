@@ -6,7 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import model.account.User;
 import model.core.App;
-import model.core.GameManager;
 import model.core.GameSession;
 import model.core.MatchSetup;
 import model.enums.Menu;
@@ -67,13 +66,13 @@ public class MiniGameController implements BaseController {
         izombie = new IZombieEngine(activeLevel);
         System.out.println("Deploy zombies to eat all 5 brains before your zombie-sun runs dry.");
         System.out.println("Command: 'place zombie <type> <x> <y>'.");
-        System.out.println(izombie.renderMap());
+        view.BoardRenderer.render(izombie);
         break;
       case BEGHOULED:
         beghouled = new BeghouledEngine(activeLevel);
         System.out.println("Line up three or more matching plants to earn sun and clear the lawn.");
         System.out.println("Commands: 'swap plant <x1> <y1> <x2> <y2>', 'upgrade plant <name>'.");
-        System.out.println(beghouled.renderMap());
+        view.BoardRenderer.render(beghouled);
         break;
       default:
         System.out.println("error: unsupported mini-game type: " + activeType);
@@ -221,10 +220,10 @@ public class MiniGameController implements BaseController {
 
   private void renderMap() {
     switch (activeType) {
-      case VASEBREAKER -> System.out.print(vasebreaker.renderMap());
+      case VASEBREAKER -> view.BoardRenderer.render(vasebreaker);
       case WALLNUT_BOWLING -> System.out.print(bowling.renderMap());
-      case I_ZOMBIE -> System.out.print(izombie.renderMap());
-      case BEGHOULED -> System.out.print(beghouled.renderMap());
+      case I_ZOMBIE -> view.BoardRenderer.render(izombie);
+      case BEGHOULED -> view.BoardRenderer.render(beghouled);
       default -> System.out.println("--- Mini-Game Map (" + activeType + ") ---");
     }
   }

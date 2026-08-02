@@ -27,7 +27,7 @@ public class ZombotanyPeashooterAction implements ZombieAction {
       board.addProjectile(p);
 
       lastShootTick = currentTick;
-      System.out.printf("Zombotany Peashooter Zombie fired at row %d!%n", zombie.getRow());
+      System.out.printf("Zombotany Peashooter Zombie fired at row %d!%n", zombie.getRow() + 1);
     }
 
     Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);

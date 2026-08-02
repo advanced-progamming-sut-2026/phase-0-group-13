@@ -70,7 +70,7 @@ public class ZombieFactory {
   private ZombieAction determineBehavior(ZombieTemplate template, ZombieType type, double diffMultiplier) {
     double eatDamage = template.getEatDps() * diffMultiplier;
     return switch (type) {
-      case NORMAL, CONEHEAD, BUCKETHEAD, KNIGHT, BLOCKHEAD, IMP, ARCADE,
+      case NORMAL, CONEHEAD, BUCKETHEAD, KNIGHT, BLOCKHEAD, IMP,
            ZOMBOTANY_WALLNUT -> new StandardZombieAction(eatDamage);
       case ZOMBOSS_EGYPT, ZOMBOSS_PIRATE, ZOMBOSS_COWBOY, ZOMBOSS_DARK ->
               new ZombossAction(120, 1800, eatDamage);
@@ -82,7 +82,7 @@ public class ZombieFactory {
       case ZOMBOTANY_PEASHOOTER, HUNTER -> new ZombotanyPeashooterAction(150, 10.0);
       case ZOMBOTANY_JALAPENO -> new ZombotanyJalapenoAction(100);
       case ZOMBOTANY_SQUASH -> new TacklerZombieAction(true);
-      case FOOTBALLER, IMP_DRAGON -> new TacklerZombieAction();
+      case FOOTBALLER, IMP_DRAGON, ARCADE -> new TacklerZombieAction();
       case PARASOL -> new ParasolZombieAction(200, eatDamage);
       case PROSPECTOR -> new RangedDemolisherZombieAction(60, 3.0);
       case NEWSPAPER -> new EnrageOnArmorBreakZombieAction(eatDamage, 2.0);

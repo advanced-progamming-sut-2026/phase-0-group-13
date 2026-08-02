@@ -11,7 +11,6 @@ import model.game.TileEffects.IceTrailEffect;
 import model.game.TileEffects.TileEffect;
 import model.game.TileEffects.TombStoneEffect;
 import model.game.plant.Plant;
-import model.game.reward.Currency;
 import model.game.reward.Reward;
 import model.game.zombie.Zombie;
 import model.game.zombie.factory.ZombieFactory;
@@ -406,8 +405,18 @@ public class Board {
     }
     return null;
   }
+  public Plant getTopPlantAt(int row, double x) {
+    Plant top = null;
+    for (Plant p : plants) {
+      if (p.getRow() == row && Math.abs(p.getCol() - x) < 0.5
+              && (top == null || top.getShield() != p)) {
+        top = p;
+      }
+    }
+    return top;
+  }
   public Plant getEdiblePlantAt(int row, double x, int currentTick) {
-    Plant plant = getPlantAt(row, x);
+    Plant plant = getTopPlantAt(row, x);
     if (plant != null && plant.isDisabled(currentTick)) {
       return null;
     }
@@ -489,9 +498,6 @@ public class Board {
     return plants;
   }
 
-  public List<Sun> getSuns() {
-    return sunManager.getSuns();
-  }
 
   public List<Lawnmower> getLawnmowers() {
     return lawnmowers;

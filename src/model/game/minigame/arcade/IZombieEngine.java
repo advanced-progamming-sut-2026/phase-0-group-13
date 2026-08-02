@@ -12,6 +12,9 @@ public final class IZombieEngine {
   public static final int COLS = 9;
   public static final int BRAINS = 5;
   public static final String SUN_PRODUCER = "sun-imp";
+  // Cutout plants fire on the same cadence as every other plant in the game: one shot per
+  // 1.5s (15 ticks at 10 ticks/second), matching the Peashooter's Action Interval in plants.json.
+  public static final int PLANT_FIRE_INTERVAL = 15;
 
   public static final class ZombieSpec {
     public final String name;
@@ -35,6 +38,7 @@ public final class IZombieEngine {
   }
 
   private static final Map<String, ZombieSpec> CATALOG = buildCatalog();
+  private static final int[][] STAGE_PICKS = {{0, 1, 2, 3, 4}, {3, 4, 5, 6, 7}, {3, 5, 7, 8, 9}};
 
   private static Map<String, ZombieSpec> buildCatalog() {
     Map<String, ZombieSpec> map = new LinkedHashMap<>();
@@ -97,6 +101,7 @@ public final class IZombieEngine {
   private final boolean[] brainAlive = new boolean[BRAINS];
   private final int level;
   private int zombieSun;
+  private int tickCount;
   private boolean won;
   private boolean lost;
 
@@ -114,8 +119,8 @@ public final class IZombieEngine {
     int plantsPerRow = 1 + level;
     for (int row = 0; row < ROWS; row++) {
       for (int i = 0; i < plantsPerRow; i++) {
-        int col = COLS - 2 - i * 2;
-        if (col < 1) {
+        int col = 1 + i * 2;
+        if (col >= COLS - 1) {
           break;
         }
         defensePlants.add(new DefensePlant(row, col, 120 + level * 30, 12 + level * 3, 5.0));
@@ -124,11 +129,10 @@ public final class IZombieEngine {
   }
 
   public List<ZombieSpec> availableZombieTypes() {
+    List<ZombieSpec> all = new ArrayList<>(CATALOG.values());
     List<ZombieSpec> available = new ArrayList<>();
-    for (ZombieSpec spec : CATALOG.values()) {
-      if (level >= 3 || spec.unlockLevel <= level) {
-        available.add(spec);
-      }
+    for (int index : STAGE_PICKS[Math.min(Math.max(level, 1), STAGE_PICKS.length) - 1]) {
+      available.add(all.get(index));
     }
     return available;
   }
@@ -141,9 +145,9 @@ public final class IZombieEngine {
     if (spec == null) {
       return "error: unknown zombie type '" + typeName + "'";
     }
-    boolean unlocked = level >= 3 || spec.unlockLevel <= level;
+    boolean unlocked = availableZombieTypes().contains(spec);
     if (!unlocked) {
-      return "error: " + typeName + " isn't unlocked until level " + spec.unlockLevel;
+      return "error: " + typeName + " isn't available at level " + level;
     }
     if (zombieSun < spec.cost) {
       return "error: not enough zombie-sun (need " + spec.cost + ", have " + zombieSun + ")";
@@ -155,23 +159,24 @@ public final class IZombieEngine {
   }
   public void tick() {
     if (won || lost) {return;}
+    tickCount++;
     for (DeployedZombie zombie : deployedZombies) {
       if (zombie.isDead() || !zombie.spec.producesSun) {
         continue;
       }
       zombie.sunTimer++;
-      if (zombie.sunTimer >= 24) {
+      if (zombie.sunTimer >= Math.max(8, 48 - tickCount / 100)) {
         zombie.sunTimer = 0;
         zombieSun += 25;
       }
     }
     for (DefensePlant plant : defensePlants) {
-      if (plant.isDead()) {
+      if (plant.isDead() || tickCount % PLANT_FIRE_INTERVAL != 0) {
         continue;
       }
       for (DeployedZombie zombie : deployedZombies) {
         if (zombie.row != plant.row || zombie.isDead()) {continue;}
-        double distance = plant.col - zombie.column;
+        double distance = zombie.column - plant.col;
         if (distance >= 0 && distance <= plant.range) {
           zombie.health -= plant.damagePerTick;
           break;
@@ -240,11 +245,6 @@ public final class IZombieEngine {
   public boolean isWon() {
     return won;
   }
-
-  public boolean isLost() {
-    return lost;
-  }
-
   public boolean isFinished() {
     return won || lost;
   }
@@ -252,6 +252,18 @@ public final class IZombieEngine {
   public int getZombieSun() {
     return zombieSun;
   }
+
+  public boolean isBrainAlive(int row) {
+    return brainAlive[Math.min(row, BRAINS - 1)];
+  }
+  public int getPlantHealthAt(int row, int col) {
+    for (DefensePlant plant : defensePlants) {
+      if (plant.row == row && plant.col == col && !plant.isDead()) {
+        return plant.health;}}return -1;}
+  public int getZombieHealthAt(int row, int col) {
+    for (DeployedZombie zombie : deployedZombies) {
+      if (zombie.row == row && (int) Math.round(zombie.column) == col && !zombie.isDead()) {
+        return zombie.health;}}return -1;}
 
   public int getBrainsRemaining() {
     int count = 0;
@@ -263,37 +275,4 @@ public final class IZombieEngine {
     return count;
   }
 
-  public String renderMap() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("--- I, Zombie: Level ").append(level).append(" | Zombie-Sun: ").append(zombieSun)
-        .append(" | Brains left: ").append(getBrainsRemaining()).append("/").append(BRAINS)
-        .append(" ---\n");
-    for (int row = 0; row < ROWS; row++) {
-      StringBuilder line = new StringBuilder();
-      line.append(brainAlive[Math.min(row, BRAINS - 1)] ? "(B)" : "( )");
-      for (int col = 0; col < COLS; col++) {
-        char glyph = '.';
-        for (DefensePlant p : defensePlants) {
-          if (!p.isDead() && p.row == row && p.col == col) {
-            glyph = 'P';
-              break;
-          }
-        }
-        for (DeployedZombie z : deployedZombies) {
-          if (!z.isDead() && z.row == row && (int) Math.round(z.column) == col) {
-            glyph = 'Z';
-              break;
-          }
-        }
-        line.append('[').append(glyph).append(']');
-      }
-      sb.append(line).append('\n');
-    }
-    sb.append("Available: ");
-    for (ZombieSpec spec : availableZombieTypes()) {
-      sb.append(spec.name).append('(').append(spec.cost).append(") ");
-    }
-    sb.append('\n');
-    return sb.toString();
-  }
 }

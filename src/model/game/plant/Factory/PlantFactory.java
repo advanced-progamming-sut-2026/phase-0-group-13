@@ -333,11 +333,11 @@ public class PlantFactory {
   private PlantAction determineExplosiveBehavior(
           int damage, EnumSet<PlantTag> tags, PlantTemplate template) {
     int blastDamage = damage > 0 ? damage : 1800;
-    int range = mentions(template.baseAbility, "3x3") ? 1 : 0;
+    int range = mentions(template.baseAbility, "lawn") ? 9 : (mentions(template.baseAbility, "3x3") ? 1 : 0);
 
     if (tags.contains(PlantTag.TRAP)) {
       int armSeconds = parseArmSeconds(template.baseAbility);
-      return new ExplodeAction(armSeconds * TICKS_PER_SECOND, blastDamage, Math.max(range, 1));
+      return new ExplodeAction(armSeconds * TICKS_PER_SECOND, blastDamage, Math.max(range, 1), true);
     }
     return new ExplodeAction(0, blastDamage, Math.max(range, 1));
   }
@@ -350,7 +350,7 @@ public class PlantFactory {
       return 15;
     }
     Matcher matcher = ARM_SECONDS.matcher(abilityText);
-    return matcher.find() ? Integer.parseInt(matcher.group(1)) : 15;
+    return matcher.find() ? Integer.parseInt(matcher.group(1)) : 0;
   }
 
   private boolean mentions(String text, String needle) {

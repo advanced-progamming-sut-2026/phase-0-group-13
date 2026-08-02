@@ -29,7 +29,14 @@ public class ConveyorRule extends MiniGame implements SpecialStageRule {
       elapsedTicks = 0;
       readyPlant = beltPlants.get(nextIndex % beltPlants.size());
       nextIndex++;
+      System.out.printf("The conveyor belt delivered a %s.%n", readyPlant);
     }
+  }
+  @Override
+  public boolean isPlantAllowed(String plantName) {
+    return readyPlant != null && plantName != null
+            && model.account.User.normalizePlantKey(readyPlant)
+            .equals(model.account.User.normalizePlantKey(plantName));
   }
 
   public String consumeReadyPlant() {

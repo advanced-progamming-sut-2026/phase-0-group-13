@@ -71,20 +71,40 @@ public final class MatchLauncher {
 
     SpecialStageRule rule = levelInStage == BOSS_LEVEL_IN_STAGE && bossName != null
             ? new BossStageRule(bossName)
-            : specialRuleFor(stage, levelInStage, deck);
+            : specialRuleFor(gameManager, stage, levelInStage, deck);
     if (rule == null) {
       return;
     }
 
     gameManager.setSpecialStageRule(rule);
     System.out.println("Special level active: " + rule.getClass().getSimpleName());
+    if (rule instanceof ConveyorRule) {
+      gameManager.enableFreePlanting();
+      gameManager.disableCooldowns();
+      gameManager.getBoard().getGameState().setSkySunDisabled(true);
+    }
+    if (rule instanceof SaveOurSeedsRule) {
+      placeProtectedPlants(gameManager);
+    }
     if (rule instanceof PlantWhatYouGetRule) {
       // زامبی‌ها تا وقتی بازیکن 'start zombie waves' نزنه وارد نمیشن
       gameManager.pauseZombieWaves();
+      gameManager.getBoard().getGameState()
+              .addSun(800 - gameManager.getBoard().getGameState().getCurrentSun());
+      gameManager.getBoard().getGameState().setSkySunDisabled(true);
+      gameManager.disableCooldowns();
       System.out.println("Plant freely, then type 'start zombie waves' to begin the assault.");
     }
   }
 
+  private static void placeProtectedPlants(GameManager gameManager) {
+    if (GameDataManager.plantRepository == null) {return;}
+    var factory = new model.game.plant.Factory.PlantFactory(GameDataManager.plantRepository);
+    for (int row = 0; row < ROWS; row += 2) {
+      var guarded = factory.createPlant("sunflower", row, 0);
+      if (guarded != null) {
+        gameManager.getBoard().placePlant(guarded);
+        System.out.printf("PROTECT THIS: %s at (1, %d)%n", guarded.getName(), row + 1);}}}
   private static final int BOSS_LEVEL_IN_STAGE = 4;
 
   private static int currentLevelInStage() {
@@ -92,7 +112,8 @@ public final class MatchLauncher {
     return user != null ? user.getProgress().getCurrentLevel() : 1;
   }
 
-  private static SpecialStageRule specialRuleFor(int stage, int levelInStage, List<String> deck) {
+  private static SpecialStageRule specialRuleFor(
+          GameManager gameManager, int stage, int levelInStage, List<String> deck) {
     if (levelInStage != 2 && levelInStage != 3) {
       return null;
     }
@@ -101,16 +122,22 @@ public final class MatchLauncher {
       case 1:
         return second
                 ? new ConveyorRule(deck, 120)
-                : new LockedPlantsRule(deck.subList(0, Math.max(1, deck.size() - 1)));
+                : new LockedPlantsRule("Pea", "peashooter");
       case 2:
         return second ? new SaveOurSeedsRule() : new TimedWarRule(1200);
       case 3:
         return second ? new NightOpsRule() : new DeadLineRule(4);
       default:
         return second
-                ? new LoveYourPlantsRule(deck.isEmpty() ? "peashooter" : deck.get(0))
+                ? (gameManager == null ? null : new LoveYourPlantsRule(5, gameManager.getMatchContext()))
                 : new PlantWhatYouGetRule(deck, 120);
     }
+  }
+
+  public static SpecialStageRule selectionRule() {
+    SpecialStageRule rule =
+            specialRuleFor(null, resolveStageNumber(), currentLevelInStage(), List.of());
+    return rule != null && rule.restrictsSelection() ? rule : null;
   }
 
   private static int resolveStageNumber() {

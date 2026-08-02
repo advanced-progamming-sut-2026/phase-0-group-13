@@ -11,6 +11,7 @@ import model.core.MatchSetup;
 import model.enums.Commands.MenuCommands;
 import model.enums.Commands.PlantSelectionMenuCommands;
 import model.enums.Menu;
+import model.game.minigame.SpecialStageRule;
 
 public class PlantSelectionMenuController implements BaseController {
 
@@ -54,12 +55,14 @@ public class PlantSelectionMenuController implements BaseController {
     User user = requireUser();
     if (user == null) return;
 
+    SpecialStageRule rule = MatchLauncher.selectionRule();
     System.out.println("--- All Unlocked Plants ---");
     for (String name : user.getUnlockedPlants()) {
       boolean selected = user.getSelectedDeck().contains(name);
       boolean boosted = user.isPlantBoosted(name);
-      System.out.println(
-              "  " + name + (selected ? " [selected]" : "") + (boosted ? " [boosted]" : ""));
+      boolean locked = rule != null && !rule.isPlantAllowed(name);
+      System.out.println("  " + name + (locked ? " [locked in this stage]" : "")
+              + (selected ? " [selected]" : "") + (boosted ? " [boosted]" : ""));
     }
   }
 
@@ -67,9 +70,10 @@ public class PlantSelectionMenuController implements BaseController {
     User user = requireUser();
     if (user == null) return;
 
+    SpecialStageRule rule = MatchLauncher.selectionRule();
     System.out.println("--- Available Plants for This Stage ---");
     for (String name : user.getUnlockedPlants()) {
-      if (!user.getSelectedDeck().contains(name)) {
+      if (!user.getSelectedDeck().contains(name) && (rule == null || rule.isPlantAllowed(name))) {
         System.out.println("  " + name);
       }
     }
@@ -79,6 +83,11 @@ public class PlantSelectionMenuController implements BaseController {
     User user = requireUser();
     if (user == null) return;
 
+    SpecialStageRule rule = MatchLauncher.selectionRule();
+    if (rule != null && !rule.isPlantAllowed(type)) {
+      System.out.println("error: " + type + " is locked in this stage");
+      return;
+    }
     Result result = user.addToDeck(type);
     System.out.println(result.message());
   }
@@ -108,7 +117,10 @@ public class PlantSelectionMenuController implements BaseController {
     if (user == null) return;
 
     int deckSize = user.getSelectedDeck().size();
-    int requiredSlots = Math.min(User.MIN_DECK_SLOTS, user.getUnlockedPlants().size());
+    SpecialStageRule rule = MatchLauncher.selectionRule();
+    int selectable = (int) user.getUnlockedPlants().stream()
+            .filter(name -> rule == null || rule.isPlantAllowed(name)).count();
+    int requiredSlots = Math.min(User.MIN_DECK_SLOTS, selectable);
     if (deckSize < requiredSlots) {
       System.out.println(
               "error: select at least "

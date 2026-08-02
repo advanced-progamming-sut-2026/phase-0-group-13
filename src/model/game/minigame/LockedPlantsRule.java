@@ -1,30 +1,31 @@
 package model.game.minigame;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import data.GameDataManager;
 import model.game.GameState;
 
 public class LockedPlantsRule extends MiniGame implements SpecialStageRule {
-  private final Set<String> allowedPlantsLower;
+  private final String lockedFamily;
+  private final String survivorKey;
 
-  // فقط لیست مشخصی از گیاه‌ها قابل کاشتن هستن، صرف‌نظر از دک انتخابی بازیکن
-  public LockedPlantsRule(List<String> allowedPlants) {
-    this.allowedPlantsLower = new HashSet<>();
-    for (String plant : allowedPlants) {
-      if (plant != null) {
-        allowedPlantsLower.add(model.account.User.normalizePlantKey(plant));
-      }
-    }
+  // طبق داک: از یک خانواده فقط یک گیاه در دسترس میمونه و بقیه‌ی اون خانواده قفلن
+  public LockedPlantsRule(String lockedFamily, String survivor) {
+    this.lockedFamily = lockedFamily.toLowerCase();
+    this.survivorKey = model.account.User.normalizePlantKey(survivor);
   }
 
   @Override
   public void apply(GameState gameState) {}
 
   @Override
+  public boolean restrictsSelection() { return true; }
+  @Override
   public boolean isPlantAllowed(String plantName) {
-    return plantName != null
-            && allowedPlantsLower.contains(model.account.User.normalizePlantKey(plantName));
+    if (plantName == null || GameDataManager.plantRepository == null
+            || model.account.User.normalizePlantKey(plantName).equals(survivorKey)) {
+      return true;}
+    var template = GameDataManager.plantRepository.find(plantName);
+    return template == null || template.tags == null
+            || !template.tags.toLowerCase().contains(lockedFamily);
   }
 
   @Override

@@ -272,17 +272,12 @@ public final class VasebreakerEngine {
     return won;
   }
 
-  public boolean isLost() {
-    return lost;
-  }
+
 
   public boolean isFinished() {
     return won || lost;
   }
 
-  public int getTickCount() {
-    return tickCount;
-  }
 
   public List<ArcadeZombie> getZombies() {
     return zombies;
@@ -296,6 +291,11 @@ public final class VasebreakerEngine {
     return names;
   }
 
+  public int getPlantHealthAt(int row, int col) {
+    for (ArcadePlant plant : plants) {
+      if (plant.row == row && plant.col == col && !plant.isDead()) {
+        return plant.health;}}
+    return -1;}
   public VaseContent[][] getVaseGrid() {
     return vaseGrid;
   }
@@ -304,31 +304,4 @@ public final class VasebreakerEngine {
     return smashed;
   }
 
-  public String renderMap() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("--- Vasebreaker: Level ").append(level).append(" ---\n");
-    for (int r = 0; r < ROWS; r++) {
-      for (int c = 0; c < COLS; c++) {
-        char glyph;
-        if (!smashed[r][c]) {
-          glyph = 'V';
-        } else {
-          boolean hasZombie = false;
-          for (ArcadeZombie z : zombies) {
-            if (!z.isDead() && z.row == r && z.getColumn() == c) {
-              hasZombie = true;
-              break;
-            }
-          }
-          glyph = hasZombie ? 'Z' : '.';
-        }
-        sb.append('[').append(glyph).append(']');
-      }
-      sb.append('\n');
-    }
-    if (!pendingSeeds.isEmpty()) {
-      sb.append("Fresh seeds: ").append(getPendingSeedNames()).append('\n');
-    }
-    return sb.toString();
-  }
 }

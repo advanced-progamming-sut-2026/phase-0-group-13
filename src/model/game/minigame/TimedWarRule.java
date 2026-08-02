@@ -16,6 +16,7 @@ public class TimedWarRule extends MiniGame implements SpecialStageRule {
     elapsedTicks++;
   }
 
+  public int remainingTicks() { return Math.max(0, timeLimitTicks - elapsedTicks); }
   // اگه زمان تموم بشه و هنوز زامبی زنده رو نقشه باشه، باخت
   @Override
   public boolean checkLoseCondition(Board board) {
