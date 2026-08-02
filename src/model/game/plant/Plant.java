@@ -11,7 +11,7 @@ import model.game.plant.behavior.PlantAction;
 public class Plant {
   private final String name;
   private int currentHealth;
-  private final int maxHealth;
+  private int maxHealth;
   private final int cost;
   private final int level;
 
@@ -151,6 +151,14 @@ public class Plant {
   public int getStackCount() { return stackCount; }
   public Plant getShield() { return shield; }
   public void setShield(Plant shield) { this.shield = shield; }
+
+  /** غذای گیاه برای گردوها: زره دائمی اضافه می‌کند (هم سقف جان و هم جان فعلی بالا می‌رود). */
+  public void grantBonusHealth(int amount) {
+    if (amount > 0) {
+      this.maxHealth += amount;
+      this.currentHealth += amount;
+    }
+  }
 
   public void heal(int amount) {
     if (amount > 0) this.currentHealth = Math.min(maxHealth, this.currentHealth + amount);

@@ -169,6 +169,15 @@ public class PlantFactory {
   private static final Pattern SUN_AMOUNT =
           Pattern.compile("(\\d+)\\s*sun", Pattern.CASE_INSENSITIVE);
 
+  /** اولین عدد متن اثر غذای گیاه را برمی‌دارد (مثلا "4000 extra health" → 4000). */
+  private int parseBonusHealth(String abilityText, int fallback) {
+    if (abilityText == null) {
+      return fallback;
+    }
+    Matcher matcher = java.util.regex.Pattern.compile("(\\d+)").matcher(abilityText);
+    return matcher.find() ? Integer.parseInt(matcher.group(1)) : fallback;
+  }
+
   private int parseSunAmount(String abilityText, int fallback) {
     if (abilityText == null) {
       return fallback;
@@ -382,6 +391,9 @@ public class PlantFactory {
                       new LobAction(Math.max(1, interval / 3), damage * 2, true, resolveProjectileEffect(tags)));
       case MELEE -> new PlantFood(150, new MeleeAction(Math.max(1, interval / 3), damage * 2));
       case HOMING -> new PlantFood(150, new HomingAction(Math.max(1, interval / 3), damage * 2));
+      case WALL_NUT ->
+              new PlantFood(1, new FortifyAction(parseBonusHealth(template.plantFoodEffect, 4000)));
+      case EXPLOSIVE -> new PlantFood(1, new ExplodeAction(0, Math.max(damage * 2, 1800), 1));
       default -> new PlantFood(1,
               new DummyPlantAction("Plant Food effect '" + template.plantFoodEffect + "' not implemented"));
     };
