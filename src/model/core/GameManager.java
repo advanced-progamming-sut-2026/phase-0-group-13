@@ -173,6 +173,12 @@ public class GameManager {
     if (activeSpecialRule != null && !activeSpecialRule.isPlantAllowed(plant.getName())) return false;
     if (row < 0 || row >= board.getRows() || col < 0 || col >= board.getColumns()) return false;
 
+    // سنگ‌قبر و موانع مشابه، خانه را غیرقابل کاشت می‌کنند
+    model.game.Tile tile = board.getTile(row, col);
+    if (tile != null && tile.getEffect() != null && tile.getEffect().blocksPlanting()) {
+      return false;
+    }
+
     Plant existingPlant = board.getPlantAt(row, col);
     boolean plantIsAquatic = plant.getTags().contains(model.enums.PlantTag.WATER);
     boolean stacking = false;

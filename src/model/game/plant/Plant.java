@@ -39,6 +39,7 @@ public class Plant {
   public static final int MAX_STACK = 5;
   private int stackCount = 1;
   private Plant shield;
+  private boolean blueFlame;
 
   public Plant(PlantTemplate template, int row, int col, PlantCategory category, EnumSet<PlantTag> tags,
                PlantAction behavior, PlantFood plantFood) {
@@ -125,7 +126,8 @@ public class Plant {
     if (plantFood != null) {
       plantFood.activate();
     } else {
-      System.out.println("Warning: " + name + " has no Plant Food effect configured; feed ignored.");
+      // طبق plants.json مینت‌ها و Imitater ذاتا اثر غذای گیاه ندارند (یک‌بارمصرف/کپی‌کننده)
+      System.out.println(name + " is a single-use plant and has no Plant Food effect.");
     }
   }
 
@@ -151,6 +153,11 @@ public class Plant {
   public int getStackCount() { return stackCount; }
   public Plant getShield() { return shield; }
   public void setShield(Plant shield) { this.shield = shield; }
+
+  /** Torchwood با غذای گیاه شعله آبی می‌گیرد و تیرهای عبوری را ۳ برابر می‌کند (به جای ۲ برابر). */
+  public boolean isBlueFlame() { return blueFlame; }
+
+  public void setBlueFlame(boolean blueFlame) { this.blueFlame = blueFlame; }
 
   /** غذای گیاه برای گردوها: زره دائمی اضافه می‌کند (هم سقف جان و هم جان فعلی بالا می‌رود). */
   public void grantBonusHealth(int amount) {

@@ -400,18 +400,54 @@ public class GamePlayController implements BaseController {
       Progress progress = user.getProgress();
       model.Result reward =
               AdventureMap.getLevelReward(progress.getCurrentStage(), progress.getCurrentLevel());
-      if (reward.success() && reward.getObject() instanceof String unlockId) {
-        System.out.println(reward.message());
-        if (!unlockId.contains("trophy")) {
-          user.unlockPlant(unlockId);
-        }
-      }
+      grantLevelReward(user, reward);
       System.out.println(progress.advanceAdventure().message());
       user.unlockItem("stage_" + progress.getCurrentStage());
       user.triggerQuestEvent("STAGE_CLEAR", 1);
     }
 
     saveUserState();
+  }
+
+  /**
+   * جایزه‌ی مرحله را می‌دهد. اگر جایزه‌ی از پیش تعیین‌شده گیاهی باشد که بازیکن همین الان دارد،
+   * به جایش اولین گیاه قفل‌بودهٔ بازی داده می‌شود تا جایزه همیشه چیز جدیدی باشد.
+   */
+  private void grantLevelReward(User user, model.Result reward) {
+    String unlockId = reward.success() && reward.getObject() instanceof String id ? id : null;
+
+    if (unlockId != null && unlockId.contains("trophy")) {
+      System.out.println(reward.message());
+      return;
+    }
+
+    if (unlockId == null || user.hasUnlockedPlant(unlockId)) {
+      unlockId = firstLockedPlant(user);
+    }
+
+    if (unlockId == null) {
+      System.out.println("You already own every plant in the game!");
+      return;
+    }
+
+    model.Result unlocked = user.unlockPlant(unlockId);
+    System.out.println("Reward Unlocked: " + unlockId + "!");
+    if (!unlocked.success()) {
+      System.out.println(unlocked.message());
+    }
+  }
+
+  /** اولین گیاهی که بازیکن هنوز باز نکرده (ترتیب فایل plants.json = ترتیب پیشرفت). */
+  private String firstLockedPlant(User user) {
+    if (GameDataManager.plantRepository == null) {
+      return null;
+    }
+    for (PlantTemplate template : GameDataManager.plantRepository.getAll()) {
+      if (template.name != null && !user.hasUnlockedPlant(template.name)) {
+        return template.name.toLowerCase();
+      }
+    }
+    return null;
   }
 
   private void saveUserState() {

@@ -287,7 +287,7 @@ public class Board {
       if (p.getEffect() != Projectile.ProjectileEffect.FIRE) {
         Plant plantHere = getPlantAt(Math.round(p.getYCoordinate()), p.getXCoordinate());
         if (plantHere != null && plantHere.getTags().contains(PlantTag.FIRE)) {
-          p = p.ignited();
+          p = p.ignited(plantHere.isBlueFlame());
           iterator.set(p);
         }
       }

@@ -169,6 +169,24 @@ public class PlantFactory {
   private static final Pattern SUN_AMOUNT =
           Pattern.compile("(\\d+)\\s*sun", Pattern.CASE_INSENSITIVE);
 
+  /**
+   * غذای گیاه برای گیاهان پشتیبان. Imitater طبق دیتا اثری ندارد (وابسته به گیاه کپی‌شده) و
+   * null برمی‌گرداند تا پیام مناسب چاپ شود.
+   */
+  private PlantFood determineModifierPlantFood(PlantTemplate template) {
+    String name = template.name == null ? "" : template.name.toLowerCase();
+    if (name.contains("torchwood")) {
+      return new PlantFood(1, new BlueFlameAction());
+    }
+    if (name.contains("hypno")) {
+      return new PlantFood(150, new HypnoShroomAction(true));
+    }
+    if (name.contains("lily")) {
+      return new PlantFood(1, new LilyPadSpreadAction(this, 3));
+    }
+    return null;
+  }
+
   /** اولین عدد متن اثر غذای گیاه را برمی‌دارد (مثلا "4000 extra health" → 4000). */
   private int parseBonusHealth(String abilityText, int fallback) {
     if (abilityText == null) {
@@ -394,6 +412,7 @@ public class PlantFactory {
       case WALL_NUT ->
               new PlantFood(1, new FortifyAction(parseBonusHealth(template.plantFoodEffect, 4000)));
       case EXPLOSIVE -> new PlantFood(1, new ExplodeAction(0, Math.max(damage * 2, 1800), 1));
+      case MODIFIER -> determineModifierPlantFood(template);
       default -> new PlantFood(1,
               new DummyPlantAction("Plant Food effect '" + template.plantFoodEffect + "' not implemented"));
     };

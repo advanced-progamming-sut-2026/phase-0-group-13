@@ -15,6 +15,14 @@ public class TileEffect {
     this.active = true;
   }
 
+  /**
+   * آیا این خانه تا وقتی افکت فعال است غیرقابل کاشت می‌شود؟ طبق داک سنگ‌قبر (و موانعی مثل دبه)
+   * غیرقابل کاشت‌اند؛ افکت‌های دیگر به‌صورت پیش‌فرض مانع کاشت نیستند.
+   */
+  public boolean blocksPlanting() {
+    return false;
+  }
+
   public void tick() {
     if (!active) return;
 

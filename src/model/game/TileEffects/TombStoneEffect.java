@@ -1,6 +1,13 @@
 package model.game.TileEffects;
 
 public class TombStoneEffect extends TileEffect {
+
+  // طبق داک روی این خانه نمی‌توان گیاه کاشت
+  @Override
+  public boolean blocksPlanting() {
+    return isActive();
+  }
+
   private int health;
   private boolean blocksShots;
 

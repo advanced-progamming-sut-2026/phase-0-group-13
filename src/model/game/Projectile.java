@@ -156,11 +156,20 @@ public class Projectile {
 
 
   public Projectile ignited() {
+    return ignited(false);
+  }
+
+  /**
+   * @param blueFlame شعله آبی Torchwood (غذای گیاه): چون FIRE موقع برخورد دمیج را ۲ برابر می‌کند،
+   *     پایه را ۱.۵ برابر می‌کنیم تا مجموع ۳ برابر شود.
+   */
+  public Projectile ignited(boolean blueFlame) {
     if (effect == ProjectileEffect.FIRE || isFromZombie) {
       return this;
     }
+    int litDamage = blueFlame ? Math.round(damage * 1.5f) : damage;
     Projectile lit =
-            new Projectile(damage, speed,
+            new Projectile(litDamage, speed,
                     xCoordinate, getYCoordinate(), ProjectileEffect.FIRE, piercing, lobbed, isFromZombie);
     lit.setDirection(stepCol, stepRow);
     lit.alreadyHit.addAll(this.alreadyHit);

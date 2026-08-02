@@ -3,6 +3,13 @@ package model.game.TileEffects;
 // بشکه‌ای که از Barrel Roller جا مونده: جلوی شلیک‌ها رو میگیره ولی زامبی‌ها ازش رد میشن، و وقتی
 // شکسته بشه دو تا imp ازش بیرون میان (Board.tryBarrelBurst)
 public class BarrelEffect extends TileEffect {
+
+  // طبق داک روی این خانه نمی‌توان گیاه کاشت
+  @Override
+  public boolean blocksPlanting() {
+    return isActive();
+  }
+
   private int health;
   private boolean burst;
 
