@@ -149,5 +149,16 @@ public class Zombie {
   public boolean isEating() { return isEating; }
   public void setEating(boolean eating) { this.isEating = eating; }
   public List<Armor> getArmors() { return armors; }
+
+  /** مجموع جان باقی‌ماندهٔ لایه‌های زرهِ سالم (برای نمایش وضعیت زامبی). */
+  public int getRemainingArmorHealth() {
+    int total = 0;
+    for (Armor armor : armors) {
+      if (!armor.isDestroyed()) {
+        total += armor.getCurrentHealth();
+      }
+    }
+    return total;
+  }
   public Map<StatusEffect, Integer> getActiveEffects() { return activeEffects; }
 }

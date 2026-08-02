@@ -310,11 +310,19 @@ public class GamePlayController implements BaseController {
             "  plant: " + (plant == null ? "none" : plant.getName() + " (hp " + plant.getCurrentHealth() + ")"));
     StringBuilder zs = new StringBuilder();
     for (Zombie z : board.getZombies()) {
-      if (Math.round(z.getX()) == rc[1] && z.getRow() == rc[0]) {
-        zs.append(z.getName()).append(" ");
+      if (Math.round(z.getX()) == rc[1] && z.getRow() == rc[0] && !z.isDead()) {
+        zs.append("\n    ").append(z.getName())
+                .append(" (hp ").append(z.getCurrentHealth()).append(")");
+        for (var armor : z.getArmors()) {
+          if (!armor.isDestroyed()) {
+            zs.append("\n      armor ").append(armor.getName())
+                    .append(": ").append(armor.getCurrentHealth())
+                    .append("/").append(armor.getMaxHealth());
+          }
+        }
       }
     }
-    System.out.println("  zombies: " + (zs.length() == 0 ? "none" : zs.toString().trim()));
+    System.out.println("  zombies: " + (zs.length() == 0 ? "none" : zs.toString()));
     System.out.println(
             "  effect: "
                     + (tile == null || tile.getEffect() == null
@@ -335,7 +343,8 @@ public class GamePlayController implements BaseController {
       System.out.println("  armor:");
       for (var armor : z.getArmors()) {
         if (!armor.isDestroyed()) {
-          System.out.println("    " + armor.getName() + ": " + armor.getCurrentHealth());
+          System.out.printf("    %s: %d/%d%n",
+                  armor.getName(), armor.getCurrentHealth(), armor.getMaxHealth());
         }
       }
       System.out.println("  effects:");

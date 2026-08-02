@@ -15,7 +15,7 @@ import model.game.zombie.Zombie;
 
 public final class BoardRenderer {
 
-  private static final int CELL_TEXT_WIDTH = 6;
+  private static final int CELL_TEXT_WIDTH = 8;
   private static final String ROW_PREFIX_PAD = "     ";
   private static final String ZOMBIE_PREFIX = "Zombie";
 
@@ -51,7 +51,7 @@ public final class BoardRenderer {
             "Legend: Z?=zombie   P?=plant   ~=water   +=gravestone   .=empty tile"
                     + "   (? = first letter of the name)");
     System.out.println(
-            "        Second line of every row is the current HP."
+            "        Second line of every row is the current HP (zombies show body+armour)."
                     + " Coordinates are (column, row), both 1-indexed.");
   }
 
@@ -84,8 +84,8 @@ public final class BoardRenderer {
       StringBuilder healthLine = new StringBuilder("    |");
       for (int col = 0; col < cols; col++) {
         String[] cellData = cell.apply(row, col);
-        entityLine.append(String.format(cellFormat, cellData[0]));
-        healthLine.append(String.format(cellFormat, cellData[1]));
+        entityLine.append(String.format(cellFormat, fit(cellData[0])));
+        healthLine.append(String.format(cellFormat, fit(cellData[1])));
       }
       System.out.println(entityLine);
       System.out.println(healthLine);
@@ -211,13 +211,21 @@ public final class BoardRenderer {
 
     for (int col = 0; col < board.getColumns(); col++) {
       String[] cellData = getCellDetails(board, row, col);
-      entityLine.append(String.format(cellFormat, cellData[0]));
-      healthLine.append(String.format(cellFormat, cellData[1]));
+      entityLine.append(String.format(cellFormat, fit(cellData[0])));
+      healthLine.append(String.format(cellFormat, fit(cellData[1])));
     }
 
     String mower = board.getLawnmowers().get(row).isActive() ? "  [MOWER]" : "  [ used]";
     System.out.println(entityLine + mower);
     System.out.println(healthLine);
+  }
+
+  /** متن خانه را به اندازه ستون کوتاه می‌کند تا جدول هرگز به‌هم نریزد. */
+  private static String fit(String text) {
+    if (text == null) {
+      return "";
+    }
+    return text.length() <= CELL_TEXT_WIDTH ? text : text.substring(0, CELL_TEXT_WIDTH);
   }
 
   private static String buildSeparator(int columns) {
@@ -247,7 +255,12 @@ public final class BoardRenderer {
     for (Zombie z : board.getZombies()) {
       if (z.getRow() == row && Math.round(z.getX()) == col && !z.isDead()) {
         entities.append("Z").append(initialOf(z.getName()));
+        // جان بدنه + زرهِ باقی‌مانده، تا آسیب وارد شده به زره هم روی نقشه دیده شود
+        int armorLeft = z.getRemainingArmorHealth();
         healths.append(z.getCurrentHealth());
+        if (armorLeft > 0) {
+          healths.append("+").append(armorLeft);
+        }
         break;
       }
     }
