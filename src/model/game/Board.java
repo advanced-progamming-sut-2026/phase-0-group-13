@@ -265,6 +265,22 @@ public class Board {
     return nearest;
   }
 
+  /**
+   * انگورهای Grapeshot به جای حذف شدن، از دیواره‌های زمین کمانه می‌کنند و فقط وقتی عمرشان
+   * تمام شد ناپدید می‌شوند.
+   */
+  private void handleBouncingProjectile(Projectile p, ListIterator<Projectile> iterator) {
+    if (p.getYCoordinate() < 0 || p.getYCoordinate() >= rows) {
+      p.bounceVertically(rows);
+    }
+    if (p.getXCoordinate() < 0 || p.getXCoordinate() >= columns) {
+      p.bounceHorizontally(columns);
+    }
+    if (p.isExpired()) {
+      iterator.remove();
+    }
+  }
+
   private void handleProjectiles(int currentTick) {
     ListIterator<Projectile> iterator = projectiles.listIterator();
     while (iterator.hasNext()) {
@@ -304,6 +320,11 @@ public class Board {
           break;
         }
       }
+      if (p.isBouncing()) {
+        handleBouncingProjectile(p, iterator);
+        continue;
+      }
+
       if ((hitRegistered && !p.isPiercing()) || p.getXCoordinate() > columns || p.getXCoordinate() < -1
               || p.getYCoordinate() < 0 || p.getYCoordinate() >= rows) {
         iterator.remove();

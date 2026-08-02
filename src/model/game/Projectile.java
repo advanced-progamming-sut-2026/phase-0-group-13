@@ -26,6 +26,8 @@ public class Projectile {
   private final ProjectileEffect effect;
   private final boolean piercing;
   private final boolean lobbed;
+  private boolean bouncing;
+  private int remainingLifeTicks = -1;
 
   private final Set<Zombie> alreadyHit = new HashSet<>();
 
@@ -65,7 +67,43 @@ public class Projectile {
     if (isActive) {
       this.xCoordinate += speed * stepCol;
       this.yCoordinate += speed * stepRow;
+      if (remainingLifeTicks > 0) {
+        remainingLifeTicks--;
+      }
     }
+  }
+
+  // ---- انگورهای کمانه‌کننده Grapeshot ----
+
+  /** این پرتابه از دیواره‌ها کمانه می‌کند و بعد از {@code lifeTicks} تیک ناپدید می‌شود. */
+  public void makeBouncing(int lifeTicks) {
+    this.bouncing = true;
+    this.remainingLifeTicks = lifeTicks;
+  }
+
+  public boolean isBouncing() {
+    return bouncing;
+  }
+
+  public boolean isExpired() {
+    return remainingLifeTicks == 0;
+  }
+
+  /** کمانه از سقف/کف زمین: جهت عمودی برعکس می‌شود. */
+  public void bounceVertically(int rows) {
+    stepRow = -stepRow;
+    if (stepRow == 0) {
+      stepRow = 1;
+    }
+    yCoordinate = Math.max(0, Math.min(rows - 1.0, yCoordinate + stepRow));
+    alreadyHit.clear();
+  }
+
+  /** کمانه از دیوارهٔ چپ/راست: جهت افقی برعکس می‌شود. */
+  public void bounceHorizontally(int columns) {
+    stepCol = -stepCol;
+    xCoordinate = Math.max(0, Math.min(columns - 1.0, xCoordinate + stepCol));
+    alreadyHit.clear();
   }
 
   public void hitZombie(Zombie zombie) {

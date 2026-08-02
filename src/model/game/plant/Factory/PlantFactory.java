@@ -366,7 +366,28 @@ public class PlantFactory {
       int armSeconds = parseArmSeconds(template.baseAbility);
       return new ExplodeAction(armSeconds * TICKS_PER_SECOND, blastDamage, Math.max(range, 1), true);
     }
-    return new ExplodeAction(0, blastDamage, Math.max(range, 1));
+
+    ExplodeAction explode = new ExplodeAction(0, blastDamage, Math.max(range, 1));
+    // گیاهانی مثل Grapeshot بعد از انفجار، ساچمه‌های کمانه‌کننده پخش می‌کنند
+    if (mentions(template.baseAbility, "ricochet")) {
+      explode.withScatteringGrapes(
+              GRAPE_COUNT, parseVanishSeconds(template.baseAbility) * TICKS_PER_SECOND,
+              Math.max(blastDamage / 6, 100));
+    }
+    return explode;
+  }
+
+  private static final int GRAPE_COUNT = 6;
+  private static final int DEFAULT_GRAPE_LIFE_SECONDS = 5;
+
+  /** از متن توانایی، «vanish after N seconds» را می‌خواند. */
+  private int parseVanishSeconds(String abilityText) {
+    if (abilityText == null) {
+      return DEFAULT_GRAPE_LIFE_SECONDS;
+    }
+    Matcher matcher =
+            java.util.regex.Pattern.compile("(\\d+)\\s*second").matcher(abilityText.toLowerCase());
+    return matcher.find() ? Integer.parseInt(matcher.group(1)) : DEFAULT_GRAPE_LIFE_SECONDS;
   }
 
   private static final Pattern ARM_SECONDS =
