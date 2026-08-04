@@ -32,8 +32,11 @@ public class Plant {
 
   /** طبق داک سه سطح یخ‌زدگی: دو سطح اول اثری ندارند، سطح سوم گیاه را کامل یخ می‌زند. */
   public static final int MAX_FREEZE_LEVEL = 3;
+  /** طبق داک، یخِ روی گیاه ۶۰۰ جان دارد. */
+  public static final int ICE_BLOCK_HEALTH = 600;
   private int freezeLevel = 0;
   private int frozenUntilTick = -1;
+  private int iceHealth = 0;
 
   private boolean deathHookFired = false;
 
@@ -108,20 +111,58 @@ public class Plant {
     this.freezeLevel = 0;
   }
 
+  /**
+   * دو سطح اول یخ‌زدگی هیچ اثری ندارند؛ سطح سوم گیاه را داخل یخ ۶۰۰ جانی حبس می‌کند. طبق داک این
+   * یخ با تایمر آب نمی‌شود و باید با تیر گیاهان شکسته (یا با آتش ذوب) شود، پس {@code durationTicks}
+   * فقط برای سازگاری با فراخوانی‌های قبلی (Hunter و پرتابه‌ها) نگه داشته شده است.
+   */
   public void addFreezeExposure(int amount, int currentTick, int durationTicks) {
     if (isFrozen(currentTick)) return;
 
     this.freezeLevel = Math.min(MAX_FREEZE_LEVEL, this.freezeLevel + amount);
     if (this.freezeLevel >= MAX_FREEZE_LEVEL) {
-      freeze(currentTick, durationTicks);
+      encaseInIce();
     }
   }
 
+  /** گیاه را داخل بلوک یخ می‌کند (تا شکسته‌نشدن یخ، گیاه هیچ کاری نمی‌کند). */
+  public void encaseInIce() {
+    if (iceHealth > 0) return;
+
+    this.iceHealth = ICE_BLOCK_HEALTH;
+    this.freezeLevel = 0;
+    System.out.printf(
+            "%s at (%d, %d) is frozen solid; the ice has %d hp.%n",
+            name, col + 1, row + 1, ICE_BLOCK_HEALTH);
+  }
+
+  /** تیر گیاهان یخ را می‌شکند؛ آتش (تیر یا گیاه مجاور) آن را سریع‌تر آب می‌کند. */
+  public void damageIce(int amount) {
+    if (iceHealth <= 0 || amount <= 0) return;
+
+    iceHealth = Math.max(0, iceHealth - amount);
+    if (iceHealth == 0) {
+      System.out.printf("The ice around %s at (%d, %d) shattered.%n", name, col + 1, row + 1);
+    }
+  }
+
+  /** تیر/گیاه آتشین یخ را بلافاصله آب می‌کند. */
+  public void meltIce() {
+    damageIce(iceHealth);
+  }
+
+  public int getIceHealth() { return iceHealth; }
+
   public boolean isFrozen(int currentTick) {
-    return currentTick < frozenUntilTick;
+    return iceHealth > 0 || currentTick < frozenUntilTick;
   }
 
   public int getFreezeLevel() { return freezeLevel; }
+
+  /** آیا این گیاه اصلا اثر «غذای گیاه» دارد؟ (گیاهان یک‌بارمصرف و نعناع‌ها ندارند) */
+  public boolean hasPlantFoodEffect() {
+    return plantFood != null;
+  }
 
   public void applyPlantFood() {
     if (plantFood != null) {

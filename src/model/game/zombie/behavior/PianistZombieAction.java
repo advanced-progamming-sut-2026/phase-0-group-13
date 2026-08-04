@@ -32,6 +32,9 @@ public class PianistZombieAction implements ZombieAction {
     zombie.move();
   }
 
+  // طبق داک: «زامبی‌ها هر چند ثانیه یک‌بار به‌صورت رندوم ردیف خود را با یکی از ردیف‌های همسایه
+  // جابه‌جا می‌کنند»؛ یعنی همهٔ زامبی‌های زمین (به‌جز خود پیانیست که مشغول نواختن است) هرکدام به یکی
+  // از ردیف‌های همسایهٔ خودشان می‌روند، نه فقط زامبی‌های یک ردیفِ تصادفی
   private void playTune(Zombie zombie, Board board, int currentTick) {
     if (lastTuneTick == -1) {
       lastTuneTick = currentTick;
@@ -42,10 +45,9 @@ public class PianistZombieAction implements ZombieAction {
     }
     lastTuneTick = currentTick;
 
-    int sourceRow = random.nextInt(board.getRows());
     List<Zombie> dancers = new ArrayList<>();
     for (Zombie other : board.getZombies()) {
-      if (other != zombie && !other.isDead() && other.getRow() == sourceRow) {
+      if (other != zombie && !other.isDead()) {
         dancers.add(other);
       }
     }
@@ -53,12 +55,20 @@ public class PianistZombieAction implements ZombieAction {
       return;
     }
 
-    int targetRow = pickNeighbourRow(board, sourceRow);
     for (Zombie dancer : dancers) {
-      dancer.setRow(targetRow);
+      dancer.setRow(pickNeighbourRow(board, dancer.getRow()));
     }
-    System.out.printf("%s played a tune; %d zombie(s) shuffled from row %d to row %d!%n",
-            zombie.getName(), dancers.size(), sourceRow + 1, targetRow + 1);
+    System.out.printf("%s played a tune; %d zombie(s) danced into a neighbouring row!%n",
+            zombie.getName(), dancers.size());
+  }
+
+  @Override
+  public String debugState(Zombie zombie, int currentTick) {
+    if (lastTuneTick == -1) {
+      return "piano warming up";
+    }
+    int remaining = Math.max(0, tuneIntervalTicks - (currentTick - lastTuneTick));
+    return String.format("next tune in %.1fs", remaining / 10.0);
   }
 
   private int pickNeighbourRow(Board board, int row) {

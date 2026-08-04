@@ -1,9 +1,12 @@
 package view;
 
 import model.core.GameManager;
+import model.enums.StatusEffect;
 import model.game.Board;
 import model.game.GameState;
 import model.game.Tile;
+import model.game.TileEffects.IceTrailEffect;
+import model.game.TileEffects.TombStoneEffect;
 import model.game.minigame.DeadLineRule;
 import model.game.minigame.LoveYourPlantsRule;
 import model.game.minigame.TimedWarRule;
@@ -13,6 +16,7 @@ import model.game.minigame.arcade.VasebreakerEngine;
 import model.game.minigame.arcade.WallnutBowlingEngine;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
+import model.game.zombie.ZombieParts.ZombieTypeResolver;
 
 public final class BoardRenderer {
 
@@ -49,11 +53,155 @@ public final class BoardRenderer {
     }
 
     System.out.println(
-            "Legend: Z?=zombie   P?=plant   ~=water   +=gravestone   .=empty tile"
+            "Legend: Z?=zombie   P?=plant   ~=water   +=grave (+$=50 sun, +F=plant food)"
+                    + "   *=frozen ground   ^/v=slider ice   #=barrel   .=empty tile"
                     + "   (? = first letter of the name)");
     System.out.println(
             "        Second line of every row is the current HP (zombies show body+armour)."
                     + " Coordinates are (column, row), both 1-indexed.");
+  }
+
+  /**
+   * خروجی دیباگ: دقیقا همان نقشهٔ عادی، به‌علاوهٔ جدول زره/آسیب زامبی‌ها و وضعیت هزاردهای زمین.
+   * رندر عادی دست‌نخورده می‌ماند.
+   */
+  public static void renderDebug(GameManager gm) {
+    render(gm);
+    printZombieDebugTable(gm.getBoard(), gm.getCurrentTick());
+    printHazardDebugTable(gm.getBoard());
+  }
+
+  private static void printZombieDebugTable(Board board, int currentTick) {
+    System.out.println();
+    System.out.println("[debug] zombies (body hp | armour hp | damage taken body/armour):");
+    boolean any = false;
+    for (Zombie z : board.getZombies()) {
+      if (z.isDead()) {
+        continue;
+      }
+      if (!any) {
+        System.out.printf("  %-34s %-10s %-11s %-14s %-10s %s%n",
+                "name (type)", "position", "body hp", "armour hp", "dmg b/a", "state");
+        any = true;
+      }
+      String ability = z.getBehavior() == null ? null : z.getBehavior().debugState(z, currentTick);
+      System.out.printf("  %-34s %-10s %-11s %-14s %-10s %s%n",
+              fit(z.getName(), 20) + " (" + fit(typeOf(z), 10) + ")",
+              String.format("%.1f,%d", z.getX() + 1, z.getRow() + 1),
+              z.getCurrentHealth() + "/" + z.getMaxHealth(),
+              armourOf(z),
+              z.getBodyDamageTaken() + "/" + z.getArmorDamageTaken(),
+              stateOf(z) + (ability == null ? "" : " | " + ability));
+    }
+    if (!any) {
+      System.out.println("  none");
+    }
+  }
+
+  private static void printHazardDebugTable(Board board) {
+    System.out.println("[debug] tile hazards:");
+    boolean any = false;
+    for (int row = 0; row < board.getRows(); row++) {
+      for (int col = 0; col < board.getColumns(); col++) {
+        Tile tile = board.getTile(row, col);
+        if (tile == null || tile.getEffect() == null || !tile.getEffect().isActive()) {
+          continue;
+        }
+        any = true;
+        System.out.printf("  (%d, %d) %s%n", col + 1, row + 1, hazardDetails(tile.getEffect()));
+      }
+    }
+    for (Plant plant : board.getPlants()) {
+      if (plant.getIceHealth() > 0) {
+        any = true;
+        System.out.printf("  (%d, %d) Ice block on %s: %d/%d hp%n",
+                plant.getCol() + 1, plant.getRow() + 1, plant.getName(),
+                plant.getIceHealth(), Plant.ICE_BLOCK_HEALTH);
+      }
+    }
+    if (!any) {
+      System.out.println("  none");
+    }
+  }
+
+  private static String hazardDetails(model.game.TileEffects.TileEffect effect) {
+    if (effect instanceof TombStoneEffect grave) {
+      return "Grave: " + grave.getHealth() + " hp"
+              + (grave.isBlocksShots() ? ", blocks shots" : "")
+              + (grave.getBuriedReward() == null ? "" : ", holds " + grave.getBuriedReward());
+    }
+    if (effect instanceof IceTrailEffect ice) {
+      return ice.isFullFreeze()
+              ? "Frozen ground (zombies freeze here)"
+              : "Slider ice: pushes zombies " + (ice.getSlideDirection() < 0 ? "up" : "down");
+    }
+    return effect.getName();
+  }
+
+  /** خلاصهٔ زرهِ زامبی برای خروجی دیباگ. */
+  private static String armourOf(Zombie zombie) {
+    if (zombie.getArmors().isEmpty()) {
+      return "-";
+    }
+    return zombie.getRemainingArmorHealth() + "/" + zombie.getMaxArmorHealth()
+            + (zombie.isArmorBroken() ? " BROKEN" : "");
+  }
+
+  /** نوع زامبی طبق همان قرارداد ZombieTypeResolver. */
+  public static String typeOf(Zombie zombie) {
+    if (zombie == null || zombie.getName() == null || data.GameDataManager.zombieRepository == null) {
+      return "UNKNOWN";
+    }
+    var template = data.GameDataManager.zombieRepository.find(zombie.getName());
+    return template == null ? "UNKNOWN" : ZombieTypeResolver.resolve(template).name();
+  }
+
+  /** وضعیت جاری زامبی: یخ‌زده/کند‌شده، در حال خوردن، هیپنوتیزم، زیر آب، زرهِ شکسته و ... */
+  public static String stateOf(Zombie zombie) {
+    StringBuilder state = new StringBuilder();
+    Integer frozen = zombie.getActiveEffects().get(StatusEffect.FROZEN);
+    Integer chilled = zombie.getActiveEffects().get(StatusEffect.CHILLED);
+    if (frozen != null) {
+      appendState(state, String.format("frozen %.1fs", frozen / 10.0));
+    }
+    if (chilled != null) {
+      appendState(state, String.format("chilled %.1fs", chilled / 10.0));
+    }
+    if (zombie.isEating()) {
+      appendState(state, "eating");
+    } else if (frozen == null) {
+      appendState(state, "walking");
+    }
+    if (zombie.isHypnotized()) {
+      appendState(state, "hypnotized");
+    }
+    if (zombie.isSubmerged()) {
+      appendState(state, "submerged");
+    }
+    if (zombie.hasShieldBlocker()) {
+      appendState(state, "lob-proof");
+    }
+    if (zombie.isShiny()) {
+      appendState(state, "glowing");
+    }
+    if (zombie.isArmorBroken()) {
+      appendState(state, "armour broken");
+    }
+    return state.length() == 0 ? "idle" : state.toString();
+  }
+
+  private static void appendState(StringBuilder state, String text) {
+    if (state.length() > 0) {
+      state.append(", ");
+    }
+    state.append(text);
+  }
+
+  private static String fit(String text, int width) {
+    if (text == null) {
+      return "";
+    }
+    return text.length() <= width ? text : text.substring(0, width);
   }
 
   private static void printSpecialStageHud(GameManager gm) {
@@ -333,10 +481,10 @@ public final class BoardRenderer {
 
     Tile tile = board.getTile(row, col);
     if (entities.length() == 0 && tile != null) {
-      if (tile.isWater()) {
+      if (tile.getEffect() != null && tile.getEffect().isActive()) {
+        entities.append(glyphFor(tile.getEffect()));
+      } else if (tile.isWater()) {
         entities.append("~");
-      } else if (tile.getEffect() != null) {
-        entities.append("+");
       }
     }
 
@@ -348,6 +496,24 @@ public final class BoardRenderer {
     }
 
     return new String[] {entities.toString(), healths.toString()};
+  }
+
+  /** طبق داک، انواع زمین/هزارد باید روی نقشه از هم قابل تشخیص باشند. */
+  private static String glyphFor(model.game.TileEffects.TileEffect effect) {
+    if (effect instanceof TombStoneEffect grave) {
+      String reward = grave.getBuriedReward();
+      if (reward == null) {
+        return "+";
+      }
+      return "SUN".equals(reward) ? "+$" : "+F";
+    }
+    if (effect instanceof IceTrailEffect ice) {
+      if (ice.isFullFreeze()) {
+        return "*";
+      }
+      return ice.getSlideDirection() < 0 ? "^" : "v";
+    }
+    return "#";
   }
 
   private static char initialOf(String name) {

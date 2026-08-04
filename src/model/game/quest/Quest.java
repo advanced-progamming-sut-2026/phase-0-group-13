@@ -138,8 +138,11 @@ public class Quest {
                     && ctx.getPlantsPlacedCount() > 0
                     && !ctx.isGardenSymmetricExceptMiddleRow());
 
+    // "The final garden layout must be symmetric": باید در پایان مسابقه (نه هر لحظه از وسط بازی) و
+    // روی چیدمانی که واقعا روی زمین ایستاده سنجیده شود، وگرنه یک گیاه در ردیف وسط یا زمینِ خالی
+    // (بعد از خورده‌شدن همه‌ی گیاه‌ها) هم کوئست را کامل می‌کرد
     map.put("must be symmetric", (q, ctx) ->
-            ctx.getPlantsPlacedCount() > 0 && ctx.isGardenSymmetric());
+            ctx.isMatchWon() && ctx.getPlantsOnBoard() > 0 && ctx.isGardenSymmetric());
 
     map.put("without using any plant of the", (q, ctx) -> {
       PlantTag family = resolveFamilyTag(q.variable);

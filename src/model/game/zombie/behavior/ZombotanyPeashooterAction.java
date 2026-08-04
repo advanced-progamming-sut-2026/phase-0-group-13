@@ -9,11 +9,18 @@ public class ZombotanyPeashooterAction implements ZombieAction {
   private final int shootInterval;
   private int lastShootTick;
   private final double eatingDamage;
+  private final boolean icyShots;
 
   public ZombotanyPeashooterAction(int shootInterval, double eatingDamage) {
+    this(shootInterval, eatingDamage, false);
+  }
+
+  // icyShots برای Zombie Hunter است که طبق داک به نزدیک‌ترین گیاه ردیفش «یخ» پرتاب می‌کند
+  public ZombotanyPeashooterAction(int shootInterval, double eatingDamage, boolean icyShots) {
     this.shootInterval = shootInterval;
     this.eatingDamage = eatingDamage;
     this.lastShootTick = 0;
+    this.icyShots = icyShots;
   }
 
   public ZombotanyPeashooterAction() {
@@ -23,7 +30,7 @@ public class ZombotanyPeashooterAction implements ZombieAction {
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     if (currentTick - lastShootTick >= shootInterval) {
-      Projectile p = new Projectile(20, -0.5, zombie.getX(), zombie.getRow(), false, true);
+      Projectile p = new Projectile(20, -0.5, zombie.getX(), zombie.getRow(), icyShots, true);
       board.addProjectile(p);
 
       lastShootTick = currentTick;

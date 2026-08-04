@@ -133,6 +133,9 @@ public class GameManager {
       if (!wasStarted && currentWave.isStarted() && currentSeason != null) {
         currentSeason.onWaveStart(board, currentWaveIndex, currentTick, currentWave.isFinalWave());
       }
+      if (currentSeason != null && currentWave.isFinalWave()) {
+        currentSeason.onFinalWaveTick(board, currentTick);
+      }
       if (currentWave.checkCompletion()) {
         currentWaveIndex++;
       }
@@ -245,6 +248,11 @@ public class GameManager {
 
   public boolean usePlantFood(Plant targetPlant) {
     if (board == null || !running) return false;
+    // غذای گیاه نباید روی گیاهی که اصلا اثری ندارد مصرف (و سوخت) شود
+    if (targetPlant != null && !targetPlant.hasPlantFoodEffect()) {
+      System.out.println("Error: " + targetPlant.getName() + " has no Plant Food effect!");
+      return false;
+    }
     if (board.getGameState().usePlantFood()) {
       targetPlant.applyPlantFood();
       System.out.printf("Plant Food used on %s!%n", targetPlant.getName());

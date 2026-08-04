@@ -6,7 +6,7 @@ public class IceTrailEffect extends TileEffect {
   private final int laneShift;
 
   public IceTrailEffect(int duration, double speedMultiplier) {
-    this(duration, speedMultiplier, false);
+    this(duration, speedMultiplier, false, 0);
   }
 
   // fullFreeze=true یعنی "تایل یخ‌زده" (زامبی رو کاملا فریز میکنه، مثل Frostbite Caves)؛
@@ -26,6 +26,12 @@ public class IceTrailEffect extends TileEffect {
     this.laneShift = laneShift;
   }
 
+  // طبق داک روی زمین‌های لیز و یخ‌زده نمی‌توان گیاه کاشت
+  @Override
+  public boolean blocksPlanting() {
+    return isActive();
+  }
+
   public int getLaneShift() {
     return laneShift;
   }
@@ -40,6 +46,11 @@ public class IceTrailEffect extends TileEffect {
 
   public boolean isFullFreeze() {
     return fullFreeze;
+  }
+
+  /** نام دیگر {@link #getLaneShift()} (استفاده‌شده در Board و خروجی دیباگ نقشه). */
+  public int getSlideDirection() {
+    return laneShift;
   }
 
   public double getSpeedMultiplier() {

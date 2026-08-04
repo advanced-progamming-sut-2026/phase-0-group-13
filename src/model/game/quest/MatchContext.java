@@ -37,6 +37,7 @@ public final class MatchContext {
 
   private boolean gardenSymmetric;
   private boolean gardenSymmetricExceptMiddleRow;
+  private int plantsOnBoard;
   private int boardRows;
   private int boardColumns;
 
@@ -128,12 +129,16 @@ public final class MatchContext {
     boolean symmetric = true;
     boolean symmetricExceptMiddle = true;
     int middleRow = rows / 2;
+    int standing = 0;
 
     for (int row = 0; row < rows; row++) {
       int mirrorRow = rows - 1 - row;
       for (int col = 0; col < cols; col++) {
         boolean occupied = board.getPlantAt(row, col) != null;
         boolean mirrorOccupied = board.getPlantAt(mirrorRow, col) != null;
+        if (occupied) {
+          standing++;
+        }
         if (occupied != mirrorOccupied) {
           symmetric = false;
           if (row != middleRow && mirrorRow != middleRow) {
@@ -144,6 +149,7 @@ public final class MatchContext {
     }
     this.gardenSymmetric = symmetric;
     this.gardenSymmetricExceptMiddleRow = symmetricExceptMiddle;
+    this.plantsOnBoard = standing;
   }
 
 
@@ -159,6 +165,9 @@ public final class MatchContext {
   public int getPlantsLost() { return plantsLost; }
   public Set<PlantTag> getPlantFamiliesPlaced() { return plantFamiliesPlaced; }
   public boolean isGardenSymmetric() { return gardenSymmetric; }
+
+  /** تعداد گیاهانی که همین الان روی زمین ایستاده‌اند (نه تعداد کاشته‌شده‌ها در کل مسابقه). */
+  public int getPlantsOnBoard() { return plantsOnBoard; }
   public boolean isGardenSymmetricExceptMiddleRow() { return gardenSymmetricExceptMiddleRow; }
   public int getCurrentTick() { return currentTick; }
 

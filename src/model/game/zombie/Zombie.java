@@ -163,5 +163,30 @@ public class Zombie {
     }
     return total;
   }
+
+  /** مجموع سقف جان همهٔ لایه‌های زره (سالم و شکسته) — برای گزارش وضعیت. */
+  public int getMaxArmorHealth() {
+    int total = 0;
+    for (Armor armor : armors) {
+      total += armor.getMaxHealth();
+    }
+    return total;
+  }
+
+  public int getArmorDamageTaken() {
+    return getMaxArmorHealth() - getRemainingArmorHealth();
+  }
+
+  public int getBodyDamageTaken() {
+    return maxHealth - currentHealth;
+  }
+
+  public boolean isArmorBroken() {
+    return !armors.isEmpty() && !hasIntactArmor();
+  }
+
+  public void setX(double x) {
+    this.x = x;
+  }
   public Map<StatusEffect, Integer> getActiveEffects() { return activeEffects; }
 }

@@ -3,6 +3,7 @@ package model.environment;
 import java.util.List;
 import java.util.Random;
 import model.enums.PlantTag;
+import model.enums.StatusEffect;
 import model.game.Board;
 import model.game.GameState;
 import model.game.Tile;
@@ -17,6 +18,10 @@ public class FrostbiteCavesSeason extends Season {
   private static final int WIND_INTERVAL_TICKS = 200;
   private static final int FREEZE_INCREMENT = 1;
   private static final int FREEZE_DURATION_TICKS = 100;
+  private static final int FROZEN_ZOMBIE_COUNT = 2;
+  private static final int FROZEN_ZOMBIE_THAW_TICKS = 400;
+  // داک: اگر گیاه آتشین در یکی از ۸ خانهٔ اطراف باشد، یخ با نرخ ۶۰ جان بر ثانیه آب می‌شود
+  private static final int FIRE_MELT_PER_TICK = 6;
 
   private final Random random = new Random();
   private int lastWindTick = -1;
@@ -45,28 +50,59 @@ public class FrostbiteCavesSeason extends Season {
     return plainGrid();
   }
 
-  // چند خونه لیزخوردن (فقط کند میکنن) و چند خونه کاملا یخ‌زده (زامبی روشون کاملا فریز میشه) رندوم رو
-  // نقشه میزاره
+  // چند «زمین لیز» با جهت از پیش تعیین‌شده (بالا/پایین) و چند خانهٔ کاملا یخ‌زده رندوم روی نقشه
+  // می‌گذارد، به‌علاوهٔ چند زامبیِ یخ‌زده که تا آب‌شدن یخشان هیچ کاری نمی‌کنند
   @Override
   public void placeHazards(Board board) {
+    // طبق داک، زامبی‌های این فصل با تیر یخی گیاهان یخ نمی‌زنند
     board.setZombiesResistIce(true);
-    Random hazardRandom = new Random();
     for (int i = 0; i < SLIP_TILE_COUNT; i++) {
-      int row = hazardRandom.nextInt(board.getRows());
-      int col = hazardRandom.nextInt(board.getColumns());
-      int laneShift = hazardRandom.nextBoolean() ? -1 : 1;
+      int row = random.nextInt(board.getRows());
+      int col = random.nextInt(board.getColumns());
+      // در ردیف اول/آخر جهت طوری انتخاب می‌شود که زامبی از زمین بیرون نیفتد
+      int laneShift =
+              row == 0 ? 1 : (row == board.getRows() - 1 ? -1 : (random.nextBoolean() ? 1 : -1));
       board.placeTileEffect(
               row, col, new IceTrailEffect(HAZARD_DURATION_TICKS, 0.5, false, laneShift));
     }
     for (int i = 0; i < FROZEN_TILE_COUNT; i++) {
-      int row = hazardRandom.nextInt(board.getRows());
-      int col = hazardRandom.nextInt(board.getColumns());
+      int row = random.nextInt(board.getRows());
+      int col = random.nextInt(board.getColumns());
       board.placeTileEffect(row, col, new IceTrailEffect(HAZARD_DURATION_TICKS, 0.0, true));
+    }
+    placeFrozenZombies(board);
+  }
+
+  private void placeFrozenZombies(Board board) {
+    List<Zombie> pool = getAvailableZombies();
+    if (pool.isEmpty()) {
+      return;
+    }
+    for (int i = 0; i < FROZEN_ZOMBIE_COUNT; i++) {
+      Zombie frozen = pool.get(random.nextInt(pool.size()));
+      if (frozen == null || frozen.isDead()) {
+        continue;
+      }
+      int row = random.nextInt(board.getRows());
+      double col = Math.max(0, board.getColumns() - 1 - random.nextInt(3));
+      frozen.setRow(row);
+      frozen.setX(col);
+      frozen.applyEffect(StatusEffect.FROZEN, FROZEN_ZOMBIE_THAW_TICKS);
+      board.spawnZombie(frozen);
+      System.out.printf(
+              "A frozen %s is stuck in the ice at (%d, %d).%n",
+              frozen.getName(), (int) col + 1, row + 1);
+      pool.remove(frozen);
+      if (pool.isEmpty()) {
+        return;
+      }
     }
   }
 
   @Override
   public void onTick(Board board, int currentTick) {
+    meltIceNearFirePlants(board);
+
     if (lastWindTick == -1) {
       lastWindTick = currentTick;
       return;
@@ -82,7 +118,25 @@ public class FrostbiteCavesSeason extends Season {
       if (plant.getRow() == targetRow
               && !plant.isDead()
               && !plant.getTags().contains(PlantTag.FIRE)) {
-        plant.addFreezeExposure(FREEZE_INCREMENT, currentTick, FREEZE_DURATION_TICKS);
+        plant.addFreezeExposure(Plant.FREEZE_LEVEL_STEP, currentTick);
+      }
+    }
+  }
+
+  private void meltIceNearFirePlants(Board board) {
+    for (Plant plant : board.getPlants()) {
+      if (plant.getIceHealth() <= 0) {
+        continue;
+      }
+      for (Plant other : board.getPlants()) {
+        if (other == plant || other.isDead() || !other.getTags().contains(PlantTag.FIRE)) {
+          continue;
+        }
+        if (Math.abs(other.getRow() - plant.getRow()) <= 1
+                && Math.abs(other.getCol() - plant.getCol()) <= 1) {
+          plant.damageIce(FIRE_MELT_PER_TICK);
+          break;
+        }
       }
     }
   }

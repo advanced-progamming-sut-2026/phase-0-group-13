@@ -274,6 +274,10 @@ public class PlantFactory {
     return name != null && name.toLowerCase().endsWith("-mint");
   }
 
+  private boolean hasNoPlantFoodEffect(String plantFoodEffect) {
+    return plantFoodEffect != null && plantFoodEffect.trim().toLowerCase().startsWith("none");
+  }
+
   private PlantAction determineModifierBehavior(PlantTemplate template) {
     String name = template.name == null ? "" : template.name.toLowerCase();
     if (name.contains("hypno")) {
@@ -420,7 +424,9 @@ public class PlantFactory {
 
   private PlantFood determinePlantFood(
           PlantTemplate template, PlantCategory category, int interval, int damage, EnumSet<PlantTag> tags) {
-    if (isMint(template.name)) {
+    // plants.json برای گیاهان یک‌بارمصرف (Cherry Bomb, Jalapeno, Gold Bloom, ...) صراحتا
+    // "None (single-use plant)" ثبت کرده؛ پس نباید برایشان اثر ساختگی بسازیم
+    if (isMint(template.name) || hasNoPlantFoodEffect(template.plantFoodEffect)) {
       return null;
     }
     return switch (category) {

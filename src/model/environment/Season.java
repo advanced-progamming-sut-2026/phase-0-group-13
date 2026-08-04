@@ -50,6 +50,10 @@ public abstract class Season {
     onWaveStart(board, waveNumber, currentTick);
   }
 
+  // فقط در موج آخر و هر تیک صدا زده می‌شود؛ فصل‌هایی مثل مصر باستان که ورود ویژه (گردباد) دارند
+  // این را override می‌کنند تا زامبی‌های تازه‌وارد را همان لحظهٔ ورود جابه‌جا کنند
+  public void onFinalWaveTick(model.game.Board board, int currentTick) {}
+
   // چون Zombies.json فیلد جدا برای فصل/چپتر نداره، از روی alias خام زامبی‌ها فیلتر میکنیم (مثلا
   // "ZombieEgyptImpDefault" یا "ZombieIceAgeDodo")؛ همون قراردادی که ZombieTypeResolver هم برای
   // تشخیص نوع زامبی از روی اسم استفاده میکنه

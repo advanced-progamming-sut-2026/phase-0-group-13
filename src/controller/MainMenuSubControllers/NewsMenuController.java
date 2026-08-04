@@ -68,6 +68,8 @@ public class NewsMenuController implements BaseController {
     AllNews newsBox = user.getNewsBox();
     List<News> all = new ArrayList<>(newsBox.getUnreadNews());
     all.addAll(newsBox.getReadNews());
+    // خبرها باید به ترتیب زمانی (جدیدترین اول) دیده شوند، نه اول همهٔ نخوانده‌ها بعد خوانده‌ها
+    all.sort((first, second) -> Long.compare(second.getTimestamp(), first.getTimestamp()));
 
     if (all.isEmpty()) {
       System.out.println("You have no news yet.");

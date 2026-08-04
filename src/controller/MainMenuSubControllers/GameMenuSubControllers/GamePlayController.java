@@ -69,7 +69,9 @@ public class GamePlayController implements BaseController {
   }
 
   private boolean dispatchNoArg(String command, GameManager gm) {
-    if (GamePlayMenuCommands.ShowMap.getMatcher(command) != null) {
+    if (GamePlayMenuCommands.ShowMapDebug.getMatcher(command) != null) {
+      view.BoardRenderer.renderDebug(gm);
+    } else if (GamePlayMenuCommands.ShowMap.getMatcher(command) != null) {
       view.BoardRenderer.render(gm);
     } else if (GamePlayMenuCommands.ShowSunAmount.getMatcher(command) != null) {
       System.out.println("Sun: " + gm.getSunAmount());
@@ -312,13 +314,17 @@ public class GamePlayController implements BaseController {
     for (Zombie z : board.getZombies()) {
       if (Math.round(z.getX()) == rc[1] && z.getRow() == rc[0] && !z.isDead()) {
         zs.append("\n    ").append(z.getName())
-                .append(" (hp ").append(z.getCurrentHealth()).append(")");
+                .append(" [").append(view.BoardRenderer.typeOf(z)).append("]")
+                .append(" (hp ").append(z.getCurrentHealth()).append("/").append(z.getMaxHealth())
+                .append(", body damage ").append(z.getBodyDamageTaken())
+                .append(", armour damage ").append(z.getArmorDamageTaken()).append(")")
+                .append("\n      state: ").append(view.BoardRenderer.stateOf(z));
         for (var armor : z.getArmors()) {
-          if (!armor.isDestroyed()) {
-            zs.append("\n      armor ").append(armor.getName())
-                    .append(": ").append(armor.getCurrentHealth())
-                    .append("/").append(armor.getMaxHealth());
-          }
+          zs.append("\n      armor ").append(armor.getName())
+                  .append(" [").append(armor.getType() == null ? "-" : armor.getType().name())
+                  .append("]: ").append(armor.getCurrentHealth())
+                  .append("/").append(armor.getMaxHealth())
+                  .append(armor.isDestroyed() ? " BROKEN" : "");
         }
       }
     }
@@ -337,21 +343,41 @@ public class GamePlayController implements BaseController {
       return;
     }
     for (Zombie z : zombies) {
-      System.out.println(z.getName() + ":");
+      System.out.printf("%s (%s):%n", z.getName(), view.BoardRenderer.typeOf(z));
       System.out.printf("  position: %.1f, %d%n", z.getX() + 1, z.getRow() + 1);
-      System.out.println("  health: " + z.getCurrentHealth());
-      System.out.println("  armor:");
-      for (var armor : z.getArmors()) {
-        if (!armor.isDestroyed()) {
-          System.out.printf("    %s: %d/%d%n",
-                  armor.getName(), armor.getCurrentHealth(), armor.getMaxHealth());
-        }
-      }
+      System.out.printf("  health: %d/%d   (body damage taken: %d)%n",
+              z.getCurrentHealth(), z.getMaxHealth(), z.getBodyDamageTaken());
+      printArmorInfo(z);
+      System.out.println("  state: " + view.BoardRenderer.stateOf(z));
       System.out.println("  effects:");
       for (var effect : z.getActiveEffects().entrySet()) {
         System.out.printf(
                 "    %s: %.1fs%n", effect.getKey().name().toLowerCase(), effect.getValue() / 10.0);
       }
+      String ability = z.getBehavior() == null
+              ? null : z.getBehavior().debugState(z, gm.getCurrentTick());
+      if (ability != null) {
+        System.out.println("  ability: " + ability);
+      }
+    }
+  }
+
+  /** لایه‌های زره را با نوع، جان باقی‌مانده و آسیب جذب‌شده چاپ می‌کند. */
+  private void printArmorInfo(Zombie z) {
+    System.out.println("  armor:");
+    for (var armor : z.getArmors()) {
+      System.out.printf("    %s [%s]: %d/%d (damage taken %d)%s%n",
+              armor.getName(),
+              armor.getType() == null ? "-" : armor.getType().name(),
+              armor.getCurrentHealth(),
+              armor.getMaxHealth(),
+              armor.getMaxHealth() - armor.getCurrentHealth(),
+              armor.isDestroyed() ? " BROKEN" : (armor.isMetallic() ? " (metallic)" : ""));
+    }
+    if (!z.getArmors().isEmpty()) {
+      System.out.printf("    total: %d/%d (armor damage taken: %d, all broken: %s)%n",
+              z.getRemainingArmorHealth(), z.getMaxArmorHealth(),
+              z.getArmorDamageTaken(), z.isArmorBroken() ? "yes" : "no");
     }
   }
   private void finishMatch(GameManager gm) {

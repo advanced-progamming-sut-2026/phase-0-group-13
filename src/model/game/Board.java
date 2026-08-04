@@ -64,6 +64,7 @@ public class Board {
           effect.tick();
           if (effect instanceof TombStoneEffect tombstone) {
             tryNecromancy(tombstone, i, j, currentTick);
+            tryGraveReward(tombstone, i, j);
           }
           if (effect instanceof BarrelEffect barrel) {
             tryBarrelBurst(barrel, i, j);
@@ -101,6 +102,22 @@ public class Board {
     }
     tombstone.markRaised(currentTick);
   }
+  // سنگ‌قبرهای دوران تاریکی می‌توانند ۵۰ خورشید یا یک غذای گیاه داشته باشند که با نابودی قبر آزاد شود
+  private void tryGraveReward(TombStoneEffect tombstone, int row, int col) {
+    if (tombstone.isActive() || tombstone.getBuriedReward() == null) {
+      return;
+    }
+    String reward = tombstone.claimReward();
+    if ("SUN".equals(reward)) {
+      gameState.addSun(50);
+      System.out.printf("The grave at (%d, %d) held 50 sun!%n", col + 1, row + 1);
+    } else if (gameState.addPlantFood()) {
+      System.out.printf(
+              "The grave at (%d, %d) held a plant food; you have %d plant foods now.%n",
+              col + 1, row + 1, gameState.getPlantFoodCount());
+    }
+  }
+
   private void tryBarrelBurst(BarrelEffect barrel, int row, int col) {
     if (barrel.isActive() || barrel.hasBurst()) {
       return;
@@ -131,7 +148,9 @@ public class Board {
       }
       TileEffect effect = tiles[zombie.getRow()][col].getEffect();
       if (effect instanceof IceTrailEffect ice && ice.isActive()) {
-        if (ice.isFullFreeze()) {
+        if (ice.getSlideDirection() != 0) {
+          slideZombie(zombie, ice.getSlideDirection());
+        } else if (ice.isFullFreeze()) {
           zombie.applyEffect(StatusEffect.FROZEN, 5);
         } else if (ice.isSlippery()) {
           slideZombie(zombie, ice.getLaneShift());
@@ -170,6 +189,7 @@ public class Board {
   }
 
   private boolean zombiesResistIce;
+
 
   private final model.game.plant.behavior.ExplodeAction deathExplodeAction =
           new model.game.plant.behavior.ExplodeAction(0, 1800, 1);
@@ -251,7 +271,11 @@ public class Board {
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < columns; j++) {
         TileEffect effect = tiles[i][j].getEffect();
-        if (effect instanceof TombStoneEffect tombstone && tombstone.isActive()) {
+        // فقط قبرهایی که «قابلیت نکرومنسی» دارند زامبی بیرون می‌دهند (طبق داک، همهٔ خانه‌ها این
+        // قابلیت را ندارند)
+        if (effect instanceof TombStoneEffect tombstone
+                && tombstone.isActive()
+                && tombstone.isNecromancy()) {
           ZombieFactory factory = new ZombieFactory(GameDataManager.zombieRepository);
           Zombie risen = factory.createZombie("ZombieEgyptImpDefault", i, j);
           if (risen != null) {
@@ -339,7 +363,7 @@ public class Board {
           iterator.set(p);
         }
       }
-      if (isBlockedByTombstone(p)) {
+      if (isBlockedByTombstone(p) || breaksIceBlock(p)) {
         iterator.remove();
         continue;
       }
@@ -368,7 +392,8 @@ public class Board {
     }
   }
   private boolean isBlockedByTombstone(Projectile p) {
-    if (p.isFromZombie()) {
+    // تیرهای کمانی (lobber) طبق داک از روی موانع رد می‌شوند
+    if (p.isFromZombie() || p.isLobbed()) {
       return false;
     }
     int row = Math.round(p.getYCoordinate());
@@ -381,10 +406,30 @@ public class Board {
       barrel.takeDamage(p.getDamage());
       return true;
     }
-    return effect instanceof TombStoneEffect tombstone
+    if (effect instanceof TombStoneEffect tombstone
             && tombstone.isActive()
-            && tombstone.isBlocksShots();
+            && tombstone.isBlocksShots()) {
+      // طبق داک سنگ‌قبر ۷۰۰ جان دارد و «وقتی تیر می‌خورد آسیب می‌بیند» تا نابود شود؛ قبلا تیر را
+      // می‌گرفت ولی هیچ آسیبی نمی‌دید، یعنی عملا نابودشدنی نبود
+      tombstone.takeDamage(p.getDamage());
+      return true;
+    }
+    return false;
   }
+  // طبق داک، یخِ روی گیاه باید با تیر گیاهان شکسته شود و تیر آتشین آن را فورا آب می‌کند
+  private boolean breaksIceBlock(Projectile p) {
+    Plant iced = getPlantAt(Math.round(p.getYCoordinate()), p.getXCoordinate());
+    if (iced == null || iced.getIceHealth() <= 0) {
+      return false;
+    }
+    if (p.getEffect() == Projectile.ProjectileEffect.FIRE) {
+      iced.meltIce();
+    } else {
+      iced.damageIce(p.getDamage());
+    }
+    return true;
+  }
+
   private void handleLawnmowers() {
     for (Lawnmower mower : lawnmowers) {
       if (!mower.isActive()) {

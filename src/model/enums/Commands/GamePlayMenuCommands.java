@@ -16,6 +16,7 @@ public enum GamePlayMenuCommands implements Command {
   CheatAddPlantFood("cheat\\s+add-plant-food"),
   CheatUnlockAllPlants("cheat\\s+unlock-all-plants"),
   ShowMap("show\\s+map"),
+  ShowMapDebug("show\\s+map\\s+-(?:debug|d)"),
   ShowPlantsStatus("show\\s+plants?\\s+status"),
   ShowTileStatus("show\\s+tile\\s+status\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),
   ZombiesInfo("zombies\\s+info"),

@@ -14,6 +14,8 @@ public class TombStoneEffect extends TileEffect {
   private final boolean necromancy;
   private final int necromancyIntervalTicks;
   private int lastRaiseTick = -1;
+  // داک (دوران تاریکی): بعضی سنگ‌قبرها ۵۰ خورشید یا یک غذای گیاه داخلشان است -> "SUN"/"PLANT_FOOD"
+  private String buriedReward;
 
   public TombStoneEffect(int health, boolean blocksShots) {
     this(health, blocksShots, false, 0);
@@ -63,6 +65,25 @@ public class TombStoneEffect extends TileEffect {
 
   public boolean isBlocksShots() {
     return blocksShots;
+  }
+
+  public boolean isNecromancy() {
+    return necromancy;
+  }
+
+  public String getBuriedReward() {
+    return buriedReward;
+  }
+
+  public void setBuriedReward(String buriedReward) {
+    this.buriedReward = buriedReward;
+  }
+
+  /** جایزهٔ داخل قبر را یک‌بار تحویل می‌دهد. */
+  public String claimReward() {
+    String reward = buriedReward;
+    buriedReward = null;
+    return reward;
   }
 
   public int getHealth() {
