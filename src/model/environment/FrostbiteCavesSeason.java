@@ -118,7 +118,7 @@ public class FrostbiteCavesSeason extends Season {
       if (plant.getRow() == targetRow
               && !plant.isDead()
               && !plant.getTags().contains(PlantTag.FIRE)) {
-        plant.addFreezeExposure(Plant.FREEZE_LEVEL_STEP, currentTick);
+        plant.addFreezeExposure(FREEZE_INCREMENT, currentTick, FREEZE_DURATION_TICKS);
       }
     }
   }

@@ -28,7 +28,6 @@ public class AncientEgyptSeason extends Season {
   private static final int TORNADO_MIN_COLUMNS = 1;
   private static final int TORNADO_MAX_COLUMNS = 4;
 
-  private final java.util.Random random = new java.util.Random();
 
   @Override
   public void onFinalWaveTick(Board board, int currentTick) {

@@ -185,8 +185,6 @@ public class Zombie {
     return !armors.isEmpty() && !hasIntactArmor();
   }
 
-  public void setX(double x) {
-    this.x = x;
-  }
+
   public Map<StatusEffect, Integer> getActiveEffects() { return activeEffects; }
 }
