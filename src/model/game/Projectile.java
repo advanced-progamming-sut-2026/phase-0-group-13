@@ -150,7 +150,9 @@ public class Projectile {
     if (!isActive || !isFromZombie) return;
     plant.takeDamage(this.damage);
     if (effect == ProjectileEffect.ICE) {
-      plant.freeze(currentTick, PLANT_FREEZE_DURATION_TICKS);
+      // طبق داک، تیر یخی زامبی‌ها (شکارچی و تیرهای برگردانده‌شده‌ی ژانگولر) یک سطح یخ‌زدگی
+      // اضافه می‌کند و گیاه در سومین برخورد کاملا یخ می‌زند
+      plant.addFreezeExposure(1, currentTick, PLANT_FREEZE_DURATION_TICKS);
     }
     this.isActive = false;
   }

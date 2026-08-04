@@ -45,7 +45,7 @@ public class PianistZombieAction implements ZombieAction {
     int sourceRow = random.nextInt(board.getRows());
     List<Zombie> dancers = new ArrayList<>();
     for (Zombie other : board.getZombies()) {
-      if (!other.isDead() && other.getRow() == sourceRow) {
+      if (other != zombie && !other.isDead() && other.getRow() == sourceRow) {
         dancers.add(other);
       }
     }
