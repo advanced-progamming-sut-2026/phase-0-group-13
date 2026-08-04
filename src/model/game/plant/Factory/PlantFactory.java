@@ -417,7 +417,9 @@ public class PlantFactory {
     if (tags.contains(PlantTag.SUN)) return new SunOnHitAction(5);
     if (name != null && name.toLowerCase().contains("endurian")) return new ReflectDamageAction();
     if (tags.contains(PlantTag.MOVE_ZOMBIES)) {
-      return new LaneRedirectAction(3);
+      // Sweet Potato آهنرباست و زامبی‌ها را به ردیف خودش می‌کِشد؛ Garlic برعکس، هُلشان می‌دهد
+      boolean magnet = name != null && name.toLowerCase().contains("sweet potato");
+      return magnet ? new LaneMagnetAction(20) : new LaneRedirectAction(3);
     }
     return null;
   }
