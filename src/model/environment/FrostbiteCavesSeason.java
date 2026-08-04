@@ -49,11 +49,14 @@ public class FrostbiteCavesSeason extends Season {
   // نقشه میزاره
   @Override
   public void placeHazards(Board board) {
+    board.setZombiesResistIce(true);
     Random hazardRandom = new Random();
     for (int i = 0; i < SLIP_TILE_COUNT; i++) {
       int row = hazardRandom.nextInt(board.getRows());
       int col = hazardRandom.nextInt(board.getColumns());
-      board.placeTileEffect(row, col, new IceTrailEffect(HAZARD_DURATION_TICKS, 0.5, false));
+      int laneShift = hazardRandom.nextBoolean() ? -1 : 1;
+      board.placeTileEffect(
+              row, col, new IceTrailEffect(HAZARD_DURATION_TICKS, 0.5, false, laneShift));
     }
     for (int i = 0; i < FROZEN_TILE_COUNT; i++) {
       int row = hazardRandom.nextInt(board.getRows());

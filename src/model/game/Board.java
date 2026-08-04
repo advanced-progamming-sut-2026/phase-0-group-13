@@ -133,12 +133,44 @@ public class Board {
       if (effect instanceof IceTrailEffect ice && ice.isActive()) {
         if (ice.isFullFreeze()) {
           zombie.applyEffect(StatusEffect.FROZEN, 5);
+        } else if (ice.isSlippery()) {
+          slideZombie(zombie, ice.getLaneShift());
         } else {
           zombie.applyEffect(StatusEffect.CHILLED, 5);
         }
       }
     }
   }
+  /**
+   * زمین لیز: زامبی به ردیف بالا/پایین منتقل می‌شود. زامبی دودوسوار (که از موانع پرواز می‌کند)
+   * از زمین لیز هم فرار می‌کند.
+   */
+  private void slideZombie(Zombie zombie, int laneShift) {
+    if (zombie.getBehavior() instanceof model.game.zombie.behavior.DodoRiderZombieAction) {
+      return;
+    }
+    int targetRow = zombie.getRow() + laneShift;
+    if (targetRow < 0 || targetRow >= rows) {
+      targetRow = zombie.getRow() - laneShift;
+    }
+    if (targetRow < 0 || targetRow >= rows || targetRow == zombie.getRow()) {
+      return;
+    }
+    zombie.setRow(targetRow);
+    System.out.printf("%s slipped on the ice to row %d!%n", zombie.getName(), targetRow + 1);
+  }
+
+  /** در غارهای یخی، زامبی‌ها با تیر یخی گیاهان یخ نمی‌زنند. */
+  public void setZombiesResistIce(boolean resist) {
+    this.zombiesResistIce = resist;
+  }
+
+  public boolean zombiesResistIce() {
+    return zombiesResistIce;
+  }
+
+  private boolean zombiesResistIce;
+
   private final model.game.plant.behavior.ExplodeAction deathExplodeAction =
           new model.game.plant.behavior.ExplodeAction(0, 1800, 1);
   private void triggerDeathExplosions() {
@@ -316,6 +348,10 @@ public class Board {
         if (zombie.getRow() == p.getYCoordinate()
                 && Math.abs(zombie.getX() - p.getXCoordinate()) < 0.5) {
           p.hitZombie(zombie);
+          if (zombiesResistIce) {
+            // غارهای یخی: تیر یخی گیاهان این زامبی‌ها را یخ نمی‌زند
+            zombie.extinguishFrozenStatus();
+          }
           hitRegistered = true;
           break;
         }
