@@ -15,7 +15,7 @@ public class FrostbiteCavesSeason extends Season {
   private static final int FROZEN_TILE_COUNT = 2;
   private static final int HAZARD_DURATION_TICKS = -1; // -1 یعنی دائمی، مثل خود Tombstone
   private static final int WIND_INTERVAL_TICKS = 200;
-  private static final int FREEZE_INCREMENT = 34;
+  private static final int FREEZE_INCREMENT = 1;
   private static final int FREEZE_DURATION_TICKS = 100;
 
   private final Random random = new Random();

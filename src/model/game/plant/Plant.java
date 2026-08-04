@@ -30,7 +30,8 @@ public class Plant {
   private boolean cursed = false;
   private model.game.zombie.Zombie curseSource;
 
-  public static final int MAX_FREEZE_LEVEL = 100;
+  /** طبق داک سه سطح یخ‌زدگی: دو سطح اول اثری ندارند، سطح سوم گیاه را کامل یخ می‌زند. */
+  public static final int MAX_FREEZE_LEVEL = 3;
   private int freezeLevel = 0;
   private int frozenUntilTick = -1;
 
