@@ -33,6 +33,22 @@ sourceSets {
         java {
             srcDirs = ['src']
         }
+        // تصاویر/فونت‌ها/... مربوط به نسخه گرافیکی؛ روی کلاس‌پث می‌رود تا Gdx.files.internal پیدایشان کند
+        resources {
+            srcDir 'assets'
+        }
+    }
+}
+
+// نسخه گرافیکی (LibGDX). نسخه ترمینالی دست‌نخورده با همان Main قبلی اجرا می‌شود.
+tasks.register('runGdx', JavaExec) {
+    group = 'application'
+    description = 'Runs the LibGDX desktop launcher (empty window).'
+    mainClass = 'view.gdx.DesktopLauncher'
+    classpath = sourceSets.main.runtimeClasspath
+    // روی مک، بک‌اند LWJGL3 باید روی ترد اول اجرا شود
+    if (System.getProperty('os.name').toLowerCase().contains('mac')) {
+        jvmArgs '-XstartOnFirstThread'
     }
 }
 // اجازه می‌دهد ورودی کیبورد به برنامه برسد وقتی از طریق Gradle اجرا می‌شود
