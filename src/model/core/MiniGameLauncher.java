@@ -11,8 +11,34 @@ import model.game.WaveGenerator;
 public final class MiniGameLauncher {
   private static final int ROWS = 5;
   private static final int COLS = 9;
+  private static final int COIN_REWARD_PER_LEVEL = 150;
+  private static final int MEOW_POINTS_ON_WIN = 200;
 
   private MiniGameLauncher() {}
+
+  public static void awardClear(model.account.User user, MiniGameType type, int level) {
+    if (user == null) {
+      return;
+    }
+    int coinReward = COIN_REWARD_PER_LEVEL * level;
+    user.addCoins(coinReward);
+    user.addMeowPoints(MEOW_POINTS_ON_WIN);
+    System.out.println("Reward: +" + coinReward + " coins, +" + MEOW_POINTS_ON_WIN + " MyoPoints.");
+
+    String key = type.name().toLowerCase();
+    if (user.getProgress().recordMiniGameCleared(key, level)) {
+      int cleared = user.getProgress().getClearedMiniGameLevel(key);
+      System.out.printf("Mini-game progress: %s %d/%d levels cleared.%n",
+              key, cleared, model.account.Progress.MINI_GAME_LEVELS);
+      if (cleared < model.account.Progress.MINI_GAME_LEVELS) {
+        System.out.println("Next up: level " + (cleared + 1) + "!");
+      } else {
+        System.out.println("You have mastered " + key + "!");
+      }
+    }
+
+    user.triggerQuestEvent("MINIGAME_CLEAR", 1);
+  }
 
   public static void launch() {
     MiniGameType type = MatchSetup.getInstance().getCurrentMiniGame();
@@ -25,7 +51,6 @@ public final class MiniGameLauncher {
     GameSession.start(gameManager, Menu.QuestMenu);
     if (type == MiniGameType.ZOMBOTANY) {
       // زامبوتانی موتور جداگانه نداره: یه مرحله‌ی عادیه که استخر زامبی‌هاش گیاه-زامبی‌هان
-      gameManager.setBonusMatch(true);
       App.setCurrentMenu(Menu.GamePlayMenu);
     } else {
       App.setCurrentMenu(Menu.MiniGameMenu);
@@ -57,8 +82,8 @@ public final class MiniGameLauncher {
     return switch (type) {
       case VASEBREAKER -> "Smash every vase before the zombies inside them reach your brain. "
           + "Use 'smash vase <x> <y>'.";
-      case WALLNUT_BOWLING -> "Line up your shot and send a walnut down the lane. "
-          + "Use 'roll walnut <lane>'.";
+      case WALLNUT_BOWLING -> "The conveyor belt delivers your nuts; plant them before the red "
+          + "line. Use 'plant nut <x> <y>'.";
       case I_ZOMBIE -> "Deploy zombies to break through the lawn. "
           + "Use 'place zombie <type> <x> <y>'.";
       case BEGHOULED -> "Line up three or more matching plants to earn sun. "

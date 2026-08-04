@@ -247,6 +247,13 @@ public class QuestMenuController implements BaseController {
 
     MatchSetup.getInstance().setMiniGame(type, level);
     System.out.println("Loading Mini-Game: " + type.name() + " (Level " + level + ") ...");
+    if (type == MiniGameType.ZOMBOTANY) {
+      // زامبوتانی مثل یه مرحله‌ی عادیه، پس از همون مسیر انتخاب گیاه رد میشه
+      user.clearDeck();
+      System.out.println("Choose your plants for the Seed Bank before starting.");
+      App.setCurrentMenu(Menu.PlantSelectionMenu);
+      return;
+    }
     MiniGameLauncher.launch();
   }
 

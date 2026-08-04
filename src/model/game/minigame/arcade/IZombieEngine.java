@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 
 public final class IZombieEngine {
@@ -11,6 +12,8 @@ public final class IZombieEngine {
   public static final int ROWS = 5;
   public static final int COLS = 9;
   public static final int BRAINS = 5;
+  public static final int STARTING_SUN = 150;
+  public static final int RED_LINE_COLUMN = 4;
   public static final String SUN_PRODUCER = "sun-imp";
   // Cutout plants fire on the same cadence as every other plant in the game: one shot per
   // 1.5s (15 ticks at 10 ticks/second), matching the Peashooter's Action Interval in plants.json.
@@ -37,25 +40,34 @@ public final class IZombieEngine {
     }
   }
 
+  public static final int BUCKETHEAD_HEALTH = 1290;
+
   private static final Map<String, ZombieSpec> CATALOG = buildCatalog();
-  private static final int[][] STAGE_PICKS = {{0, 1, 2, 3, 4}, {3, 4, 5, 6, 7}, {3, 5, 7, 8, 9}};
+  private static final int[][] STAGE_PICKS = {{0, 1, 2, 3, 4}, {1, 3, 5, 6, 7}, {3, 5, 7, 8, 9}};
 
   private static Map<String, ZombieSpec> buildCatalog() {
     Map<String, ZombieSpec> map = new LinkedHashMap<>();
     map.put("basic", new ZombieSpec("basic", 50, 90, 8, 0.05, false, 1));
     map.put("conehead", new ZombieSpec("conehead", 75, 160, 8, 0.05, false, 1));
     map.put("pole-vaulter", new ZombieSpec("pole-vaulter", 100, 110, 10, 0.09, false, 1));
-    map.put(SUN_PRODUCER, new ZombieSpec(SUN_PRODUCER, 125, 70, 0, 0.0, true, 1));
     map.put("buckethead", new ZombieSpec("buckethead", 150, 260, 8, 0.05, false, 1));
+    map.put("newspaper", new ZombieSpec("newspaper", 100, 190, 10, 0.07, false, 1));
 
     map.put("football", new ZombieSpec("football", 175, 400, 14, 0.08, false, 2));
     map.put("digger", new ZombieSpec("digger", 125, 130, 10, 0.07, false, 2));
     map.put("screen-door", new ZombieSpec("screen-door", 150, 220, 8, 0.05, false, 2));
     map.put("ladder", new ZombieSpec("ladder", 150, 150, 9, 0.06, false, 2));
     map.put("gargantuar", new ZombieSpec("gargantuar", 300, 1400, 40, 0.03, false, 2));
+
+    map.put(SUN_PRODUCER, new ZombieSpec(SUN_PRODUCER, 0, BUCKETHEAD_HEALTH, 0, 0.0, true, 1));
     return map;
   }
 
+  private static List<ZombieSpec> purchasableSpecs() {
+    List<ZombieSpec> purchasable = new ArrayList<>();
+    for (ZombieSpec spec : CATALOG.values()) {
+      if (!spec.producesSun) {purchasable.add(spec);}}
+    return purchasable;}
   private static final class DeployedZombie {
     private final ZombieSpec spec;
     private final int row;
@@ -99,6 +111,7 @@ public final class IZombieEngine {
   private final List<DeployedZombie> deployedZombies = new ArrayList<>();
   private final List<DefensePlant> defensePlants = new ArrayList<>();
   private final boolean[] brainAlive = new boolean[BRAINS];
+  private final Random random;
   private final int level;
   private int zombieSun;
   private int tickCount;
@@ -106,30 +119,44 @@ public final class IZombieEngine {
   private boolean lost;
 
   public IZombieEngine(int level) {
+    this(level, new Random());
+  }
+  public IZombieEngine(int level, Random random) {
     this.level = level;
-    this.zombieSun = 150 + level * 50;
+    this.random = random;
+    this.zombieSun = STARTING_SUN;
     for (int i = 0; i < BRAINS; i++) {
       brainAlive[i] = true;
     }
     seedDefensivePlants();
+    seedSunProducers();
   }
 
   private void seedDefensivePlants() {
 
     int plantsPerRow = 1 + level;
     for (int row = 0; row < ROWS; row++) {
-      for (int i = 0; i < plantsPerRow; i++) {
-        int col = 1 + i * 2;
-        if (col >= COLS - 1) {
-          break;
-        }
-        defensePlants.add(new DefensePlant(row, col, 120 + level * 30, 12 + level * 3, 5.0));
+      List<Integer> columns = new ArrayList<>();
+      for (int col = 0; col < RED_LINE_COLUMN; col++) {
+        columns.add(col);
       }
+      java.util.Collections.shuffle(columns, random);
+      for (int i = 0; i < plantsPerRow && i < columns.size(); i++) {
+        defensePlants.add(
+                new DefensePlant(row, columns.get(i), 120 + level * 30, 12 + level * 3, 5.0));
+      }
+    }
+  }
+  private void seedSunProducers() {
+    ZombieSpec spec = CATALOG.get(SUN_PRODUCER);
+    for (int row = 0; row < ROWS; row++) {
+      deployedZombies.add(new DeployedZombie(spec, row, COLS - 1));
+      System.out.printf("A %s takes its place in lane %d.%n", SUN_PRODUCER, row + 1);
     }
   }
 
   public List<ZombieSpec> availableZombieTypes() {
-    List<ZombieSpec> all = new ArrayList<>(CATALOG.values());
+    List<ZombieSpec> all = purchasableSpecs();
     List<ZombieSpec> available = new ArrayList<>();
     for (int index : STAGE_PICKS[Math.min(Math.max(level, 1), STAGE_PICKS.length) - 1]) {
       available.add(all.get(index));
@@ -141,9 +168,16 @@ public final class IZombieEngine {
     if (row < 0 || row >= ROWS || col < 0 || col >= COLS) {
       return "error: coordinates out of bounds";
     }
+    if (col <= RED_LINE_COLUMN) {
+      return "error: zombies can only be placed to the right of the red line (columns "
+              + (RED_LINE_COLUMN + 2) + "-" + COLS + ")";
+    }
     ZombieSpec spec = CATALOG.get(typeName.toLowerCase().trim());
     if (spec == null) {
       return "error: unknown zombie type '" + typeName + "'";
+    }
+    if (spec.producesSun) {
+      return "error: " + typeName + " cannot be bought; one already guards every lane";
     }
     boolean unlocked = availableZombieTypes().contains(spec);
     if (!unlocked) {
@@ -168,19 +202,17 @@ public final class IZombieEngine {
       if (zombie.sunTimer >= Math.max(8, 48 - tickCount / 100)) {
         zombie.sunTimer = 0;
         zombieSun += 25;
+        System.out.printf("zombie %s produced a sun at (%d, %d); you now have %d sun.%n",
+                zombie.spec.name, (int) Math.round(zombie.column) + 1, zombie.row + 1, zombieSun);
       }
     }
     for (DefensePlant plant : defensePlants) {
       if (plant.isDead() || tickCount % PLANT_FIRE_INTERVAL != 0) {
         continue;
       }
-      for (DeployedZombie zombie : deployedZombies) {
-        if (zombie.row != plant.row || zombie.isDead()) {continue;}
-        double distance = zombie.column - plant.col;
-        if (distance >= 0 && distance <= plant.range) {
-          zombie.health -= plant.damagePerTick;
-          break;
-        }
+      DeployedZombie target = nearestZombieAhead(plant);
+      if (target != null) {
+        target.health -= plant.damagePerTick;
       }
     }
     for (DeployedZombie zombie : deployedZombies) {
@@ -203,15 +235,48 @@ public final class IZombieEngine {
         }
       }
     }
+    reportCasualties();
     defensePlants.removeIf(DefensePlant::isDead);
     deployedZombies.removeIf(DeployedZombie::isDead);
     checkEndConditions();
+  }
+
+  private DeployedZombie nearestZombieAhead(DefensePlant plant) {
+    DeployedZombie nearest = null;
+    double nearestDistance = Double.MAX_VALUE;
+    for (DeployedZombie zombie : deployedZombies) {
+      if (zombie.row != plant.row || zombie.isDead()) {
+        continue;
+      }
+      double distance = zombie.column - plant.col;
+      if (distance >= 0 && distance <= plant.range && distance < nearestDistance) {
+        nearest = zombie;
+        nearestDistance = distance;
+      }
+    }
+    return nearest;
+  }
+
+  private void reportCasualties() {
+    for (DeployedZombie zombie : deployedZombies) {
+      if (zombie.isDead()) {
+        System.out.printf("Zombie of type %s is dead at (%d, %d).%n",
+                zombie.spec.name, (int) Math.round(zombie.column) + 1, zombie.row + 1);
+      }
+    }
+    for (DefensePlant plant : defensePlants) {
+      if (plant.isDead()) {
+        System.out.printf("Plant cutout at (%d, %d) is destroyed.%n", plant.col + 1, plant.row + 1);
+      }
+    }
   }
 
   private void eatBrain(int row) {
     int brainIndex = Math.min(row, BRAINS - 1);
     if (brainAlive[brainIndex]) {
       brainAlive[brainIndex] = false;
+      System.out.printf("The brain in lane %d has been eaten; %d left.%n",
+              row + 1, getBrainsRemaining());
     }
   }
 
@@ -225,12 +290,14 @@ public final class IZombieEngine {
     }
     if (!anyBrainAlive) {
       won = true;
+      System.out.println("All five brains are eaten. You win!");
       return;
     }
 
     boolean canStillAct = zombieSun >= cheapestAvailableCost() || !deployedZombies.isEmpty();
     if (!canStillAct) {
       lost = true;
+      System.out.println("No sun, no zombies left and nothing you can place; you lose.");
     }
   }
 

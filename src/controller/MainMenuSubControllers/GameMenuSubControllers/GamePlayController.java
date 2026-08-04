@@ -405,6 +405,19 @@ public class GamePlayController implements BaseController {
       earned.apply(user);
     }
 
+    model.enums.MiniGameType miniGame = MatchSetup.getInstance().getCurrentMiniGame();
+    if (miniGame != model.enums.MiniGameType.NONE) {
+      // مینی‌گیم پیشرفت ادونچر رو جلو نمیبره؛ فقط مرحله‌ی خودش ثبت میشه
+      if (result.isWon()) {
+        System.out.println("You cleared " + miniGame + " (Level "
+                + MatchSetup.getInstance().getMiniGameLevel() + ")!");
+        model.core.MiniGameLauncher.awardClear(
+                user, miniGame, MatchSetup.getInstance().getMiniGameLevel());
+      }
+      saveUserState();
+      return;
+    }
+
     if (result.isWon()) {
       Progress progress = user.getProgress();
       model.Result reward =

@@ -26,11 +26,17 @@ public class ConveyorRule extends MiniGame implements SpecialStageRule {
     }
     elapsedTicks++;
     if (elapsedTicks >= spawnIntervalTicks) {
-      elapsedTicks = 0;
-      readyPlant = beltPlants.get(nextIndex % beltPlants.size());
-      nextIndex++;
-      System.out.printf("The conveyor belt delivered a %s.%n", readyPlant);
+      deliverNow();
     }
+  }
+  public void deliverNow() {
+    if (beltPlants.isEmpty()) {
+      return;
+    }
+    elapsedTicks = 0;
+    readyPlant = beltPlants.get(nextIndex % beltPlants.size());
+    nextIndex++;
+    System.out.printf("The conveyor belt delivered a %s.%n", readyPlant);
   }
   @Override
   public boolean isPlantAllowed(String plantName) {

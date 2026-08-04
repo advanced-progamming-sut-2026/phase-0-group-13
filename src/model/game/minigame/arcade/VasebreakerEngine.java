@@ -12,6 +12,7 @@ public final class VasebreakerEngine {
   private static final int SEED_TIMEOUT_TICKS = 100; // 10 seconds at 10 ticks/second
 
   public enum VaseContent {
+    NONE,
     EMPTY,
     ZOMBIE,
     SEED_PACKET,
@@ -19,18 +20,25 @@ public final class VasebreakerEngine {
     GARGANTUAR_VASE
   }
   public static final class ArcadeZombie {
+    private final String name;
     private final int row;
     private double positionCol;
     private int health;
     private final int damagePerHit;
     private final boolean isGargantuar;
 
-    private ArcadeZombie(int row, double positionCol, int health, int damagePerHit, boolean isGargantuar) {
+    private ArcadeZombie(String name, int row, double positionCol, int health, int damagePerHit,
+            boolean isGargantuar) {
+      this.name = name;
       this.row = row;
       this.positionCol = positionCol;
       this.health = health;
       this.damagePerHit = damagePerHit;
       this.isGargantuar = isGargantuar;
+    }
+
+    public String getName() {
+      return name;
     }
 
     public int getRow() {
@@ -55,12 +63,14 @@ public final class VasebreakerEngine {
   }
 
   private static final class ArcadePlant {
+    private final String name;
     private final int row;
     private final int col;
     private int health;
     private final int damagePerTick;
 
-    private ArcadePlant(int row, int col, int health, int damagePerTick) {
+    private ArcadePlant(String name, int row, int col, int health, int damagePerTick) {
+      this.name = name;
       this.row = row;
       this.col = col;
       this.health = health;
@@ -74,10 +84,14 @@ public final class VasebreakerEngine {
 
   private static final class PendingSeed {
     private final String plantName;
+    private final int row;
+    private final int col;
     private int ticksLeft;
 
-    private PendingSeed(String plantName, int ticksLeft) {
+    private PendingSeed(String plantName, int row, int col, int ticksLeft) {
       this.plantName = plantName;
+      this.row = row;
+      this.col = col;
       this.ticksLeft = ticksLeft;
     }
   }
@@ -107,76 +121,77 @@ public final class VasebreakerEngine {
   private void generateVases() {
 
     int zombieVaseCount = 4 + level * 2;
-    int seedVaseCount = 3 + level;
+    int seedVaseCount = 4 - level;
     int plantVaseCount = 2;
-    boolean allowGargantuar = level >= 3;
+    int gargantuarVaseCount = level;
+    int emptyVaseCount = 4;
 
     List<int[]> allTiles = new ArrayList<>();
     for (int r = 0; r < ROWS; r++) {
       for (int c = 0; c < COLS; c++) {
         allTiles.add(new int[] {r, c});
-        vaseGrid[r][c] = VaseContent.EMPTY;
+        vaseGrid[r][c] = VaseContent.NONE;
       }
     }
     java.util.Collections.shuffle(allTiles, random);
 
     int index = 0;
-    if (allowGargantuar) {
-      int[] tile = allTiles.get(index++);
-      vaseGrid[tile[0]][tile[1]] = VaseContent.GARGANTUAR_VASE;
+    index = fillTiles(allTiles, index, gargantuarVaseCount, VaseContent.GARGANTUAR_VASE);
+    index = fillTiles(allTiles, index, zombieVaseCount, VaseContent.ZOMBIE);
+    index = fillTiles(allTiles, index, seedVaseCount, VaseContent.SEED_PACKET);
+    index = fillTiles(allTiles, index, plantVaseCount, VaseContent.PLANT_VASE);
+    fillTiles(allTiles, index, emptyVaseCount, VaseContent.EMPTY);
+  }
+
+  private int fillTiles(List<int[]> tiles, int startIndex, int count, VaseContent content) {
+    int index = startIndex;
+    for (int i = 0; i < count && index < tiles.size(); i++, index++) {
+      int[] tile = tiles.get(index);
+      vaseGrid[tile[0]][tile[1]] = content;
     }
-    for (int i = 0; i < zombieVaseCount && index < allTiles.size(); i++, index++) {
-      int[] tile = allTiles.get(index);
-      vaseGrid[tile[0]][tile[1]] = VaseContent.ZOMBIE;
-    }
-    for (int i = 0; i < seedVaseCount && index < allTiles.size(); i++, index++) {
-      int[] tile = allTiles.get(index);
-      vaseGrid[tile[0]][tile[1]] = VaseContent.SEED_PACKET;
-    }
-    for (int i = 0; i < plantVaseCount && index < allTiles.size(); i++, index++) {
-      int[] tile = allTiles.get(index);
-      vaseGrid[tile[0]][tile[1]] = VaseContent.PLANT_VASE;
-    }
+    return index;
   }
 
   public String smash(int row, int col) {
     if (row < 0 || row >= ROWS || col < 0 || col >= COLS) {
       return "error: coordinates out of bounds";
     }
+    if (vaseGrid[row][col] == VaseContent.NONE) {
+      return "error: there is no vase at (" + (col + 1) + ", " + (row + 1) + ")";
+    }
     if (smashed[row][col]) {
       return "error: that vase is already smashed";
     }
     smashed[row][col] = true;
     VaseContent content = vaseGrid[row][col];
+    String broken = String.format("Vase at (%d, %d) is broken.", col + 1, row + 1);
 
     switch (content) {
       case EMPTY:
-        return "Just an empty vase. Dust everywhere.";
+        return broken + " It was empty; dust everywhere.";
       case ZOMBIE: {
         int health = 90 + level * 40;
-        zombies.add(new ArcadeZombie(row, COLS - 1, health, 6, false));
-        return "A zombie was hiding in the vase! It's loose on row " + (row + 1) + ".";
+        zombies.add(new ArcadeZombie("Zombie", row, col, health, 6, false));
+        return broken + String.format(" Zombie released at (%d, %d).", col + 1, row + 1);
       }
       case GARGANTUAR_VASE: {
         int health = 1400 + level * 200;
-        zombies.add(new ArcadeZombie(row, COLS - 1, health, 40, true));
-        return "A GARGANTUAR smashes out of the vase on row " + (row + 1) + "! Run!";
+        zombies.add(new ArcadeZombie("Gargantuar", row, col, health, 40, true));
+        return broken + String.format(" Gargantuar released at (%d, %d)! Run!", col + 1, row + 1);
       }
-      case SEED_PACKET: {
-        String plant = randomStarterPlant();
-        pendingSeeds.add(new PendingSeed(plant, SEED_TIMEOUT_TICKS));
-        return "Found a seed packet: " + plant + "! Plant it before it wilts.";
-      }
-      case PLANT_VASE: {
-        int health = 250 + level * 50;
-        int dmg = 18 + level * 4;
-        plants.add(new ArcadePlant(row, col, health, dmg));
-        return "A pre-grown defensive plant tumbles out and takes root at (" + (col + 1)
-            + ", " + (row + 1) + ")!";
-      }
+      case SEED_PACKET:
+      case PLANT_VASE:
+        return broken + " " + dropSeedPacket(row, col);
       default:
-        return "Nothing happens.";
+        return broken;
     }
+  }
+
+  private String dropSeedPacket(int row, int col) {
+    String plant = randomStarterPlant();
+    pendingSeeds.add(new PendingSeed(plant, row, col, SEED_TIMEOUT_TICKS));
+    return String.format("A %s seed packet dropped at (%d, %d); it wilts in %d seconds.",
+            plant, col + 1, row + 1, SEED_TIMEOUT_TICKS / 10);
   }
 
   private String randomStarterPlant() {
@@ -198,7 +213,7 @@ public final class VasebreakerEngine {
     if (match == null) {
       return "error: no fresh " + plantName + " seed packet available";
     }
-    if (!smashed[row][col]) {
+    if (vaseGrid[row][col] != VaseContent.NONE && !smashed[row][col]) {
       return "error: there is still an unbroken vase there - smash it first";
     }
     for (ArcadePlant p : plants) {
@@ -207,15 +222,15 @@ public final class VasebreakerEngine {
       }
     }
     pendingSeeds.remove(match);
-    plants.add(new ArcadePlant(row, col, 200 + level * 40, 15 + level * 3));
-    return plantName + " planted at (" + (col + 1) + ", " + (row + 1) + ").";
+    plants.add(new ArcadePlant(match.plantName, row, col, 200 + level * 40, 15 + level * 3));
+    return match.plantName + " planted at (" + (col + 1) + ", " + (row + 1) + ").";
   }
   public void tick() {
     if (won || lost) {
       return;
     }
     tickCount++;
-    pendingSeeds.removeIf(seed -> --seed.ticksLeft <= 0);
+    expireSeeds();
     for (ArcadePlant plant : plants) {
       if (plant.isDead()) {
         continue;
@@ -244,26 +259,41 @@ public final class VasebreakerEngine {
         zombie.positionCol -= zombie.isGargantuar ? 0.05 : 0.1;
         if (zombie.positionCol <= 0) {
           lost = true;
+          System.out.println("The zombie ate your brain; LOSER!!!");
           return;
         }
       }
     }
 
+    reportCasualties();
     plants.removeIf(ArcadePlant::isDead);
     zombies.removeIf(ArcadeZombie::isDead);
 
-    boolean allVasesResolved = allZombieVasesSmashed();
-    if (allVasesResolved && zombies.isEmpty()) {
+    if (allVasesSmashed() && zombies.isEmpty()) {
       won = true;
+      System.out.println("Every vase on the lawn is broken and the lawn is clear. You win!");
     }
   }
+  private void expireSeeds() {
+    for (PendingSeed seed : new ArrayList<>(pendingSeeds)) {
+      if (--seed.ticksLeft <= 0) {
+        pendingSeeds.remove(seed);
+        System.out.printf("The %s seed packet at (%d, %d) wilted away.%n",
+                seed.plantName, seed.col + 1, seed.row + 1);}}}
+  private void reportCasualties() {
+    for (ArcadeZombie zombie : zombies) {
+      if (zombie.isDead()) {
+        System.out.printf("Zombie of type %s is dead at (%d, %d).%n",
+                zombie.getName(), zombie.getColumn() + 1, zombie.row + 1);}}
+    for (ArcadePlant plant : plants) {
+      if (plant.isDead()) {
+        System.out.printf("Plant %s at (%d, %d) is destroyed.%n",
+                plant.name, plant.col + 1, plant.row + 1);}}}
 
-  private boolean allZombieVasesSmashed() {
+  private boolean allVasesSmashed() {
     for (int r = 0; r < ROWS; r++) {
       for (int c = 0; c < COLS; c++) {
-        VaseContent content = vaseGrid[r][c];
-        boolean dangerous = content == VaseContent.ZOMBIE || content == VaseContent.GARGANTUAR_VASE;
-        if (dangerous && !smashed[r][c]) {
+        if (vaseGrid[r][c] != VaseContent.NONE && !smashed[r][c]) {
           return false;
         }
       }
@@ -293,6 +323,12 @@ public final class VasebreakerEngine {
     }
     return names;
   }
+
+  public boolean hasPendingSeedAt(int row, int col) {
+    for (PendingSeed seed : pendingSeeds) {
+      if (seed.row == row && seed.col == col) {
+        return true;}}
+    return false;}
 
   public int getPlantHealthAt(int row, int col) {
     for (ArcadePlant plant : plants) {

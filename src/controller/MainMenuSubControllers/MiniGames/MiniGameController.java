@@ -17,9 +17,6 @@ import model.game.minigame.arcade.WallnutBowlingEngine;
 
 public class MiniGameController implements BaseController {
 
-  private static final int COIN_REWARD_PER_LEVEL = 150;
-  private static final int MEOW_POINTS_ON_WIN = 200;
-
   private final Pattern smashVasePattern =
           Pattern.compile("(?i)^smash\\s+vase\\s+(?<x>\\d+)\\s+(?<y>\\d+)$");
   private final Pattern plantSeedPattern =
@@ -27,8 +24,8 @@ public class MiniGameController implements BaseController {
   private final Pattern placeZombiePattern =
           Pattern.compile(
                   "(?i)^place\\s+zombie\\s+(?<type>[\\w-]+)\\s+(?<x>\\d+)\\s+(?<y>\\d+)$");
-  private final Pattern rollWalnutPattern =
-          Pattern.compile("(?i)^roll\\s+(?<nut>walnut|explode-o-nut|giant-walnut)\\s+(?<lane>\\d+)$");
+  private final Pattern plantNutPattern =
+          Pattern.compile("(?i)^plant\\s+nut\\s+(?<x>\\d+)\\s+(?<y>\\d+)$");
   private final Pattern advancePattern =
           Pattern.compile("(?i)^advance\\s+time\\s+(?<count>\\d+)\\s+ticks?$");
   private final Pattern swapPlantPattern =
@@ -55,12 +52,13 @@ public class MiniGameController implements BaseController {
         vasebreaker = new VasebreakerEngine(activeLevel);
         System.out.println("Smash every vase before what's inside reaches your brain.");
         System.out.println("Commands: 'smash vase <x> <y>', 'plant seed <name> <x> <y>'.");
+        view.BoardRenderer.render(vasebreaker);
         break;
       case WALLNUT_BOWLING:
         bowling = new WallnutBowlingEngine(activeLevel);
-        System.out.println("Bowl a nut down a lane and knock out every zombie.");
-        System.out.println("Commands: 'roll walnut <lane>', 'roll explode-o-nut <lane>', "
-                + "'roll giant-walnut <lane>'.");
+        System.out.println("The conveyor belt hands you nuts; plant them before the red line.");
+        System.out.println("Command: 'plant nut <x> <y>'.");
+        view.BoardRenderer.render(bowling);
         break;
       case I_ZOMBIE:
         izombie = new IZombieEngine(activeLevel);
@@ -112,9 +110,9 @@ public class MiniGameController implements BaseController {
         handlePlaceZombie(m);
         checkForEnd();
       }
-    } else if ((m = rollWalnutPattern.matcher(command)).matches()) {
+    } else if ((m = plantNutPattern.matcher(command)).matches()) {
       if (checkType(MiniGameType.WALLNUT_BOWLING)) {
-        handleRollWalnut(m);
+        handlePlantNut(m);
         checkForEnd();
       }
     } else if ((m = swapPlantPattern.matcher(command)).matches()) {
@@ -207,21 +205,16 @@ public class MiniGameController implements BaseController {
     System.out.println(izombie.placeZombie(type, y, x));
   }
 
-  private void handleRollWalnut(Matcher m) {
-    int lane = Integer.parseInt(m.group("lane")) - 1;
-    WallnutBowlingEngine.NutType type =
-            switch (m.group("nut").toLowerCase()) {
-              case "explode-o-nut" -> WallnutBowlingEngine.NutType.EXPLODE_O_NUT;
-              case "giant-walnut" -> WallnutBowlingEngine.NutType.GIANT;
-              default -> WallnutBowlingEngine.NutType.NORMAL;
-            };
-    System.out.println(bowling.rollWalnut(lane, type));
+  private void handlePlantNut(Matcher m) {
+    int x = Integer.parseInt(m.group("x")) - 1;
+    int y = Integer.parseInt(m.group("y")) - 1;
+    System.out.println(bowling.plantNut(y, x));
   }
 
   private void renderMap() {
     switch (activeType) {
       case VASEBREAKER -> view.BoardRenderer.render(vasebreaker);
-      case WALLNUT_BOWLING -> System.out.print(bowling.renderMap());
+      case WALLNUT_BOWLING -> view.BoardRenderer.render(bowling);
       case I_ZOMBIE -> view.BoardRenderer.render(izombie);
       case BEGHOULED -> view.BoardRenderer.render(beghouled);
       default -> System.out.println("--- Mini-Game Map (" + activeType + ") ---");
@@ -245,7 +238,7 @@ public class MiniGameController implements BaseController {
     User user = UserManager.getInstance().getCurrentUser();
     if (won) {
       System.out.println("You cleared " + activeType + " (Level " + activeLevel + ")!");
-      grantRewards(user);
+      model.core.MiniGameLauncher.awardClear(user, activeType, activeLevel);
     } else {
       System.out.println("The mini-game is over. Better luck next attempt at "
               + activeType + " (Level " + activeLevel + ").");
@@ -253,31 +246,6 @@ public class MiniGameController implements BaseController {
 
     saveState();
     exit();
-  }
-
-  private void grantRewards(User user) {
-    if (user == null) {
-      return;
-    }
-    int coinReward = COIN_REWARD_PER_LEVEL * activeLevel;
-    user.addCoins(coinReward);
-    user.addMeowPoints(MEOW_POINTS_ON_WIN);
-    System.out.println("Reward: +" + coinReward + " coins, +" + MEOW_POINTS_ON_WIN + " MyoPoints.");
-
-    // ثبت مرحلهٔ پاس‌شده تا پیشرفت مینی‌گیم در لیست و لیدربورد دیده شود
-    String key = activeType.name().toLowerCase();
-    if (user.getProgress().recordMiniGameCleared(key, activeLevel)) {
-      int cleared = user.getProgress().getClearedMiniGameLevel(key);
-      System.out.printf("Mini-game progress: %s %d/%d levels cleared.%n",
-              key, cleared, model.account.Progress.MINI_GAME_LEVELS);
-      if (cleared < model.account.Progress.MINI_GAME_LEVELS) {
-        System.out.println("Next up: level " + (cleared + 1) + "!");
-      } else {
-        System.out.println("You have mastered " + key + "!");
-      }
-    }
-
-    user.triggerQuestEvent("MINIGAME_CLEAR", 1);
   }
 
   private void saveState() {
