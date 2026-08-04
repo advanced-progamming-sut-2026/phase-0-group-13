@@ -1,31 +1,52 @@
 package model.game.minigame.arcade;
 
+import data.GameDataManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import model.game.minigame.ConveyorRule;
+import model.game.plant.PlantParts.PlantTemplate;
+import model.game.zombie.ZombieParts.ZombieTemplate;
 
 public final class WallnutBowlingEngine {
 
   public static final int LANES = 5;
   public static final int LANE_LENGTH = 9;
+  public static final int RED_LINE_COLUMN = 2;
+  private static final int BELT_INTERVAL_TICKS = 120;
+  private static final int FALLBACK_NORMAL_ZOMBIE_HEALTH = 190;
+  private static final int FALLBACK_CHERRY_BOMB_DAMAGE = 1800;
 
   public enum NutType {
-    NORMAL,
-    EXPLODE_O_NUT,
-    GIANT
+    NORMAL("bowling wall-nut", 'O'),
+    EXPLODE_O_NUT("explode-o-nut", 'E'),
+    GIANT("giant wall-nut", 'G');
+    public final String label;
+    public final char glyph;
+    NutType(String label, char glyph) {
+      this.label = label;
+      this.glyph = glyph;
+    }
+    static NutType byLabel(String name) {
+      for (NutType type : values()) {
+        if (type.label.equalsIgnoreCase(name == null ? "" : name.trim())) {
+          return type;}}return NORMAL;}
   }
 
   public static final class LaneZombie {
+    private final String name;
     private final int lane;
     private int column;
     private int health;
 
-    private LaneZombie(int lane, int column, int health) {
+    private LaneZombie(String name, int lane, int column, int health) {
+      this.name = name;
       this.lane = lane;
       this.column = column;
       this.health = health;
     }
 
+    public String getName() {return name;}
     public int getLane() {
       return lane;
     }
@@ -52,10 +73,10 @@ public final class WallnutBowlingEngine {
     private int bounceStage;
     private boolean spent;
 
-    private RollingNut(NutType type, int lane) {
+    private RollingNut(NutType type, int lane, int column) {
       this.type = type;
       this.lane = lane;
-      this.column = 0;
+      this.column = column;
       this.dLane = 0;
       this.dColumn = 1;
     }
@@ -63,8 +84,11 @@ public final class WallnutBowlingEngine {
 
   private final List<LaneZombie> zombies = new ArrayList<>();
   private final List<RollingNut> activeNuts = new ArrayList<>();
+  private final ConveyorRule conveyor;
   private final Random random;
   private final int level;
+  private final int nutDamage;
+  private final int explosionDamage;
   private int zombiesRemainingToSpawn;
   private final int ticksBetweenSpawns;
   private int ticksSinceLastSpawn;
@@ -82,40 +106,70 @@ public final class WallnutBowlingEngine {
   public WallnutBowlingEngine(int level, Random random) {
     this.level = level;
     this.random = random;
+    this.nutDamage = normalZombieHealth();
+    this.explosionDamage = cherryBombDamage();
     this.zombiesRemainingToSpawn = 8 + level * 4;
     this.ticksBetweenSpawns = Math.max(15, 45 - level * 10);
+    this.conveyor = new ConveyorRule(
+            List.of(NutType.NORMAL.label, NutType.EXPLODE_O_NUT.label, NutType.GIANT.label),
+            BELT_INTERVAL_TICKS);
+    this.conveyor.deliverNow();
     spawnWave(2 + level);
   }
 
+  private static int normalZombieHealth() {
+    if (GameDataManager.zombieRepository != null) {
+      ZombieTemplate template = GameDataManager.zombieRepository.find("ZombieMummyDefault");
+      if (template != null && template.getBaseHp() > 0) {
+        return template.getBaseHp();
+      }
+    }
+    return FALLBACK_NORMAL_ZOMBIE_HEALTH;
+  }
+  private static int cherryBombDamage() {
+    if (GameDataManager.plantRepository != null) {
+      PlantTemplate template = GameDataManager.plantRepository.find("Cherry Bomb");
+      if (template != null && template.damage != null) {
+        try {
+          return Integer.parseInt(template.damage.trim());
+        } catch (NumberFormatException e) {
+          return FALLBACK_CHERRY_BOMB_DAMAGE;
+        }
+      }
+    }
+    return FALLBACK_CHERRY_BOMB_DAMAGE;
+  }
   private void spawnWave(int count) {
     for (int i = 0; i < count && zombiesRemainingToSpawn > 0; i++) {
       int lane = random.nextInt(LANES);
-      int health = 60 + level * 25;
-      zombies.add(new LaneZombie(lane, LANE_LENGTH - 1, health));
+      int health = normalZombieHealth() * level;
+      zombies.add(new LaneZombie("Zombie", lane, LANE_LENGTH - 1, health));
       zombiesRemainingToSpawn--;
     }
   }
 
-  public NutType nextAvailableNutType(NutType requested) {
-    if (requested == NutType.EXPLODE_O_NUT && level < 2) {
-      return NutType.NORMAL;
-    }
-    if (requested == NutType.GIANT && level < 3) {
-      return NutType.NORMAL;
-    }
-    return requested;
-  }
-
-  public String rollWalnut(int lane, NutType requestedType) {
+  public String plantNut(int lane, int column) {
     if (lane < 0 || lane >= LANES) {
       return "error: lane out of bounds (1-" + LANES + ")";
     }
-    NutType type = nextAvailableNutType(requestedType);
-    String note = type != requestedType
-            ? " (" + requestedType + " isn't unlocked yet at this level; rolling a normal nut instead)"
-            : "";
-    activeNuts.add(new RollingNut(type, lane));
-    return "Rolling a " + type + " down lane " + (lane + 1) + "..." + note;
+    if (column < 0 || column > RED_LINE_COLUMN) {
+      return "error: you can only plant before the red line (columns 1-"
+              + (RED_LINE_COLUMN + 1) + ")";
+    }
+    String delivered = conveyor.consumeReadyPlant();
+    if (delivered == null) {
+      return "error: the conveyor belt has not delivered a nut yet";
+    }
+    NutType type = NutType.byLabel(delivered);
+    activeNuts.add(new RollingNut(type, lane, column));
+    return String.format("%s planted at (%d, %d); it starts rolling down the lane.",
+            type.label, column + 1, lane + 1);
+  }
+
+  public String getReadyNutLabel() {
+    return conveyor.isPlantAllowed(NutType.NORMAL.label) ? NutType.NORMAL.label
+            : conveyor.isPlantAllowed(NutType.EXPLODE_O_NUT.label) ? NutType.EXPLODE_O_NUT.label
+            : conveyor.isPlantAllowed(NutType.GIANT.label) ? NutType.GIANT.label : "nothing yet";
   }
 
   public void tick() {
@@ -123,6 +177,7 @@ public final class WallnutBowlingEngine {
       return;
     }
 
+    conveyor.apply(null);
     ticksSinceLastSpawn++;
     if (ticksSinceLastSpawn >= ticksBetweenSpawns && zombiesRemainingToSpawn > 0) {
       spawnWave(1 + level / 2);
@@ -136,16 +191,25 @@ public final class WallnutBowlingEngine {
       checkCollision(nut);
     }
     activeNuts.removeIf(n -> n.spent);
+    reportCasualties();
     zombies.removeIf(LaneZombie::isDead);
 
     if (checkLoseCondition()) {
       lost = true;
+      System.out.println("The zombie ate your brain; LOSER!!!");
       return;
     }
 
     if (zombiesRemainingToSpawn <= 0 && zombies.isEmpty()) {
       won = true;
+      System.out.println("Every zombie is bowled over. You win!");
     }
+  }
+  private void reportCasualties() {
+    for (LaneZombie zombie : zombies) {
+      if (zombie.isDead()) {
+        System.out.printf("Zombie of type %s is dead at (%d, %d).%n",
+                zombie.name, zombie.column + 1, zombie.lane + 1);}}
   }
 
   private void advanceZombies() {
@@ -181,6 +245,8 @@ public final class WallnutBowlingEngine {
       // Hit the row boundary: bounce off it by reflecting the vertical component.
       nut.dLane = -nut.dLane;
       nextLane = nut.lane + nut.dLane;
+      System.out.printf("The %s bounced off the lawn edge at lane %d.%n",
+              nut.type.label, nut.lane + 1);
     }
     nut.lane = Math.max(0, Math.min(LANES - 1, nextLane));
     nut.column += nut.dColumn;
@@ -216,23 +282,23 @@ public final class WallnutBowlingEngine {
   }
 
   private void handleNormalNutHit(RollingNut nut, LaneZombie hit) {
-    hit.health -= 1_000;
+    hit.health -= nutDamage;
     score += 10;
     rotateTrajectory(nut);
   }
 
-
   private void rotateTrajectory(RollingNut nut) {
     if (nut.bounceStage == 0) {
       nut.bounceStage = 1;
-      nut.dLane = nut.lane <= 0 ? 1 : (nut.lane >= LANES - 1 ? -1 : 1);
-    } else {
-      nut.bounceStage = 2;
-      nut.dColumn = 0;
-      if (nut.dLane == 0) {
-        nut.dLane = 1;
-      }
+      nut.dLane = nut.lane >= LANES - 1 ? -1 : 1;
+      System.out.printf("The %s bounced 45 degrees at (%d, %d).%n",
+              nut.type.label, nut.column + 1, nut.lane + 1);
+      return;
     }
+    nut.bounceStage++;
+    nut.dLane = -nut.dLane;
+    System.out.printf("The %s bounced 90 degrees at (%d, %d).%n",
+            nut.type.label, nut.column + 1, nut.lane + 1);
   }
 
   private void handleExplodeNutHit(RollingNut nut, LaneZombie hit) {
@@ -240,16 +306,20 @@ public final class WallnutBowlingEngine {
       boolean inBlastLane = Math.abs(zombie.lane - nut.lane) <= 1;
       boolean inBlastColumn = Math.abs(zombie.column - nut.column) <= 1;
       if (inBlastLane && inBlastColumn) {
-        zombie.health -= 1_800;
+        zombie.health -= explosionDamage;
       }
     }
     score += 60;
     nut.spent = true;
+    System.out.printf("The %s exploded at (%d, %d) over a 3x3 area for %d damage.%n",
+            nut.type.label, nut.column + 1, nut.lane + 1, explosionDamage);
   }
 
   private void handleGiantNutHit(LaneZombie hit) {
     hit.health = 0;
     score += 25;
+    System.out.printf("The %s crushed a zombie at (%d, %d) and rolls straight on.%n",
+            NutType.GIANT.label, hit.column + 1, hit.lane + 1);
   }
 
   private LaneZombie findZombieAt(int lane, int column) {
@@ -281,28 +351,25 @@ public final class WallnutBowlingEngine {
     return zombies;
   }
 
-  public String renderMap() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("--- Wall-nut Bowling: Level ").append(level).append(" | Score: ").append(score)
-            .append(" | Zombies left to spawn: ").append(zombiesRemainingToSpawn).append(" ---\n");
-    for (int lane = 0; lane < LANES; lane++) {
-      StringBuilder row = new StringBuilder();
-      for (int col = 0; col < LANE_LENGTH; col++) {
-        char glyph = '.';
-        LaneZombie z = findZombieAt(lane, col);
-        if (z != null) {
-          glyph = 'Z';
-        }
-        for (RollingNut nut : activeNuts) {
-          if (!nut.spent && nut.lane == lane && nut.column == col) {
-            glyph = 'O';
-              break;
-          }
-        }
-        row.append('[').append(glyph).append(']');
+  public int getZombiesRemainingToSpawn() {
+    return zombiesRemainingToSpawn;
+  }
+
+  public int getLevel() {
+    return level;
+  }
+
+  public int getZombieHealthAt(int lane, int column) {
+    LaneZombie zombie = findZombieAt(lane, column);
+    return zombie == null ? -1 : zombie.health;
+  }
+
+  public NutType getNutTypeAt(int lane, int column) {
+    for (RollingNut nut : activeNuts) {
+      if (!nut.spent && nut.lane == lane && nut.column == column) {
+        return nut.type;
       }
-      sb.append("Lane ").append(lane + 1).append(": ").append(row).append('\n');
     }
-    return sb.toString();
+    return null;
   }
 }

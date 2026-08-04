@@ -139,6 +139,10 @@ public class PlantSelectionMenuController implements BaseController {
 
     System.out.println("Seed Bank locked in: " + user.getSelectedDeck());
     System.out.println("Handing off to the game engine...");
+    if (MatchSetup.getInstance().getCurrentMiniGame() != model.enums.MiniGameType.NONE) {
+      model.core.MiniGameLauncher.launch();
+      return;
+    }
     MatchLauncher.launch();
   }
 

@@ -10,6 +10,7 @@ import model.game.minigame.TimedWarRule;
 import model.game.minigame.arcade.BeghouledEngine;
 import model.game.minigame.arcade.IZombieEngine;
 import model.game.minigame.arcade.VasebreakerEngine;
+import model.game.minigame.arcade.WallnutBowlingEngine;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
@@ -97,10 +98,22 @@ public final class BoardRenderer {
     renderArcadeGrid(VasebreakerEngine.ROWS, VasebreakerEngine.COLS,
             String.format("  Zombies: %d   |   Fresh seeds: %s",
                     engine.getZombies().size(), engine.getPendingSeedNames()),
-            "Legend: V?=vase (?=unknown, G=green/plant, X=giant)   Z?=zombie   P?=plant"
-                    + "   .=smashed   ZZ/V?=zombie standing on an unbroken vase",
+            "Legend: V?=vase (?=unknown, G=green/plant, X=giant)   xx=opened vase   Z?=zombie"
+                    + "   P?=plant   SS=seed packet on the ground   .=empty tile",
             row -> String.format(" %-3d|", row + 1),
             (row, col) -> getVaseCellDetails(engine, row, col));
+  }
+  public static void render(WallnutBowlingEngine engine) {
+    renderArcadeGrid(WallnutBowlingEngine.LANES, WallnutBowlingEngine.LANE_LENGTH,
+            String.format("  Level: %d   |   Score: %d   |   Zombies left to spawn: %d"
+                            + "   |   On the belt: %s",
+                    engine.getLevel(), engine.getScore(), engine.getZombiesRemainingToSpawn(),
+                    engine.getReadyNutLabel()),
+            "Legend: ZZ=zombie   OO=bowling wall-nut   EE=explode-o-nut   GG=giant wall-nut\n"
+                    + "        ||=red line - you may only plant in columns 1-"
+                    + (WallnutBowlingEngine.RED_LINE_COLUMN + 1),
+            row -> String.format(" %-3d|", row + 1),
+            (row, col) -> getBowlingCellDetails(engine, row, col));
   }
   public static void render(IZombieEngine engine) {
     renderArcadeGrid(IZombieEngine.ROWS, IZombieEngine.COLS,
@@ -108,6 +121,8 @@ public final class BoardRenderer {
                             + " walk LEFT into the brains",
                     engine.getZombieSun(), engine.getBrainsRemaining(), IZombieEngine.BRAINS),
             "Legend: B=brain alive (row label)   x=brain eaten   PP=cutout plant   ZZ=your zombie\n"
+                    + "        ||=red line - you may only deploy in columns "
+                    + (IZombieEngine.RED_LINE_COLUMN + 2) + "-" + IZombieEngine.COLS + "\n"
                     + "Available: " + costList(engine),
             row -> String.format("%c%-3d|", engine.isBrainAlive(row) ? 'B' : 'x', row + 1),
             (row, col) -> getIZombieCellDetails(engine, row, col));
@@ -118,7 +133,7 @@ public final class BoardRenderer {
                     engine.getSun(), engine.getMatchesMade(), engine.getMatchTarget()),
             "Legend: ZZ=zombie   ##=crater (nothing can go here)\n"
                     + plantGlyphLegend()
-                    + "Upgrades: " + upgradeList(),
+                    + "Upgrades: " + upgradeList(engine),
             row -> String.format(" %-3d|", row + 1),
             (row, col) -> getBeghouledCellDetails(engine, row, col));
   }
@@ -137,12 +152,33 @@ public final class BoardRenderer {
         legend.append("\n        ");
       }legend.append(String.format("%c%c=%-17s", kind.glyph, kind.glyph, kind.label));printed++;}
     return legend.append('\n').toString();}
-  private static String upgradeList() {
+  private static String upgradeList(BeghouledEngine engine) {
     StringBuilder list = new StringBuilder();
-    for (BeghouledEngine.Upgrade upgrade : BeghouledEngine.getUpgrades()) {
+    for (BeghouledEngine.Upgrade upgrade : engine.getUpgrades()) {
       list.append(upgrade.from.label).append("->").append(upgrade.to.label)
               .append('(').append(upgrade.cost).append(")  ");}
     return list.toString();}
+  private static String[] getBowlingCellDetails(WallnutBowlingEngine engine, int row, int col) {
+    StringBuilder entities = new StringBuilder();
+    StringBuilder healths = new StringBuilder();
+
+    WallnutBowlingEngine.NutType nut = engine.getNutTypeAt(row, col);
+    if (nut != null) {
+      entities.append(nut.glyph).append(nut.glyph);
+      healths.append('-');
+    }
+    int zombieHealth = engine.getZombieHealthAt(row, col);
+    if (zombieHealth >= 0) {
+      if (entities.length() > 0) {entities.append("/");healths.append("/");}
+      entities.append("ZZ");healths.append(zombieHealth);
+    }
+    if (col == WallnutBowlingEngine.RED_LINE_COLUMN) {
+      if (entities.length() > 0) {entities.append("/");healths.append("/");}
+      entities.append("||");healths.append('-');
+    }
+    return new String[] {entities.length() == 0 ? "." : entities.toString(),
+            healths.length() == 0 ? "-" : healths.toString()};
+  }
   private static String[] getIZombieCellDetails(IZombieEngine engine, int row, int col) {
     StringBuilder entities = new StringBuilder();
     StringBuilder healths = new StringBuilder();
@@ -156,6 +192,10 @@ public final class BoardRenderer {
     if (zombieHealth >= 0) {
       if (entities.length() > 0) {entities.append("/");healths.append("/");}
       entities.append("ZZ");healths.append(zombieHealth);
+    }
+    if (col == IZombieEngine.RED_LINE_COLUMN) {
+      if (entities.length() > 0) {entities.append("/");healths.append("/");}
+      entities.append("||");healths.append('-');
     }
     return new String[] {entities.length() == 0 ? "." : entities.toString(),
             healths.length() == 0 ? "-" : healths.toString()};
@@ -192,14 +232,24 @@ public final class BoardRenderer {
         entities.append("/");
         healths.append("/");
       }entities.append("PP");healths.append(plantHealth);}
-    if (!engine.getSmashedGrid()[row][col]) {
+    if (engine.hasPendingSeedAt(row, col)) {
       if (entities.length() > 0) {
         entities.append("/");healths.append("/");}
-      entities.append('V').append(switch (engine.getVaseGrid()[row][col]) {
-        case PLANT_VASE -> 'G';
-        case GARGANTUAR_VASE -> 'X';
-        default -> '?';
-      });
+      entities.append("SS");healths.append('-');
+    }
+    VasebreakerEngine.VaseContent vase = engine.getVaseGrid()[row][col];
+    if (vase != VasebreakerEngine.VaseContent.NONE) {
+      if (entities.length() > 0) {
+        entities.append("/");healths.append("/");}
+      if (engine.getSmashedGrid()[row][col]) {
+        entities.append("xx");
+      } else {
+        entities.append('V').append(switch (vase) {
+          case PLANT_VASE -> 'G';
+          case GARGANTUAR_VASE -> 'X';
+          default -> '?';
+        });
+      }
       healths.append('-');
     }
     return new String[] {entities.length() == 0 ? "." : entities.toString(),

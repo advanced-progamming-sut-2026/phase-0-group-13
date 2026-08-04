@@ -64,25 +64,55 @@ public final class BeghouledEngine {
     }
   }
 
-  // دو زنجیره‌ی دو مرحله‌ای داریم: peashooter -> repeater -> mega-gatling-pea و
-  // cabbage-pult -> melon-pult -> winter-melon
-  private static final Map<PlantKind, Upgrade> UPGRADES = buildUpgrades();
-
-  private static Map<PlantKind, Upgrade> buildUpgrades() {
+  private static Map<PlantKind, Upgrade> buildUpgrades(int level) {
     Map<PlantKind, Upgrade> map = new LinkedHashMap<>();
-    map.put(PlantKind.PEASHOOTER, new Upgrade(PlantKind.PEASHOOTER, PlantKind.REPEATER, 500));
-    map.put(PlantKind.REPEATER, new Upgrade(PlantKind.REPEATER, PlantKind.MEGA_GATLING_PEA, 1500));
-    map.put(PlantKind.CABBAGE_PULT, new Upgrade(PlantKind.CABBAGE_PULT, PlantKind.MELON_PULT, 1000));
-    map.put(PlantKind.MELON_PULT, new Upgrade(PlantKind.MELON_PULT, PlantKind.WINTER_MELON, 750));
-    map.put(PlantKind.WALLNUT, new Upgrade(PlantKind.WALLNUT, PlantKind.TALL_NUT, 500));
-    map.put(PlantKind.PUFF_SHROOM, new Upgrade(PlantKind.PUFF_SHROOM, PlantKind.FUME_SHROOM, 250));
-    return map;
+    switch (Math.min(Math.max(level, 1), 3)) {
+      case 1:
+        map.put(PlantKind.PEASHOOTER, new Upgrade(PlantKind.PEASHOOTER, PlantKind.REPEATER, 500));
+        map.put(PlantKind.REPEATER,
+                new Upgrade(PlantKind.REPEATER, PlantKind.MEGA_GATLING_PEA, 1500));
+        map.put(PlantKind.CABBAGE_PULT,
+                new Upgrade(PlantKind.CABBAGE_PULT, PlantKind.MELON_PULT, 1000));
+        map.put(PlantKind.MELON_PULT,
+                new Upgrade(PlantKind.MELON_PULT, PlantKind.WINTER_MELON, 750));
+        map.put(PlantKind.WALLNUT, new Upgrade(PlantKind.WALLNUT, PlantKind.TALL_NUT, 500));
+        map.put(PlantKind.PUFF_SHROOM,
+                new Upgrade(PlantKind.PUFF_SHROOM, PlantKind.FUME_SHROOM, 250));
+        return map;
+      case 2:
+        map.put(PlantKind.PEASHOOTER, new Upgrade(PlantKind.PEASHOOTER, PlantKind.REPEATER, 600));
+        map.put(PlantKind.REPEATER,
+                new Upgrade(PlantKind.REPEATER, PlantKind.MEGA_GATLING_PEA, 1800));
+        map.put(PlantKind.MELON_PULT,
+                new Upgrade(PlantKind.MELON_PULT, PlantKind.WINTER_MELON, 900));
+        map.put(PlantKind.WALLNUT, new Upgrade(PlantKind.WALLNUT, PlantKind.TALL_NUT, 600));
+        map.put(PlantKind.PUFF_SHROOM,
+                new Upgrade(PlantKind.PUFF_SHROOM, PlantKind.FUME_SHROOM, 300));
+        return map;
+      default:
+        map.put(PlantKind.PEASHOOTER, new Upgrade(PlantKind.PEASHOOTER, PlantKind.REPEATER, 750));
+        map.put(PlantKind.REPEATER,
+                new Upgrade(PlantKind.REPEATER, PlantKind.MEGA_GATLING_PEA, 2000));
+        map.put(PlantKind.MELON_PULT,
+                new Upgrade(PlantKind.MELON_PULT, PlantKind.WINTER_MELON, 1000));
+        map.put(PlantKind.WALLNUT, new Upgrade(PlantKind.WALLNUT, PlantKind.TALL_NUT, 700));
+        return map;
+    }
   }
 
-  private static final PlantKind[] STARTING_KINDS = {
-    PlantKind.PEASHOOTER, PlantKind.SUNFLOWER, PlantKind.WALLNUT,
-    PlantKind.CABBAGE_PULT, PlantKind.PUFF_SHROOM
-  };
+  private static PlantKind[] startingKinds(int level) {
+    switch (Math.min(Math.max(level, 1), 3)) {
+      case 1:
+        return new PlantKind[] {PlantKind.PEASHOOTER, PlantKind.SUNFLOWER, PlantKind.WALLNUT,
+            PlantKind.CABBAGE_PULT, PlantKind.PUFF_SHROOM};
+      case 2:
+        return new PlantKind[] {PlantKind.PEASHOOTER, PlantKind.SUNFLOWER, PlantKind.WALLNUT,
+            PlantKind.MELON_PULT, PlantKind.PUFF_SHROOM};
+      default:
+        return new PlantKind[] {PlantKind.PEASHOOTER, PlantKind.SUNFLOWER, PlantKind.WALLNUT,
+            PlantKind.MELON_PULT, PlantKind.FUME_SHROOM};
+    }
+  }
 
   private static final class LaneZombie {
     private final int row;
@@ -101,6 +131,8 @@ public final class BeghouledEngine {
     }
   }
 
+  private final Map<PlantKind, Upgrade> upgrades;
+  private final PlantKind[] startingKinds;
   private final PlantKind[][] grid = new PlantKind[ROWS][COLS];
   // خونه‌هایی که زامبی گیاهشون رو خورده: دیگه هیچ گیاهی اونجا قرار نمیگیره، نه با پر شدن معمولی و
   // نه با جابه‌جا کردن گیاه‌ها
@@ -130,6 +162,8 @@ public final class BeghouledEngine {
     this.random = random;
     this.matchTarget = 6 + level * 3;
     this.ticksBetweenSpawns = Math.max(20, 70 - level * 12);
+    this.upgrades = buildUpgrades(level);
+    this.startingKinds = startingKinds(level);
     reshuffleBoard();
   }
 
@@ -148,7 +182,7 @@ public final class BeghouledEngine {
   }
 
   private PlantKind randomKind() {
-    return STARTING_KINDS[random.nextInt(STARTING_KINDS.length)];
+    return startingKinds[random.nextInt(startingKinds.length)];
   }
 
   public String swap(int rowA, int colA, int rowB, int colB) {
@@ -186,7 +220,7 @@ public final class BeghouledEngine {
     if (from == null) {
       return "error: unknown plant '" + fromLabel + "'";
     }
-    Upgrade upgrade = UPGRADES.get(from);
+    Upgrade upgrade = upgrades.get(from);
     if (upgrade == null) {
       return "error: " + from.label + " has no upgrade.";
     }
@@ -235,10 +269,22 @@ public final class BeghouledEngine {
 
     List<List<int[]>> groups = findMatchGroups();
     while (!groups.isEmpty() && chain < MAX_CASCADE_CHAIN) {
+      if (chain > 0) {
+        System.out.printf("Cascade %d! The falling plants lined up %d more match(es).%n",
+                chain, groups.size());
+      }
       for (List<int[]> group : groups) {
         int sunUnits = group.size() - (MIN_MATCH - 1) + (chain > 0 ? 1 : 0);
-        totalSun += sunUnits * SUN_PER_MATCH_UNIT;
+        int gained = sunUnits * SUN_PER_MATCH_UNIT;
+        totalSun += gained;
         matchesMade++;
+        int[] head = group.get(0);
+        System.out.printf("Match of %d %s starting at (%d, %d): +%d sun.%n",
+                group.size(), grid[head[0]][head[1]].label, head[1] + 1, head[0] + 1, gained);
+        if (group.size() >= MIN_MATCH + 1) {
+          System.out.printf("Combo! A %d-in-a-row pays %d sun instead of %d.%n",
+                  group.size(), gained, SUN_PER_MATCH_UNIT);
+        }
       }
       for (List<int[]> group : groups) {
         for (int[] cell : group) {
@@ -426,6 +472,7 @@ public final class BeghouledEngine {
       zombie.column -= 1;
       if (zombie.column < 0) {
         lost = true;
+        System.out.println("The zombie ate your brain; LOSER!!!");
         return;
       }
     }
@@ -455,7 +502,7 @@ public final class BeghouledEngine {
     return sun;
   }
 
-  public static java.util.Collection<Upgrade> getUpgrades() {return UPGRADES.values();}
+  public java.util.Collection<Upgrade> getUpgrades() {return upgrades.values();}
   public PlantKind getPlantAt(int row, int col) {
     return grid[row][col];
   }

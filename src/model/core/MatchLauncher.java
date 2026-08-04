@@ -78,10 +78,11 @@ public final class MatchLauncher {
 
     gameManager.setSpecialStageRule(rule);
     System.out.println("Special level active: " + rule.getClass().getSimpleName());
-    if (rule instanceof ConveyorRule) {
+    if (rule instanceof ConveyorRule conveyor) {
       gameManager.enableFreePlanting();
       gameManager.disableCooldowns();
       gameManager.getBoard().getGameState().setSkySunDisabled(true);
+      conveyor.deliverNow();
     }
     if (rule instanceof SaveOurSeedsRule) {
       placeProtectedPlants(gameManager);
@@ -135,6 +136,9 @@ public final class MatchLauncher {
   }
 
   public static SpecialStageRule selectionRule() {
+    if (MatchSetup.getInstance().getCurrentMiniGame() != model.enums.MiniGameType.NONE) {
+      return null;
+    }
     SpecialStageRule rule =
             specialRuleFor(null, resolveStageNumber(), currentLevelInStage(), List.of());
     return rule != null && rule.restrictsSelection() ? rule : null;

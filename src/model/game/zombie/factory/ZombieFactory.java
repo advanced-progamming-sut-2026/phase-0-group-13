@@ -79,7 +79,8 @@ public class ZombieFactory {
       case BARREL_ROLLER -> new BarrelRollerZombieAction(eatDamage);
       case GARGANTUAR -> new GargantuarAction((int) Math.round(resolveBaseHp(template, type) * diffMultiplier));
       case EXPLORER -> new ExplorerZombieAction();
-      case ZOMBOTANY_PEASHOOTER, HUNTER -> new ZombotanyPeashooterAction(150, 10.0);
+      case ZOMBOTANY_PEASHOOTER -> new ZombotanyPeashooterAction(15, eatDamage);
+      case HUNTER -> new ZombotanyPeashooterAction(150, 10.0);
       case ZOMBOTANY_JALAPENO -> new ZombotanyJalapenoAction(100);
       case ZOMBOTANY_SQUASH -> new TacklerZombieAction(true);
       case FOOTBALLER, IMP_DRAGON, ARCADE -> new TacklerZombieAction();
