@@ -413,7 +413,7 @@ public class PlantFactory {
     if (tags.contains(PlantTag.SUN)) return new SunOnHitAction(5);
     if (name != null && name.toLowerCase().contains("endurian")) return new ReflectDamageAction();
     if (tags.contains(PlantTag.MOVE_ZOMBIES)) {
-      return new DummyPlantAction("Lane-redirect needs Zombie row to become mutable");
+      return new LaneRedirectAction(3);
     }
     return null;
   }

@@ -11,8 +11,11 @@ import model.game.zombie.Zombie;
 
 public class JesterZombieAction implements ZombieAction {
   private static final double CATCH_RANGE = 0.6;
+  private static final int SPIN_DURATION_TICKS = 30;
+  private static final double SPIN_SPEED_MULTIPLIER = 2.0;
 
   private final double eatingDamage;
+  private int spinTicksLeft;
 
   public JesterZombieAction(double eatingDamage) {
     this.eatingDamage = eatingDamage;
@@ -21,7 +24,31 @@ public class JesterZombieAction implements ZombieAction {
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     reflectIncomingProjectiles(zombie, board);
+    updateSpin(zombie);
     walkOrEat(zombie, board, currentTick);
+  }
+
+  /**
+   * ژانگولر تا وقتی پرتابه‌ای به سمتش می‌آید می‌چرخد و در حال چرخش سریع‌تر جلو می‌رود؛
+   * وقتی مدتی پرتابه‌ای نیاید، چرخش تمام می‌شود و به سرعت عادی برمی‌گردد.
+   */
+  private void updateSpin(Zombie zombie) {
+    if (spinTicksLeft <= 0) {
+      return;
+    }
+    spinTicksLeft--;
+    if (spinTicksLeft == 0) {
+      zombie.setSpeedMultiplier(1.0);
+      System.out.printf("%s stopped spinning.%n", zombie.getName());
+    }
+  }
+
+  private void startSpinning(Zombie zombie) {
+    if (spinTicksLeft <= 0) {
+      zombie.setSpeedMultiplier(SPIN_SPEED_MULTIPLIER);
+      System.out.printf("%s started spinning and speeds up!%n", zombie.getName());
+    }
+    spinTicksLeft = SPIN_DURATION_TICKS;
   }
 
   private void reflectIncomingProjectiles(Zombie zombie, Board board) {
@@ -35,6 +62,7 @@ public class JesterZombieAction implements ZombieAction {
       }
       iterator.remove();
       reflected.add(buildReflectedProjectile(incoming, zombie));
+      startSpinning(zombie);
       System.out.printf("%s juggled a projectile back at the plants!%n", zombie.getName());
     }
     for (Projectile projectile : reflected) {
@@ -51,8 +79,9 @@ public class JesterZombieAction implements ZombieAction {
   }
   
   private Projectile buildReflectedProjectile(Projectile incoming, Zombie zombie) {
+    // تیر با همان قدرت خودش برمی‌گردد (نه با دمیج گازگرفتن زامبی)
     return new Projectile(
-            (int) eatingDamage,
+            Math.max(incoming.getDamage(), (int) eatingDamage),
             -0.5,
             zombie.getX(),
             zombie.getRow(),

@@ -97,6 +97,9 @@ public final class WallnutBowlingEngine {
   }
 
   public NutType nextAvailableNutType(NutType requested) {
+    if (requested == null) {
+      return NutType.NORMAL;
+    }
     if (requested == NutType.EXPLODE_O_NUT && level < 2) {
       return NutType.NORMAL;
     }
