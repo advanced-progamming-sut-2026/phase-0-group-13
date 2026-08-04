@@ -139,6 +139,9 @@ public class Zombie {
   public void setShieldBlocker(boolean shieldBlocker) { this.shieldBlocker = shieldBlocker; }
   public boolean isDead() { return this.currentHealth <= 0; }
   public double getX() { return x; }
+
+  /** برای مکانیزم‌هایی مثل گردباد مصر که زامبی را جابه‌جا می‌کنند. */
+  public void setX(double x) { this.x = x; }
   public double getY() { return y; }
   public int getRow() { return row; }
   public void setRow(int row) { this.row = row; }

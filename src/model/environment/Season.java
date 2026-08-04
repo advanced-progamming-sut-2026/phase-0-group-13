@@ -44,6 +44,12 @@ public abstract class Season {
 
   public void onWaveStart(model.game.Board board, int waveNumber, int currentTick) {}
 
+  /** نسخه‌ی کامل‌تر: می‌داند این موج، موج آخر (پرچم) است یا نه. */
+  public void onWaveStart(
+          model.game.Board board, int waveNumber, int currentTick, boolean finalWave) {
+    onWaveStart(board, waveNumber, currentTick);
+  }
+
   // چون Zombies.json فیلد جدا برای فصل/چپتر نداره، از روی alias خام زامبی‌ها فیلتر میکنیم (مثلا
   // "ZombieEgyptImpDefault" یا "ZombieIceAgeDodo")؛ همون قراردادی که ZombieTypeResolver هم برای
   // تشخیص نوع زامبی از روی اسم استفاده میکنه

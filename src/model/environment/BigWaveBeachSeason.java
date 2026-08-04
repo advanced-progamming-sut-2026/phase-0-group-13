@@ -11,6 +11,10 @@ import model.game.zombie.Zombie;
 
 public class BigWaveBeachSeason extends Season {
   private static final int TIDE_DESTROY_DAMAGE = 10000;
+  /** تعداد ستون‌های سمت راست که در جزر (کم‌ترین حالت) دریا هستند. */
+  private static final int LOW_TIDE_COLUMNS = 3;
+  /** خط قرمز مد: آب حداکثر تا این تعداد ستونِ سمت راست بالا می‌آید. */
+  private static final int HIGH_TIDE_COLUMNS = 5;
 
   private boolean tideHigh = false;
 
@@ -44,9 +48,12 @@ public class BigWaveBeachSeason extends Season {
     System.out.printf(
             "The tide is %s for wave %d!%n", tideHigh ? "rising" : "receding", waveNumber + 1);
 
+    // فقط ستون‌های سمت راست دریا هستند؛ با مد، آب یکی-دو ستون جلوتر می‌آید (نه کل زمین)
+    int waterColumns = tideHigh ? HIGH_TIDE_COLUMNS : LOW_TIDE_COLUMNS;
+    int firstWaterCol = Math.max(1, board.getColumns() - waterColumns);
     for (int row = 0; row < board.getRows(); row++) {
       for (int col = 0; col < board.getColumns(); col++) {
-        board.setWaterAt(row, col, tideHigh);
+        board.setWaterAt(row, col, col >= firstWaterCol);
       }
     }
 
@@ -54,9 +61,13 @@ public class BigWaveBeachSeason extends Season {
       return;
     }
 
+    // فقط گیاهانی که حالا زیر آب رفته‌اند از بین می‌روند (نه کل گیاهان زمین)
     for (Plant plant : new ArrayList<>(board.getPlants())) {
+      if (plant.isDead() || !board.isWaterAt(plant.getRow(), plant.getCol())) {
+        continue;
+      }
       boolean aquatic = plant.getTags().contains(PlantTag.WATER);
-      if (!aquatic && !plant.isDead() && !isProtectedByLilyPad(board, plant)) {
+      if (!aquatic && !isProtectedByLilyPad(board, plant)) {
         plant.takeDamage(TIDE_DESTROY_DAMAGE);
         System.out.printf("The rising tide swept away %s!%n", plant.getName());
       }

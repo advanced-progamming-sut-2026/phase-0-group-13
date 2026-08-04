@@ -131,7 +131,7 @@ public class GameManager {
       currentWave.update(board);
 
       if (!wasStarted && currentWave.isStarted() && currentSeason != null) {
-        currentSeason.onWaveStart(board, currentWaveIndex, currentTick);
+        currentSeason.onWaveStart(board, currentWaveIndex, currentTick, currentWave.isFinalWave());
       }
       if (currentWave.checkCompletion()) {
         currentWaveIndex++;
