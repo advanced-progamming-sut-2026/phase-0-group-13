@@ -30,6 +30,7 @@ public class ProduceSunAction implements PlantAction {
     if (currentTick - plant.getLastActionTick() >= productionInterval) {
       Sun newSun = new Sun(sunAmount, Sun.INFINITE_LIFETIME, SunType.SUNFLOWER);
       newSun.changinCordinate(plant.getCol(), plant.getRow());
+      newSun.setGroundedTick(currentTick);
       board.addSun(newSun);
       uncollectedSun = newSun;
       plant.setLastActionTick(currentTick);

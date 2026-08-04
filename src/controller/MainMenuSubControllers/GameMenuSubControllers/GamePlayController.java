@@ -166,13 +166,23 @@ public class GamePlayController implements BaseController {
       return;
     }
     String type = m.group("type").trim();
-    PlantTemplate template = GameDataManager.plantRepository.find(type);
+    // ایمیتیتر خودش هیچ رفتاری ندارد؛ طبق داک اولین گیاه دیگر سیدبانک را کپی می‌کند تا همان کارت
+    // با یک کول‌داون کاملا مستقل، دوباره قابل کاشت باشد
+    String buildType = type;
+    if (type.equalsIgnoreCase("imitater")) {
+      buildType = resolveImitaterTarget(type);
+      if (buildType == null) {
+        System.out.println("error: Imitater needs another plant in your seed bank to copy");
+        return;
+      }
+    }
+    PlantTemplate template = GameDataManager.plantRepository.find(buildType);
     if (template == null) {
       System.out.println("error: unknown plant '" + type + "'");
       return;
     }
 
-    int userLevel = getCurrentPlantLevel(type);
+    int userLevel = getCurrentPlantLevel(buildType);
     int adjustedRecharge = adjustedRechargeSeconds(template, userLevel);
     int remaining = gm.ticksUntilPlantReady(type, adjustedRecharge);
     if (remaining > 0) {
@@ -182,7 +192,7 @@ public class GamePlayController implements BaseController {
 
     Plant plant = null;
     try {
-      plant = new PlantFactory(GameDataManager.plantRepository).createPlant(type, rc[0], rc[1], userLevel);
+      plant = new PlantFactory(GameDataManager.plantRepository).createPlant(buildType, rc[0], rc[1], userLevel);
     } catch (RuntimeException e) {
       System.out.println("error: could not build plant '" + type + "'");
       return;
@@ -194,11 +204,28 @@ public class GamePlayController implements BaseController {
     if (gm.placePlant(plant, rc[0], rc[1])) {
       gm.recordPlanting(type);
       System.out.printf("Planted %s at (%s, %s).%n", type, m.group("x"), m.group("y"));
-      activateBoostIfAny(plant, type);
+      if (!buildType.equalsIgnoreCase(type)) {
+        System.out.printf("%s imitates %s!%n", type, buildType);
+      }
+      activateBoostIfAny(plant, buildType);
       if (gm.getSpecialStageRule() instanceof model.game.minigame.ConveyorRule c) c.consumeReadyPlant();
     } else {
       System.out.println("error: cannot plant there (tile occupied or not enough sun)");
     }
+  }
+
+  /** ایمیتیتر طبق داک اولین گیاه دیگر (غیر از خودش) را از سیدبانک بازیکن کپی می‌کند. */
+  private String resolveImitaterTarget(String selfType) {
+    User user = UserManager.getInstance().getCurrentUser();
+    if (user == null) {
+      return null;
+    }
+    for (String deckPlant : user.getSelectedDeck()) {
+      if (deckPlant != null && !deckPlant.equalsIgnoreCase(selfType)) {
+        return deckPlant;
+      }
+    }
+    return null;
   }
 
   private int getCurrentPlantLevel(String plantType) {

@@ -5,9 +5,13 @@ import java.util.List;
 import java.util.Random;
 
 public class SunManager {
+  // امتیاز SPEED_SUN_COLLECT: برداشتن خورشید تا ۲ ثانیه (۲۰ تیک) بعد از قابل‌برداشت شدنش "سریع" حساب میشه
+  private static final int FAST_COLLECT_WINDOW_TICKS = 20;
+
   private final List<Sun> suns;
   private int lastSunDropTick;
   private final Random random;
+  private boolean lastCollectWasFast;
 
   public SunManager() {
     this.suns = new ArrayList<>();
@@ -63,7 +67,7 @@ public class SunManager {
     }
   }
 
-  public Integer collectSunAt(int col, int row, Board board) {
+  public Integer collectSunAt(int col, int row, Board board, int currentTick) {
     for (Sun sun : suns) {
       if (!sun.isExpired() && Math.abs(sun.getX() - col) <= 0.5 && sun.getY() == row) {
         if (sun.getType() == model.enums.SunType.RADIOACTIVE && sun.isFalling()) {
@@ -75,10 +79,19 @@ public class SunManager {
         }
         int amount = sun.getAmount();
         sun.collect(board.getGameState());
+        lastCollectWasFast = sun.getGroundedTick() >= 0
+                && currentTick - sun.getGroundedTick() <= FAST_COLLECT_WINDOW_TICKS;
         return amount;
       }
     }
     return null;
+  }
+
+  /** آیا آخرین برداشت (فراخوانی موفق collectSunAt) در بازه‌ی زمانی "سریع" بوده؟ برای امتیاز بازی. */
+  public boolean wasLastCollectFast() {
+    boolean fast = lastCollectWasFast;
+    lastCollectWasFast = false;
+    return fast;
   }
 
   public void addSun(Sun s) {

@@ -150,6 +150,7 @@ public class Zombie {
   public int getCurrentHealth() { return currentHealth; }
   public int getMaxHealth() { return maxHealth; }
   public boolean isEating() { return isEating; }
+  public double getSpeed() { return speed; }
   public void setEating(boolean eating) { this.isEating = eating; }
   public List<Armor> getArmors() { return armors; }
 

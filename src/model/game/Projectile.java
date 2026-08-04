@@ -30,6 +30,8 @@ public class Projectile {
   private int remainingLifeTicks = -1;
 
   private final Set<Zombie> alreadyHit = new HashSet<>();
+  // چند زامبی رو همین یه تیر (پیرسینگ/strike-through) کشته؛ برای امتیاز MULTI_KILL_ONE_SHOT
+  private int killCount = 0;
 
   public Projectile(
           int damage,
@@ -124,6 +126,9 @@ public class Projectile {
     boolean ignoresArmor = (effect == ProjectileEffect.POISON);
 
     zombie.takeDamage(finalDamage, ignoresArmor);
+    if (zombie.isDead()) {
+      killCount++;
+    }
 
     if (effect == ProjectileEffect.ICE) {
       zombie.applyEffect(StatusEffect.CHILLED, 50);
@@ -159,6 +164,11 @@ public class Projectile {
 
   public int getDamage() {
     return damage;
+  }
+
+  /** چند زامبی تاحالا با همین یه شلیک کشته شده (برای امتیاز MULTI_KILL_ONE_SHOT). */
+  public int getKillCount() {
+    return killCount;
   }
 
   public void setDirection(int stepCol, int stepRow) {

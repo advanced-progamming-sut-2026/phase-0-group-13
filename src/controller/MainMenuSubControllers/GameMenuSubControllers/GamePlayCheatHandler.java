@@ -9,7 +9,6 @@ import java.util.Set;
 import model.account.User;
 import model.core.GameManager;
 import model.core.MatchSetup;
-import model.enums.ScoreEvent;
 import model.game.minigame.SpecialStageRule;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.game.zombie.Zombie;
@@ -120,8 +119,7 @@ final class GamePlayCheatHandler {
       }
     }
     System.out.println("Nuke released. Zombies wiped: " + killed);
-    if (killed >= 2) {
-      gm.registerCombatEvent(ScoreEvent.SIMULTANEOUS_KILL);
-    }
+    // امتیاز SIMULTANEOUS_KILL دیگه خودکار و عمومی از GameManager.processBoardEvents ثبت میشه
+    // (وقتی چند زامبی تو یه تیک بمیرن)، پس اینجا دیگه لازم نیست جدا صداش بزنیم
   }
 }

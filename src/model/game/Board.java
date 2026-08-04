@@ -27,6 +27,10 @@ public class Board {
   private int pendingKillCount;
   private final List<KillDetail> pendingKillDetails = new ArrayList<>();
   private int pendingPlantsLostCount;
+  private int pendingFastZombieKills;
+  private int pendingMultiKillShots;
+  // زامبی سریع‌تر از سرعت معمولی (0.0185 تایل/تیک، طبق Zombies.json) برای امتیاز KILL_FAST_ZOMBIE
+  private static final double FAST_ZOMBIE_SPEED_THRESHOLD = 0.0185;
   private final java.util.Set<Zombie> mowerVictims =
           java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
   public record KillDetail(int row, long column, boolean laneHasUnusedMower, boolean killedByMower) {}
@@ -232,6 +236,9 @@ public class Board {
         if (zombie.getBehavior() != null) {
           zombie.getBehavior().onDeath(zombie, this);
         }
+        if (zombie.getSpeed() > FAST_ZOMBIE_SPEED_THRESHOLD) {
+          pendingFastZombieKills++;
+        }
         pendingKillCount++;
         pendingKillDetails.add(new KillDetail(
                 zombie.getRow(),
@@ -260,6 +267,16 @@ public class Board {
     List<KillDetail> drained = new ArrayList<>(pendingKillDetails);
     pendingKillDetails.clear();
     return drained;
+  }
+  public int drainPendingFastZombieKills() {
+    int count = pendingFastZombieKills;
+    pendingFastZombieKills = 0;
+    return count;
+  }
+  public int drainPendingMultiKillShots() {
+    int count = pendingMultiKillShots;
+    pendingMultiKillShots = 0;
+    return count;
   }
   public void placeTileEffect(int row, int col, TileEffect effect) {
     Tile tile = getTile(row, col);
@@ -375,6 +392,10 @@ public class Board {
           if (zombiesResistIce) {
             // غارهای یخی: تیر یخی گیاهان این زامبی‌ها را یخ نمی‌زند
             zombie.extinguishFrozenStatus();
+          }
+          // فقط لحظه‌ای که همین تیر برای اولین بار به ۲ کشتار می‌رسد شمارش می‌شود (نه هر کشتار بعدی)
+          if (p.getKillCount() == 2) {
+            pendingMultiKillShots++;
           }
           hitRegistered = true;
           break;
@@ -612,8 +633,13 @@ public class Board {
     return tiles[row][col];
   }
 
-  public Integer collectSunAt(int col, int row) {
-    return sunManager.collectSunAt(col, row, this);
+  public Integer collectSunAt(int col, int row, int currentTick) {
+    return sunManager.collectSunAt(col, row, this, currentTick);
+  }
+
+  /** آیا آخرین برداشت خورشید سریع بوده؟ (برای امتیاز SPEED_SUN_COLLECT) */
+  public boolean wasLastSunCollectFast() {
+    return sunManager.wasLastCollectFast();
   }
 
   public void applyAreaDamageToZombies(int centerCol, int centerRow, int radius, int damage) {

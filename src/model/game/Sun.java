@@ -12,6 +12,9 @@ public class Sun {
   private SunType sunType;
   private boolean isCollected;
   private int fallingTicks;
+  // تیکی که این خورشید قابل‌برداشت شد (اگه از آسمون میفته، لحظه‌ی رسیدن به زمین)؛ برای امتیاز
+  // SPEED_SUN_COLLECT استفاده میشه
+  private int groundedTick = -1;
 
   public Sun(int amount, int timeToLive, SunType sunType) {
     this(amount, timeToLive, sunType, false);
@@ -36,6 +39,7 @@ public class Sun {
     if (fallingTicks > 0) {
       fallingTicks--;
       if (fallingTicks == 0) {
+        groundedTick = currentTick;
         System.out.printf(
                 "Sun reached the ground at position (%d, %d)%n", (int) x + 1, (int) y + 1);
         if (sunType == SunType.RADIOACTIVE) {
@@ -73,4 +77,7 @@ public class Sun {
   public void setType(SunType sunType) { this.sunType = sunType; }
   public boolean isFalling() { return fallingTicks > 0; }
   public void setCollected(boolean collected) { this.isCollected = collected; }
+  /** خورشیدهایی که مستقیم از گیاه تولید میشن (نه از آسمون) از همون لحظه‌ی ساخت قابل‌برداشتن. */
+  public void setGroundedTick(int tick) { if (this.groundedTick < 0) this.groundedTick = tick; }
+  public int getGroundedTick() { return groundedTick; }
 }

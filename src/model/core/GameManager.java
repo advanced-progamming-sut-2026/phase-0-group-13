@@ -107,9 +107,21 @@ public class GameManager {
       matchContext.onWaveStarted(currentWaveIndex, currentTick);
     }
 
-    for (Board.KillDetail kill : board.drainPendingKillDetails()) {
+    List<Board.KillDetail> kills = board.drainPendingKillDetails();
+    for (Board.KillDetail kill : kills) {
       matchContext.onZombieKilled(
               currentTick, (int) kill.column(), kill.laneHasUnusedMower(), kill.killedByMower());
+    }
+    if (kills.size() >= 2) {
+      registerCombatEvent(ScoreEvent.SIMULTANEOUS_KILL);
+    }
+    int fastKills = board.drainPendingFastZombieKills();
+    for (int i = 0; i < fastKills; i++) {
+      registerCombatEvent(ScoreEvent.KILL_FAST_ZOMBIE);
+    }
+    int multiKillShots = board.drainPendingMultiKillShots();
+    for (int i = 0; i < multiKillShots; i++) {
+      registerCombatEvent(ScoreEvent.MULTI_KILL_ONE_SHOT);
     }
 
     int plantsLostThisTick = board.drainPendingPlantsLostCount();
@@ -241,8 +253,13 @@ public class GameManager {
 
   public Integer collectSunAt(int col, int row) {
     if (board == null || !running) return null;
-    Integer amount = board.collectSunAt(col, row);
-    if (amount != null && amount > 0) matchContext.onSunCollected(amount);
+    Integer amount = board.collectSunAt(col, row, currentTick);
+    if (amount != null && amount > 0) {
+      matchContext.onSunCollected(amount);
+      if (board.wasLastSunCollectFast()) {
+        registerCombatEvent(ScoreEvent.SPEED_SUN_COLLECT);
+      }
+    }
     return amount;
   }
 

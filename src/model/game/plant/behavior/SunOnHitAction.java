@@ -24,6 +24,7 @@ public class SunOnHitAction implements PlantAction {
     if (damageTaken > 0) {
       Sun sun = new Sun(sunPerHit, 150, SunType.SUNFLOWER);
       sun.changinCordinate(plant.getCol(), plant.getRow());
+      sun.setGroundedTick(currentTick);
       board.addSun(sun);
     }
     lastObservedHealth = plant.getCurrentHealth();
