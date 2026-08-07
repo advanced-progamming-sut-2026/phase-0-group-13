@@ -1,1 +1,7 @@
 src/data/database/session.json
+
+# Phase 2 asset source library: bulk upstream data, ~840 MB. Not shippable and
+# not meant for version control. See docs/phase2/asset-organization.md.
+resources/raw/
+resources/_source/
+tools/pvz-libs/*.zip
