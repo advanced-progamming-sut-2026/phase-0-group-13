@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>libPVZ — Field Guide</title>
+<style>
+  :root {
+    --bg: #F3F5EC;
+    --surface: #FFFFFF;
+    --surface-2: #EAEEDF;
+    --ink: #1C2418;
+    --ink-soft: #55604E;
+    --ink-faint: #8A9480;
+    --line: #D6DCC7;
+    --accent: #2E7D42;
+    --accent-strong: #235F33;
+    --accent-ink: #FFFFFF;
+    --accent-2: #B9791F;
+    --chip-bg: #E7EEDA;
+    --code-bg: #10160D;
+    --code-ink: #D8E8CE;
+    --code-key: #8FD39F;
+    --danger: #C0522E;
+    --shadow: 0 1px 2px rgba(28,36,24,0.06), 0 6px 20px rgba(28,36,24,0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #11150E; --surface: #171C12; --surface-2: #1E2417; --ink: #E7ECDD;
+      --ink-soft: #A2AC93; --ink-faint: #6C775F; --line: #2B3421; --accent: #5FBE75;
+      --accent-strong: #7BD68D; --accent-ink: #0C130B; --accent-2: #E3AE5A;
+      --chip-bg: #1E2A1B; --danger: #E38363;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11150E; --surface: #171C12; --surface-2: #1E2417; --ink: #E7ECDD;
+    --ink-soft: #A2AC93; --ink-faint: #6C775F; --line: #2B3421; --accent: #5FBE75;
+    --accent-strong: #7BD68D; --accent-ink: #0C130B; --accent-2: #E3AE5A;
+    --chip-bg: #1E2A1B; --danger: #E38363;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 10px 24px rgba(0,0,0,0.35);
+  }
+  :root[data-theme="light"] {
+    --bg: #F3F5EC; --surface: #FFFFFF; --surface-2: #EAEEDF; --ink: #1C2418;
+    --ink-soft: #55604E; --ink-faint: #8A9480; --line: #D6DCC7; --accent: #2E7D42;
+    --accent-strong: #235F33; --accent-ink: #FFFFFF; --accent-2: #B9791F;
+    --chip-bg: #E7EEDA; --danger: #C0522E;
+    --shadow: 0 1px 2px rgba(28,36,24,0.06), 0 6px 20px rgba(28,36,24,0.05);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    font-size: 17px; line-height: 1.65; overflow-x: hidden;
+  }
+  h1, h2, h3, .eyebrow, nav { font-family: "Avenir Next", "Century Gothic", "Futura PT", "Segoe UI Semibold", "Segoe UI", Roboto, sans-serif; }
+  code, pre, .mono, .chip { font-family: ui-monospace, "Cascadia Mono", "SF Mono", "JetBrains Mono", Consolas, "Roboto Mono", monospace; }
+
+  h1, h2, h3 { text-wrap: balance; color: var(--ink); font-weight: 700; margin: 0; }
+  h1 { font-size: clamp(28px, 4vw, 38px); letter-spacing: -0.01em; }
+  h2 { font-size: 24px; letter-spacing: -0.005em; }
+  h3 { font-size: 16.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent-strong); }
+  h4 { font-family: ui-monospace, monospace; font-size: 16px; margin: 0 0 6px; color: var(--ink); font-weight: 700; }
+  p { margin: 0 0 14px; max-width: 66ch; }
+  a { color: var(--accent-strong); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .eyebrow { text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; font-weight: 600; color: var(--accent-strong); }
+
+  .page { display: grid; grid-template-columns: 250px minmax(0, 1fr); max-width: 1180px; margin: 0 auto; padding: 28px 24px 80px; gap: 40px; align-items: start; }
+  @media (max-width: 880px) { .page { grid-template-columns: 1fr; padding: 18px 16px 60px; gap: 20px; } }
+
+  .toc { position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto; padding-right: 6px; border-right: 1px solid var(--line); }
+  @media (max-width: 880px) { .toc { position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--line); padding-bottom: 12px; } }
+  .toc-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+  .toc-brand .mark { font-size: 20px; }
+  .toc-brand .name { font-weight: 700; font-size: 14px; letter-spacing: 0.01em; }
+  .toc-brand .ver { color: var(--ink-faint); font-size: 11px; }
+  .toc nav { display: flex; flex-direction: column; gap: 2px; }
+  .toc a { display: block; text-decoration: none; color: var(--ink-soft); font-size: 13.5px; padding: 5px 8px; border-radius: 4px; font-weight: 500; border-left: 2px solid transparent; }
+  .toc a.sub { padding-left: 18px; font-size: 12.5px; }
+  .toc a:hover { color: var(--ink); background: var(--surface-2); }
+  .toc a.active { color: var(--accent-strong); border-left-color: var(--accent); background: var(--chip-bg); }
+  .toc .group-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-faint); margin: 14px 0 4px; font-weight: 600; }
+
+  .content { min-width: 0; }
+  section { padding-top: 46px; scroll-margin-top: 16px; }
+  section:first-of-type { padding-top: 0; }
+  section + section { border-top: 1px solid var(--line); }
+  .section-head { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+
+  .masthead { padding-bottom: 30px; border-bottom: 1px solid var(--line); }
+  .masthead h1 { margin-top: 8px; }
+  .masthead .dek { margin-top: 10px; font-size: 17px; color: var(--ink-soft); max-width: 62ch; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--chip-bg); color: var(--accent-strong); border: 1px solid var(--line); border-radius: 100px; padding: 4px 11px; font-size: 12px; font-weight: 600; }
+  .chip.alt { color: var(--accent-2); }
+  .source-note { margin-top: 16px; font-size: 13.5px; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; max-width: 62ch; }
+  .source-note strong { color: var(--ink); }
+
+  table.spec { border-collapse: collapse; width: 100%; max-width: 620px; font-size: 14.5px; }
+  table.spec th, table.spec td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.spec th { color: var(--ink-faint); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+  table.spec td.k { font-family: ui-monospace, monospace; color: var(--accent-strong); white-space: nowrap; }
+
+  pre { background: var(--code-bg); color: var(--code-ink); border-radius: 8px; padding: 16px 18px; overflow-x: auto; font-size: 13.3px; line-height: 1.55; box-shadow: var(--shadow); max-width: 100%; }
+  pre code { font-family: inherit; }
+  .tok-str { color: #E8C878; }
+  .tok-com { color: #7C8A70; font-style: italic; }
+  .tok-kw { color: #79B8E8; }
+  .tok-cls { color: var(--code-key); }
+
+  .code-tab-label { font-size: 12px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 8px; }
+
+  .callout { border-left: 3px solid var(--accent-2); background: var(--surface); border-radius: 0 6px 6px 0; padding: 12px 16px; margin: 18px 0; max-width: 62ch; font-size: 14.5px; color: var(--ink-soft); }
+  .callout strong { color: var(--ink); }
+  .callout.warn { border-left-color: var(--danger); }
+
+  .api-card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; margin-bottom: 18px; box-shadow: var(--shadow); }
+  .api-card .kind { color: var(--ink-faint); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 8px; }
+  .api-card p { font-size: 14.5px; margin-bottom: 10px; }
+  .api-card .members { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+  .api-card .member { font-size: 13px; }
+  .api-card .member code { color: var(--ink); }
+  .api-card .member .desc { color: var(--ink-faint); font-family: "Iowan Old Style", Georgia, serif; font-size: 13.5px; }
+
+  .diagram-wrap { overflow-x: auto; margin: 18px 0 26px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); box-shadow: var(--shadow); padding: 6px; }
+  .diagram-wrap svg { display: block; min-width: 640px; width: 100%; height: auto; }
+  .dg-box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+  .dg-box.emph { stroke: var(--accent); }
+  .dg-title { font-family: "Avenir Next", "Segoe UI Semibold", sans-serif; font-weight: 700; font-size: 13px; fill: var(--ink); }
+  .dg-sub { font-family: ui-monospace, monospace; font-size: 10.5px; fill: var(--ink-soft); }
+  .dg-arrow { stroke: var(--accent); stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+  .dg-note { font-family: "Iowan Old Style", Georgia, serif; font-style: italic; font-size: 11px; fill: var(--ink-faint); }
+
+  .plain-row { display: block; margin-bottom: 14px; }
+  .plain-row .w { display: block; margin-bottom: 6px; font-weight: 700; font-family: "Avenir Next", sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent-strong); }
+  .plain-row pre { margin: 0; }
+
+  .trouble-list { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
+  .trouble-item { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }
+  .trouble-item .symptom { font-family: ui-monospace, monospace; font-size: 13px; color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); display: inline-block; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; }
+  .trouble-item p { font-size: 14.5px; margin-bottom: 6px; }
+
+  footer.page-footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-faint); }
+
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <aside class="toc">
+    <div class="toc-brand">
+      <span class="mark" aria-hidden="true">🧟</span>
+      <div>
+        <div class="name">libPVZ</div>
+        <div class="ver">field guide</div>
+      </div>
+    </div>
+    <nav id="toc-nav">
+      <a href="#overview">Overview</a>
+      <a href="#requirements">Requirements</a>
+      <a href="#asset-layout">Asset layout</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#install">Install</a>
+      <a href="#quickstart">Quick start</a>
+      <div class="group-label">Core API</div>
+      <a class="sub" href="#api-texturebank">TextureBank</a>
+      <a class="sub" href="#api-pamplayer">PamPlayer</a>
+      <a class="sub" href="#api-clipref">ClipRef</a>
+      <a class="sub" href="#api-resourceindex">ResourceIndex</a>
+      <a class="sub" href="#api-misc">AtlasLocator / Matrix2D</a>
+      <a href="#visibility">Visibility &amp; flags</a>
+      <a href="#recipes">Recipes</a>
+      <a href="#troubleshooting">Troubleshooting</a>
+      <a href="#license">License &amp; provenance</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <header class="masthead">
+      <div class="eyebrow">LibGDX · PAM animation runtime</div>
+      <h1>libPVZ, field notes for your own project</h1>
+      <p class="dek">A working reference for pulling <code>pizpizi/libPVZ</code> into a LibGDX game: the asset layout it expects, how <code>TextureBank</code> and <code>PamPlayer</code> fit together, every public class and method, and the gotchas found by actually reading the source.</p>
+      <div class="meta-row">
+        <span class="chip">v0.1.4</span>
+        <span class="chip">JDK 8+</span>
+        <span class="chip">LibGDX 1.12.1+</span>
+        <span class="chip alt">MIT license</span>
+      </div>
+      <div class="source-note">
+        <strong>How this was verified:</strong> the repository was cloned at tag <code>v0.1.4</code> and compiled locally (<code>gradlew.bat compileJava compileTestJava</code>) &mdash; that part succeeded. The bundled demo needs your own extracted Plants vs. Zombies&nbsp;2 assets to actually render anything, which weren't available in this environment, so the demo itself was read (not run) to write this guide. Every code claim below traces back to a specific line in <code>src/main/java</code>.
+      </div>
+    </header>
+
+    <section id="overview">
+      <div class="section-head"><h2>Overview</h2></div>
+      <p><strong>libPVZ</strong> is a LibGDX runtime for PopCap's PAM animation format &mdash; the skeletal/vector animation system Plants vs. Zombies&nbsp;2 uses for every plant, zombie, and effect. It does not ship any game data itself; you point it at your own extracted assets and it parses the binary <code>.PAM</code> files, bakes the hierarchy into flat per-frame quad arrays, and draws them through a normal <code>Batch</code>.</p>
+      <p>Two classes carry the whole system: <code>TextureBank</code> resolves image/atlas IDs to actual <code>Texture</code> objects from your extracted <code>resources.json</code>, and <code>PamPlayer</code> is a stateless renderer that reads and bakes <code>.PAM</code> files on a background thread and draws them by path+clip or by a cached <code>ClipRef</code> handle.</p>
+      <p>Unlike a texture atlas library, there's no way to discover valid PAM paths, clip names, or resource IDs from the API itself &mdash; you either read the extracted <code>resources.json</code> by hand or use the companion <a href="https://github.com/pizpizi/pvz-asset-browser">PvZ Asset Browser</a> tool the author built for exactly this.</p>
+    </section>
+
+    <section id="requirements">
+      <div class="section-head"><h2>Requirements</h2></div>
+      <table class="spec">
+        <thead><tr><th>Dependency</th><th>Minimum</th></tr></thead>
+        <tbody>
+          <tr><td class="k">JDK</td><td>8</td></tr>
+          <tr><td class="k">LibGDX</td><td>1.12.1</td></tr>
+          <tr><td class="k">Gradle</td><td>7.0 (the repo's own wrapper pulls Gradle 9, which needs JDK 17+ to run &mdash; see <a href="#troubleshooting">Troubleshooting</a>)</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:14px">You also need a full extracted copy of Plants vs. Zombies&nbsp;2's assets on disk. libPVZ ships zero game data &mdash; nothing to add, nothing to license-check on the library's side; the obligation is entirely on how you sourced your own assets.</p>
+    </section>
+
+    <section id="asset-layout">
+      <div class="section-head"><h2>Asset layout libPVZ expects</h2><p class="cat-intro" style="font-size:14.5px;color:var(--ink-soft)">This is the single most important prerequisite &mdash; both constructors below fail immediately if the folder doesn't look like this.</p></div>
+      <pre><code>&lt;assets folder&gt;/
+├── resources.json          <span class="tok-com">(or RESOURCES.json)</span>   &larr; required by TextureBank
+├── atlases/                <span class="tok-com">(or ATLASES/)</span>        &larr; required by TextureBank, holds the atlas .png files
+└── pam/                    <span class="tok-com">(or IMAGES/)</span>         &larr; required by PamPlayer, holds the .PAM files</code></pre>
+      <p>Each pair is a fallback, checked in that order (lower-case first, then the fully-capitalized variant) &mdash; that's <code>TextureBank</code> and <code>PamPlayer</code>'s constructors probing for both the raw game extraction layout (usually upper-case) and a manually-renamed one. Note this fallback is a single fixed check, not a case-insensitive search: on a case-sensitive filesystem (Linux/macOS), a folder named e.g. <code>Atlases</code> matches neither and will fail.</p>
+      <div class="callout warn">
+        <strong>The two fallbacks are independent.</strong> You can end up with <code>resources.json</code> lower-case but <code>ATLASES/</code> upper-case, if that's how your extraction tool produced them &mdash; each constructor checks its own pair, not a consistent casing across the whole folder.
+      </div>
+      <p>PAM paths passed to <code>PamPlayer</code> (e.g. <code>player.draw(batch, "ZOMBIES/PEASANT/PEASANT.PAM", ...)</code>) are relative to whichever of <code>pam/</code> or <code>IMAGES/</code> was found &mdash; so that path really resolves to <code>&lt;assets&gt;/pam/ZOMBIES/PEASANT/PEASANT.PAM</code> (or the <code>IMAGES/</code> equivalent).</p>
+      <p><code>TextureBank</code>'s <code>resolution</code> constructor argument (e.g. <code>"768"</code>) must match a <code>"res"</code> value used inside the groups of your <code>resources.json</code> &mdash; it's how the library picks the right variant when the same image exists at multiple resolutions. Groups with no <code>"res"</code> tag at all are always kept as a fallback (score 1), so an unmatched resolution silently falls back to those rather than failing outright.</p>
+    </section>
+
+    <section id="architecture">
+      <div class="section-head"><h2>Architecture</h2></div>
+      <p>Two independent systems that share the same background-loading pattern: <code>TextureBank</code> resolves images/atlases, <code>PamPlayer</code> resolves and bakes animation files. <code>PamPlayer</code> asks <code>TextureBank</code> for the atlases a given animation needs, but never touches raw PNGs itself.</p>
+      <div class="diagram-wrap">
+        <svg viewBox="0 0 980 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Data flow: assets folder feeds ResourceIndex and AtlasLocator inside TextureBank; PamPlayer's background worker parses PAM files and bakes them using TextureBank's regions; your render loop draws via Batch and must call textures.update() every frame.">
+          <defs>
+            <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="var(--accent)"></path>
+            </marker>
+          </defs>
+
+          <rect class="dg-box" x="20" y="150" width="150" height="70" rx="6"></rect>
+          <text class="dg-title" x="95" y="180" text-anchor="middle">Assets folder</text>
+          <text class="dg-sub" x="95" y="198" text-anchor="middle">resources.json · atlases/ · pam/</text>
+
+          <rect class="dg-box" x="230" y="40" width="220" height="90" rx="6"></rect>
+          <text class="dg-title" x="340" y="68" text-anchor="middle">ResourceIndex</text>
+          <text class="dg-sub" x="340" y="86" text-anchor="middle">image/atlas id &rarr; atlas + pixel rect</text>
+          <text class="dg-sub" x="340" y="104" text-anchor="middle">parsed once, in TextureBank's ctor</text>
+
+          <rect class="dg-box" x="230" y="250" width="220" height="90" rx="6"></rect>
+          <text class="dg-title" x="340" y="278" text-anchor="middle">AtlasLocator</text>
+          <text class="dg-sub" x="340" y="296" text-anchor="middle">atlas id &rarr; .png FileHandle</text>
+          <text class="dg-sub" x="340" y="314" text-anchor="middle">scans atlases/ once at startup</text>
+
+          <rect class="dg-box emph" x="510" y="145" width="200" height="130" rx="6"></rect>
+          <text class="dg-title" x="610" y="172" text-anchor="middle">TextureBank</text>
+          <text class="dg-sub" x="610" y="190" text-anchor="middle">AssetManager-backed</text>
+          <text class="dg-sub" x="610" y="206" text-anchor="middle">region(id) / atlas(id)</text>
+          <text class="dg-sub" x="610" y="222" text-anchor="middle">loadSync / loadAsync</text>
+          <text class="dg-sub" x="610" y="238" text-anchor="middle">update() &mdash; call every frame</text>
+
+          <rect class="dg-box emph" x="770" y="30" width="190" height="140" rx="6"></rect>
+          <text class="dg-title" x="865" y="58" text-anchor="middle">PamPlayer</text>
+          <text class="dg-sub" x="865" y="76" text-anchor="middle">1 daemon worker thread:</text>
+          <text class="dg-sub" x="865" y="92" text-anchor="middle">parse .PAM &rarr; BakedAnimation</text>
+          <text class="dg-sub" x="865" y="108" text-anchor="middle">finalizes on GL thread</text>
+          <text class="dg-sub" x="865" y="124" text-anchor="middle">via Gdx.app.postRunnable</text>
+          <text class="dg-sub" x="865" y="148" text-anchor="middle">draw(...) / getClip(...)</text>
+
+          <rect class="dg-box" x="770" y="250" width="190" height="90" rx="6"></rect>
+          <text class="dg-title" x="865" y="278" text-anchor="middle">Your render loop</text>
+          <text class="dg-sub" x="865" y="296" text-anchor="middle">textures.update()</text>
+          <text class="dg-sub" x="865" y="312" text-anchor="middle">player.draw(batch, clip, time, x, y, loop)</text>
+
+          <path class="dg-arrow" d="M170,175 L230,110"></path>
+          <path class="dg-arrow" d="M170,195 L230,280"></path>
+          <path class="dg-arrow" d="M450,90 L510,175"></path>
+          <path class="dg-arrow" d="M450,300 L510,220"></path>
+          <path class="dg-arrow" d="M710,190 L770,150"></path>
+          <path class="dg-arrow" d="M865,170 L865,250"></path>
+          <path class="dg-arrow" d="M770,300 L710,240"></path>
+
+          <text class="dg-note" x="610" y="285" text-anchor="middle">atlas textures fetched via</text>
+          <text class="dg-note" x="610" y="300" text-anchor="middle">textures.region() during bake</text>
+        </svg>
+      </div>
+      <p>Everything the worker thread produces is only ever handed off to the GL thread through <code>Gdx.app.postRunnable</code>, so <code>PamPlayer</code>'s public methods are safe to call from <code>render()</code> without extra synchronization on your end &mdash; but that also means a freshly-referenced animation renders nothing for a few frames while it loads. See <a href="#recipes">Recipes</a> for preloading it away.</p>
+    </section>
+
+    <section id="install">
+      <div class="section-head"><h2>Install</h2></div>
+      <div class="code-tab-label">build.gradle · Groovy DSL</div>
+      <pre><code>repositories {
+    mavenCentral()
+    maven { <span class="tok-kw">url</span> <span class="tok-str">'https://jitpack.io'</span> }
+}
+
+dependencies {
+    api <span class="tok-str">"com.github.pizpizi:libPVZ:v0.1.4"</span>
+}</code></pre>
+      <p style="margin-top:14px">That's the entire dependency graph &mdash; libPVZ only depends on core <code>gdx</code> (declared <code>api</code> in its own build, so it flows through to you automatically). No TenPatch, no FreeType, nothing extra to add for the library itself.</p>
+      <div class="callout">
+        <strong>Your launcher module still needs LibGDX's usual desktop natives</strong> &mdash; <code>gdx-backend-lwjgl3</code> and <code>gdx-platform:...:natives-desktop</code> (or your target platform's equivalents). That's standard LibGDX setup, unrelated to this library.
+      </div>
+    </section>
+
+    <section id="quickstart">
+      <div class="section-head"><h2>Quick start</h2></div>
+      <p>Trimmed from the repo's own <code>Demo.java</code> (<code>src/test/java/pvz/demo/Demo.java</code>) down to the essentials: load one animation, play its first clip, loop forever.</p>
+      <pre><code><span class="tok-kw">package</span> com.example.game;
+
+<span class="tok-kw">import</span> com.badlogic.gdx.ApplicationAdapter;
+<span class="tok-kw">import</span> com.badlogic.gdx.Gdx;
+<span class="tok-kw">import</span> com.badlogic.gdx.files.FileHandle;
+<span class="tok-kw">import</span> com.badlogic.gdx.graphics.OrthographicCamera;
+<span class="tok-kw">import</span> com.badlogic.gdx.graphics.g2d.SpriteBatch;
+<span class="tok-kw">import</span> com.badlogic.gdx.utils.ScreenUtils;
+<span class="tok-kw">import</span> pvz.libpvz.pam.ClipRef;
+<span class="tok-kw">import</span> pvz.libpvz.pam.PamPlayer;
+<span class="tok-kw">import</span> pvz.libpvz.textures.TextureBank;
+
+<span class="tok-kw">public class</span> <span class="tok-cls">MyGame</span> <span class="tok-kw">extends</span> ApplicationAdapter {
+    <span class="tok-kw">private static final</span> String PAM = <span class="tok-str">"ZOMBIES/PEASANT/PEASANT.PAM"</span>;
+
+    <span class="tok-kw">private</span> TextureBank textures;
+    <span class="tok-kw">private</span> PamPlayer player;
+    <span class="tok-kw">private</span> SpriteBatch batch;
+    <span class="tok-kw">private</span> OrthographicCamera camera;
+    <span class="tok-kw">private</span> ClipRef idle;
+    <span class="tok-kw">private float</span> stateTime;
+
+    <span class="tok-com">@Override</span>
+    <span class="tok-kw">public void</span> create() {
+        batch = <span class="tok-kw">new</span> SpriteBatch();
+        camera = <span class="tok-kw">new</span> OrthographicCamera(1280, 720);
+        camera.position.set(0, 0, 0);
+        camera.update();
+
+        FileHandle assets = Gdx.files.absolute(<span class="tok-str">"/path/to/Base Assets"</span>);
+        textures = <span class="tok-kw">new</span> TextureBank(<span class="tok-str">"768"</span>, assets);
+        player = <span class="tok-kw">new</span> PamPlayer(textures, assets);
+
+        <span class="tok-com">// Blocks until the .PAM and its atlases are parsed and uploaded --
+        // fine at load time, avoid it inside render().</span>
+        player.loadSync(PAM);
+        idle = player.getClip(PAM, <span class="tok-str">"idle"</span>);
+    }
+
+    <span class="tok-com">@Override</span>
+    <span class="tok-kw">public void</span> render() {
+        stateTime += Gdx.graphics.getDeltaTime();
+        ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1f);
+
+        <span class="tok-com">// Required every frame: drains TextureBank's AssetManager queue.</span>
+        textures.update();
+
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+        player.draw(batch, idle, stateTime, 0, 0, <span class="tok-kw">true</span>);
+        batch.end();
+    }
+
+    <span class="tok-com">@Override</span>
+    <span class="tok-kw">public void</span> dispose() {
+        batch.dispose();
+        textures.dispose();
+    }
+}</code></pre>
+      <p>To run the repo's own interactive demo instead of writing your own: set <code>-Dpvz.assets=/path/to/Base Assets</code> (and optionally <code>-Dpvz.pam=...</code>) and run <code>gradlew.bat runDemo</code> from the repo root &mdash; see <a href="#troubleshooting">Troubleshooting</a> for the JDK caveat that applies to the wrapper itself.</p>
+    </section>
+
+    <section id="core-api">
+      <div class="section-head"><h2>Core API</h2><p style="font-size:14.5px;color:var(--ink-soft)">Five public classes across two packages: <code>pvz.libpvz</code> and <code>pvz.libpvz.{pam,textures}</code>. <code>PamData</code>, <code>PamBinaryReader</code>, and <code>BakedAnimation</code> are package-private &mdash; internal, not part of the API surface.</p></div>
+
+      <div class="api-card" id="api-texturebank">
+        <h4>TextureBank <span class="kind">implements Disposable</span></h4>
+        <p>Owns an internal <code>AssetManager</code> and resolves image/atlas resource IDs (strings from <code>resources.json</code>) into loaded LibGDX <code>Texture</code>/<code>TextureRegion</code> objects.</p>
+        <pre><code>TextureBank(String resolution, FileHandle assetsFolder)</code></pre>
+        <div class="members">
+          <div class="member"><code>TextureRegion region(String imageResourceId)</code> <span class="desc">— a sub-rect of its atlas; loads+caches the atlas synchronously on first call</span></div>
+          <div class="member"><code>TextureRegion atlas(String atlasId)</code> <span class="desc">— the whole atlas texture, e.g. for debugging</span></div>
+          <div class="member"><code>void loadSync(String atlasId)</code> / <code>void loadAsync(String atlasId, Runnable cb)</code></div>
+          <div class="member"><code>void update()</code> <span class="desc">— drains the AssetManager queue; call every frame, unconditionally</span></div>
+          <div class="member"><code>void unloadAtlas(String atlasId)</code> <span class="desc">— disposes one atlas texture and its cached regions</span></div>
+          <div class="member"><code>FileHandle atlasFile(String atlasId)</code> <span class="desc">— the resolved .png FileHandle on disk</span></div>
+          <div class="member"><code>int exportAtlasParts(String atlasId, FileHandle outDir)</code> <span class="desc">— slices every image in an atlas out to individual PNGs</span></div>
+          <div class="member"><code>int exportImage(String imageId, FileHandle outDir)</code> <span class="desc">— see the caveat in <a href="#troubleshooting">Troubleshooting</a></span></div>
+          <div class="member"><code>ResourceIndex getResourceIndex()</code> <span class="desc">— same as <code>resourceIndex()</code>, both exist</span></div>
+          <div class="member"><code>int loadedTextureCount()</code></div>
+        </div>
+        <p style="margin-top:6px">Resolution loading is lazy: nothing is fetched until the first <code>region()</code>/<code>atlas()</code>/<code>loadSync</code>/<code>loadAsync</code> call for that atlas. <code>region()</code> and the plain <code>atlas()</code> call block synchronously the first time; use <code>loadAsync</code> ahead of time if you want to avoid a hitch.</p>
+      </div>
+
+      <div class="api-card" id="api-pamplayer">
+        <h4>PamPlayer</h4>
+        <p>Stateless per-call renderer with an internal cache. One instance can draw the same or different animations at as many positions as you want &mdash; nothing about a draw call mutates shared state other than the load caches.</p>
+        <pre><code>PamPlayer(TextureBank textures, FileHandle assetsFolder)</code></pre>
+        <div class="members">
+          <div class="member"><code>void draw(Batch, String pam, String clip, float time, float x, float y, boolean loop)</code></div>
+          <div class="member"><code>void draw(..., Map&lt;String,Boolean&gt; partsVisibility)</code> <span class="desc">— overload with per-part show/hide</span></div>
+          <div class="member"><code>void drawPart(Batch, String pam, String clip, float time, float x, float y, String part)</code> <span class="desc">— draws only that named part (and its descendants); always loops regardless of the caller</span></div>
+          <div class="member"><code>ClipRef getClip(String pam, String clip)</code> <span class="desc">— null until the animation has finished baking; poll or use <code>loadAsync</code>'s callback</span></div>
+          <div class="member"><code>void draw(Batch, ClipRef, float time, float x, float y, boolean loop[, Map&lt;String,Boolean&gt;])</code> <span class="desc">— the fast path, no string lookups at all</span></div>
+          <div class="member"><code>List&lt;String&gt; clips(String pam)</code> <span class="desc">— loads synchronously if not cached yet</span></div>
+          <div class="member"><code>Rectangle bounds(String pam[, String clip])</code> <span class="desc">— local-space bounding box, loads synchronously</span></div>
+          <div class="member"><code>float clipDurationSeconds(String pam, String clip)</code></div>
+          <div class="member"><code>void loadSync(String pam)</code> <span class="desc">— blocks the calling thread until parsed, baked, and textures uploaded</span></div>
+          <div class="member"><code>void loadAsync(String pam, Runnable onLoaded)</code> <span class="desc">— callback fires on the GL thread</span></div>
+        </div>
+        <p style="margin-top:6px">Every <code>draw(...)</code> overload silently no-ops (draws nothing, throws nothing) if the animation hasn't finished loading yet. That's <code>bakedAsync</code>'s contract: it triggers a background load and returns immediately.</p>
+      </div>
+
+      <div class="api-card" id="api-clipref">
+        <h4>ClipRef <span class="kind">final</span></h4>
+        <p>An opaque handle returned by <code>getClip(...)</code>. Its only public member is <code>duration</code> (the clip's length in seconds, precomputed as <code>frameCount / frameRate</code>) &mdash; useful for detecting when a non-looping clip has finished, exactly as the demo does. Obtain it once (ideally at load time) and reuse it every frame instead of calling <code>draw(Batch, String, String, ...)</code> in a hot loop.</p>
+      </div>
+
+      <div class="api-card" id="api-resourceindex">
+        <h4>ResourceIndex</h4>
+        <p>Parses <code>resources.json</code> once, at <code>TextureBank</code> construction. Get it via <code>textures.getResourceIndex()</code>.</p>
+        <div class="members">
+          <div class="member"><code>ImageEntry image(String id)</code> <span class="desc">— fields: id, atlasId, path, ax, ay, aw, ah (atlas-space pixel rect)</span></div>
+          <div class="member"><code>AtlasEntry atlas(String id)</code> <span class="desc">— fields: id, path, width, height</span></div>
+          <div class="member"><code>boolean isAnimationAtlas(String atlasId)</code> <span class="desc">— true if any PopAnim resource shares this atlas's parent group</span></div>
+          <div class="member"><code>Set&lt;String&gt; imageIds()</code> / <code>Set&lt;String&gt; atlasIds()</code></div>
+          <div class="member"><code>List&lt;String&gt; getImagesForAtlas(String atlasId)</code></div>
+          <div class="member"><code>String preferredResolution()</code> / <code>int imageCount()</code> / <code>int atlasCount()</code></div>
+        </div>
+        <p style="margin-top:6px">When the same resource ID appears in multiple resolution groups, the one matching your requested resolution wins; if none match, the highest-scoring untagged group is used instead of failing.</p>
+      </div>
+
+      <div class="api-card" id="api-misc">
+        <h4>AtlasLocator <span class="kind">·</span> Matrix2D</h4>
+        <p><strong>AtlasLocator</strong> is constructed internally by <code>TextureBank</code> (you'll rarely touch it directly) &mdash; it scans the atlases folder once and maps each PNG's base filename to its <code>FileHandle</code>, case-insensitively. Its constructor throws <code>IllegalArgumentException</code> immediately if the folder doesn't exist, which is usually the very first error you'll see from a misconfigured asset path.</p>
+        <p><strong>Matrix2D</strong> is a plain 2D affine transform (<code>a, b, c, d, tx, ty</code>, all public fields) used internally to bake the PAM hierarchy. It's public but there's normally no reason to construct one yourself.</p>
+      </div>
+    </section>
+
+    <section id="visibility">
+      <div class="section-head"><h2>Visibility &amp; flags</h2></div>
+      <p>Some parts are hidden by default based on their <em>name</em>, not an explicit flag in the file. A part's name is checked once at bake time against these rules (from <code>BakedAnimation.Part</code>):</p>
+      <table class="spec">
+        <thead><tr><th>Name match</th><th>Hidden unless whitelisted</th></tr></thead>
+        <tbody>
+          <tr><td class="k">equals "butter"</td><td>yes</td></tr>
+          <tr><td class="k">equals "ink"</td><td>yes</td></tr>
+          <tr><td class="k">contains "armor"</td><td>yes</td></tr>
+          <tr><td class="k">contains "custom"</td><td>yes</td></tr>
+          <tr><td class="k">equals "ground_swatch"</td><td>yes</td></tr>
+          <tr><td class="k">equals "ground_swatch_plane"</td><td>yes</td></tr>
+          <tr><td class="k">contains "arm_outer_upper_bone"</td><td>yes</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:14px">The README documents the first five; the arm-bone rule isn't mentioned there but is real (<code>BakedAnimation.Part.computeFlags</code>). To reveal a hidden part, put its exact name in the visibility map passed to <code>draw(...)</code> with value <code>true</code> &mdash; the map only needs entries for parts you want to <em>override</em> — everything else follows its default.</p>
+    </section>
+
+    <section id="recipes">
+      <div class="section-head"><h2>Recipes</h2></div>
+
+      <h3>Preload during a loading screen, draw with ClipRef in gameplay</h3>
+      <pre><code><span class="tok-com">// Loading screen -- fine to block here</span>
+player.loadSync(<span class="tok-str">"ZOMBIES/PEASANT/PEASANT.PAM"</span>);
+ClipRef walk = player.getClip(<span class="tok-str">"ZOMBIES/PEASANT/PEASANT.PAM"</span>, <span class="tok-str">"walk"</span>);
+
+<span class="tok-com">// render() -- zero string lookups per frame</span>
+player.draw(batch, walk, stateTime, x, y, <span class="tok-kw">true</span>);</code></pre>
+
+      <h3>Stream in an animation without a loading-screen stall</h3>
+      <pre><code>player.loadAsync(<span class="tok-str">"ZOMBIES/PEASANT/PEASANT.PAM"</span>, () -&gt; {
+    zombieClip = player.getClip(<span class="tok-str">"ZOMBIES/PEASANT/PEASANT.PAM"</span>, <span class="tok-str">"walk"</span>);
+});
+<span class="tok-com">// until the callback fires, draw(batch, "ZOMBIES/...", "walk", ...) is a
+// safe no-op -- nothing is drawn, nothing throws.</span></code></pre>
+
+      <h3>Show armor for one instance, butter for another</h3>
+      <pre><code>Map&lt;String, Boolean&gt; armored = <span class="tok-kw">new</span> HashMap&lt;&gt;();
+armored.put(<span class="tok-str">"_zombie_egypt_armor2_states"</span>, <span class="tok-kw">true</span>);
+armored.put(<span class="tok-str">"zombie_armor_bucket_norm"</span>, <span class="tok-kw">true</span>);
+
+Map&lt;String, Boolean&gt; buttered = <span class="tok-kw">new</span> HashMap&lt;&gt;();
+buttered.put(<span class="tok-str">"butter"</span>, <span class="tok-kw">true</span>);
+
+player.draw(batch, clipRef, stateTime, 0, -200, <span class="tok-kw">true</span>, armored);
+player.draw(batch, clipRef, stateTime, 0,  200, <span class="tok-kw">true</span>, buttered);</code></pre>
+
+      <h3>Frame a clip with a camera, using its real bounding box</h3>
+      <pre><code>Rectangle bounds = player.bounds(<span class="tok-str">"ZOMBIES/PEASANT/PEASANT.PAM"</span>, <span class="tok-str">"idle"</span>);
+<span class="tok-com">// bounds is centered on the animation's local origin -- offset by
+// your draw position (x, y) to get world-space framing.</span>
+camera.position.set(x + bounds.x + bounds.width / 2f, y + bounds.y + bounds.height / 2f, 0);</code></pre>
+
+      <h3>Dump an atlas to individual PNGs for inspection</h3>
+      <pre><code>ResourceIndex index = textures.getResourceIndex();
+<span class="tok-kw">int</span> exported = textures.exportAtlasParts(<span class="tok-str">"ATLAS_ZOMBIE_EGYPT_BASIC"</span>, Gdx.files.local(<span class="tok-str">"debug-export"</span>));
+Gdx.app.log(<span class="tok-str">"MyGame"</span>, exported + <span class="tok-str">" images written"</span>);</code></pre>
+      <p style="font-size:14.5px;color:var(--ink-soft)">Prefer this over <code>exportImage(String, FileHandle)</code> for a single image too &mdash; see the known bug in <a href="#troubleshooting">Troubleshooting</a>.</p>
+
+      <h3>Play a one-shot clip, then fall back to idle</h3>
+      <p style="font-size:14.5px;color:var(--ink-soft)"><code>ClipRef.duration</code> is exactly what makes this cheap &mdash; no need to ask <code>PamPlayer</code> anything mid-animation.</p>
+      <pre><code>ClipRef idle, attack;
+<span class="tok-kw">boolean</span> attacking = <span class="tok-kw">false</span>;
+<span class="tok-kw">float</span> stateTime = 0f;
+
+<span class="tok-com">// on the attack trigger:</span>
+attacking = <span class="tok-kw">true</span>;
+stateTime = 0f;
+
+<span class="tok-com">// render():</span>
+stateTime += Gdx.graphics.getDeltaTime();
+ClipRef current = attacking ? attack : idle;
+<span class="tok-com">// don't loop the attack -- we want it to reach its last frame and stop there</span>
+player.draw(batch, current, stateTime, x, y, !attacking);
+
+<span class="tok-kw">if</span> (attacking && stateTime &gt;= attack.duration) {
+    attacking = <span class="tok-kw">false</span>;
+    stateTime = 0f;
+}</code></pre>
+
+      <h3>Render a single part in isolation (e.g. a UI portrait)</h3>
+      <pre><code><span class="tok-com">// Draws only the "head" node and anything parented under it -- everything
+// else in the hierarchy is skipped. Note drawPart always loops internally
+// regardless of what you'd normally pass, so a free-running stateTime is fine.</span>
+player.drawPart(batch, <span class="tok-str">"ZOMBIES/PEASANT/PEASANT.PAM"</span>, <span class="tok-str">"idle"</span>, stateTime, iconX, iconY, <span class="tok-str">"head"</span>);</code></pre>
+
+      <h3>Draw a plain icon straight from the atlas, no PAM involved</h3>
+      <p style="font-size:14.5px;color:var(--ink-soft)">For HUD art that's a static image rather than an animation &mdash; <code>TextureBank</code> works standalone here, <code>PamPlayer</code> isn't involved at all.</p>
+      <pre><code>TextureRegion coinIcon = textures.region(<span class="tok-str">"IMAGE_REWARD_COIN_SILVER"</span>);
+<span class="tok-kw">if</span> (coinIcon != <span class="tok-kw">null</span>) {
+    batch.draw(coinIcon, hudX, hudY);
+}</code></pre>
+
+      <h3>Load a whole roster before revealing the level-select screen</h3>
+      <pre><code>List&lt;String&gt; roster = Arrays.asList(
+    <span class="tok-str">"ZOMBIES/PEASANT/PEASANT.PAM"</span>,
+    <span class="tok-str">"ZOMBIES/CONEHEAD/CONEHEAD.PAM"</span>,
+    <span class="tok-str">"ZOMBIES/BUCKETHEAD/BUCKETHEAD.PAM"</span>
+);
+AtomicInteger remaining = <span class="tok-kw">new</span> AtomicInteger(roster.size());
+<span class="tok-kw">boolean</span>[] ready = { <span class="tok-kw">false</span> };
+
+<span class="tok-kw">for</span> (String pam : roster) {
+    player.loadAsync(pam, () -&gt; {
+        <span class="tok-kw">if</span> (remaining.decrementAndGet() == 0) {
+            ready[0] = <span class="tok-kw">true</span>; <span class="tok-com">// safe to flip to the level-select screen now</span>
+        }
+    });
+}</code></pre>
+
+      <h3>Free memory when leaving a level</h3>
+      <p style="font-size:14.5px;color:var(--ink-soft)"><code>TextureBank.unloadAtlas(...)</code> is the only eviction hook in the library. <code>PamPlayer</code> caches parsed/baked PAMs (<code>animationByPath</code>, <code>bakedByPath</code>) in private fields with no public eviction method at all &mdash; the only way to release that memory is to stop referencing the <code>PamPlayer</code> instance itself (e.g. create a fresh one per level) and let it be garbage collected.</p>
+      <pre><code><span class="tok-com">// Drops one atlas's Texture and its cached regions immediately.</span>
+textures.unloadAtlas(<span class="tok-str">"ATLAS_ZOMBIE_EGYPT_BASIC"</span>);
+
+<span class="tok-com">// To also drop parsed/baked PAM data, discard the PamPlayer itself --
+// there's no unload(pam) equivalent on that side.</span>
+player = <span class="tok-kw">new</span> PamPlayer(textures, assetsFolder);</code></pre>
+    </section>
+
+    <section id="troubleshooting">
+      <div class="section-head"><h2>Troubleshooting</h2><p style="font-size:14.5px;color:var(--ink-soft)">Confirmed by reading the source or reproducing directly, except where marked as a standard LibGDX/Gradle issue.</p></div>
+      <div class="trouble-list">
+
+        <div class="trouble-item">
+          <div class="symptom">exportImage(id, dir) always returns 0</div>
+          <p><strong>Real bug, reproduced by reading the source.</strong> <code>TextureBank.exportImage</code> filters its loop with <code>if (image != imageId) continue;</code> &mdash; a reference comparison on <code>String</code>, not <code>.equals(...)</code>. The loop variable comes from <code>resourceIndex.imageIds()</code> (fresh strings parsed out of JSON); the <code>imageId</code> you pass in is essentially never the same object instance, so the condition is true on every iteration and nothing gets written.</p>
+          <p><strong>Workaround:</strong> use <code>exportAtlasParts(atlasId, outDir)</code> instead and pick the one file you need out of the output directory &mdash; it uses a correct <code>.equals()</code> comparison internally.</p>
+        </div>
+
+        <div class="trouble-item">
+          <div class="symptom">IllegalArgumentException: ATLASES directory not found</div>
+          <p>Thrown by <code>AtlasLocator</code>'s constructor &mdash; neither <code>atlases/</code> nor <code>ATLASES/</code> exists directly under the folder you passed to <code>TextureBank</code>. Double-check you're pointing at the root of your extracted assets, not a subfolder, and check case if you're on Linux/macOS (see <a href="#asset-layout">Asset layout</a>).</p>
+        </div>
+
+        <div class="trouble-item">
+          <div class="symptom">Nothing draws, no exception at all</div>
+          <p>Two common causes, both silent by design: (1) the animation is still on its background load &mdash; every <code>draw(...)</code> overload no-ops until baking finishes; (2) you forgot to call <code>textures.update()</code> every frame, so the atlas texture never finishes uploading even after the PAM itself is parsed and baked.</p>
+        </div>
+
+        <div class="trouble-item">
+          <div class="symptom">IllegalArgumentException: Unknown clip 'x'; available clips: [...]</div>
+          <p>Not really a bug &mdash; <code>BakedAnimation.range(...)</code> throws this deliberately, and it lists every valid clip name for that PAM in the message itself. Usually means a typo, or you assumed a clip existed that this particular character doesn't have.</p>
+        </div>
+
+        <div class="trouble-item">
+          <div class="symptom">IllegalArgumentException: Not a PAM file (magic 0x...)</div>
+          <p><code>PamBinaryReader</code> checks a fixed magic number (<code>0xBAF01954</code>) as the first 4 bytes. This means the path resolved to something that isn't a <code>.PAM</code> file at all &mdash; often a sign the <code>pam</code>/<code>IMAGES</code> path was built wrong (see <a href="#asset-layout">Asset layout</a>) and you're reading an unrelated file.</p>
+        </div>
+
+        <div class="trouble-item">
+          <div class="symptom">IllegalArgumentException: Unsupported PAM version</div>
+          <p>The reader caps out at version 6 (<code>PamBinaryReader.MAX_VERSION</code>). Assets pulled from a much newer game build than this library was written against could exceed that.</p>
+        </div>
+
+        <div class="trouble-item">
+          <div class="symptom">SSLException: trustAnchors parameter must be non-empty <span style="opacity:.6;font-weight:400">(environment, not this repo)</span></div>
+          <p>Same root cause as pvz-skin's field guide: <code>gradlew.bat</code> needs a JDK with an intact <code>cacerts</code> truststore to download Gradle 9 in the first place. If <code>JAVA_HOME</code> points at a broken/portable JDK, point it at a real one first:</p>
+          <pre><code><span class="tok-com">:: Windows cmd</span>
+set JAVA_HOME=C:\path\to\jdk-17
+gradlew.bat compileJava</code></pre>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="license">
+      <div class="section-head"><h2>License &amp; provenance</h2></div>
+      <p>MIT-licensed. The README states it's an unofficial, fan-made project, not affiliated with PopCap Games or Electronic Arts, and that no game assets are distributed with it.</p>
+      <div class="callout">
+        <strong>This one checks out.</strong> Unlike <code>pvz-skin</code> from the same author (which bundles an extracted texture atlas and font files despite a similar disclaimer), this repository's <code>src/main</code> contains only parsing and rendering code &mdash; no resources folder, no extracted images, no fonts. The "bring your own assets" claim is accurate here.
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      Compiled from <code>github.com/pizpizi/libPVZ</code> at tag <code>v0.1.4</code> &middot; verified by cloning and running <code>gradlew.bat compileJava compileTestJava</code> locally with a JDK 17 override.
+    </footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('#toc-nav a'));
+  var sections = links.map(function (a) { return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  links.forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var target = document.querySelector(a.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      history.replaceState(null, '', a.getAttribute('href'));
+    });
+  });
+
+  if ('IntersectionObserver' in window) {
+    var current = null;
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          var id = '#' + entry.target.id;
+          if (current) current.classList.remove('active');
+          current = links.find(function (a) { return a.getAttribute('href') === id; });
+          if (current) current.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-10% 0px -70% 0px', threshold: 0 });
+    sections.forEach(function (s) { observer.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

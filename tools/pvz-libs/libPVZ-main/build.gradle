@@ -1,0 +1,45 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+ext { gdxVersion = '1.12.1' }
+repositories {
+    maven { url 'https://maven.myket.ir' }
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+dependencies {
+    api "com.badlogicgames.gdx:gdx:${gdxVersion}"
+    
+    // Test dependencies for the smoke test playground
+    testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:${gdxVersion}"
+    testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:${gdxVersion}:natives-desktop"
+}
+
+tasks.register('runDemo', JavaExec) {
+    group = 'verification'
+    description = 'Runs the standalone libpvz playground demo'
+    mainClass = 'pvz.demo.Demo'
+    classpath = sourceSets.test.runtimeClasspath
+    
+    // Forward any -Dpvz.* properties from Gradle to the running application
+    systemProperties System.getProperties()
+    
+    jvmArgs = [
+        '--enable-native-access=ALL-UNNAMED',
+        '-Dorg.lwjgl.system.JNINativeInterfaceSize=233'
+    ]
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}

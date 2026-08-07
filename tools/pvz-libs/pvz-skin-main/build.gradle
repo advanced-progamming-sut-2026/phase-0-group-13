@@ -1,0 +1,40 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+ext { 
+    gdxVersion = '1.12.1' 
+    tenPatchVersion = '5.2.3'
+}
+repositories {
+    maven { url 'https://maven.myket.ir' }
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+dependencies {
+    api "com.badlogicgames.gdx:gdx:${gdxVersion}"
+    api "com.badlogicgames.gdx:gdx-freetype:${gdxVersion}"
+    api "com.github.raeleus.TenPatch:tenpatch:${tenPatchVersion}"
+
+    testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:${gdxVersion}"
+    testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:${gdxVersion}:natives-desktop"
+    testRuntimeOnly "com.badlogicgames.gdx:gdx-freetype-platform:${gdxVersion}:natives-desktop"
+}
+
+tasks.register('generatePreviews', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'pvz.skin.SkinPreviewGenerator'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
