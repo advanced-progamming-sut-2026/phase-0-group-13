@@ -94,9 +94,15 @@ Three new types in `view.gdx.assets`, wired to nothing:
 2. **PAM decoding.** `.PAM` is a PopCap format libGDX cannot read. Either decode it (the
    `tools/pvz-libs/libPVZ-main.zip` sources are a starting point) or bake the clips listed in
    `animations.json` into flat frame sequences at build time.
-3. **Skin path collision.** `PvzSkin.get()` loads `Gdx.files.classpath("skin/pvz2_skin.json")`
-   from inside the JitPack jar. Copying `resources/skin/` into `assets/skin/` would put a second
-   file at the same classpath location — pick one source, not both.
+3. ~~**Skin path collision.**~~ **Settled: `resources/skin/` wins, the jar is not used.** The
+   published `pvz-skin` v0.1.0 is an older export — it has no `CheckBox` or `SelectBox` style and
+   splits the atlas over two pages — so the repo's copy is the one to keep. `processResources`
+   copies `resources/skin/` to the classpath path `skin/`, and `UiSkinProvider` loads
+   `Gdx.files.classpath("skin/pvz2_skin.json")` from there. Nothing else claims that path and
+   there is no third copy under `assets/`. The skin json needs FreeType and TenPatch to parse, so
+   both are dependencies now, plus the FreeType natives as `runtimeOnly`.
+   `UiSkinProvider.FreeTypeSkin` is the Skin Composer font-block recipe, the one thing that had to
+   be taken from the library.
 4. **Naming map.** Upstream ids (`FULL/PLANT/PEASHOOTER`) do not match `PlantType` /
    `ZombieType` constants. A lookup table belongs in `assets/metadata/`, not in model code.
 5. **Selection.** 80 plants and 233 zombies are available upstream against a much smaller

@@ -54,7 +54,7 @@ public final class GameplayScreen extends BaseScreen {
     lawnRenderer = new LawnRenderer(geometry);
     entityRenderer = new EntityRenderer(geometry);
     hud = new HudStage();
-    hud.build(game.getUiSkin());
+    hud.build(game.getUiSkin(), () -> game.switchScreen(new MainMenuScreen(game)));
     clock.reset();
 
     // HUD first so buttons get the click, anything else goes to the lawn

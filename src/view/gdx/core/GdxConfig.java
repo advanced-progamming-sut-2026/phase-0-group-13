@@ -37,6 +37,15 @@ public final class GdxConfig {
 
   public static final float SECONDS_PER_TICK = 1f / TICKS_PER_SECOND;
 
+  /**
+   * Whether the graphical build shows the debug controls (the coin/diamond cheats).
+   *
+   * <p>Off unless the launcher is started with {@code -Dpvz.debug=true}, which
+   * {@code ./gradlew runGdx -Ppvz.debug=true} does for you. The terminal version has no such
+   * switch, its cheats are always typeable, so this only gates what the UI draws.
+   */
+  public static final boolean DEBUG_MODE = Boolean.getBoolean("pvz.debug");
+
   private GdxConfig() {
   }
 }

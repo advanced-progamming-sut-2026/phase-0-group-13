@@ -7,6 +7,8 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    // pvz-skin و TenPatch فقط از جیت‌پک منتشر شده‌اند
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -22,6 +24,11 @@ dependencies {
     implementation 'com.badlogicgames.gdx:gdx:1.12.1'
     implementation 'com.badlogicgames.gdx:gdx-platform:1.12.1:natives-desktop'
     implementation 'com.badlogicgames.gdx:gdx-backend-lwjgl3:1.12.1'
+    // فایل اسکین resources/skin به این دو نیاز دارد: فونت‌هایش FreeType هستند
+    // و پس‌زمینهٔ دکمه‌ها TenPatch. بدون این‌ها اسکین اصلا پارس نمی‌شود.
+    implementation 'com.badlogicgames.gdx:gdx-freetype:1.12.1'
+    implementation 'com.github.raeleus.TenPatch:tenpatch:5.2.3'
+    runtimeOnly 'com.badlogicgames.gdx:gdx-freetype-platform:1.12.1:natives-desktop'
 }
 
 test {
@@ -40,12 +47,23 @@ sourceSets {
     }
 }
 
+// اسکین Scene2D تنها چیزی است که از resources/ روی کلاس‌پث می‌رود.
+// خود resources/ حدود ۸۴۰ مگابایت است و نباید کلاسپث شود، برای همین فقط همین پوشه کپی می‌شود
+// و کپی دومی از آن داخل assets/ نگه نمی‌داریم تا دو فایل روی یک مسیر نیفتد.
+tasks.named('processResources') {
+    from('resources/skin') {
+        into 'skin'
+    }
+}
+
 // نسخه گرافیکی (LibGDX). نسخه ترمینالی دست‌نخورده با همان Main قبلی اجرا می‌شود.
 tasks.register('runGdx', JavaExec) {
     group = 'application'
-    description = 'Runs the LibGDX desktop launcher (empty window).'
+    description = 'Runs the LibGDX desktop launcher. Add -Ppvz.debug=true for the debug controls.'
     mainClass = 'view.gdx.DesktopLauncher'
     classpath = sourceSets.main.runtimeClasspath
+    // حالت دیباگ: ./gradlew runGdx -Ppvz.debug=true
+    systemProperty 'pvz.debug', String.valueOf(project.findProperty('pvz.debug') ?: false)
     // روی مک، بک‌اند LWJGL3 باید روی ترد اول اجرا شود
     if (System.getProperty('os.name').toLowerCase().contains('mac')) {
         jvmArgs '-XstartOnFirstThread'
