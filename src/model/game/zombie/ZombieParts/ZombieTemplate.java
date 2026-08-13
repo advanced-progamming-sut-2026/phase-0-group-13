@@ -61,6 +61,15 @@ public class ZombieTemplate {
 
     @SerializedName("FireLayer")
     public String fireLayer;
+
+    @SerializedName("Stages")
+    public List<Stage> stages;
+  }
+
+  /** یک فاز از باس؛ زامبوس‌ها به جای Hitpoints، جانشان را در Stages ثبت کرده‌اند. */
+  public static class Stage {
+    @SerializedName("HitPoints")
+    public Integer hitPoints;
   }
 
   public static class ZombieStatEntry {
@@ -89,7 +98,28 @@ public class ZombieTemplate {
   }
 
   public int getBaseHp() {
-    return (objdata != null && objdata.hitpoints != null) ? objdata.hitpoints : 0;
+    if (objdata != null && objdata.hitpoints != null) {
+      return objdata.hitpoints;
+    }
+    return getStagedHp();
+  }
+
+  /**
+   * جان باس‌ها. زامبوس‌ها فیلد Hitpoints ندارند و جانشان در Stages[].HitPoints (سه فاز) ثبت شده،
+   * پس جان کلشان جمع فازهاست؛ بدون این، getBaseHp صفر برمی‌گرداند و فکتوری مجبور می‌شود یک عدد
+   * ثابت جایگزین کند.
+   */
+  public int getStagedHp() {
+    if (objdata == null || objdata.stages == null) {
+      return 0;
+    }
+    int total = 0;
+    for (Stage stage : objdata.stages) {
+      if (stage != null && stage.hitPoints != null) {
+        total += stage.hitPoints;
+      }
+    }
+    return total;
   }
 
   public double getBaseSpeed() {

@@ -10,6 +10,7 @@ public class ProduceSunAction implements PlantAction {
 
   private final int productionInterval;
   private final int sunAmount;
+  private final boolean singleUse;
   private Sun uncollectedSun;
 
   public ProduceSunAction(int productionInterval) {
@@ -17,8 +18,17 @@ public class ProduceSunAction implements PlantAction {
   }
 
   public ProduceSunAction(int productionInterval, int sunAmount) {
+    this(productionInterval, sunAmount, false);
+  }
+
+  /**
+   * singleUse برای گیاهانی مثل Gold Bloom که در plants.json «یک‌بار خورشید می‌دهد و بعد ناپدید
+   * می‌شود» ثبت شده‌اند؛ بدون این، همان گیاه بی‌نهایت بار خورشید تولید می‌کند.
+   */
+  public ProduceSunAction(int productionInterval, int sunAmount, boolean singleUse) {
     this.productionInterval = productionInterval;
     this.sunAmount = sunAmount > 0 ? sunAmount : DEFAULT_SUN_AMOUNT;
+    this.singleUse = singleUse;
   }
 
   @Override
@@ -37,6 +47,11 @@ public class ProduceSunAction implements PlantAction {
 
       System.out.printf("plant %s produced a sun at (%d, %d)%n",
               plant.getName(), plant.getCol() + 1, plant.getRow() + 1);
+
+      if (singleUse) {
+        plant.takeDamage(plant.getMaxHealth());
+        System.out.printf("%s vanished after its one-off burst.%n", plant.getName());
+      }
     }
   }
 }

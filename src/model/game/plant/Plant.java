@@ -40,6 +40,13 @@ public class Plant {
 
   private boolean deathHookFired = false;
 
+  /**
+   * عمر محدود (Sea-shroom و Puff-shroom در plants.json «۶۰ ثانیه عمر» دارند). {@code -1} یعنی
+   * بدون محدودیت، که حالت همهٔ گیاهان دیگر است.
+   */
+  private int lifespanTicks = -1;
+  private int plantedTick = -1;
+
   public static final int MAX_STACK = 5;
   private int stackCount = 1;
   private Plant shield;
@@ -69,7 +76,13 @@ public class Plant {
   }
 
   public void update(int currentTick, Board board) {
-    if (isDead() || isDisabled(currentTick) || isFrozen(currentTick)) return;
+    if (isDead()) return;
+    if (hasExpired(currentTick)) {
+      System.out.printf("%s withered away after its lifespan ran out.%n", name);
+      takeDamage(maxHealth);
+      return;
+    }
+    if (isDisabled(currentTick) || isFrozen(currentTick)) return;
 
     if (plantFood != null && plantFood.canExecute()) {
       plantFood.execute(this, board, currentTick);
@@ -182,6 +195,33 @@ public class Plant {
       shield = null;
     }
     this.currentHealth = Math.max(0, this.currentHealth - damage);
+  }
+
+  /** عمر محدود بر حسب تیک؛ مقدار منفی یا صفر یعنی گیاه هیچ‌وقت خودبه‌خود از بین نمی‌رود. */
+  public void setLifespanTicks(int lifespanTicks) {
+    this.lifespanTicks = lifespanTicks;
+  }
+
+  public int getLifespanTicks() {
+    return lifespanTicks;
+  }
+
+  /** اثر غذای گیاهِ Sea-shroom/Puff-shroom عمر همهٔ هم‌نوع‌هایش را از نو می‌کند. */
+  public void resetLifespan(int currentTick) {
+    if (lifespanTicks > 0) {
+      this.plantedTick = currentTick;
+    }
+  }
+
+  private boolean hasExpired(int currentTick) {
+    if (lifespanTicks <= 0) {
+      return false;
+    }
+    if (plantedTick == -1) {
+      plantedTick = currentTick;
+      return false;
+    }
+    return currentTick - plantedTick >= lifespanTicks;
   }
 
   public boolean addStack() {

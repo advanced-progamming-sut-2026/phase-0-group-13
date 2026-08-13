@@ -15,6 +15,7 @@ public class ExplodeAction implements PlantAction {
   private int scatterGrapes;
   private int scatterLifeTicks;
   private int scatterDamage;
+  private boolean laneOnly;
 
   public ExplodeAction(int fuseTime, int damage, int range, boolean requiresContact) {
     this.fuseTime = fuseTime;
@@ -82,14 +83,64 @@ public class ExplodeAction implements PlantAction {
     return this;
   }
 
+  /**
+   * انفجار در کل یک ردیف به جای ناحیهٔ مربعی (مخصوص Jalapeno که در plants.json «هر زامبی در یک
+   * ردیف را می‌سوزاند» ثبت شده): نه ردیف‌های همسایه را می‌گیرد و نه در شعاع محدود می‌ماند.
+   */
+  public ExplodeAction asLaneWide() {
+    this.laneOnly = true;
+    return this;
+  }
+
+  /** Doom-shroom «یک گودال غیرقابل کاشت به جا می‌گذارد» (plants.json). */
+  public ExplodeAction leavingCrater() {
+    this.leavesCrater = true;
+    return this;
+  }
+
+  private boolean leavesCrater;
+
   public void detonateNow(Plant plant, Board board) {
     System.out.printf(
             "BOOM! %s exploded at (%d, %d)%n",
             plant.getName(), plant.getCol() + 1, plant.getRow() + 1);
 
-    board.applyAreaDamageToZombies(plant.getCol(), plant.getRow(), range, damage);
+    if (laneOnly) {
+      scorchLane(plant, board);
+    } else {
+      board.applyAreaDamageToZombies(plant.getCol(), plant.getRow(), range, damage);
+    }
     scatterGrapes(plant, board);
+    if (leavesCrater) {
+      board.placeTileEffect(plant.getRow(), plant.getCol(),
+              new model.game.TileEffects.CraterEffect());
+      System.out.printf("%s left an unplantable crater at (%d, %d).%n",
+              plant.getName(), plant.getCol() + 1, plant.getRow() + 1);
+    }
     plant.takeDamage(10000);
+  }
+
+  /** کل ردیف را می‌سوزاند و یخ روی همان ردیف را هم آب می‌کند (طبق «and melts ice» در دیتا). */
+  private void scorchLane(Plant plant, Board board) {
+    int burned = 0;
+    for (Zombie zombie : board.getZombies()) {
+      if (!zombie.isDead() && zombie.getRow() == plant.getRow()) {
+        zombie.takeDamage(damage, false);
+        burned++;
+      }
+    }
+    for (int col = 0; col < board.getColumns(); col++) {
+      model.game.Tile tile = board.getTile(plant.getRow(), col);
+      if (tile != null && tile.getEffect() instanceof model.game.TileEffects.IceTrailEffect) {
+        tile.setEffect(null);
+      }
+      Plant frozen = board.getPlantAt(plant.getRow(), col);
+      if (frozen != null && frozen != plant) {
+        frozen.meltIce();
+      }
+    }
+    System.out.printf("%s torched %d zombie(s) across row %d.%n",
+            plant.getName(), burned, plant.getRow() + 1);
   }
 
   private void scatterGrapes(Plant plant, Board board) {

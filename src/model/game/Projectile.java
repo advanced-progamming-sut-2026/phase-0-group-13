@@ -28,6 +28,7 @@ public class Projectile {
   private final boolean lobbed;
   private boolean bouncing;
   private int remainingLifeTicks = -1;
+  private int pierceLimit;
 
   private final Set<Zombie> alreadyHit = new HashSet<>();
   // چند زامبی رو همین یه تیر (پیرسینگ/strike-through) کشته؛ برای امتیاز MULTI_KILL_ONE_SHOT
@@ -76,6 +77,21 @@ public class Projectile {
   }
 
   // ---- انگورهای کمانه‌کننده Grapeshot ----
+
+  /**
+   * سقف تعداد زامبی‌هایی که یک تیر پیرسینگ می‌تواند از آن‌ها رد شود. صفر یعنی بی‌نهایت.
+   *
+   * <p>Cactus در plants.json «از ۳ زامبی رد می‌شود» ثبت شده (و Lvl 2 یکی اضافه می‌کند)، ولی
+   * Fume-shroom سقفی ندارد؛ پس این محدودیت اختیاری است نه سراسری.
+   */
+  public Projectile withPierceLimit(int limit) {
+    this.pierceLimit = Math.max(0, limit);
+    return this;
+  }
+
+  public int getPierceLimit() {
+    return pierceLimit;
+  }
 
   /** این پرتابه از دیواره‌ها کمانه می‌کند و بعد از {@code lifeTicks} تیک ناپدید می‌شود. */
   public void makeBouncing(int lifeTicks) {
@@ -140,6 +156,8 @@ public class Projectile {
     alreadyHit.add(zombie);
 
     if (!piercing) {
+      this.isActive = false;
+    } else if (pierceLimit > 0 && alreadyHit.size() >= pierceLimit) {
       this.isActive = false;
     }
 
@@ -223,6 +241,7 @@ public class Projectile {
                     xCoordinate, getYCoordinate(), ProjectileEffect.FIRE, piercing, lobbed, isFromZombie);
     lit.setDirection(stepCol, stepRow);
     lit.alreadyHit.addAll(this.alreadyHit);
+    lit.withPierceLimit(pierceLimit);
     return lit;
   }
 }

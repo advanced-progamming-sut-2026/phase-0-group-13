@@ -15,14 +15,44 @@ public class PlantLevel {
   private final int actionIntervalDeltaSeconds;
   private final List<String> rawEffects;
 
+  /**
+   * دسته‌های اضافه‌شده برای اثرهای لِوِلی که قبلا فقط داخل rawEffects ذخیره می‌شدند و هیچ‌وقت
+   * اعمال نمی‌شدند ("Atk Speed +10%"، "Sun +50"، "Pierce +1"، ...).
+   */
+  private final int attackSpeedPercent;
+  private final int sunDelta;
+  private final int pierceDelta;
+  private final int rangeDelta;
+  private final int durationDeltaSeconds;
+  private final int freezeTimeDeltaSeconds;
+  private final int lifespanDeltaSeconds;
+  private final int targetsDelta;
+
   private PlantLevel(int hpDelta, int damageDelta, int costDelta, int cooldownDeltaSeconds,
                      int actionIntervalDeltaSeconds, List<String> rawEffects) {
+    this(hpDelta, damageDelta, costDelta, cooldownDeltaSeconds, actionIntervalDeltaSeconds,
+            rawEffects, 0, 0, 0, 0, 0, 0, 0, 0);
+  }
+
+  private PlantLevel(int hpDelta, int damageDelta, int costDelta, int cooldownDeltaSeconds,
+                     int actionIntervalDeltaSeconds, List<String> rawEffects,
+                     int attackSpeedPercent, int sunDelta, int pierceDelta, int rangeDelta,
+                     int durationDeltaSeconds, int freezeTimeDeltaSeconds,
+                     int lifespanDeltaSeconds, int targetsDelta) {
     this.hpDelta = hpDelta;
     this.damageDelta = damageDelta;
     this.costDelta = costDelta;
     this.cooldownDeltaSeconds = cooldownDeltaSeconds;
     this.actionIntervalDeltaSeconds = actionIntervalDeltaSeconds;
     this.rawEffects = rawEffects;
+    this.attackSpeedPercent = attackSpeedPercent;
+    this.sunDelta = sunDelta;
+    this.pierceDelta = pierceDelta;
+    this.rangeDelta = rangeDelta;
+    this.durationDeltaSeconds = durationDeltaSeconds;
+    this.freezeTimeDeltaSeconds = freezeTimeDeltaSeconds;
+    this.lifespanDeltaSeconds = lifespanDeltaSeconds;
+    this.targetsDelta = targetsDelta;
   }
 
   public static PlantLevel none() {
@@ -56,11 +86,47 @@ public class PlantLevel {
       return new PlantLevel(0, 0, 0, value, 0, effects);
     }
     if (lower.contains("prod. time") || lower.contains("grow time") || lower.contains("regen")
-            || lower.contains("arm time") || lower.contains("charge time") || lower.contains("digest")) {
+            || lower.contains("arm time") || lower.contains("charge time") || lower.contains("digest")
+            || lower.contains("eat time")) {
       return new PlantLevel(0, 0, 0, 0, value, effects);
     }
 
+    // اثرهایی که تا حالا فقط متن بودند و روی گیم‌پلی سوار نمی‌شدند
+    if (lower.contains("atk speed")) {
+      return withExtra(effects, value, 0, 0, 0, 0, 0, 0, 0);
+    }
+    if (lower.contains("sun")) {
+      return withExtra(effects, 0, value, 0, 0, 0, 0, 0, 0);
+    }
+    if (lower.contains("pierce")) {
+      return withExtra(effects, 0, 0, value, 0, 0, 0, 0, 0);
+    }
+    if (lower.contains("range") || lower.contains("radius") || lower.contains("max size")) {
+      return withExtra(effects, 0, 0, 0, value, 0, 0, 0, 0);
+    }
+    if (lower.contains("duration")) {
+      return withExtra(effects, 0, 0, 0, 0, value, 0, 0, 0);
+    }
+    if (lower.contains("freeze time") || lower.contains("chill time")) {
+      return withExtra(effects, 0, 0, 0, 0, 0, value, 0, 0);
+    }
+    if (lower.contains("lifespan")) {
+      return withExtra(effects, 0, 0, 0, 0, 0, 0, value, 0);
+    }
+    if (lower.contains("targets") || lower.contains("bounces")) {
+      return withExtra(effects, 0, 0, 0, 0, 0, 0, 0, value);
+    }
+
     return new PlantLevel(0, 0, 0, 0, 0, effects);
+  }
+
+  private static PlantLevel withExtra(List<String> effects, int attackSpeedPercent, int sunDelta,
+                                      int pierceDelta, int rangeDelta, int durationDeltaSeconds,
+                                      int freezeTimeDeltaSeconds, int lifespanDeltaSeconds,
+                                      int targetsDelta) {
+    return new PlantLevel(0, 0, 0, 0, 0, effects, attackSpeedPercent, sunDelta, pierceDelta,
+            rangeDelta, durationDeltaSeconds, freezeTimeDeltaSeconds, lifespanDeltaSeconds,
+            targetsDelta);
   }
 
   public PlantLevel add(PlantLevel other) {
@@ -73,7 +139,15 @@ public class PlantLevel {
             this.costDelta + other.costDelta,
             this.cooldownDeltaSeconds + other.cooldownDeltaSeconds,
             this.actionIntervalDeltaSeconds + other.actionIntervalDeltaSeconds,
-            combined
+            combined,
+            this.attackSpeedPercent + other.attackSpeedPercent,
+            this.sunDelta + other.sunDelta,
+            this.pierceDelta + other.pierceDelta,
+            this.rangeDelta + other.rangeDelta,
+            this.durationDeltaSeconds + other.durationDeltaSeconds,
+            this.freezeTimeDeltaSeconds + other.freezeTimeDeltaSeconds,
+            this.lifespanDeltaSeconds + other.lifespanDeltaSeconds,
+            this.targetsDelta + other.targetsDelta
     );
   }
 
@@ -93,4 +167,12 @@ public class PlantLevel {
   public int getCooldownDeltaSeconds() { return cooldownDeltaSeconds; }
   public int getActionIntervalDeltaSeconds() { return actionIntervalDeltaSeconds; }
   public List<String> getRawEffects() { return rawEffects; }
+  public int getAttackSpeedPercent() { return attackSpeedPercent; }
+  public int getSunDelta() { return sunDelta; }
+  public int getPierceDelta() { return pierceDelta; }
+  public int getRangeDelta() { return rangeDelta; }
+  public int getDurationDeltaSeconds() { return durationDeltaSeconds; }
+  public int getFreezeTimeDeltaSeconds() { return freezeTimeDeltaSeconds; }
+  public int getLifespanDeltaSeconds() { return lifespanDeltaSeconds; }
+  public int getTargetsDelta() { return targetsDelta; }
 }

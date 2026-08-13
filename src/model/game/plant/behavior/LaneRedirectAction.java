@@ -14,10 +14,20 @@ public class LaneRedirectAction implements PlantAction {
 
   private final Random random = new Random();
   private final int bitesBeforeDying;
+  private final boolean laneWide;
   private int redirects;
 
   public LaneRedirectAction(int bitesBeforeDying) {
+    this(bitesBeforeDying, false);
+  }
+
+  /**
+   * laneWide برای اثر غذای گیاهِ Garlic است: دیتا می‌گوید «هر زامبیِ داخل ردیف» را بیرون می‌کند،
+   * نه فقط آن یکی که چسبیده به گیاه.
+   */
+  public LaneRedirectAction(int bitesBeforeDying, boolean laneWide) {
     this.bitesBeforeDying = Math.max(1, bitesBeforeDying);
+    this.laneWide = laneWide;
   }
 
   @Override
@@ -30,7 +40,7 @@ public class LaneRedirectAction implements PlantAction {
       if (zombie.isDead()
               || zombie.isHypnotized()
               || zombie.getRow() != plant.getRow()
-              || Math.abs(zombie.getX() - plant.getCol()) > REACH) {
+              || (!laneWide && Math.abs(zombie.getX() - plant.getCol()) > REACH)) {
         continue;
       }
 

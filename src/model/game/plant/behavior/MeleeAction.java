@@ -9,15 +9,25 @@ public class MeleeAction implements PlantAction {
   private final int actionInterval;
   private final int damage;
   private final int aoeRadius;
+  private final boolean hitsBehind;
 
   public MeleeAction(int actionInterval, int damage) {
     this(actionInterval, damage, 0);
   }
 
   public MeleeAction(int actionInterval, int damage, int aoeRadius) {
+    this(actionInterval, damage, aoeRadius, false);
+  }
+
+  /**
+   * hitsBehind برای Bonk Choy و Wasabi Whip است: دیتا می‌گوید «خانه‌های جلو <b>و پشت</b> خودش» را
+   * می‌زنند، ولی جست‌وجوی هدف فقط رو به جلو بود.
+   */
+  public MeleeAction(int actionInterval, int damage, int aoeRadius, boolean hitsBehind) {
     this.actionInterval = actionInterval;
     this.damage = damage;
     this.aoeRadius = Math.max(0, aoeRadius);
+    this.hitsBehind = hitsBehind;
   }
 
   @Override
@@ -33,12 +43,19 @@ public class MeleeAction implements PlantAction {
       return;
     }
 
-    Zombie target = findAdjacentZombie(board, plant);
-    if (target == null) return;
+    Zombie front = findAdjacentZombie(board, plant, true);
+    Zombie behind = hitsBehind ? findAdjacentZombie(board, plant, false) : null;
+    if (front == null && behind == null) return;
 
-    target.takeDamage(damage, false);
+    if (front != null) {
+      front.takeDamage(damage, false);
+      System.out.printf("Plant %s hit %s in melee range!%n", plant.getName(), front.getName());
+    }
+    if (behind != null && behind != front) {
+      behind.takeDamage(damage, false);
+      System.out.printf("Plant %s hit %s behind it!%n", plant.getName(), behind.getName());
+    }
     plant.setLastActionTick(currentTick);
-    System.out.printf("Plant %s hit %s in melee range!%n", plant.getName(), target.getName());
   }
 
   private boolean hasZombieInArea(Board board, Plant plant) {
@@ -52,14 +69,16 @@ public class MeleeAction implements PlantAction {
     return false;
   }
 
-  private Zombie findAdjacentZombie(Board board, Plant plant) {
+  /** @param ahead true یعنی خانهٔ جلو (ستون بزرگ‌تر)، false یعنی خانهٔ پشت سر گیاه */
+  private Zombie findAdjacentZombie(Board board, Plant plant, boolean ahead) {
     Zombie nearest = null;
     double bestDistance = Double.MAX_VALUE;
 
     for (Zombie zombie : board.getZombies()) {
       if (zombie.isDead() || zombie.getRow() != plant.getRow()) continue;
 
-      double distance = zombie.getX() - plant.getCol();
+      double offset = zombie.getX() - plant.getCol();
+      double distance = ahead ? offset : -offset;
       if (distance >= 0 && distance <= MELEE_RANGE && distance < bestDistance) {
         bestDistance = distance;
         nearest = zombie;

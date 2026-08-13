@@ -15,6 +15,7 @@ public class ShootForwardAction implements PlantAction {
   private final int laneSpread;
   private int[][] directions = FORWARD_ONLY;
   private int ricochetLifeTicks;
+  private int pierceLimit;
 
   public ShootForwardAction(int actionInterval, int damage, Projectile.ProjectileEffect effect,
                             boolean piercing, int laneSpread) {
@@ -46,6 +47,11 @@ public class ShootForwardAction implements PlantAction {
     this.ricochetLifeTicks = Math.max(0, lifeTicks);
   }
 
+  /** سقف عبور تیر از زامبی‌ها (Cactus: ۳). صفر یعنی بدون سقف، مثل Fume-shroom. */
+  public void setPierceLimit(int pierceLimit) {
+    this.pierceLimit = Math.max(0, pierceLimit);
+  }
+
   @Override
   public void execute(Plant plant, Board board, int currentTick) {
     if (currentTick - plant.getLastActionTick() < actionInterval) {
@@ -63,6 +69,7 @@ public class ShootForwardAction implements PlantAction {
         for (int shot = Math.max(1, plant.getStackCount()); shot > 0; shot--) {
           Projectile projectile =
                   new Projectile(damage, 0.5, plant.getCol(), row, effect, piercing, false, false);
+          projectile.withPierceLimit(pierceLimit);
           projectile.setDirection(direction[0], direction[1]);
           if (ricochetLifeTicks > 0) {
             // گلوله‌های کمانه‌کننده به صورت مورب حرکت می‌کنند تا از دیواره‌ها برگردند

@@ -12,10 +12,20 @@ public class LaneMagnetAction implements PlantAction {
   private static final double PULL_RANGE = 3.0;
 
   private final int pullIntervalTicks;
+  private final boolean pullAllAndHeal;
   private int lastPullTick = -1;
 
   public LaneMagnetAction(int pullIntervalTicks) {
+    this(pullIntervalTicks, false);
+  }
+
+  /**
+   * pullAllAndHeal اثر غذای گیاهِ Sweet Potato است: دیتا می‌گوید «همهٔ زامبی‌های نزدیک را می‌کِشد
+   * و جان خودش را کامل می‌کند» — نه یکی‌یکی و بدون درمان.
+   */
+  public LaneMagnetAction(int pullIntervalTicks, boolean pullAllAndHeal) {
     this.pullIntervalTicks = Math.max(1, pullIntervalTicks);
+    this.pullAllAndHeal = pullAllAndHeal;
   }
 
   @Override
@@ -41,7 +51,13 @@ public class LaneMagnetAction implements PlantAction {
       lastPullTick = currentTick;
       System.out.printf("%s magnetised %s from row %d into row %d!%n",
               plant.getName(), zombie.getName(), fromRow + 1, plant.getRow() + 1);
-      return;
+      if (!pullAllAndHeal) {
+        return;
+      }
+    }
+
+    if (pullAllAndHeal) {
+      plant.heal(plant.getMaxHealth());
     }
   }
 }
