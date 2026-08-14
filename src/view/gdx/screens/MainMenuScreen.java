@@ -50,6 +50,7 @@ public final class MainMenuScreen extends MenuScreen {
     }
 
     menu.add(gated(newsLabel(user), () -> go(new NewsScreen(game)), loggedIn)).width(320f).row();
+    menu.add(gated("Travel Log", () -> go(new QuestScreen(game)), loggedIn)).width(320f).row();
     menu.add(gated("Profile", () -> go(new ProfileScreen(game)), loggedIn)).width(320f).row();
     menu.add(gated("Settings", () -> go(new SettingsScreen(game)), loggedIn)).width(320f).row();
 
