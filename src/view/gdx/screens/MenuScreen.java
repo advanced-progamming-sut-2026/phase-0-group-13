@@ -3,15 +3,19 @@ package view.gdx.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.CurrencyHud;
@@ -37,6 +41,12 @@ public abstract class MenuScreen extends BaseScreen {
   protected Skin skin;
 
   private String notice;
+  private TextureAtlas backgroundAtlas;
+
+  /** Backdrop atlas under assets/, or null for none. Needs a region called "texture". */
+  protected String backgroundAtlasPath() {
+    return null;
+  }
 
   protected MenuScreen(PvzGdxGame game) {
     super(game);
@@ -79,6 +89,8 @@ public abstract class MenuScreen extends BaseScreen {
       return;
     }
 
+    addBackground();
+
     Table root = new Table();
     root.setFillParent(true);
     root.pad(24f);
@@ -117,6 +129,23 @@ public abstract class MenuScreen extends BaseScreen {
       toast(notice);
       notice = null;
     }
+  }
+
+  /** Added before the root table so everything else draws on top. */
+  private void addBackground() {
+    String path = backgroundAtlasPath();
+    if (path == null || !Gdx.files.internal(path).exists()) {
+      return;
+    }
+    backgroundAtlas = new TextureAtlas(Gdx.files.internal(path));
+    TextureRegion region = backgroundAtlas.findRegion("texture");
+    if (region == null) {
+      return;
+    }
+    Image background = new Image(region);
+    background.setFillParent(true);
+    background.setScaling(Scaling.fill);
+    stage.addActor(background);
   }
 
   /** A panel-backed table, for the screens that hold a form. */
@@ -185,6 +214,10 @@ public abstract class MenuScreen extends BaseScreen {
     if (stage != null) {
       stage.dispose();
       stage = null;
+    }
+    if (backgroundAtlas != null) {
+      backgroundAtlas.dispose();
+      backgroundAtlas = null;
     }
   }
 }

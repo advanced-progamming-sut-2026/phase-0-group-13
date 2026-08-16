@@ -27,7 +27,12 @@ public final class MainMenuScreen extends MenuScreen {
 
   @Override
   protected String title() {
-    return "Main Menu";
+    return "Plants vs. Zombies";
+  }
+
+  @Override
+  protected String backgroundAtlasPath() {
+    return "textures/environment/darkagesseason.atlas";
   }
 
   @Override
@@ -35,27 +40,44 @@ public final class MainMenuScreen extends MenuScreen {
     User user = UserManager.getInstance().getCurrentUser();
     boolean loggedIn = user != null;
 
-    Table menu = panel();
-    menu.add(new Label(greeting(user), skin, UiSkinProvider.LABEL_MEDIUM)).padBottom(14f).row();
+    // No panel here, the buttons sit straight on the background art.
+    Table menu = new Table();
+    menu.add(new Label(greeting(user), skin, UiSkinProvider.LABEL_MEDIUM)).padBottom(22f).row();
 
     if (loggedIn) {
-      menu.add(button("Play", UiSkinProvider.BUTTON_GREEN, this::play)).width(320f).row();
+      menu.add(button("PLAY", UiSkinProvider.BUTTON_GREEN, this::play))
+          .width(420f)
+          .height(96f)
+          .padBottom(24f)
+          .row();
     } else {
-      menu.add(button("Login", UiSkinProvider.BUTTON_GREEN, () -> go(new LoginScreen(game))))
-          .width(320f)
-          .row();
-      menu.add(button("Sign Up", UiSkinProvider.BUTTON_BROWN, () -> go(new SignUpScreen(game))))
-          .width(320f)
-          .row();
+      Table entry = new Table();
+      entry.defaults().pad(8f).width(200f).height(72f);
+      entry.add(button("Login", UiSkinProvider.BUTTON_GREEN, () -> go(new LoginScreen(game))));
+      entry.add(button("Sign Up", UiSkinProvider.BUTTON_BROWN, () -> go(new SignUpScreen(game))));
+      menu.add(entry).padBottom(24f).row();
     }
 
-    menu.add(gated(newsLabel(user), () -> go(new NewsScreen(game)), loggedIn)).width(320f).row();
-    menu.add(gated("Travel Log", () -> go(new QuestScreen(game)), loggedIn)).width(320f).row();
-    menu.add(gated("Profile", () -> go(new ProfileScreen(game)), loggedIn)).width(320f).row();
-    menu.add(gated("Settings", () -> go(new SettingsScreen(game)), loggedIn)).width(320f).row();
+    Table shortcuts = new Table();
+    shortcuts.defaults().pad(6f).width(190f).height(64f);
+    shortcuts.add(gated(newsLabel(user), () -> go(new NewsScreen(game)), loggedIn));
+    shortcuts.add(gated("Collection", () -> go(new CollectionScreen(game)), loggedIn));
+    shortcuts.add(gated("Greenhouse", () -> go(new GreenhouseScreen(game)), loggedIn));
+    shortcuts.add(gated("Shop", () -> go(new ShopScreen(game)), loggedIn));
+    menu.add(shortcuts).row();
+
+    Table shortcuts2 = new Table();
+    shortcuts2.defaults().pad(6f).width(190f).height(64f);
+    shortcuts2.add(gated("Travel Log", () -> go(new QuestScreen(game)), loggedIn));
+    shortcuts2.add(gated("Profile", () -> go(new ProfileScreen(game)), loggedIn));
+    shortcuts2.add(gated("Settings", () -> go(new SettingsScreen(game)), loggedIn));
+    menu.add(shortcuts2).row();
 
     if (loggedIn) {
-      menu.add(button("Logout", UiSkinProvider.BUTTON_BROWN, this::logout)).width(320f).row();
+      menu.add(button("Logout", UiSkinProvider.BUTTON_BROWN, this::logout))
+          .width(190f)
+          .padTop(18f)
+          .row();
     }
 
     content.add(menu);
@@ -67,10 +89,9 @@ public final class MainMenuScreen extends MenuScreen {
         : "Welcome back, " + user.getUsername() + "!";
   }
 
-  /** "News" on its own, or "News (3)" when the Phase 1 inbox has unread items. */
   private String newsLabel(User user) {
     int unread = user == null ? 0 : user.getNewsBox().getUnreadCount();
-    return unread > 0 ? "News (" + unread + ")" : "News";
+    return unread > 0 ? "News (" + unread + ") !" : "News";
   }
 
   /**
@@ -88,7 +109,7 @@ public final class MainMenuScreen extends MenuScreen {
   }
 
   private void play() {
-    go(new GameplayScreen(game, null, null));
+    go(new AdventureScreen(game));
   }
 
   private void logout() {
