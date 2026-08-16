@@ -1,0 +1,38 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "attack": 1.0333,
+        "attack_plantfood": 1.0333,
+        "attack_stretch": 1.1667,
+        "down": 1.0667,
+        "down_attack": 0.5667,
+        "down_attack_plantfood": 0.5667,
+        "down_idle": 0.2333,
+        "down_idle_plantfood": 1.6667,
+        "down_plantfood": 1.0667,
+        "down_stretch": 0.8333,
+        "idle": 2.6667,
+        "idle2": 2.6667,
+        "idle3": 1.3333,
+        "idle_plantfood": 2.6667,
+        "idle_plantfood2": 2.6667,
+        "idle_plantfood3": 1.3333,
+        "plantfood": 0.8667,
+        "up": 1.0667,
+        "up_plantfood": 1.0667,
+        "up_stretch": 0.8333,
+        "water": 2.9667
+      },
+      "name": "CACTUS",
+      "pam": "768/INITIAL/PLANT/CACTUS/CACTUS.PAM"
+    }
+  ],
+  "atlas": "textures/plants/cactus.atlas",
+  "entity": "Cactus",
+  "source_folder": "images/768/.../cactus"
+}

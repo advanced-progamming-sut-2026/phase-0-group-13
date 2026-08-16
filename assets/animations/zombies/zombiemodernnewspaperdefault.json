@@ -1,0 +1,25 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "die": 1.8333,
+        "eat": 8.6333,
+        "eat_newspaper": 8.6333,
+        "idle_newspaper": 2.1333,
+        "newspaper_defeat": 1.4,
+        "particles": 0.0333,
+        "walk": 3,
+        "walk_newspaper": 3
+      },
+      "name": "ZOMBIE_MODERN_NEWSPAPER",
+      "pam": "768/FULL/ZOMBIE/ZOMBIE_MODERN_NEWSPAPER/ZOMBIE_MODERN_NEWSPAPER.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombiemodernnewspaperdefault.atlas",
+  "entity": "ZombieModernNewspaperDefault",
+  "source_folder": "images/768/.../zombie_modern_newspaper"
+}

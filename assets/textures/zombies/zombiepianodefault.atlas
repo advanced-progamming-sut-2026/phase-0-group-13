@@ -1,0 +1,201 @@
+zombiewestpianogroup_768_00.png
+size: 256,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+ikNode_1
+  rotate: false
+  xy: 229, 258
+  size: 18, 34
+  orig: 18, 34
+  offset: 0, 0
+  index: -1
+ikNode_10
+  rotate: false
+  xy: 202, 424
+  size: 16, 25
+  orig: 16, 25
+  offset: 0, 0
+  index: -1
+ikNode_11
+  rotate: false
+  xy: 226, 146
+  size: 23, 25
+  orig: 23, 25
+  offset: 0, 0
+  index: -1
+ikNode_12
+  rotate: false
+  xy: 188, 424
+  size: 12, 34
+  orig: 12, 34
+  offset: 0, 0
+  index: -1
+ikNode_13
+  rotate: false
+  xy: 166, 433
+  size: 12, 23
+  orig: 12, 23
+  offset: 0, 0
+  index: -1
+ikNode_14
+  rotate: false
+  xy: 43, 432
+  size: 18, 21
+  orig: 18, 21
+  offset: 0, 0
+  index: -1
+ikNode_2
+  rotate: false
+  xy: 25, 419
+  size: 16, 28
+  orig: 16, 28
+  offset: 0, 0
+  index: -1
+ikNode_3
+  rotate: false
+  xy: 1, 419
+  size: 22, 22
+  orig: 22, 22
+  offset: 0, 0
+  index: -1
+ikNode_4
+  rotate: false
+  xy: 173, 180
+  size: 27, 16
+  orig: 27, 16
+  offset: 0, 0
+  index: -1
+ikNode_5
+  rotate: false
+  xy: 240, 404
+  size: 15, 30
+  orig: 15, 30
+  offset: 0, 0
+  index: -1
+ikNode_6
+  rotate: false
+  xy: 220, 424
+  size: 15, 26
+  orig: 15, 26
+  offset: 0, 0
+  index: -1
+ikNode_7
+  rotate: false
+  xy: 103, 433
+  size: 15, 19
+  orig: 15, 19
+  offset: 0, 0
+  index: -1
+ikNode_8
+  rotate: false
+  xy: 120, 433
+  size: 19, 15
+  orig: 19, 15
+  offset: 0, 0
+  index: -1
+zombie_piano_17x18
+  rotate: false
+  xy: 120, 450
+  size: 11, 12
+  orig: 11, 12
+  offset: 0, 0
+  index: -1
+zombie_piano_20x20
+  rotate: false
+  xy: 141, 447
+  size: 13, 13
+  orig: 13, 13
+  offset: 0, 0
+  index: -1
+zombie_piano_22x57
+  rotate: false
+  xy: 234, 334
+  size: 14, 37
+  orig: 14, 37
+  offset: 0, 0
+  index: -1
+zombie_piano_23x59
+  rotate: false
+  xy: 234, 294
+  size: 15, 38
+  orig: 15, 38
+  offset: 0, 0
+  index: -1
+zombie_piano_28x28
+  rotate: false
+  xy: 83, 433
+  size: 18, 18
+  orig: 18, 18
+  offset: 0, 0
+  index: -1
+zombie_piano_47x28
+  rotate: false
+  xy: 48, 371
+  size: 30, 18
+  orig: 30, 18
+  offset: 0, 0
+  index: -1
+zombie_piano_52x34
+  rotate: false
+  xy: 220, 234
+  size: 34, 22
+  orig: 34, 22
+  offset: 0, 0
+  index: -1
+zombie_piano_53x34
+  rotate: false
+  xy: 86, 325
+  size: 34, 22
+  orig: 34, 22
+  offset: 0, 0
+  index: -1
+zombie_piano_54x83
+  rotate: false
+  xy: 212, 58
+  size: 35, 53
+  orig: 35, 53
+  offset: 0, 0
+  index: -1
+zombie_piano_57x27
+  rotate: false
+  xy: 201, 404
+  size: 37, 18
+  orig: 37, 18
+  offset: 0, 0
+  index: -1
+zombie_piano_70x71
+  rotate: false
+  xy: 1, 371
+  size: 45, 46
+  orig: 45, 46
+  offset: 0, 0
+  index: -1
+zombie_piano_79x69
+  rotate: false
+  xy: 173, 134
+  size: 51, 44
+  orig: 51, 44
+  offset: 0, 0
+  index: -1
+zombie_piano_7x7
+  rotate: false
+  xy: 233, 48
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+zombie_piano_84x64
+  rotate: false
+  xy: 86, 357
+  size: 54, 41
+  orig: 54, 41
+  offset: 0, 0
+  index: -1
+zombie_piano_91x85
+  rotate: false
+  xy: 173, 1
+  size: 58, 55
+  orig: 58, 55
+  offset: 0, 0
+  index: -1

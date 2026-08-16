@@ -1,0 +1,159 @@
+planthypnoshroom_768_00.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+hypnoshroom_11x12
+  rotate: false
+  xy: 243, 110
+  size: 7, 8
+  orig: 7, 8
+  offset: 0, 0
+  index: -1
+hypnoshroom_12x14
+  rotate: false
+  xy: 243, 99
+  size: 8, 9
+  orig: 8, 9
+  offset: 0, 0
+  index: -1
+hypnoshroom_16x11
+  rotate: false
+  xy: 162, 108
+  size: 10, 7
+  orig: 10, 7
+  offset: 0, 0
+  index: -1
+hypnoshroom_173x161
+  rotate: false
+  xy: 1, 1
+  size: 111, 103
+  orig: 111, 103
+  offset: 0, 0
+  index: -1
+hypnoshroom_24x13
+  rotate: false
+  xy: 90, 137
+  size: 16, 9
+  orig: 16, 9
+  offset: 0, 0
+  index: -1
+hypnoshroom_24x25
+  rotate: false
+  xy: 112, 148
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+hypnoshroom_30x15
+  rotate: false
+  xy: 141, 108
+  size: 19, 10
+  orig: 19, 10
+  offset: 0, 0
+  index: -1
+hypnoshroom_30x33
+  rotate: false
+  xy: 180, 120
+  size: 19, 21
+  orig: 19, 21
+  offset: 0, 0
+  index: -1
+hypnoshroom_31x29
+  rotate: false
+  xy: 90, 148
+  size: 20, 19
+  orig: 20, 19
+  offset: 0, 0
+  index: -1
+hypnoshroom_37x39
+  rotate: false
+  xy: 216, 143
+  size: 24, 25
+  orig: 24, 25
+  offset: 0, 0
+  index: -1
+hypnoshroom_42x182
+  rotate: false
+  xy: 176, 1
+  size: 27, 117
+  orig: 27, 117
+  offset: 0, 0
+  index: -1
+hypnoshroom_45x59
+  rotate: false
+  xy: 110, 108
+  size: 29, 38
+  orig: 29, 38
+  offset: 0, 0
+  index: -1
+hypnoshroom_48x48
+  rotate: false
+  xy: 57, 137
+  size: 31, 31
+  orig: 31, 31
+  offset: 0, 0
+  index: -1
+hypnoshroom_53x40
+  rotate: false
+  xy: 180, 143
+  size: 34, 26
+  orig: 34, 26
+  offset: 0, 0
+  index: -1
+hypnoshroom_56x65
+  rotate: false
+  xy: 205, 99
+  size: 36, 42
+  orig: 36, 42
+  offset: 0, 0
+  index: -1
+hypnoshroom_57x45
+  rotate: false
+  xy: 141, 120
+  size: 37, 29
+  orig: 37, 29
+  offset: 0, 0
+  index: -1
+hypnoshroom_73x76
+  rotate: false
+  xy: 205, 1
+  size: 47, 49
+  orig: 47, 49
+  offset: 0, 0
+  index: -1
+hypnoshroom_74x70
+  rotate: false
+  xy: 205, 52
+  size: 48, 45
+  orig: 48, 45
+  offset: 0, 0
+  index: -1
+hypnoshroom_79x45
+  rotate: false
+  xy: 57, 106
+  size: 51, 29
+  orig: 51, 29
+  offset: 0, 0
+  index: -1
+hypnoshroom_84x75
+  rotate: false
+  xy: 1, 106
+  size: 54, 48
+  orig: 54, 48
+  offset: 0, 0
+  index: -1
+hypnoshroom_91x78
+  rotate: false
+  xy: 114, 56
+  size: 58, 50
+  orig: 58, 50
+  offset: 0, 0
+  index: -1
+hypnoshroom_93x82
+  rotate: false
+  xy: 114, 1
+  size: 60, 53
+  orig: 60, 53
+  offset: 0, 0
+  index: -1

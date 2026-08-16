@@ -1,0 +1,264 @@
+plantpeashooter_768_00.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+peashooter_101x76
+  rotate: false
+  xy: 135, 1
+  size: 65, 49
+  orig: 65, 49
+  offset: 0, 0
+  index: -1
+peashooter_102x80
+  rotate: false
+  xy: 67, 1
+  size: 66, 51
+  orig: 66, 51
+  offset: 0, 0
+  index: -1
+peashooter_11x11
+  rotate: false
+  xy: 248, 13
+  size: 7, 7
+  orig: 7, 7
+  offset: 0, 0
+  index: -1
+peashooter_17x7
+  rotate: false
+  xy: 49, 106
+  size: 11, 5
+  orig: 11, 5
+  offset: 0, 0
+  index: -1
+peashooter_18x20
+  rotate: false
+  xy: 244, 110
+  size: 12, 13
+  orig: 12, 13
+  offset: 0, 0
+  index: -1
+peashooter_18x30
+  rotate: false
+  xy: 244, 89
+  size: 12, 19
+  orig: 12, 19
+  offset: 0, 0
+  index: -1
+peashooter_21x17
+  rotate: false
+  xy: 133, 144
+  size: 14, 11
+  orig: 14, 11
+  offset: 0, 0
+  index: -1
+peashooter_21x17_2
+  rotate: false
+  xy: 149, 144
+  size: 14, 11
+  orig: 14, 11
+  offset: 0, 0
+  index: -1
+peashooter_21x20
+  rotate: false
+  xy: 26, 131
+  size: 14, 13
+  orig: 14, 13
+  offset: 0, 0
+  index: -1
+peashooter_21x23
+  rotate: false
+  xy: 100, 129
+  size: 14, 15
+  orig: 14, 15
+  offset: 0, 0
+  index: -1
+peashooter_21x24
+  rotate: false
+  xy: 84, 129
+  size: 14, 16
+  orig: 14, 16
+  offset: 0, 0
+  index: -1
+peashooter_21x27
+  rotate: false
+  xy: 242, 69
+  size: 14, 18
+  orig: 14, 18
+  offset: 0, 0
+  index: -1
+peashooter_22x27
+  rotate: false
+  xy: 242, 126
+  size: 14, 18
+  orig: 14, 18
+  offset: 0, 0
+  index: -1
+peashooter_23x17
+  rotate: false
+  xy: 1, 137
+  size: 15, 11
+  orig: 15, 11
+  offset: 0, 0
+  index: -1
+peashooter_23x21
+  rotate: false
+  xy: 116, 129
+  size: 15, 14
+  orig: 15, 14
+  offset: 0, 0
+  index: -1
+peashooter_23x23
+  rotate: false
+  xy: 67, 129
+  size: 15, 15
+  orig: 15, 15
+  offset: 0, 0
+  index: -1
+peashooter_23x43
+  rotate: false
+  xy: 198, 126
+  size: 15, 28
+  orig: 15, 28
+  offset: 0, 0
+  index: -1
+peashooter_24x19
+  rotate: false
+  xy: 133, 130
+  size: 16, 12
+  orig: 16, 12
+  offset: 0, 0
+  index: -1
+peashooter_24x33
+  rotate: false
+  xy: 49, 129
+  size: 16, 21
+  orig: 16, 21
+  offset: 0, 0
+  index: -1
+peashooter_26x36
+  rotate: false
+  xy: 166, 127
+  size: 17, 23
+  orig: 17, 23
+  offset: 0, 0
+  index: -1
+peashooter_33x35
+  rotate: false
+  xy: 26, 106
+  size: 21, 23
+  orig: 21, 23
+  offset: 0, 0
+  index: -1
+peashooter_36x45
+  rotate: false
+  xy: 1, 106
+  size: 23, 29
+  orig: 23, 29
+  offset: 0, 0
+  index: -1
+peashooter_38x24
+  rotate: false
+  xy: 215, 126
+  size: 25, 16
+  orig: 25, 16
+  offset: 0, 0
+  index: -1
+peashooter_46x35
+  rotate: false
+  xy: 166, 102
+  size: 30, 23
+  orig: 30, 23
+  offset: 0, 0
+  index: -1
+peashooter_47x41
+  rotate: false
+  xy: 134, 102
+  size: 30, 26
+  orig: 30, 26
+  offset: 0, 0
+  index: -1
+peashooter_49x38
+  rotate: false
+  xy: 100, 102
+  size: 32, 25
+  orig: 32, 25
+  offset: 0, 0
+  index: -1
+peashooter_55x38
+  rotate: false
+  xy: 63, 102
+  size: 35, 25
+  orig: 35, 25
+  offset: 0, 0
+  index: -1
+peashooter_60x44
+  rotate: false
+  xy: 201, 69
+  size: 39, 28
+  orig: 39, 28
+  offset: 0, 0
+  index: -1
+peashooter_64x39
+  rotate: false
+  xy: 201, 99
+  size: 41, 25
+  orig: 41, 25
+  offset: 0, 0
+  index: -1
+peashooter_69x63
+  rotate: false
+  xy: 202, 1
+  size: 44, 41
+  orig: 44, 41
+  offset: 0, 0
+  index: -1
+peashooter_81x36
+  rotate: false
+  xy: 202, 44
+  size: 52, 23
+  orig: 52, 23
+  offset: 0, 0
+  index: -1
+peashooter_8x16
+  rotate: false
+  xy: 248, 1
+  size: 5, 10
+  orig: 5, 10
+  offset: 0, 0
+  index: -1
+peashooter_8x8
+  rotate: false
+  xy: 248, 22
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+peashooter_93x68
+  rotate: false
+  xy: 1, 60
+  size: 60, 44
+  orig: 60, 44
+  offset: 0, 0
+  index: -1
+peashooter_94x71
+  rotate: false
+  xy: 67, 54
+  size: 60, 46
+  orig: 60, 46
+  offset: 0, 0
+  index: -1
+peashooter_99x74
+  rotate: false
+  xy: 135, 52
+  size: 64, 48
+  orig: 64, 48
+  offset: 0, 0
+  index: -1
+peashooter_99x88
+  rotate: false
+  xy: 1, 1
+  size: 64, 57
+  orig: 64, 57
+  offset: 0, 0
+  index: -1

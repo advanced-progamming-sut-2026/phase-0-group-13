@@ -1,0 +1,292 @@
+plantthreepeater_768_00.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+threepeater_10x16
+  rotate: false
+  xy: 78, 106
+  size: 7, 10
+  orig: 7, 10
+  offset: 0, 0
+  index: -1
+threepeater_12x12
+  rotate: false
+  xy: 153, 145
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+threepeater_132x124
+  rotate: false
+  xy: 1, 1
+  size: 85, 80
+  orig: 85, 80
+  offset: 0, 0
+  index: -1
+threepeater_14x14
+  rotate: false
+  xy: 103, 120
+  size: 9, 9
+  orig: 9, 9
+  offset: 0, 0
+  index: -1
+threepeater_16x21
+  rotate: false
+  xy: 72, 138
+  size: 10, 14
+  orig: 10, 14
+  offset: 0, 0
+  index: -1
+threepeater_17x39
+  rotate: false
+  xy: 240, 121
+  size: 11, 25
+  orig: 11, 25
+  offset: 0, 0
+  index: -1
+threepeater_17x7
+  rotate: false
+  xy: 163, 146
+  size: 11, 5
+  orig: 11, 5
+  offset: 0, 0
+  index: -1
+threepeater_18x20
+  rotate: false
+  xy: 35, 137
+  size: 12, 13
+  orig: 12, 13
+  offset: 0, 0
+  index: -1
+threepeater_19x16
+  rotate: false
+  xy: 84, 138
+  size: 12, 10
+  orig: 12, 10
+  offset: 0, 0
+  index: -1
+threepeater_21x17
+  rotate: false
+  xy: 214, 137
+  size: 14, 11
+  orig: 14, 11
+  offset: 0, 0
+  index: -1
+threepeater_21x20
+  rotate: false
+  xy: 198, 135
+  size: 14, 13
+  orig: 14, 13
+  offset: 0, 0
+  index: -1
+threepeater_21x23
+  rotate: false
+  xy: 103, 134
+  size: 14, 15
+  orig: 14, 15
+  offset: 0, 0
+  index: -1
+threepeater_21x23_2
+  rotate: false
+  xy: 119, 134
+  size: 14, 15
+  orig: 14, 15
+  offset: 0, 0
+  index: -1
+threepeater_21x39
+  rotate: false
+  xy: 141, 102
+  size: 14, 25
+  orig: 14, 25
+  offset: 0, 0
+  index: -1
+threepeater_23x17
+  rotate: false
+  xy: 18, 137
+  size: 15, 11
+  orig: 15, 11
+  offset: 0, 0
+  index: -1
+threepeater_23x23
+  rotate: false
+  xy: 1, 133
+  size: 15, 15
+  orig: 15, 15
+  offset: 0, 0
+  index: -1
+threepeater_24x19
+  rotate: false
+  xy: 135, 134
+  size: 16, 12
+  orig: 16, 12
+  offset: 0, 0
+  index: -1
+threepeater_24x26
+  rotate: false
+  xy: 157, 126
+  size: 16, 17
+  orig: 16, 17
+  offset: 0, 0
+  index: -1
+threepeater_26x20
+  rotate: false
+  xy: 53, 133
+  size: 17, 13
+  orig: 17, 13
+  offset: 0, 0
+  index: -1
+threepeater_26x36
+  rotate: false
+  xy: 236, 24
+  size: 17, 23
+  orig: 17, 23
+  offset: 0, 0
+  index: -1
+threepeater_30x32
+  rotate: false
+  xy: 236, 1
+  size: 19, 21
+  orig: 19, 21
+  offset: 0, 0
+  index: -1
+threepeater_32x13
+  rotate: false
+  xy: 175, 135
+  size: 21, 9
+  orig: 21, 9
+  offset: 0, 0
+  index: -1
+threepeater_35x21
+  rotate: false
+  xy: 215, 121
+  size: 23, 14
+  orig: 23, 14
+  offset: 0, 0
+  index: -1
+threepeater_35x25
+  rotate: false
+  xy: 78, 120
+  size: 23, 16
+  orig: 23, 16
+  offset: 0, 0
+  index: -1
+threepeater_35x46
+  rotate: false
+  xy: 116, 102
+  size: 23, 30
+  orig: 23, 30
+  offset: 0, 0
+  index: -1
+threepeater_36x38
+  rotate: false
+  xy: 53, 106
+  size: 23, 25
+  orig: 23, 25
+  offset: 0, 0
+  index: -1
+threepeater_36x45
+  rotate: false
+  xy: 28, 106
+  size: 23, 29
+  orig: 23, 29
+  offset: 0, 0
+  index: -1
+threepeater_37x45
+  rotate: false
+  xy: 231, 90
+  size: 24, 29
+  orig: 24, 29
+  offset: 0, 0
+  index: -1
+threepeater_38x24
+  rotate: false
+  xy: 188, 117
+  size: 25, 16
+  orig: 25, 16
+  offset: 0, 0
+  index: -1
+threepeater_38x74
+  rotate: false
+  xy: 1, 83
+  size: 25, 48
+  orig: 25, 48
+  offset: 0, 0
+  index: -1
+threepeater_41x93
+  rotate: false
+  xy: 88, 58
+  size: 26, 60
+  orig: 26, 60
+  offset: 0, 0
+  index: -1
+threepeater_44x39
+  rotate: false
+  xy: 158, 99
+  size: 28, 25
+  orig: 28, 25
+  offset: 0, 0
+  index: -1
+threepeater_49x38
+  rotate: false
+  xy: 197, 90
+  size: 32, 25
+  orig: 32, 25
+  offset: 0, 0
+  index: -1
+threepeater_56x79
+  rotate: false
+  xy: 198, 1
+  size: 36, 51
+  orig: 36, 51
+  offset: 0, 0
+  index: -1
+threepeater_58x55
+  rotate: false
+  xy: 158, 62
+  size: 37, 35
+  orig: 37, 35
+  offset: 0, 0
+  index: -1
+threepeater_62x59
+  rotate: false
+  xy: 116, 62
+  size: 40, 38
+  orig: 40, 38
+  offset: 0, 0
+  index: -1
+threepeater_74x92
+  rotate: false
+  xy: 148, 1
+  size: 48, 59
+  orig: 48, 59
+  offset: 0, 0
+  index: -1
+threepeater_77x53
+  rotate: false
+  xy: 198, 54
+  size: 50, 34
+  orig: 50, 34
+  offset: 0, 0
+  index: -1
+threepeater_83x32
+  rotate: false
+  xy: 28, 83
+  size: 53, 21
+  orig: 53, 21
+  offset: 0, 0
+  index: -1
+threepeater_91x85
+  rotate: false
+  xy: 88, 1
+  size: 58, 55
+  orig: 58, 55
+  offset: 0, 0
+  index: -1
+threepeater_9x17
+  rotate: false
+  xy: 250, 58
+  size: 6, 11
+  orig: 6, 11
+  offset: 0, 0
+  index: -1

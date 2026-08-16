@@ -1,0 +1,27 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "idle": 1.9667,
+        "jump_down_left": 0.8,
+        "jump_down_right": 0.8,
+        "jump_up_left": 0.8,
+        "jump_up_right": 0.8,
+        "plantfood_jump_down_left": 0.7,
+        "plantfood_jump_down_right": 0.7333,
+        "size_up": 1.2,
+        "turn": 1.2,
+        "water": 2.3667
+      },
+      "name": "SQUASH",
+      "pam": "768/INITIAL/PLANT/SQUASH/SQUASH.PAM"
+    }
+  ],
+  "atlas": "textures/plants/squash.atlas",
+  "entity": "Squash",
+  "source_folder": "images/768/.../squash"
+}

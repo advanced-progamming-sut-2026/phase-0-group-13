@@ -1,0 +1,24 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "attack": 1.0333,
+        "idle": 1.0333,
+        "idle2": 1.0333,
+        "plantfood": 0.7,
+        "plantfood_end": 0.5667,
+        "plantfood_loop": 0.7,
+        "water": 4
+      },
+      "name": "FIREPEASHOOTER",
+      "pam": "768/INITIAL/PLANT/FIREPEASHOOTER/FIREPEASHOOTER.PAM"
+    }
+  ],
+  "atlas": "textures/plants/firepeashooter.atlas",
+  "entity": "Fire Peashooter",
+  "source_folder": "images/768/.../firepeashooter"
+}

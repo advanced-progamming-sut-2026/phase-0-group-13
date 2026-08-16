@@ -1,0 +1,173 @@
+planttallnut_768_00.png
+size: 256,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+tallnut_137x141
+  rotate: false
+  xy: 104, 104
+  size: 88, 90
+  orig: 88, 90
+  offset: 0, 0
+  index: -1
+tallnut_138x123
+  rotate: false
+  xy: 1, 281
+  size: 89, 79
+  orig: 89, 79
+  offset: 0, 0
+  index: -1
+tallnut_138x157
+  rotate: false
+  xy: 104, 1
+  size: 89, 101
+  orig: 89, 101
+  offset: 0, 0
+  index: -1
+tallnut_139x130
+  rotate: false
+  xy: 65, 196
+  size: 89, 83
+  orig: 89, 83
+  offset: 0, 0
+  index: -1
+tallnut_157x160
+  rotate: false
+  xy: 1, 1
+  size: 101, 103
+  orig: 101, 103
+  offset: 0, 0
+  index: -1
+tallnut_23x12
+  rotate: false
+  xy: 219, 92
+  size: 15, 8
+  orig: 15, 8
+  offset: 0, 0
+  index: -1
+tallnut_26x11
+  rotate: false
+  xy: 236, 92
+  size: 17, 7
+  orig: 17, 7
+  offset: 0, 0
+  index: -1
+tallnut_32x21
+  rotate: false
+  xy: 65, 179
+  size: 21, 14
+  orig: 21, 14
+  offset: 0, 0
+  index: -1
+tallnut_32x31
+  rotate: false
+  xy: 65, 157
+  size: 21, 20
+  orig: 21, 20
+  offset: 0, 0
+  index: -1
+tallnut_32x31_2
+  rotate: false
+  xy: 156, 196
+  size: 21, 20
+  orig: 21, 20
+  offset: 0, 0
+  index: -1
+tallnut_32x31_3
+  rotate: false
+  xy: 1, 251
+  size: 21, 20
+  orig: 21, 20
+  offset: 0, 0
+  index: -1
+tallnut_34x18
+  rotate: false
+  xy: 195, 92
+  size: 22, 12
+  orig: 22, 12
+  offset: 0, 0
+  index: -1
+tallnut_36x28
+  rotate: false
+  xy: 24, 251
+  size: 23, 18
+  orig: 23, 18
+  offset: 0, 0
+  index: -1
+tallnut_36x28_2
+  rotate: false
+  xy: 219, 343
+  size: 23, 18
+  orig: 23, 18
+  offset: 0, 0
+  index: -1
+tallnut_48x178
+  rotate: false
+  xy: 219, 227
+  size: 31, 114
+  orig: 31, 114
+  offset: 0, 0
+  index: -1
+tallnut_56x76
+  rotate: false
+  xy: 65, 106
+  size: 36, 49
+  orig: 36, 49
+  offset: 0, 0
+  index: -1
+tallnut_78x48
+  rotate: false
+  xy: 195, 59
+  size: 50, 31
+  orig: 50, 31
+  offset: 0, 0
+  index: -1
+tallnut_83x32
+  rotate: false
+  xy: 1, 228
+  size: 53, 21
+  orig: 53, 21
+  offset: 0, 0
+  index: -1
+tallnut_85x185
+  rotate: false
+  xy: 92, 281
+  size: 55, 119
+  orig: 55, 119
+  offset: 0, 0
+  index: -1
+tallnut_8x8
+  rotate: false
+  xy: 247, 59
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+tallnut_91x87
+  rotate: false
+  xy: 195, 1
+  size: 58, 56
+  orig: 58, 56
+  offset: 0, 0
+  index: -1
+tallnut_95x181
+  rotate: false
+  xy: 156, 227
+  size: 61, 116
+  orig: 61, 116
+  offset: 0, 0
+  index: -1
+tallnut_96x185
+  rotate: false
+  xy: 194, 106
+  size: 62, 119
+  orig: 62, 119
+  offset: 0, 0
+  index: -1
+tallnut_96x187
+  rotate: false
+  xy: 1, 106
+  size: 62, 120
+  orig: 62, 120
+  offset: 0, 0
+  index: -1

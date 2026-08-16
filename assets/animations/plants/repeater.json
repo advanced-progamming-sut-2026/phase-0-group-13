@@ -1,0 +1,22 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "attack": 1,
+        "idle": 1,
+        "plantfood": 0.4,
+        "plantfood2": 2.4333,
+        "water": 1.8333
+      },
+      "name": "REPEATER",
+      "pam": "768/INITIAL/PLANT/REPEATER/REPEATER.PAM"
+    }
+  ],
+  "atlas": "textures/plants/repeater.atlas",
+  "entity": "Repeater",
+  "source_folder": "images/768/.../repeater"
+}

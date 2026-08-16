@@ -1,0 +1,23 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "die": 3.5,
+        "eat": 8.4667,
+        "idle": 3.3333,
+        "particles": 0.0333,
+        "push": 4.0333,
+        "walk": 4.0333
+      },
+      "name": "ZOMBIE_ICEAGE_TROGLOBITE",
+      "pam": "768/FULL/ZOMBIE/ZOMBIE_ICEAGE_TROGLOBITE/ZOMBIE_ICEAGE_TROGLOBITE.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombieiceagetroglobite.atlas",
+  "entity": "ZombieIceAgeTroglobite",
+  "source_folder": "images/768/.../zombie_iceage_troglobite"
+}

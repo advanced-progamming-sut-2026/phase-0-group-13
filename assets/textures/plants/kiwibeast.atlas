@@ -1,0 +1,215 @@
+plantkiwibeast_768_00.png
+size: 256,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+kiwibeast_108x215
+  rotate: false
+  xy: 121, 121
+  size: 69, 138
+  orig: 69, 138
+  offset: 0, 0
+  index: -1
+kiwibeast_114x114
+  rotate: false
+  xy: 85, 261
+  size: 73, 73
+  orig: 73, 73
+  offset: 0, 0
+  index: -1
+kiwibeast_127x147
+  rotate: false
+  xy: 1, 241
+  size: 82, 94
+  orig: 82, 94
+  offset: 0, 0
+  index: -1
+kiwibeast_13x20
+  rotate: false
+  xy: 241, 78
+  size: 9, 13
+  orig: 9, 13
+  offset: 0, 0
+  index: -1
+kiwibeast_152x38
+  rotate: false
+  xy: 101, 382
+  size: 98, 25
+  orig: 98, 25
+  offset: 0, 0
+  index: -1
+kiwibeast_181x69
+  rotate: false
+  xy: 85, 336
+  size: 116, 44
+  orig: 116, 44
+  offset: 0, 0
+  index: -1
+kiwibeast_18x18
+  rotate: false
+  xy: 241, 64
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+kiwibeast_20x19
+  rotate: false
+  xy: 241, 50
+  size: 13, 12
+  orig: 13, 12
+  offset: 0, 0
+  index: -1
+kiwibeast_21x23
+  rotate: false
+  xy: 241, 1
+  size: 14, 15
+  orig: 14, 15
+  offset: 0, 0
+  index: -1
+kiwibeast_22x22
+  rotate: false
+  xy: 241, 34
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
+kiwibeast_23x28
+  rotate: false
+  xy: 85, 241
+  size: 15, 18
+  orig: 15, 18
+  offset: 0, 0
+  index: -1
+kiwibeast_23x28_2
+  rotate: false
+  xy: 102, 241
+  size: 15, 18
+  orig: 15, 18
+  offset: 0, 0
+  index: -1
+kiwibeast_24x52
+  rotate: false
+  xy: 160, 296
+  size: 16, 34
+  orig: 16, 34
+  offset: 0, 0
+  index: -1
+kiwibeast_25x53
+  rotate: false
+  xy: 57, 337
+  size: 16, 34
+  orig: 16, 34
+  offset: 0, 0
+  index: -1
+kiwibeast_27x17
+  rotate: false
+  xy: 221, 421
+  size: 18, 11
+  orig: 18, 11
+  offset: 0, 0
+  index: -1
+kiwibeast_27x22
+  rotate: false
+  xy: 201, 421
+  size: 18, 14
+  orig: 18, 14
+  offset: 0, 0
+  index: -1
+kiwibeast_27x92
+  rotate: false
+  xy: 232, 252
+  size: 18, 59
+  orig: 18, 59
+  offset: 0, 0
+  index: -1
+kiwibeast_28x30
+  rotate: false
+  xy: 178, 313
+  size: 18, 19
+  orig: 18, 19
+  offset: 0, 0
+  index: -1
+kiwibeast_32x38
+  rotate: false
+  xy: 178, 421
+  size: 21, 25
+  orig: 21, 25
+  offset: 0, 0
+  index: -1
+kiwibeast_42x51
+  rotate: false
+  xy: 160, 261
+  size: 27, 33
+  orig: 27, 33
+  offset: 0, 0
+  index: -1
+kiwibeast_53x60
+  rotate: false
+  xy: 1, 409
+  size: 34, 39
+  orig: 34, 39
+  offset: 0, 0
+  index: -1
+kiwibeast_53x60_2
+  rotate: false
+  xy: 37, 409
+  size: 34, 39
+  orig: 34, 39
+  offset: 0, 0
+  index: -1
+kiwibeast_72x54
+  rotate: false
+  xy: 203, 313
+  size: 46, 35
+  orig: 46, 35
+  offset: 0, 0
+  index: -1
+kiwibeast_77x126
+  rotate: false
+  xy: 192, 121
+  size: 50, 81
+  orig: 50, 81
+  offset: 0, 0
+  index: -1
+kiwibeast_77x39
+  rotate: false
+  xy: 126, 409
+  size: 50, 25
+  orig: 50, 25
+  offset: 0, 0
+  index: -1
+kiwibeast_79x39
+  rotate: false
+  xy: 73, 409
+  size: 51, 25
+  orig: 51, 25
+  offset: 0, 0
+  index: -1
+kiwibeast_80x40
+  rotate: false
+  xy: 203, 350
+  size: 51, 26
+  orig: 51, 26
+  offset: 0, 0
+  index: -1
+kiwibeast_84x57
+  rotate: false
+  xy: 201, 382
+  size: 54, 37
+  orig: 54, 37
+  offset: 0, 0
+  index: -1
+kiwibeast_84x63
+  rotate: false
+  xy: 1, 337
+  size: 54, 41
+  orig: 54, 41
+  offset: 0, 0
+  index: -1
+kiwibeast_92x71
+  rotate: false
+  xy: 192, 204
+  size: 59, 46
+  orig: 59, 46
+  offset: 0, 0
+  index: -1

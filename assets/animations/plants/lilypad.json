@@ -1,0 +1,24 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "idle": 0.0667,
+        "idle2": 0.3,
+        "idle3": 2.1667,
+        "idle4": 3.1,
+        "idle5": 3.2333,
+        "plantfood": 2.1667,
+        "water": 3.5333
+      },
+      "name": "LILYPAD",
+      "pam": "768/FULL/PLANT/LILYPAD/LILYPAD.PAM"
+    }
+  ],
+  "atlas": "textures/plants/lilypad.atlas",
+  "entity": "Lily Pad",
+  "source_folder": "images/768/.../lilypad"
+}

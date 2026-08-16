@@ -1,0 +1,264 @@
+zombieiceagetroglobitegroup_768_00.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+zombie_iceage_troglobite_100x75
+  rotate: false
+  xy: 137, 1
+  size: 64, 48
+  orig: 64, 48
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_112x104
+  rotate: false
+  xy: 1, 1
+  size: 72, 67
+  orig: 72, 67
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_135x8
+  rotate: false
+  xy: 83, 195
+  size: 87, 5
+  orig: 87, 5
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_23x23
+  rotate: false
+  xy: 241, 163
+  size: 15, 15
+  orig: 15, 15
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_24x24
+  rotate: false
+  xy: 239, 145
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_28x53
+  rotate: false
+  xy: 139, 159
+  size: 18, 34
+  orig: 18, 34
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_29x56
+  rotate: false
+  xy: 118, 143
+  size: 19, 36
+  orig: 19, 36
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_29x57
+  rotate: false
+  xy: 236, 52
+  size: 19, 37
+  orig: 19, 37
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_31x31
+  rotate: false
+  xy: 184, 178
+  size: 20, 20
+  orig: 20, 20
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_34x54
+  rotate: false
+  xy: 187, 141
+  size: 22, 35
+  orig: 22, 35
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_35x60
+  rotate: false
+  xy: 232, 104
+  size: 23, 39
+  orig: 23, 39
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_36x39
+  rotate: false
+  xy: 159, 159
+  size: 23, 25
+  orig: 23, 25
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_36x45
+  rotate: false
+  xy: 59, 144
+  size: 23, 29
+  orig: 23, 29
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_37x30
+  rotate: false
+  xy: 57, 176
+  size: 24, 19
+  orig: 24, 19
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_38x32
+  rotate: false
+  xy: 30, 176
+  size: 25, 21
+  orig: 25, 21
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_38x46
+  rotate: false
+  xy: 32, 144
+  size: 25, 30
+  orig: 25, 30
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_40x30
+  rotate: false
+  xy: 1, 180
+  size: 26, 19
+  orig: 26, 19
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_40x40
+  rotate: false
+  xy: 211, 145
+  size: 26, 26
+  orig: 26, 26
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_42x39
+  rotate: false
+  xy: 1, 153
+  size: 27, 25
+  orig: 27, 25
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_43x31
+  rotate: false
+  xy: 211, 173
+  size: 28, 20
+  orig: 28, 20
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_45x41
+  rotate: false
+  xy: 87, 143
+  size: 29, 26
+  orig: 29, 26
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_45x51
+  rotate: false
+  xy: 1, 118
+  size: 29, 33
+  orig: 29, 33
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_47x30
+  rotate: false
+  xy: 84, 171
+  size: 30, 19
+  orig: 30, 19
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_52x33
+  rotate: false
+  xy: 98, 74
+  size: 34, 21
+  orig: 34, 21
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_57x48
+  rotate: false
+  xy: 48, 111
+  size: 37, 31
+  orig: 37, 31
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_62x62
+  rotate: false
+  xy: 98, 101
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_63x55
+  rotate: false
+  xy: 189, 104
+  size: 41, 35
+  orig: 41, 35
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_65x78
+  rotate: false
+  xy: 192, 52
+  size: 42, 50
+  orig: 42, 50
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_67x76
+  rotate: false
+  xy: 203, 1
+  size: 43, 49
+  orig: 43, 49
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_6x6
+  rotate: false
+  xy: 248, 1
+  size: 4, 4
+  orig: 4, 4
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_6x6_2
+  rotate: false
+  xy: 248, 7
+  size: 4, 4
+  orig: 4, 4
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_70x34
+  rotate: false
+  xy: 140, 135
+  size: 45, 22
+  orig: 45, 22
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_70x72
+  rotate: false
+  xy: 1, 70
+  size: 45, 46
+  orig: 45, 46
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_73x50
+  rotate: false
+  xy: 140, 101
+  size: 47, 32
+  orig: 47, 32
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_75x55
+  rotate: false
+  xy: 48, 74
+  size: 48, 35
+  orig: 48, 35
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_82x75
+  rotate: false
+  xy: 137, 51
+  size: 53, 48
+  orig: 53, 48
+  offset: 0, 0
+  index: -1
+zombie_iceage_troglobite_94x111
+  rotate: false
+  xy: 75, 1
+  size: 60, 71
+  orig: 60, 71
+  offset: 0, 0
+  index: -1

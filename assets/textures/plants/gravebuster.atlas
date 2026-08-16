@@ -1,0 +1,124 @@
+plantgravebuster_768_00.png
+size: 512,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+gravebuster_111x41
+  rotate: false
+  xy: 1, 165
+  size: 71, 26
+  orig: 71, 26
+  offset: 0, 0
+  index: -1
+gravebuster_128x48
+  rotate: false
+  xy: 266, 145
+  size: 82, 31
+  orig: 82, 31
+  offset: 0, 0
+  index: -1
+gravebuster_130x45
+  rotate: false
+  xy: 350, 157
+  size: 83, 29
+  orig: 83, 29
+  offset: 0, 0
+  index: -1
+gravebuster_137x56
+  rotate: false
+  xy: 379, 119
+  size: 88, 36
+  orig: 88, 36
+  offset: 0, 0
+  index: -1
+gravebuster_137x76
+  rotate: false
+  xy: 397, 68
+  size: 88, 49
+  orig: 88, 49
+  offset: 0, 0
+  index: -1
+gravebuster_138x50
+  rotate: false
+  xy: 175, 145
+  size: 89, 32
+  orig: 89, 32
+  offset: 0, 0
+  index: -1
+gravebuster_151x95
+  rotate: false
+  xy: 275, 1
+  size: 97, 61
+  orig: 97, 61
+  offset: 0, 0
+  index: -1
+gravebuster_161x46
+  rotate: false
+  xy: 70, 133
+  size: 103, 30
+  orig: 103, 30
+  offset: 0, 0
+  index: -1
+gravebuster_18x20
+  rotate: false
+  xy: 451, 157
+  size: 12, 13
+  orig: 12, 13
+  offset: 0, 0
+  index: -1
+gravebuster_21x20
+  rotate: false
+  xy: 435, 157
+  size: 14, 13
+  orig: 14, 13
+  offset: 0, 0
+  index: -1
+gravebuster_31x26
+  rotate: false
+  xy: 487, 69
+  size: 20, 17
+  orig: 20, 17
+  offset: 0, 0
+  index: -1
+gravebuster_35x26
+  rotate: false
+  xy: 487, 50
+  size: 23, 17
+  orig: 23, 17
+  offset: 0, 0
+  index: -1
+gravebuster_40x23
+  rotate: false
+  xy: 301, 178
+  size: 26, 15
+  orig: 26, 15
+  offset: 0, 0
+  index: -1
+gravebuster_51x39
+  rotate: false
+  xy: 266, 178
+  size: 33, 25
+  orig: 33, 25
+  offset: 0, 0
+  index: -1
+gravebuster_53x22
+  rotate: false
+  xy: 450, 50
+  size: 34, 14
+  orig: 34, 14
+  offset: 0, 0
+  index: -1
+gravebuster_66x63
+  rotate: false
+  xy: 74, 165
+  size: 42, 41
+  orig: 42, 41
+  offset: 0, 0
+  index: -1
+gravebuster_95x36
+  rotate: false
+  xy: 435, 173
+  size: 61, 23
+  orig: 61, 23
+  offset: 0, 0
+  index: -1

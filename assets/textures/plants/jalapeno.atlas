@@ -1,0 +1,96 @@
+plantjalapeno_768_00.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+jalapeno_105x55
+  rotate: false
+  xy: 136, 84
+  size: 67, 35
+  orig: 67, 35
+  offset: 0, 0
+  index: -1
+jalapeno_111x185
+  rotate: false
+  xy: 1, 1
+  size: 71, 119
+  orig: 71, 119
+  offset: 0, 0
+  index: -1
+jalapeno_24x22
+  rotate: false
+  xy: 233, 25
+  size: 16, 14
+  orig: 16, 14
+  offset: 0, 0
+  index: -1
+jalapeno_34x34
+  rotate: false
+  xy: 233, 1
+  size: 22, 22
+  orig: 22, 22
+  offset: 0, 0
+  index: -1
+jalapeno_40x37
+  rotate: false
+  xy: 136, 121
+  size: 26, 24
+  orig: 26, 24
+  offset: 0, 0
+  index: -1
+jalapeno_46x49
+  rotate: false
+  xy: 198, 33
+  size: 30, 32
+  orig: 30, 32
+  offset: 0, 0
+  index: -1
+jalapeno_46x49_2
+  rotate: false
+  xy: 205, 67
+  size: 30, 32
+  orig: 30, 32
+  offset: 0, 0
+  index: -1
+jalapeno_46x49_3
+  rotate: false
+  xy: 205, 101
+  size: 30, 32
+  orig: 30, 32
+  offset: 0, 0
+  index: -1
+jalapeno_51x47
+  rotate: false
+  xy: 198, 1
+  size: 33, 30
+  orig: 33, 30
+  offset: 0, 0
+  index: -1
+jalapeno_8x8
+  rotate: false
+  xy: 251, 33
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+jalapeno_94x126
+  rotate: false
+  xy: 74, 1
+  size: 60, 81
+  orig: 60, 81
+  offset: 0, 0
+  index: -1
+jalapeno_94x126_2
+  rotate: false
+  xy: 136, 1
+  size: 60, 81
+  orig: 60, 81
+  offset: 0, 0
+  index: -1
+jalapeno_94x126_3
+  rotate: false
+  xy: 74, 84
+  size: 60, 81
+  orig: 60, 81
+  offset: 0, 0
+  index: -1

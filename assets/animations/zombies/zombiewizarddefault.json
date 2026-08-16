@@ -1,0 +1,23 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "die": 2.1667,
+        "eat": 8.6333,
+        "idle": 2.8667,
+        "particles": 0.0333,
+        "sheep": 2.3,
+        "walk": 3
+      },
+      "name": "ZOMBIE_DARK_WIZARD",
+      "pam": "768/FULL/ZOMBIE/ZOMBIE_DARK_WIZARD/ZOMBIE_DARK_WIZARD.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombiewizarddefault.atlas",
+  "entity": "ZombieWizardDefault",
+  "source_folder": "images/768/.../zombie_dark_wizard"
+}

@@ -1,0 +1,54 @@
+plantpumpkin_768_00.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+pumpkin_126x85
+  rotate: false
+  xy: 1, 115
+  size: 81, 55
+  orig: 81, 55
+  offset: 0, 0
+  index: -1
+pumpkin_165x39
+  rotate: false
+  xy: 84, 158
+  size: 106, 25
+  orig: 106, 25
+  offset: 0, 0
+  index: -1
+pumpkin_165x77
+  rotate: false
+  xy: 109, 106
+  size: 106, 50
+  orig: 106, 50
+  offset: 0, 0
+  index: -1
+pumpkin_165x86
+  rotate: false
+  xy: 1, 58
+  size: 106, 55
+  orig: 106, 55
+  offset: 0, 0
+  index: -1
+pumpkin_179x86
+  rotate: false
+  xy: 1, 1
+  size: 115, 55
+  orig: 115, 55
+  offset: 0, 0
+  index: -1
+pumpkin_187x78
+  rotate: false
+  xy: 118, 54
+  size: 120, 50
+  orig: 120, 50
+  offset: 0, 0
+  index: -1
+pumpkin_187x79
+  rotate: false
+  xy: 118, 1
+  size: 120, 51
+  orig: 120, 51
+  offset: 0, 0
+  index: -1
