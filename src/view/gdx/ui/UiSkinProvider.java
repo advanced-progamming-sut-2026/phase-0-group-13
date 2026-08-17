@@ -40,6 +40,8 @@ public final class UiSkinProvider implements Disposable {
   public static final String BUTTON_BROWN = "brown";
   public static final String BUTTON_PURPLE = "purple";
   public static final String PANEL_BACKGROUND = "image_ui_dialog_asset_inner_bkgd_10";
+  public static final String DIALOG_BORDER = "image_ui_dialog_asset_dialogborder_10";
+  public static final String MODAL_DIM = "modal_background";
   public static final String COIN_ICON = "image_ui_generic_coin_icon_small";
   public static final String GEM_ICON = "image_ui_generic_gem_icon_small";
 
