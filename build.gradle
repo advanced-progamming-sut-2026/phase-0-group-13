@@ -69,6 +69,18 @@ tasks.register('runGdx', JavaExec) {
         jvmArgs '-XstartOnFirstThread'
     }
 }
+
+// سرور فاز ۳. پورت پیش‌فرض ۷۰۷۰ است: ./gradlew runServer -Pport=7070
+tasks.register('runServer', JavaExec) {
+    group = 'application'
+    description = 'Runs the Phase 3 game server.'
+    mainClass = 'network.server.ServerApplication'
+    classpath = sourceSets.main.runtimeClasspath
+    if (project.hasProperty('port')) {
+        args project.property('port')
+    }
+}
+
 // اجازه می‌دهد ورودی کیبورد به برنامه برسد وقتی از طریق Gradle اجرا می‌شود
 tasks.withType(JavaExec).configureEach {
     standardInput = System.in

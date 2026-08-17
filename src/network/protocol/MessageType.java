@@ -1,0 +1,34 @@
+package network.protocol;
+
+/** Responses carry the request's id back. Events are server pushes with no id. */
+public enum MessageType {
+  // requests
+  REGISTER_REQUEST,
+  LOGIN_REQUEST,
+  LOGOUT_REQUEST,
+  MATCHMAKING_REQUEST,
+  MATCHMAKING_CANCEL,
+  MATCH_INVITE,
+  MATCH_INVITE_DECISION,
+  GAME_ACTION,
+  REACTION,
+  LEADERBOARD_REQUEST,
+  SCORE_SUBMISSION,
+  PING,
+
+  // responses
+  REGISTER_RESPONSE,
+  LOGIN_RESPONSE,
+  LEADERBOARD_RESPONSE,
+  SCORE_RESPONSE,
+  ACK,
+  PONG,
+  ERROR,
+
+  // events
+  MATCH_FOUND,
+  MATCH_INVITE_EVENT,
+  MATCH_STATE_UPDATE,
+  MATCH_ENDED,
+  REACTION_EVENT
+}
