@@ -47,9 +47,10 @@ public class Wave {
     if (completed) return;
     if (!started) {
       started = true;
-      System.out.printf("Wave %d started.%n", waveNumber);
       if (finalWave) {
         System.out.println("The final wave has come.");
+      } else {
+        System.out.printf("Wave %d started.%n", waveNumber);
       }
     }
     ticksSinceStart++;

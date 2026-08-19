@@ -33,6 +33,14 @@ public final class Popup {
    */
   public static void show(Stage stage, Skin skin, String title, Actor body,
                           String confirmText, Runnable onConfirm) {
+    show(stage, skin, title, body, confirmText, onConfirm,
+        confirmText == null ? "Close" : "Cancel", null);
+  }
+
+  /** Two-action version. A null declineText leaves the popup with only the confirm button. */
+  public static void show(Stage stage, Skin skin, String title, Actor body,
+                          String confirmText, Runnable onConfirm,
+                          String declineText, Runnable onDecline) {
     if (stage == null || skin == null) {
       return;
     }
@@ -67,15 +75,19 @@ public final class Popup {
       });
       actions.add(confirm);
     }
-    TextButton close = new TextButton(confirmText == null ? "Close" : "Cancel", skin,
-            UiSkinProvider.BUTTON_BROWN);
-    close.addListener(new ClickListener() {
-      @Override
-      public void clicked(InputEvent event, float x, float y) {
-        dim.remove();
-      }
-    });
-    actions.add(close);
+    if (declineText != null) {
+      TextButton close = new TextButton(declineText, skin, UiSkinProvider.BUTTON_BROWN);
+      close.addListener(new ClickListener() {
+        @Override
+        public void clicked(InputEvent event, float x, float y) {
+          if (onDecline != null) {
+            onDecline.run();
+          }
+          dim.remove();
+        }
+      });
+      actions.add(close);
+    }
     panel.add(actions).padTop(18f).row();
 
     dim.add(panel);
