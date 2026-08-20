@@ -1,23 +1,26 @@
 package view.gdx.ui;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
+
 import model.core.GameManager;
 import model.game.plant.PlantParts.PlantTemplate;
-
-
 /**
  * Scene2D layer for the in-match UI: sun counter, seed bar, plant food, wave banner, pause button.
  *
@@ -34,12 +37,20 @@ import model.game.plant.PlantParts.PlantTemplate;
  */
 public final class HudStage implements Disposable {
 
-  private final Stage stage;
-  private Label statusLabel;
-  private Label sunLabel;
-  private Table seedBar;
-  private final List<SeedCard> seedCards = new ArrayList<>();
+private final Stage stage;
 
+private final HudArt hudArt = new HudArt();
+
+private Label sunLabel;
+private Label sunCount;
+private Label statusLabel;
+private Label status;
+
+private Table seedBar;
+private SeedBar seeds;
+
+private final List<SeedCard> seedCards = new ArrayList<>();
+private String selected;
   public HudStage() {
     this.stage = new Stage(new ScreenViewport());
   }
@@ -60,18 +71,24 @@ public final class HudStage implements Disposable {
     }
     Skin skin = skinProvider.get();
 
-    // TODO seed bar, plant food slots and the pause button. The style names are all listed in
-    // docs/phase2/pvz-skin-field-guide.html, e.g. ImageButton "ingame_pause".
     Table root = new Table();
     root.setFillParent(true);
-    root.top().pad(16f);
+    root.top().pad(4f);
     stage.addActor(root);
 
-    root.add(new CurrencyHud(skin)).left().expandX();
+    // The lawn starts just below, so keep this block short.
+    Table topRow = new Table();
+    topRow.add(new CurrencyHud(skin)).left();
+    topRow.add(sunCounter(skin)).left().padLeft(22f);
+    status = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
+    topRow.add(status).left().padLeft(22f).expandX();
     if (onExit != null) {
-      root.add(exitButton(skin, onExit)).right();
+      topRow.add(exitButton(skin, onExit)).right().width(120f).height(46f);
     }
-    root.row();
+    root.add(topRow).growX().row();
+
+    seedBar = new Table();
+    root.add(seedBar).left().padTop(2f).row();
 
     if (DebugPanel.isEnabled()) {
       root.add(new DebugPanel(skin, message -> Toast.show(stage, skin, message)))
@@ -94,6 +111,26 @@ public final class HudStage implements Disposable {
     root.add(seedBar).colspan(2).left().padTop(14f);
   }
 
+  /** Sun gets its own icon and a bigger number, it is the one figure the player watches. */
+  private Table sunCounter(Skin skin) {
+    Table box = new Table();
+    TextureRegion sun = hudArt.find("sun");
+    if (sun != null) {
+      Image icon = new Image(sun);
+      icon.setScaling(Scaling.fit);
+      box.add(icon).size(34f, 34f).padRight(6f);
+    }
+    sunCount = new Label("0", skin, UiSkinProvider.LABEL_BIG);
+    box.add(sunCount).left();
+    return box;
+  }
+
+  public void setSun(int amount) {
+    if (sunCount != null) {
+      sunCount.setText(String.valueOf(amount));
+    }
+  }
+
   private TextButton exitButton(Skin skin, Runnable onExit) {
     TextButton button = new TextButton("Menu", skin, UiSkinProvider.BUTTON_BROWN);
     button.addListener(
@@ -106,83 +143,36 @@ public final class HudStage implements Disposable {
     return button;
   }
 
-  /**
-   * Fills the seed bar with one card per plant in the deck. Safe to call again (e.g. if the
-   * deck can somehow change mid-match); it rebuilds from scratch each time.
-   *
-   * @param onPick called with the plant's template name when its card is clicked
-   */
-  public void buildSeedBar(Skin skin, List<PlantTemplate> templates, Consumer<String> onPick) {
-    if (seedBar == null || skin == null || templates == null) {
+
+  /** Seed packets for this match. Clicking one arms it for the next click on the lawn. */
+  public void buildSeedBar(Skin skin, java.util.List<model.game.plant.PlantParts.PlantTemplate> templates,
+      java.util.function.Consumer<String> onPick) {
+    if (seedBar == null || skin == null) {
       return;
     }
-    seedBar.clearChildren();
-    seedCards.clear();
-    for (PlantTemplate template : templates) {
-      TextButton button = new TextButton(
-          template.name + "\n" + template.cost, skin, UiSkinProvider.BUTTON_BROWN);
-      button.addListener(
-          new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-              onPick.accept(template.name);
-            }
-          });
-      seedBar.add(button).size(96f, 64f).padRight(6f);
-      seedCards.add(new SeedCard(template, button));
+    seedBar.clear();
+    seeds = new SeedBar(skin, null, templates, plant -> {
+      selected = plant;
+      onPick.accept(plant);
+    });
+    seedBar.add(seeds);
+  }
+
+  public void updateSeeds(model.core.GameManager match, String selected,
+      java.util.function.ToIntFunction<String> levelOf) {
+    if (seeds != null) {
+      seeds.update(match, selected, levelOf);
     }
   }
 
-  /**
-   * Refreshes each seed card: highlights the one currently selected for placing, and dims
-   * (via alpha, not a skin-specific disabled style) any still on cooldown. Cheap enough to call
-   * every frame -- it does no allocation beyond the per-card cooldown lookup.
-   */
-  public void updateSeeds(GameManager match, String selectedType, ToIntFunction<String> levelLookup) {
-    if (match == null || seedCards.isEmpty()) {
-      return;
-    }
-    for (SeedCard card : seedCards) {
-      boolean selected = card.template.name.equalsIgnoreCase(selectedType);
-      Color base = selected ? SELECTED_TINT : Color.WHITE;
-
-      int level = levelLookup == null ? 1 : Math.max(1, levelLookup.applyAsInt(card.template.name));
-      int recharge = adjustedRechargeSeconds(card.template, level);
-      boolean onCooldown = match.ticksUntilPlantReady(card.template.name, recharge) > 0;
-      card.button.setColor(base.r, base.g, base.b, onCooldown ? 0.5f : 1f);
-    }
-  }
-
-  private static int adjustedRechargeSeconds(PlantTemplate template, int level) {
-    model.game.plant.PlantParts.PlantLevel levelStats =
-        model.game.plant.PlantParts.PlantLevel.cumulative(template, level);
-    return Math.max(0, template.recharge + levelStats.getCooldownDeltaSeconds());
-  }
-
-  /** Free-text status line -- wave, plant food count, what's currently selected. */
   public void setStatus(String text) {
-    if (statusLabel != null) {
-      statusLabel.setText(text == null ? "" : text);
+    if (status != null) {
+      status.setText(text);
     }
   }
 
-  public void setSun(int amount) {
-    if (sunLabel != null) {
-      sunLabel.setText("Sun: " + amount);
-    }
-  }
-
-  private static final Color SELECTED_TINT = new Color(0.65f, 1f, 0.65f, 1f);
-
-  /** One seed-bar card: the plant it represents and the button showing it. */
-  private static final class SeedCard {
-    private final PlantTemplate template;
-    private final TextButton button;
-
-    private SeedCard(PlantTemplate template, TextButton button) {
-      this.template = template;
-      this.button = button;
-    }
+  public String getSelected() {
+    return selected;
   }
 
   public void act(float delta) {
@@ -200,6 +190,10 @@ public final class HudStage implements Disposable {
 
   @Override
   public void dispose() {
+    if (seeds != null) {
+      seeds.dispose();
+    }
+    hudArt.dispose();
     stage.dispose();
   }
 }

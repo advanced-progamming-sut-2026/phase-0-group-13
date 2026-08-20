@@ -95,11 +95,9 @@ public final class GameplayScreen extends BaseScreen {
     game.switchScreen(new AdventureScreen(game));
   }
 
-  // Painted lawn measured off delayload_background_egypt_compressed_768_00.png: the tile seams sit
-  // at x 253.60 + 81.728n and y 199.63 + 97.706n in the 1024x768 art, which the renderer stretches
-  // over the whole 1280x720 world.
   private void layout() {
-    geometry.setBounds(317f, 74.85f, 919.44f, 458f);
+    float[] box = LawnRenderer.lawnBounds(match);
+    geometry.setBounds(box[0], box[1], box[2], box[3]);
   }
 
   @Override
