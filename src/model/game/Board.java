@@ -621,6 +621,11 @@ public class Board {
     return plants;
   }
 
+  /** برای رابط گرافیکی: خورشیدهای روی زمین، همان چیزی که SunManager نگه می‌دارد. */
+  public List<Sun> getSuns() {
+    return sunManager.getSuns();
+  }
+
 
   public List<Lawnmower> getLawnmowers() {
     return lawnmowers;

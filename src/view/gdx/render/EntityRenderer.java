@@ -121,7 +121,7 @@ public final class EntityRenderer implements WorldRenderer {
     float scale = targetHeight / region.getRegionHeight();
     float width = region.getRegionWidth() * scale;
     context.getBatch().draw(region, geometry.columnCentreX(col) - width / 2f,
-        geometry.rowCentreY(row) - targetHeight / 2f, width, targetHeight);
+        geometry.rowCentreY((int) Math.round(row)) - targetHeight / 2f, width, targetHeight);
   }
 
   private void drawShapes(RenderContext context, Board board) {
@@ -140,7 +140,7 @@ public final class EntityRenderer implements WorldRenderer {
       shapes.setColor(sunColor);
       for (Sun sun : board.getSuns()) {
         shapes.circle(geometry.columnCentreX(sun.getX()),
-            geometry.rowCentreY(sun.getY()), 16f);
+            geometry.rowCentreY((int) Math.round(sun.getY())), 16f);
       }
     }
     for (Zombie zombie : board.getZombies()) {
