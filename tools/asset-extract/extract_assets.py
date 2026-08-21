@@ -530,6 +530,11 @@ ZOMBIE_PACKETS = {
     "ZombieIceAgeHunter": "iceage_hunter",
     "ZombieIceAgeTroglobite": "iceage_troglobite",
     "ZombieZombossMechCowboy": "zombossmech_cowboy",
+    # Big Wave Beach roster, checked the same way: whole zombies, not props.
+    "ZombieBeachFisherman": "beach_fisherman",
+    "ZombieBeachOctopus": "beach_octopus",
+    "ZombieBeachSnorkel": "beach_snorkel",
+    "ZombieZombossMechPirate": "zombossmech_pirate",
 }
 
 

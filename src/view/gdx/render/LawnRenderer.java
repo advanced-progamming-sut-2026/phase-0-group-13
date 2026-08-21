@@ -23,6 +23,7 @@ public final class LawnRenderer implements WorldRenderer {
   private final Color lightLane = new Color(1f, 1f, 1f, 0.10f);
   private final Color darkLane = new Color(0f, 0f, 0f, 0.10f);
   private final Color graveColor = new Color(0.35f, 0.32f, 0.30f, 0.92f);
+  private final Color waterTile = new Color(0.16f, 0.55f, 0.72f, 0.45f);
   private final Color frozenTile = new Color(0.75f, 0.93f, 1f, 0.55f);
   private final Color slipTile = new Color(0.6f, 0.88f, 1f, 0.3f);
   private final Color slipArrow = new Color(0.15f, 0.45f, 0.7f, 0.85f);
@@ -94,10 +95,11 @@ public final class LawnRenderer implements WorldRenderer {
 
   // Measured off each season's background art. Seasons we have not measured fall back to Egypt.
   public static float[] lawnBounds(GameManager game) {
-    if ("frost".equals(seasonKey(game))) {
-      return new float[] {315.05f, 88.66f, 918.60f, 453.92f};
+    switch (seasonKey(game)) {
+      case "frost": return new float[] {315.05f, 88.66f, 918.60f, 453.92f};
+      case "beach": return new float[] {218.45f, 80.03f, 918.92f, 452.01f};
+      default: return new float[] {317f, 74.85f, 919.44f, 458f};
     }
-    return new float[] {317f, 74.85f, 919.44f, 458f};
   }
 
   private void drawGrid(RenderContext context, Board board) {
@@ -109,6 +111,12 @@ public final class LawnRenderer implements WorldRenderer {
         shapes.setColor((row + col) % 2 == 0 ? lightLane : darkLane);
         shapes.rect(geometry.columnToX(col), geometry.rowToY(row),
             geometry.getCellWidth() - 1f, geometry.getCellHeight() - 1f);
+        // the tide decides where you can plant, so it has to be visible
+        if (board.isWaterAt(row, col)) {
+          shapes.setColor(waterTile);
+          shapes.rect(geometry.columnToX(col) + 1f, geometry.rowToY(row) + 1f,
+              geometry.getCellWidth() - 2f, geometry.getCellHeight() - 2f);
+        }
         drawTileEffect(shapes, board, row, col);
       }
     }

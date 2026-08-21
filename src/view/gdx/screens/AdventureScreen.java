@@ -9,6 +9,9 @@ import data.persistence.UserManager;
 import model.account.AdventureMap;
 import model.account.Progress;
 import model.account.User;
+import model.core.GameManager;
+import model.core.GameSession;
+import model.core.MatchLauncher;
 import model.core.MatchSetup;
 import model.environment.AncientEgyptSeason;
 import model.environment.BigWaveBeachSeason;
@@ -162,10 +165,35 @@ public final class AdventureScreen extends MenuScreen {
     return button(label, UiSkinProvider.BUTTON_GREEN, () -> startLevel(target));
   }
 
+  /** Same route the terminal build takes: pick a chapter, lock in a deck, let MatchLauncher build it. */
   private void startLevel(int level) {
+    User user = UserManager.getInstance().getCurrentUser();
+    if (user == null) {
+      toast("error: no user logged in");
+      return;
+    }
     MatchSetup.getInstance().setTargetChapter(String.valueOf(openChapter));
-    toast("Entering " + chapterName(openChapter) + " - level " + level + "...");
-    go(new GameplayScreen(game, null, null));
+    MatchSetup.getInstance().setTargetLevel(level);
+    MatchSetup.getInstance().setSelectedPlants(deckFor(user));
+    MatchSetup.getInstance().setBoostedPlants(user.getBoostedPlants());
+    MatchSetup.getInstance().setDifficultyLevel(user.getDifficultyLevel());
+
+    MatchLauncher.launch();
+    GameManager started = GameSession.getActiveGame();
+    if (started == null) {
+      toast("could not start the level");
+      return;
+    }
+    go(new GameplayScreen(game, started, null));
+  }
+
+  // The seed bank only holds so many, and the bar has to fit on screen.
+  private static java.util.List<String> deckFor(User user) {
+    java.util.List<String> unlocked = user.getUnlockedPlants();
+    int slots = MatchSetup.getInstance().getMaxDeckSlots();
+    return unlocked.size() <= slots
+        ? unlocked
+        : new java.util.ArrayList<>(unlocked.subList(0, slots));
   }
 
   /** Levels of this chapter the player has already cleared. */

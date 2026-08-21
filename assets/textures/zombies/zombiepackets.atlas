@@ -3,6 +3,27 @@ size: 2048,2048
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+ZombieBeachFisherman
+  rotate: false
+  xy: 722, 650
+  size: 92, 110
+  orig: 92, 110
+  offset: 0, 0
+  index: -1
+ZombieBeachOctopus
+  rotate: false
+  xy: 1895, 274
+  size: 90, 133
+  orig: 90, 133
+  offset: 0, 0
+  index: -1
+ZombieBeachSnorkel
+  rotate: false
+  xy: 1, 160
+  size: 90, 136
+  orig: 90, 136
+  offset: 0, 0
+  index: -1
 ZombieEgyptGargantuar
   rotate: false
   xy: 845, 1
@@ -85,6 +106,13 @@ ZombieZombossMechCowboy
   xy: 1614, 139
   size: 92, 136
   orig: 92, 136
+  offset: 0, 0
+  index: -1
+ZombieZombossMechPirate
+  rotate: false
+  xy: 341, 1
+  size: 99, 142
+  orig: 99, 142
   offset: 0, 0
   index: -1
 basic
