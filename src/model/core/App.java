@@ -20,6 +20,11 @@ public class App {
   public static void initData() {
     GAME_DATA_MANAGER.initAllData();
 
+    // Both front ends come through here, so this is the one place the client connects. A failure
+    // is not fatal: the menus still open and the account layer reports it when something actually
+    // needs the server.
+    network.client.ClientSession.getInstance().connect();
+
     if (GameDataManager.wasSessionRestored()) {
       currentMenu = Menu.MainMenu;
     }

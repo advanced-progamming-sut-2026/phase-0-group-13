@@ -14,8 +14,6 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
 
@@ -41,15 +39,12 @@ private final Stage stage;
 
 private final HudArt hudArt = new HudArt();
 
-private Label sunLabel;
 private Label sunCount;
-private Label statusLabel;
 private Label status;
 
 private Table seedBar;
 private SeedBar seeds;
 
-private final List<SeedCard> seedCards = new ArrayList<>();
 private String selected;
   public HudStage() {
     this.stage = new Stage(new ScreenViewport());
@@ -97,18 +92,6 @@ private String selected;
           .padTop(12f);
       root.row();
     }
-
-    sunLabel = new Label("Sun: 0", skin, UiSkinProvider.LABEL_MEDIUM);
-    statusLabel = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
-    root.add(sunLabel).left().padTop(10f);
-    root.add(statusLabel).right().expandX().padTop(10f);
-    root.row();
-
-    // Docked in the top table for now, same as everything else here; moving it to the
-    // bottom of the screen the way the real game does is a Phase-2 polish pass, not
-    // needed just to have a working seed bar.
-    seedBar = new Table();
-    root.add(seedBar).colspan(2).left().padTop(14f);
   }
 
   /** Sun gets its own icon and a bigger number, it is the one figure the player watches. */

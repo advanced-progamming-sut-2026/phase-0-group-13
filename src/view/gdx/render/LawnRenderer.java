@@ -33,6 +33,10 @@ public final class LawnRenderer implements WorldRenderer {
   private TextureAtlas backgroundAtlas;
   private TextureRegion background;
   private String loadedFor;
+  // Which season is on screen, so the props can pick the season's own art. Set every frame in
+  // render() rather than threaded through every draw call.
+  private String season = "egypt";
+  private float clock;
 
   public LawnRenderer(LawnGeometry geometry) {
     this.geometry = geometry;
@@ -47,6 +51,8 @@ public final class LawnRenderer implements WorldRenderer {
     if (game == null || game.getBoard() == null) {
       return;
     }
+    season = seasonKey(game);
+    clock += delta;
     drawBackground(context, game);
     drawGrid(context, game.getBoard());
   }
@@ -98,6 +104,7 @@ public final class LawnRenderer implements WorldRenderer {
     switch (seasonKey(game)) {
       case "frost": return new float[] {315.05f, 88.66f, 918.60f, 453.92f};
       case "beach": return new float[] {218.45f, 80.03f, 918.92f, 452.01f};
+      case "dark": return new float[] {314.12f, 74.43f, 932.74f, 456.75f};
       default: return new float[] {317f, 74.85f, 919.44f, 458f};
     }
   }
@@ -134,8 +141,7 @@ public final class LawnRenderer implements WorldRenderer {
 
   private void drawProps(RenderContext context, Board board) {
     TextureRegion mowerArt = hudArt.find("lawnmower");
-    TextureRegion graveArt = hudArt.find("gravestone");
-    if (mowerArt == null && graveArt == null) {
+    if (mowerArt == null && !hasGraveArt()) {
       return;
     }
     context.getBatch().begin();
@@ -149,23 +155,67 @@ public final class LawnRenderer implements WorldRenderer {
       }
       context.getBatch().setColor(1f, 1f, 1f, 1f);
     }
-    if (graveArt != null) {
-      float height = geometry.getCellHeight() * 0.82f;
-      float width = graveArt.getRegionWidth() * height / graveArt.getRegionHeight();
-      for (int row = 0; row < board.getRows(); row++) {
-        for (int col = 0; col < board.getColumns(); col++) {
-          if (board.getTile(row, col) == null) {
-            continue;
-          }
-          TileEffect effect = board.getTile(row, col).getEffect();
-          if (effect instanceof TombStoneEffect grave && grave.isActive()) {
-            context.getBatch().draw(graveArt, geometry.columnCentreX(col) - width / 2f,
-                geometry.rowToY(row) + geometry.getCellHeight() * 0.1f, width, height);
-          }
+    for (int row = 0; row < board.getRows(); row++) {
+      for (int col = 0; col < board.getColumns(); col++) {
+        if (board.getTile(row, col) == null) {
+          continue;
+        }
+        TileEffect effect = board.getTile(row, col).getEffect();
+        if (effect instanceof TombStoneEffect grave && grave.isActive()) {
+          drawGrave(context, grave, row, col);
         }
       }
     }
     context.getBatch().end();
+  }
+
+  /**
+   * One grave, in the art of the season it stands in.
+   *
+   * <p>Dark Ages graves are not all the same thing and the doc says the player has to be able to
+   * tell them apart: some have 50 sun buried in them, some a plant food, and some of the tiles
+   * push a zombie out at the start of every wave. So the crest on the stone follows
+   * TombStoneEffect.getBuriedReward() and the necromancy tiles get the world's own spawn disc
+   * under them, pulsing so it reads as "something comes out of here".
+   */
+  private void drawGrave(RenderContext context, TombStoneEffect grave, int row, int col) {
+    TextureRegion art = graveArt(grave);
+    if (art == null) {
+      return;
+    }
+    if (grave.isNecromancy()) {
+      TextureRegion disc = hudArt.find("necromancy");
+      if (disc != null) {
+        float size = geometry.getCellWidth() * 0.86f;
+        float pulse = 0.45f + 0.2f * (float) Math.sin(clock * 3f);
+        context.getBatch().setColor(1f, 1f, 1f, pulse);
+        context.getBatch().draw(disc, geometry.columnCentreX(col) - size / 2f,
+            geometry.rowToY(row) + geometry.getCellHeight() * 0.06f, size, size);
+        context.getBatch().setColor(1f, 1f, 1f, 1f);
+      }
+    }
+    float height = geometry.getCellHeight() * 0.82f;
+    float width = art.getRegionWidth() * height / art.getRegionHeight();
+    context.getBatch().draw(art, geometry.columnCentreX(col) - width / 2f,
+        geometry.rowToY(row) + geometry.getCellHeight() * 0.1f, width, height);
+  }
+
+  private boolean hasGraveArt() {
+    return hudArt.find("dark".equals(season) ? "darkgrave" : "gravestone") != null;
+  }
+
+  /** Dark Ages has its own stone per buried reward; the other seasons share Egypt's. */
+  private TextureRegion graveArt(TombStoneEffect grave) {
+    if (!"dark".equals(season)) {
+      return hudArt.find("gravestone");
+    }
+    if ("SUN".equals(grave.getBuriedReward())) {
+      return hudArt.find("darkgravesun");
+    }
+    if ("PLANT_FOOD".equals(grave.getBuriedReward())) {
+      return hudArt.find("darkgravefood");
+    }
+    return hudArt.find("darkgrave");
   }
 
   private void drawTileEffect(ShapeRenderer shapes, Board board, int row, int col) {
@@ -177,7 +227,7 @@ public final class LawnRenderer implements WorldRenderer {
       drawIceTile(shapes, ice, row, col);
       return;
     }
-    if (hudArt.find("gravestone") != null) {
+    if (hasGraveArt()) {
       return;
     }
     if (effect instanceof TombStoneEffect grave && grave.isActive()) {

@@ -130,7 +130,18 @@ public final class GameplayScreen extends BaseScreen {
     hud.setStatus("wave " + Math.min(match.getCurrentWaveIndex() + 1, match.getTotalWaves())
         + "/" + match.getTotalWaves()
         + "   plant food " + match.getPlantFoodCount()
+        + nightNote()
         + (picked == null ? "   pick a seed, then click the lawn" : "   placing: " + picked));
+  }
+
+  /**
+   * Dark Ages is at night and nothing falls out of the sky, so every sun has to come off a plant.
+   * The background says "night" on its own but not "and that is why your sun is not going up".
+   */
+  private String nightNote() {
+    return match.getBoard() != null && match.getBoard().getGameState().isSkySunDisabled()
+        ? "   night: no sun falls from the sky"
+        : "";
   }
 
   private void showResult() {

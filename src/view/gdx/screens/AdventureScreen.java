@@ -173,7 +173,6 @@ public final class AdventureScreen extends MenuScreen {
       return;
     }
     MatchSetup.getInstance().setTargetChapter(String.valueOf(openChapter));
-    MatchSetup.getInstance().setTargetLevel(level);
     MatchSetup.getInstance().setSelectedPlants(deckFor(user));
     MatchSetup.getInstance().setBoostedPlants(user.getBoostedPlants());
     MatchSetup.getInstance().setDifficultyLevel(user.getDifficultyLevel());

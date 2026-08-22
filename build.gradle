@@ -31,6 +31,12 @@ dependencies {
     runtimeOnly 'com.badlogicgames.gdx:gdx-freetype-platform:1.12.1:natives-desktop'
 }
 
+// سورس‌ها UTF-8 هستند (کامنت‌های فارسی)؛ بدون این، javac با کدپیج پیش‌فرض ویندوز
+// (windows-1252) روی همان کامنت‌ها با unmappable character شکست می‌خورد
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 test {
     useJUnitPlatform()
 }

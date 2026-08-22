@@ -535,6 +535,20 @@ ZOMBIE_PACKETS = {
     "ZombieBeachOctopus": "beach_octopus",
     "ZombieBeachSnorkel": "beach_snorkel",
     "ZombieZombossMechPirate": "zombossmech_pirate",
+    # Dark Ages roster, checked the same way: every crop is a whole zombie. dark_armor3 is the
+    # helmeted, shoulder-plated Knight the King makes; dark_juggler is the motley Jester;
+    # dark_imp_dragon is the imp in the dragon suit. ZombieDarkTurquoiseDefault has no art
+    # anywhere in the archive, so it keeps the renderer's "no verified portrait" state.
+    "ZombieDarkArmor3Default": "dark_armor3",
+    "ZombieDarkBarrelRollerDefault": "barrelroller",
+    "ZombieDarkImpDragonDefault": "dark_imp_dragon",
+    "ZombieDarkJugglerDefault": "dark_juggler",
+    "ZombieDarkKing": "dark_king",
+    "ZombieWizardDefault": "dark_wizard",
+    "ZombiePianoDefault": "piano",
+    "ZombieZombossMechDark": "zombossmech_dark",
+    # Egypt's boss was the one adventure boss still without a portrait.
+    "ZombieZombossMechEgypt": "zombossmech_egypt",
 }
 
 
@@ -602,6 +616,24 @@ HUD_PIECES = {
     "pea": ("ATLASIMAGE_ATLAS_PLANTPEASHOOTER_768_00", "peashooter", "peashooter_33x35"),
     "gravestone": ("ATLASIMAGE_ATLAS_EGYPT_GRAVESTONE_768_00", "egypt_gravestone",
                    "Egypt_Hieroglyph_118x148"),
+    # Dark Ages. The doc wants the player to be able to tell the three grave kinds apart, and
+    # the world ships one gravestone page per kind: plain, "50 sun buried in it" (sun crest) and
+    # "a plant food buried in it" (leaf crest). Cropped and looked at, same as everything else.
+    "darkgrave": ("ATLASIMAGE_ATLAS_TOMBSTONE_DARK_BASE_768_00", "Dark_Noop",
+                  "Dark_Noop_132x160"),
+    "darkgravesun": ("ATLASIMAGE_ATLAS_TOMBSTONE_DARK_SUN_768_00", "Dark_Sun",
+                     "Dark_Sun_132x160"),
+    "darkgravefood": ("ATLASIMAGE_ATLAS_TOMBSTONE_DARK_PLANTFOOD_768_00", "Dark_Plantfood",
+                      "Dark_Plantfood_132x160"),
+    # The disc the world plays under a grave that is about to push a zombie out of the ground.
+    "necromancy": ("ATLASIMAGE_ATLAS_TOMBSTONE_DARK_EFFECTS_768_00",
+                   "tombstone_dark_spawn_effect", "zombie_egypt_tombraiser_disc_01"),
+    # The fleece the Wizard's "sheepening" effect drops over a plant it curses.
+    "sheep": ("ATLASIMAGE_ATLAS_ZOMBIEDARKWIZARDGROUP_768_00", "dark_wizard_sheepening",
+              "dark_wizard_sheepening_117x146"),
+    # The burst the King plays when he hands a passing zombie its helmet.
+    "kingaura": ("ATLASIMAGE_ATLAS_ZOMBIEDARKKINGKNIGHTEFFECT_768_00", "zombie_hat_switch_effect",
+                 "zombie_hat_switch_effect_545x514"),
 }
 
 
