@@ -1,5 +1,7 @@
 package network.server;
 
+import com.google.gson.JsonElement;
+
 /** bestScore stays null until they submit one - no fake zeros on the leaderboard. */
 public class ServerAccount {
 
@@ -11,6 +13,10 @@ public class ServerAccount {
   private int coins;
   private int diamonds;
   private Integer bestScore;
+  // The player's own document (unlocked plants, progress, inventory, greenhouse, quests, ...).
+  // Stored as raw JSON so the server keeps every field the game model has without duplicating the
+  // model here; it is written and read back verbatim.
+  private JsonElement gameData;
 
   public ServerAccount() {}
 
@@ -77,5 +83,13 @@ public class ServerAccount {
 
   public void setBestScore(Integer bestScore) {
     this.bestScore = bestScore;
+  }
+
+  public JsonElement getGameData() {
+    return gameData;
+  }
+
+  public void setGameData(JsonElement gameData) {
+    this.gameData = gameData;
   }
 }

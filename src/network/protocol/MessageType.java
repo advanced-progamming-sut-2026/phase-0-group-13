@@ -14,6 +14,7 @@ public enum MessageType {
   REACTION,
   LEADERBOARD_REQUEST,
   SCORE_SUBMISSION,
+  PROFILE_UPDATE,
   PING,
 
   // responses
@@ -21,6 +22,7 @@ public enum MessageType {
   LOGIN_RESPONSE,
   LEADERBOARD_RESPONSE,
   SCORE_RESPONSE,
+  PROFILE_RESPONSE,
   ACK,
   PONG,
   ERROR,

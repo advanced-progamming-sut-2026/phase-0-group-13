@@ -11,6 +11,9 @@ import model.game.Projectile;
 import model.game.Sun;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
+import model.game.zombie.behavior.JesterZombieAction;
+import model.game.zombie.behavior.KingAuraZombieAction;
+import model.game.zombie.behavior.ZombossAction;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
 import view.gdx.ui.ZombieArt;
@@ -24,6 +27,9 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float ZOMBIE_ROW_FILL = 0.92f;
   private static final float PLANT_REFERENCE_HEIGHT = 70f;
   private static final float PLANT_ROW_FILL = 0.78f;
+  // Zomboss's hit box in Zombies.json is 340 tall against a walker's 95, so it is not a
+  // zombie-sized sprite: it stands about two and a half lanes high and is allowed to be wide.
+  private static final float ZOMBOSS_ROW_FILL = 2.4f;
   private static final float ZOMBIE_FOOT_INSET = 0.08f;
   private static final float PLANT_FOOT_INSET = 0.14f;
 
@@ -37,6 +43,9 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color peaColor = new Color(0.55f, 0.9f, 0.3f, 1f);
   private final Color sunColor = new Color(1f, 0.85f, 0.2f, 1f);
   private final Color noArt = new Color(1f, 1f, 1f, 0.85f);
+  // Reflected shots belong to the zombie now, so they must not read as one of your peas.
+  private final Color reflectedPea = new Color(1f, 0.42f, 0.3f, 1f);
+  private float clock;
 
   public EntityRenderer(LawnGeometry geometry) {
     this.geometry = geometry;
@@ -52,35 +61,49 @@ public final class EntityRenderer implements WorldRenderer {
       return;
     }
     Board board = game.getBoard();
+    clock += delta;
     drawSprites(context, board);
     drawShapes(context, board);
   }
 
   private void drawSprites(RenderContext context, Board board) {
     context.getBatch().begin();
+    TextureRegion sheep = hudArt.find("sheep");
     for (Plant plant : board.getPlants()) {
-      TextureRegion art = plantArt.find(plant.getName());
-      if (art != null) {
-        drawStanding(context, art, plant.getCol(), plant.getRow(),
-            scaleFor(art, PLANT_REFERENCE_HEIGHT, PLANT_ROW_FILL), PLANT_FOOT_INSET);
+      // A Wizard's curse turns the plant into a harmless sheep until the wizard dies, so the
+      // board has to show a sheep, not a plant that has quietly stopped shooting.
+      boolean cursed = plant.isCursed() && sheep != null;
+      TextureRegion art = cursed ? sheep : plantArt.find(plant.getName());
+      if (art == null) {
+        continue;
       }
+      // the fleece is one effect frame, not a seed packet, so it is sized to the tile directly
+      float scale = cursed
+          ? geometry.getCellHeight() * PLANT_ROW_FILL / art.getRegionHeight()
+          : scaleFor(art, PLANT_REFERENCE_HEIGHT, PLANT_ROW_FILL);
+      drawStanding(context, art, plant.getCol(), plant.getRow(), scale, PLANT_FOOT_INSET);
     }
     for (Zombie zombie : board.getZombies()) {
       if (zombie.isDead()) {
         continue;
       }
+      drawKingAura(context, zombie);
       TextureRegion art = zombieArt.find(zombie.getName());
       if (art != null) {
         drawStanding(context, art, onBoard(zombie.getX()), zombie.getRow(),
-            scaleFor(art, ZOMBIE_REFERENCE_HEIGHT, ZOMBIE_ROW_FILL), ZOMBIE_FOOT_INSET);
+            zombieScale(zombie, art), ZOMBIE_FOOT_INSET, spinAngle(zombie));
       }
     }
     TextureRegion pea = hudArt.find("pea");
     if (pea != null) {
       for (Projectile projectile : board.getProjectiles()) {
+        // the juggler throws your own shots back at you; those have to look wrong
+        context.getBatch().setColor(projectile.isFromZombie() ? reflectedPea : Color.WHITE);
         drawCentred(context, pea, projectile.getXCoordinate(),
-            Math.round(projectile.getYCoordinate()), geometry.getCellHeight() * 0.22f);
+            Math.round(projectile.getYCoordinate()), geometry.getCellHeight()
+                * (projectile.isFromZombie() ? 0.28f : 0.22f));
       }
+      context.getBatch().setColor(Color.WHITE);
     }
     TextureRegion sun = hudArt.find("sun");
     if (sun != null) {
@@ -97,6 +120,17 @@ public final class EntityRenderer implements WorldRenderer {
     return Math.max(0.0, column);
   }
 
+  private static boolean isBoss(Zombie zombie) {
+    return zombie.getBehavior() instanceof ZombossAction;
+  }
+
+  /** Walkers share one reference height so a gargantuar stays bigger; Zomboss is its own size. */
+  private float zombieScale(Zombie zombie, TextureRegion art) {
+    return isBoss(zombie)
+        ? geometry.getCellHeight() * ZOMBOSS_ROW_FILL / art.getRegionHeight()
+        : scaleFor(art, ZOMBIE_REFERENCE_HEIGHT, ZOMBIE_ROW_FILL);
+  }
+
   private float scaleFor(TextureRegion region, float referenceHeight, float rowFill) {
     float scale = geometry.getCellHeight() * rowFill / referenceHeight;
     // nothing may spill sideways into the neighbouring lane
@@ -110,10 +144,45 @@ public final class EntityRenderer implements WorldRenderer {
   /** Feet on the ground rather than centred, so plants look planted and zombies look upright. */
   private void drawStanding(RenderContext context, TextureRegion region, double col, int row,
       float scale, float footInset) {
+    drawStanding(context, region, col, row, scale, footInset, 0f);
+  }
+
+  /** Same, but spun about its own middle. Only the juggler uses a non-zero angle. */
+  private void drawStanding(RenderContext context, TextureRegion region, double col, int row,
+      float scale, float footInset, float angle) {
     float width = region.getRegionWidth() * scale;
     float height = region.getRegionHeight() * scale;
     float bottom = geometry.rowToY(row) + geometry.getCellHeight() * footInset;
-    context.getBatch().draw(region, geometry.columnCentreX(col) - width / 2f, bottom, width, height);
+    context.getBatch().draw(region, geometry.columnCentreX(col) - width / 2f, bottom,
+        width / 2f, height / 2f, width, height, 1f, 1f, angle);
+  }
+
+  /**
+   * The juggler spins while shots keep coming at it and moves faster the whole time, and every
+   * shot it catches goes back at the plants. Standing still while that happens would leave the
+   * player with no idea why their peas turned around, so it actually spins on screen.
+   */
+  private float spinAngle(Zombie zombie) {
+    return zombie.getBehavior() instanceof JesterZombieAction jester && jester.isSpinning()
+        ? (clock * 540f) % 360f
+        : 0f;
+  }
+
+  /**
+   * The King never moves and never eats; what he does is speed up everything in his lane. That
+   * is invisible unless the reach is drawn, so his own knighting burst marks it out.
+   */
+  private void drawKingAura(RenderContext context, Zombie zombie) {
+    TextureRegion aura = hudArt.find("kingaura");
+    if (aura == null || !(zombie.getBehavior() instanceof KingAuraZombieAction)) {
+      return;
+    }
+    float size = geometry.getCellWidth() * 2.6f;
+    float pulse = 0.32f + 0.12f * (float) Math.sin(clock * 2.5f);
+    context.getBatch().setColor(1f, 0.9f, 0.45f, pulse);
+    context.getBatch().draw(aura, geometry.columnCentreX(onBoard(zombie.getX())) - size / 2f,
+        geometry.rowCentreY(zombie.getRow()) - size / 2f, size, size);
+    context.getBatch().setColor(Color.WHITE);
   }
 
   private void drawCentred(RenderContext context, TextureRegion region, double col, double row,
@@ -168,8 +237,9 @@ public final class EntityRenderer implements WorldRenderer {
     TextureRegion art = zombieArt.find(zombie.getName());
     float spriteHeight = art == null
         ? geometry.getCellHeight() * 0.6f
-        : art.getRegionHeight() * scaleFor(art, ZOMBIE_REFERENCE_HEIGHT, ZOMBIE_ROW_FILL);
-    float width = geometry.getCellWidth() * 0.55f;
+        : art.getRegionHeight() * zombieScale(zombie, art);
+    // the chapter ends when this one dies, so its bar has to be readable from across the lawn
+    float width = geometry.getCellWidth() * (isBoss(zombie) ? 1.9f : 0.55f);
     float x = geometry.columnCentreX(onBoard(zombie.getX())) - width / 2f;
     float y = geometry.rowToY(zombie.getRow()) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
         + spriteHeight + 4f;
@@ -177,10 +247,11 @@ public final class EntityRenderer implements WorldRenderer {
     y = Math.min(y, geometry.rowToY(0) + geometry.getCellHeight() - 7f);
     float fraction = zombie.getCurrentHealth() / (float) Math.max(1, zombie.getMaxHealth());
     fraction = Math.max(0f, Math.min(1f, fraction));
+    float thickness = isBoss(zombie) ? 11f : 5f;
     shapes.setColor(healthBack);
-    shapes.rect(x - 1f, y - 1f, width + 2f, 7f);
+    shapes.rect(x - 1f, y - 1f, width + 2f, thickness + 2f);
     shapes.setColor(fraction < 0.35f ? healthLow : healthFront);
-    shapes.rect(x, y, width * fraction, 5f);
+    shapes.rect(x, y, width * fraction, thickness);
   }
 
   @Override

@@ -31,7 +31,10 @@ public class DarkAgesSeason extends Season {
 
   @Override
   public List<Zombie> getAvailableZombies() {
-    return zombiesByAliasKeyword("dark", "piano");
+    // ویزارد تنها زامبی این فصل است که alias اش "Dark" ندارد (ZombieWizardDefault, با objclass
+    // ZombieDarkWizardProps)، برای همین اسمش جدا آمده؛ بدون این، طلسم گوسفندکردن گیاه هیچ‌وقت
+    // در بازی دیده نمی‌شود
+    return zombiesByAliasKeyword("dark", "piano", "wizard");
   }
 
   @Override

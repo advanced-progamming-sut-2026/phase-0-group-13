@@ -1,0 +1,82 @@
+hud.png
+size: 1318,333
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+darkgrave
+  rotate: false
+  xy: 2, 2
+  size: 85, 103
+  orig: 85, 103
+  offset: 0, 0
+  index: -1
+darkgravefood
+  rotate: false
+  xy: 89, 2
+  size: 85, 103
+  orig: 85, 103
+  offset: 0, 0
+  index: -1
+darkgravesun
+  rotate: false
+  xy: 176, 2
+  size: 85, 103
+  orig: 85, 103
+  offset: 0, 0
+  index: -1
+gravestone
+  rotate: false
+  xy: 263, 2
+  size: 76, 95
+  orig: 76, 95
+  offset: 0, 0
+  index: -1
+kingaura
+  rotate: false
+  xy: 341, 2
+  size: 349, 329
+  orig: 349, 329
+  offset: 0, 0
+  index: -1
+lawnmower
+  rotate: false
+  xy: 692, 2
+  size: 155, 108
+  orig: 155, 108
+  offset: 0, 0
+  index: -1
+necromancy
+  rotate: false
+  xy: 849, 2
+  size: 101, 101
+  orig: 101, 101
+  offset: 0, 0
+  index: -1
+pea
+  rotate: false
+  xy: 952, 2
+  size: 21, 23
+  orig: 21, 23
+  offset: 0, 0
+  index: -1
+plantfood
+  rotate: false
+  xy: 975, 2
+  size: 192, 192
+  orig: 192, 192
+  offset: 0, 0
+  index: -1
+sheep
+  rotate: false
+  xy: 1169, 2
+  size: 75, 94
+  orig: 75, 94
+  offset: 0, 0
+  index: -1
+sun
+  rotate: false
+  xy: 1246, 2
+  size: 70, 71
+  orig: 70, 71
+  offset: 0, 0
+  index: -1

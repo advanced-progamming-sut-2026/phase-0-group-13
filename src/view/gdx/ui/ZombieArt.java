@@ -11,30 +11,32 @@ import java.util.Map;
 
 
 /**
- * Zombie art lookup, one atlas per zombie under {@code textures/zombies/<name>.atlas}.
+ * Zombie art lookup: the zombie-packet portraits first, the per-zombie atlas second.
  *
- * <p>Unlike {@link PlantArt} there is no single "portrait" atlas here: only some zombies have
- * art at all (15 at the time of writing, out of 40+ zombie templates), and the atlases that do
- * exist are disassembled skeletal-rig exports -- lots of small named body-part regions (e.g.
- * {@code egypt_gargantuar_102x79}) plus a handful of {@code ikNode_*} bone markers, not one
- * finished stand-alone sprite. There's no metadata (unlike plants.json's seed-packet convention)
- * saying which region, if any, reads as a clean whole-body portrait.
+ * <p>{@code textures/zombies/zombiepackets.atlas} is the zombie equivalent of the seed-packet
+ * page {@link PlantArt} reads: one finished, whole-body picture per zombie, keyed by the alias
+ * Zombies.json uses. Every region in it was cropped and looked at before being listed in
+ * ZOMBIE_PACKETS in tools/asset-extract/extract_assets.py, so a hit here is verified art for
+ * that exact zombie.
  *
- * <p>So this is a placeholder rather than real art: it picks the single largest non-bone region
- * in the atlas as a stand-in body part, on the theory that the largest piece is probably the
- * torso or a full-body chunk. Zombies with no atlas, or with only bone-marker regions, return
- * null and EntityRenderer falls back to its outline-plus-health-bar drawing -- see
- * EntityRenderer.drawShapes()'s "no verified portrait" branch. Wiring up the real per-frame
- * animations (walk/eat/idle) from the JSON files in assets/animations/zombies is separate,
- * later work; this class only unblocks the build and gives *something* visible for the zombies
- * that have any art at all.
+ * <p>The per-zombie atlases under {@code textures/zombies/<name>.atlas} are disassembled
+ * skeletal-rig exports -- lots of small named body-part regions (e.g. {@code
+ * egypt_gargantuar_102x79}) plus {@code ikNode_*} bone markers, not one finished sprite. They
+ * stay as a fallback (largest non-bone region) for the few zombies with a rig but no packet, so
+ * nothing that used to draw stops drawing. Zombies with neither return null and EntityRenderer
+ * falls back to its outline-plus-health-bar drawing -- see the "no verified portrait" branch in
+ * EntityRenderer.drawShapes(). Wiring up the real per-frame animations (walk/eat/idle) from the
+ * JSON files in assets/animations/zombies is separate, later work.
  */
 public final class ZombieArt implements Disposable {
 
   private static final String ATLAS_DIR = "textures/zombies/";
+  private static final String PACKETS_PATH = ATLAS_DIR + "zombiepackets.atlas";
 
   private final Map<String, TextureAtlas> loaded = new HashMap<>();
   private final Map<String, TextureRegion> resolved = new HashMap<>();
+  private Map<String, TextureRegion> packets;
+  private TextureAtlas packetAtlas;
 
   /** Best-effort portrait for this zombie's raw name, or null if there is none usable. */
   public TextureRegion find(String zombieName) {
@@ -46,9 +48,33 @@ public final class ZombieArt implements Disposable {
       return resolved.get(key);
     }
 
-    TextureRegion picked = pickPortrait(key);
+    TextureRegion picked = packets().get(key);
+    if (picked == null) {
+      picked = pickPortrait(key);
+    }
     resolved.put(key, picked);
     return picked;
+  }
+
+  /**
+   * The packet page, indexed by the same normalised key {@link #find} is asked for.
+   *
+   * <p>Region names on the page keep their upstream casing ({@code ZombieDarkKing}), so they are
+   * normalised on the way into the map instead of being looked up directly.
+   */
+  private Map<String, TextureRegion> packets() {
+    if (packets != null) {
+      return packets;
+    }
+    packets = new HashMap<>();
+    if (!Gdx.files.internal(PACKETS_PATH).exists()) {
+      return packets;
+    }
+    packetAtlas = new TextureAtlas(Gdx.files.internal(PACKETS_PATH));
+    for (TextureAtlas.AtlasRegion region : packetAtlas.getRegions()) {
+      packets.putIfAbsent(normalise(region.name), region);
+    }
+    return packets;
   }
 
   private TextureRegion pickPortrait(String key) {
@@ -90,5 +116,10 @@ public final class ZombieArt implements Disposable {
     }
     loaded.clear();
     resolved.clear();
+    if (packetAtlas != null) {
+      packetAtlas.dispose();
+      packetAtlas = null;
+    }
+    packets = null;
   }
 }

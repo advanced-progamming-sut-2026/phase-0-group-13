@@ -43,6 +43,11 @@ public class JesterZombieAction implements ZombieAction {
     }
   }
 
+  /** True while the juggler is spinning, so the renderer can show it. Read-only. */
+  public boolean isSpinning() {
+    return spinTicksLeft > 0;
+  }
+
   private void startSpinning(Zombie zombie) {
     if (spinTicksLeft <= 0) {
       zombie.setSpeedMultiplier(SPIN_SPEED_MULTIPLIER);

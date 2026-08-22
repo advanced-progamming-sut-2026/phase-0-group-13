@@ -64,6 +64,16 @@ public final class RequestRouter {
         int limit = request == null ? 10 : request.limit();
         connection.send(message.reply(MessageType.LEADERBOARD_RESPONSE, leaderboard.top(limit)));
       }
+      case PROFILE_UPDATE -> {
+        Payloads.Profile stored = authentication.update(
+            connection.getUsername(), message.payloadAs(Payloads.ProfileUpdate.class));
+        if (stored == null) {
+          connection.send(message.reply(MessageType.ERROR,
+              new Payloads.Ack(false, "error: could not store the profile")));
+        } else {
+          connection.send(message.reply(MessageType.PROFILE_RESPONSE, stored));
+        }
+      }
       case SCORE_SUBMISSION -> {
         Payloads.ScoreSubmission submission = message.payloadAs(Payloads.ScoreSubmission.class);
         connection.send(message.reply(MessageType.SCORE_RESPONSE,
