@@ -9,6 +9,7 @@ import data.persistence.UserManager;
 import java.util.ArrayList;
 import java.util.List;
 import model.account.User;
+import model.game.minigame.SpecialStageRule;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.core.GameManager;
 import model.core.GameSession;
@@ -82,6 +83,7 @@ public final class GameplayScreen extends BaseScreen {
 
     Gdx.input.setInputProcessor(new InputMultiplexer(hud.getStage(), input));
     layout();
+    showBriefing();
   }
 
   private static List<PlantTemplate> deckTemplates() {
@@ -152,6 +154,33 @@ public final class GameplayScreen extends BaseScreen {
       // do not let the match catch up on time spent in the menu
       clock.reset();
     }
+  }
+
+  /** Shown once when the level starts: what to expect this level, per the Phase 2 spec. */
+  private void showBriefing() {
+    if (match == null || game.getUiSkin().get() == null) {
+      return;
+    }
+    Label text = new Label(briefingText(), game.getUiSkin().get(), UiSkinProvider.LABEL_MEDIUM);
+    text.setWrap(true);
+    Table body = new Table();
+    body.add(text).width(420f);
+    Popup.show(hud.getStage(), game.getUiSkin().get(), "Level start", body,
+        new Popup.Choice("Let's go", UiSkinProvider.BUTTON_GREEN, null));
+  }
+
+  private String briefingText() {
+    StringBuilder text = new StringBuilder();
+    text.append(match.getTotalWaves()).append(" waves of zombies incoming.\n");
+    if (match.getBoard() != null && match.getBoard().getGameState().isSkySunDisabled()) {
+      text.append("No sun will fall from the sky -- grow your own.\n");
+    }
+    SpecialStageRule rule = match.getSpecialStageRule();
+    if (rule != null) {
+      text.append(rule.getClass().getSimpleName()).append(" is active this level.\n");
+    }
+    text.append("Defend your lawn -- don't let the zombies reach the house!");
+    return text.toString();
   }
 
   private void layout() {

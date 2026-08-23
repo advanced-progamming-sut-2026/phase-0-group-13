@@ -32,6 +32,11 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float ZOMBOSS_ROW_FILL = 2.4f;
   private static final float ZOMBIE_FOOT_INSET = 0.08f;
   private static final float PLANT_FOOT_INSET = 0.14f;
+  // Plants have no idle cycle of their own (see the .PAM note on ZombieArt); this tiny bob on
+  // the footInset fraction is the whole stand-in the doc allows for plants, and it costs nothing
+  // beyond what drawStanding already computes.
+  private static final float PLANT_IDLE_SPEED = 2.2f;
+  private static final float PLANT_IDLE_BOB_FRACTION = 0.02f;
 
   private final LawnGeometry geometry;
   private final PlantArt plantArt = new PlantArt();
@@ -45,6 +50,7 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color noArt = new Color(1f, 1f, 1f, 0.85f);
   // Reflected shots belong to the zombie now, so they must not read as one of your peas.
   private final Color reflectedPea = new Color(1f, 0.42f, 0.3f, 1f);
+  // King's aura pulse and the Juggler's spin both read this; it only ticks in render().
   private float clock;
 
   public EntityRenderer(LawnGeometry geometry) {
@@ -81,7 +87,8 @@ public final class EntityRenderer implements WorldRenderer {
       float scale = cursed
           ? geometry.getCellHeight() * PLANT_ROW_FILL / art.getRegionHeight()
           : scaleFor(art, PLANT_REFERENCE_HEIGHT, PLANT_ROW_FILL);
-      drawStanding(context, art, plant.getCol(), plant.getRow(), scale, PLANT_FOOT_INSET);
+      drawStanding(context, art, plant.getCol(), plant.getRow(), scale,
+          PLANT_FOOT_INSET + idleBobFraction(plant));
     }
     for (Zombie zombie : board.getZombies()) {
       if (zombie.isDead()) {
@@ -118,6 +125,12 @@ public final class EntityRenderer implements WorldRenderer {
    * Only the left side is clamped, zombies spawn to the right of the lawn and walk in. */
   private double onBoard(double column) {
     return Math.max(0.0, column);
+  }
+
+  /** Slow up/down drift, phase-shifted per tile so neighbouring plants do not bob in lockstep. */
+  private float idleBobFraction(Plant plant) {
+    float phase = (plant.getRow() * 3 + plant.getCol()) * 0.9f;
+    return PLANT_IDLE_BOB_FRACTION * (float) Math.sin(clock * PLANT_IDLE_SPEED + phase);
   }
 
   private static boolean isBoss(Zombie zombie) {

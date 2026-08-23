@@ -9,6 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -16,10 +19,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
  *
  * <p>The dimmed backdrop is a filled touchable table, which is also what stops clicks getting
  * through to the screen underneath.
+ *
+ * <p>Every button is a {@link Choice}. Confirm/cancel dialogs sit side by side; a real menu of
+ * three or more, like pause, stacks instead so the labels stay readable.
  */
 public final class Popup {
 
-  /** One button on a multi-choice popup. */
+  private static final float ROW_BUTTON_WIDTH = 210f;
+  private static final float STACKED_BUTTON_WIDTH = 300f;
+
+  /** One button on a popup: its label, skin style (e.g. BUTTON_GREEN) and what it runs. */
   public record Choice(String label, String style, Runnable action) {}
 
   private Popup() {
@@ -35,31 +44,8 @@ public final class Popup {
    * this one is for a real choice between three or more, like pause.
    */
   public static void show(Stage stage, Skin skin, String title, Actor body, Choice... choices) {
-    if (stage == null || skin == null) {
-      return;
-    }
-    Table dim = dim(skin);
-    Table panel = panel(skin, title, body);
-
-    Table actions = new Table();
-    actions.defaults().pad(6f).width(300f).height(66f);
-    for (Choice choice : choices) {
-      TextButton button = new TextButton(choice.label(), skin, choice.style());
-      button.addListener(new ClickListener() {
-        @Override
-        public void clicked(InputEvent event, float x, float y) {
-          dim.remove();
-          if (choice.action() != null) {
-            choice.action().run();
-          }
-        }
-      });
-      actions.add(button).row();
-    }
-    panel.add(actions).padTop(18f).row();
-
-    dim.add(panel);
-    stage.addActor(dim);
+    List<Choice> list = choices == null ? List.of() : Arrays.asList(choices);
+    show(stage, skin, title, body, list, true, STACKED_BUTTON_WIDTH);
   }
 
   /**
@@ -76,40 +62,43 @@ public final class Popup {
   public static void show(Stage stage, Skin skin, String title, Actor body,
                           String confirmText, Runnable onConfirm,
                           String declineText, Runnable onDecline) {
+    List<Choice> choices = new ArrayList<>();
+    if (confirmText != null) {
+      choices.add(new Choice(confirmText, UiSkinProvider.BUTTON_GREEN, onConfirm));
+    }
+    if (declineText != null) {
+      choices.add(new Choice(declineText, UiSkinProvider.BUTTON_BROWN, onDecline));
+    }
+    show(stage, skin, title, body, choices, false, ROW_BUTTON_WIDTH);
+  }
+
+  // One builder behind every overload. Closing before running the action matters: Restart and
+  // Save & Exit switch screens, and the stage this popup lives on goes with them.
+  private static void show(Stage stage, Skin skin, String title, Actor body,
+                           List<Choice> choices, boolean stacked, float buttonWidth) {
     if (stage == null || skin == null) {
       return;
     }
-
     Table dim = dim(skin);
     Table panel = panel(skin, title, body);
 
     Table actions = new Table();
-    actions.defaults().pad(8f).width(210f).height(66f);
-    if (confirmText != null) {
-      TextButton confirm = new TextButton(confirmText, skin, UiSkinProvider.BUTTON_GREEN);
-      confirm.addListener(new ClickListener() {
+    actions.defaults().pad(stacked ? 6f : 8f).width(buttonWidth).height(66f);
+    for (Choice choice : choices) {
+      TextButton button = new TextButton(choice.label(), skin, choice.style());
+      button.addListener(new ClickListener() {
         @Override
         public void clicked(InputEvent event, float x, float y) {
-          if (onConfirm != null) {
-            onConfirm.run();
-          }
           dim.remove();
+          if (choice.action() != null) {
+            choice.action().run();
+          }
         }
       });
-      actions.add(confirm);
-    }
-    if (declineText != null) {
-      TextButton close = new TextButton(declineText, skin, UiSkinProvider.BUTTON_BROWN);
-      close.addListener(new ClickListener() {
-        @Override
-        public void clicked(InputEvent event, float x, float y) {
-          if (onDecline != null) {
-            onDecline.run();
-          }
-          dim.remove();
-        }
-      });
-      actions.add(close);
+      actions.add(button);
+      if (stacked) {
+        actions.row();
+      }
     }
     panel.add(actions).padTop(18f).row();
 

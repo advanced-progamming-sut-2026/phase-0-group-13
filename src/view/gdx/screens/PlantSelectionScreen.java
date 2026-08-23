@@ -52,7 +52,8 @@ public final class PlantSelectionScreen extends MenuScreen {
 
   @Override
   protected Screen backTarget() {
-    return new AdventureScreen(game);
+    // Back into this chapter's level grid, not the chapter list the player already stepped past.
+    return new AdventureScreen(game, chapter);
   }
 
   @Override

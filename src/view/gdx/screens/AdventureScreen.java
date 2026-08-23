@@ -34,7 +34,13 @@ public final class AdventureScreen extends MenuScreen {
   private int openChapter;
 
   public AdventureScreen(PvzGdxGame game) {
+    this(game, 0);
+  }
+
+  /** Opens straight into a chapter's level grid, e.g. coming back from plant selection. */
+  public AdventureScreen(PvzGdxGame game, int openChapter) {
     super(game);
+    this.openChapter = openChapter;
   }
 
   @Override
@@ -121,6 +127,10 @@ public final class AdventureScreen extends MenuScreen {
     final int target = stage;
     if (unlocked) {
       row.add(button("Enter", UiSkinProvider.BUTTON_GREEN, () -> {
+        // Same as the terminal's "enter chapter": a fresh seed bank for whichever level gets
+        // picked next, so a deck chosen for a different chapter doesn't leak in.
+        user.clearDeck();
+        MatchSetup.getInstance().setTargetChapter(String.valueOf(target));
         openChapter = target;
         refresh();
       })).width(180f);
@@ -166,8 +176,8 @@ public final class AdventureScreen extends MenuScreen {
   }
 
   // The chapter has to be in MatchSetup before the selection screen opens: selectionRule() reads
-  // it to work out which plants this stage locks out. The conveyor level has no selection at all
-  // (the belt hands out the plants), so it goes straight to the lawn.
+  // it to work out which plants this stage locks out. The Conveyor Belt level hands out plants
+  // itself, so it skips selection and goes straight to the lawn.
   private void startLevel(int level) {
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) {
@@ -182,7 +192,9 @@ public final class AdventureScreen extends MenuScreen {
       return;
     }
 
-    MatchSetup.getInstance().setSelectedPlants(user.getSelectedDeck());
+    // No selection screen ran, and entering the chapter cleared the deck, so the belt draws from
+    // everything the player owns rather than from an empty seed bank.
+    MatchSetup.getInstance().setSelectedPlants(user.getUnlockedPlants());
     MatchSetup.getInstance().setBoostedPlants(user.getBoostedPlants());
     MatchLauncher.launch();
     GameManager started = GameSession.getActiveGame();
