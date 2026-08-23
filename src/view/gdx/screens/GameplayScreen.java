@@ -223,6 +223,9 @@ public final class GameplayScreen extends BaseScreen {
       hud.setStatus("no match running");
       return;
     }
+    // Ahead of the paused check: the counter is frozen either way, but it should read the real
+    // total rather than whatever it happened to show when the menu opened.
+    hud.setSun(match.getSunAmount());
     if (paused) {
       hud.setStatus("paused");
       return;
