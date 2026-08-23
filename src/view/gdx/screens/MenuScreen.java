@@ -107,7 +107,13 @@ public abstract class MenuScreen extends BaseScreen {
     buildContent(content);
 
     if (DebugPanel.isEnabled()) {
-      root.add(new DebugPanel(skin, this::toast)).right().padTop(16f).row();
+      // Floats over the corner instead of taking a row - it can be toggled on any screen now,
+      // and the taller ones have no spare height to give it.
+      Table corner = new Table();
+      corner.setFillParent(true);
+      corner.bottom().right().pad(12f);
+      corner.add(new DebugPanel(skin, this::toast));
+      stage.addActor(corner);
     }
 
     stage.addListener(

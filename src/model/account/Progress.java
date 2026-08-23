@@ -82,7 +82,7 @@ public class Progress {
     int previousStage = this.currentStage;
     int previousLevel = this.currentLevel;
 
-    if (this.currentLevel < 4) {
+    if (this.currentLevel < AdventureMap.LEVELS_PER_STAGE) {
       this.currentLevel++;
     } else {
       this.currentStage++;
@@ -126,7 +126,7 @@ public class Progress {
   }
 
   public boolean isLevelAccessible(int stage, int level) {
-    if (stage < 1 || level < 1 || level > 10) return false;
+    if (stage < 1 || level < 1 || level > AdventureMap.LEVELS_PER_STAGE) return false;
 
     if (stage < this.currentStage) return true;
 

@@ -4,6 +4,7 @@ import data.GameDataManager;
 import data.persistence.UserManager;
 import java.util.ArrayList;
 import java.util.List;
+import model.account.AdventureMap;
 import model.account.User;
 import model.enums.Menu;
 import model.environment.AncientEgyptSeason;
@@ -32,7 +33,7 @@ import model.game.zombie.Zombie;
 public final class MatchLauncher {
   private static final int ROWS = 5;
   private static final int COLS = 9;
-  private static final int LEVELS_PER_STAGE = 4;
+  private static final int LEVELS_PER_STAGE = AdventureMap.LEVELS_PER_STAGE;
 
   private MatchLauncher() {}
 
@@ -106,7 +107,7 @@ public final class MatchLauncher {
       if (guarded != null) {
         gameManager.getBoard().placePlant(guarded);
         System.out.printf("PROTECT THIS: %s at (1, %d)%n", guarded.getName(), row + 1);}}}
-  private static final int BOSS_LEVEL_IN_STAGE = 4;
+  private static final int BOSS_LEVEL_IN_STAGE = AdventureMap.LEVELS_PER_STAGE;
 
   private static int currentLevelInStage() {
     User user = UserManager.getInstance().getCurrentUser();

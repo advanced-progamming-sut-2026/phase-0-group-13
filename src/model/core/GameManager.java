@@ -65,6 +65,7 @@ public class GameManager {
 
   public void startGame() { running = true; }
   public void startZombieWaves() { this.zombieWavesStarted = true; }
+  public boolean isZombieWavesStarted() { return zombieWavesStarted; }
   public void pauseZombieWaves() { this.zombieWavesStarted = false; }
 
   public void setSeason(model.environment.Season season) { this.currentSeason = season; }

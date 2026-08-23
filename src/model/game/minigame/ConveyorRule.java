@@ -45,6 +45,15 @@ public class ConveyorRule extends MiniGame implements SpecialStageRule {
             .equals(model.account.User.normalizePlantKey(plantName));
   }
 
+  /** What the belt is offering right now, without taking it. */
+  public String peekReadyPlant() {
+    return readyPlant;
+  }
+
+  public List<String> getBeltPlants() {
+    return java.util.Collections.unmodifiableList(beltPlants);
+  }
+
   public String consumeReadyPlant() {
     String plant = readyPlant;
     readyPlant = null;

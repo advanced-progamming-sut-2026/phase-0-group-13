@@ -3,8 +3,8 @@ package model.account;
 import model.Result;
 
 public class AdventureMap {
-  public static final int MAX_STAGES = 5;
-  public static final int LEVELS_PER_STAGE = 10;
+  public static final int MAX_STAGES = 4;
+  public static final int LEVELS_PER_STAGE = 4;
 
   // این و باید فکر بکنیم و درست بکنیم ، فعلا فصل هارو انتخاب نکردیم به صورت دقیق که بخوایم ریوارد
   // هاشو مشخص بکنیم

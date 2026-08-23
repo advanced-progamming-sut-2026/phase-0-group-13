@@ -24,7 +24,7 @@ import view.gdx.ui.UiSkinProvider;
  * <p>Quest.claimReward already refuses an unfinished or claimed quest, so the claim rules are not
  * repeated here; the button state is only there to show which quests are claimable.
  *
- * <p>Mini-games, the other half of the Phase 1 Travel Log, are still terminal-only.
+ * <p>Mini-games, the other half of the Phase 1 Travel Log, live on {@link MiniGamesScreen}.
  */
 public final class QuestScreen extends MenuScreen {
 
@@ -91,10 +91,12 @@ public final class QuestScreen extends MenuScreen {
     scroll.setScrollingDisabled(true, false);
     content.add(scroll).grow().row();
 
-    content.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget())))
-        .width(220f)
-        .padTop(8f)
-        .row();
+    Table footer = new Table();
+    footer.defaults().pad(6f).width(220f).height(60f);
+    footer.add(button("Mini-Games", UiSkinProvider.BUTTON_GREEN,
+        () -> go(new MiniGamesScreen(game))));
+    footer.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget())));
+    content.add(footer).padTop(8f).row();
   }
 
   private Table buildFilters(User user) {

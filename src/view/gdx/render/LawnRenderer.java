@@ -12,6 +12,7 @@ import model.game.Lawnmower;
 import model.game.TileEffects.IceTrailEffect;
 import model.game.TileEffects.TileEffect;
 import model.game.TileEffects.TombStoneEffect;
+import view.gdx.core.GameSettings;
 import view.gdx.core.GdxConfig;
 import view.gdx.ui.HudArt;
 
@@ -115,9 +116,12 @@ public final class LawnRenderer implements WorldRenderer {
     shapes.begin(ShapeRenderer.ShapeType.Filled);
     for (int row = 0; row < board.getRows(); row++) {
       for (int col = 0; col < board.getColumns(); col++) {
-        shapes.setColor((row + col) % 2 == 0 ? lightLane : darkLane);
-        shapes.rect(geometry.columnToX(col), geometry.rowToY(row),
-            geometry.getCellWidth() - 1f, geometry.getCellHeight() - 1f);
+        // only the cell shading is optional; water and hazards decide where you can plant
+        if (GameSettings.isGridVisible()) {
+          shapes.setColor((row + col) % 2 == 0 ? lightLane : darkLane);
+          shapes.rect(geometry.columnToX(col), geometry.rowToY(row),
+              geometry.getCellWidth() - 1f, geometry.getCellHeight() - 1f);
+        }
         // the tide decides where you can plant, so it has to be visible
         if (board.isWaterAt(row, col)) {
           shapes.setColor(waterTile);

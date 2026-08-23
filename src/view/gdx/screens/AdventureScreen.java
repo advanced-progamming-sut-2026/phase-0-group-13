@@ -113,7 +113,6 @@ public final class AdventureScreen extends MenuScreen {
     Table row = new Table();
     row.left();
 
-    // Stages 4 and 5 are both Dark Ages, so the number is what tells the rows apart.
     row.add(new Label(stage + ".  " + chapterName(stage), skin, UiSkinProvider.LABEL_BIG))
         .left()
         .expandX();
