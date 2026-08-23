@@ -175,32 +175,34 @@ public final class AdventureScreen extends MenuScreen {
     return button(label, UiSkinProvider.BUTTON_GREEN, () -> startLevel(target));
   }
 
-  /**
-   * Same route the terminal build takes: the Conveyor Belt level hands out plants itself and
-   * skips straight to the match, everything else goes through plant selection first.
-   */
+  // The chapter has to be in MatchSetup before the selection screen opens: selectionRule() reads
+  // it to work out which plants this stage locks out. The Conveyor Belt level hands out plants
+  // itself, so it skips selection and goes straight to the lawn.
   private void startLevel(int level) {
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) {
       toast("error: no user logged in");
       return;
     }
-    if (!MatchLauncher.skipsPlantSelection(openChapter, level)) {
-      go(new PlantSelectionScreen(game, openChapter, level));
+    MatchSetup.getInstance().setTargetChapter(String.valueOf(openChapter));
+    MatchSetup.getInstance().setDifficultyLevel(user.getDifficultyLevel());
+
+    if (!MatchLauncher.skipsPlantSelection(openChapter, user.getProgress().getCurrentLevel())) {
+      go(new PlantSelectionScreen(game, openChapter));
       return;
     }
 
+    // No selection screen ran, and entering the chapter cleared the deck, so the belt draws from
+    // everything the player owns rather than from an empty seed bank.
     MatchSetup.getInstance().setSelectedPlants(user.getUnlockedPlants());
     MatchSetup.getInstance().setBoostedPlants(user.getBoostedPlants());
-    MatchSetup.getInstance().setDifficultyLevel(user.getDifficultyLevel());
-
     MatchLauncher.launch();
     GameManager started = GameSession.getActiveGame();
     if (started == null) {
       toast("could not start the level");
       return;
     }
-    go(new GameplayScreen(game, started, null));
+    go(new GameplayScreen(game, started));
   }
 
   /** Levels of this chapter the player has already cleared. */

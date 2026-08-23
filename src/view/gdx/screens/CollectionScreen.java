@@ -2,15 +2,11 @@ package view.gdx.screens;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import data.GameDataManager;
 import data.persistence.UserManager;
@@ -20,7 +16,9 @@ import model.game.plant.PlantParts.PlantTemplate;
 import model.game.zombie.ZombieParts.ZombieTemplate;
 import model.game.zombie.ZombieParts.ZombieTypeResolver;
 import view.gdx.core.PvzGdxGame;
+import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
+import view.gdx.ui.SeedCard;
 import view.gdx.ui.UiSkinProvider;
 
 
@@ -36,6 +34,7 @@ public final class CollectionScreen extends MenuScreen {
   private static final int COLUMNS = 4;
 
   private final PlantArt plantArt = new PlantArt();
+  private final HudArt hudArt = new HudArt();
   private Table content;
   private boolean showingPlants = true;
   private String selected;
@@ -106,7 +105,7 @@ public final class CollectionScreen extends MenuScreen {
   private ScrollPane gridPane(User user) {
     Table grid = panel();
     grid.top();
-    grid.defaults().pad(8f).width(168f).height(150f);
+    grid.defaults().pad(8f).width(168f).height(180f);
 
     int column = 0;
     if (showingPlants) {
@@ -131,56 +130,33 @@ public final class CollectionScreen extends MenuScreen {
     return scroll;
   }
 
-  private Table plantCard(User user, PlantTemplate template) {
+  private SeedCard plantCard(User user, PlantTemplate template) {
     boolean unlocked = user.hasUnlockedPlant(template.name);
+    SeedCard card = new SeedCard(skin, SeedCard.Size.FULL, template.name, template.name,
+            plantArt.find(template.name), hudArt, this::select)
+            .withCost(template.cost);
     // The terminal almanac names locked plants too, so the card can show it.
-    String state = unlocked ? "Lv " + user.getPlantLevel(template.name) : "locked";
-    return card(template.name, state, template.name, unlocked, plantArt.find(template.name));
-  }
-
-  private Table zombieCard(User user, ZombieTemplate template) {
-    boolean seen = hasSeen(user, template);
-    return card(seen ? template.getName() : "???", seen ? "seen" : "not encountered",
-            template.getName(), seen, null);
-  }
-
-  /** One grid card: art on top, name and state under it. The whole card is clickable. */
-  private Table card(String name, String state, String key, boolean enabled, TextureRegion art) {
-    Table card = new Table();
-    card.setBackground(skin.getDrawable(enabled && key.equals(selected)
-            ? UiSkinProvider.DIALOG_BORDER : UiSkinProvider.PANEL_BACKGROUND));
-    card.pad(6f);
-
-    if (art != null) {
-      Image image = new Image(art);
-      image.setScaling(Scaling.fit);
-      card.add(image).size(96f, 66f).padBottom(2f).row();
-    } else {
-      Label none = new Label(enabled ? "art unavailable" : "", skin, "secondary");
-      none.setAlignment(Align.center);
-      card.add(none).size(96f, 66f).padBottom(2f).row();
-    }
-
-    Label title = new Label(name, skin, UiSkinProvider.LABEL_MEDIUM);
-    title.setWrap(true);
-    title.setAlignment(Align.center);
-    card.add(title).width(150f).row();
-    card.add(new Label(state, skin, "secondary")).row();
-
-    if (enabled) {
-      card.setTouchable(Touchable.enabled);
-      card.addListener(new ClickListener() {
-        @Override
-        public void clicked(InputEvent event, float x, float y) {
-          selected = key;
-          refresh();
-        }
-      });
-    } else {
-      // Dim enough to read as locked, not so far that the name goes unreadable.
-      card.getColor().a = 0.72f;
-    }
+    card.setStatus(unlocked ? "Lv " + user.getPlantLevel(template.name) : "locked");
+    card.setBoosted(user.isPlantBoosted(template.name));
+    card.setEnabled(unlocked);
+    card.setSelected(unlocked && template.name.equals(selected));
     return card;
+  }
+
+  private SeedCard zombieCard(User user, ZombieTemplate template) {
+    boolean seen = hasSeen(user, template);
+    // no withCost: a zombie has no sun price
+    SeedCard card = new SeedCard(skin, SeedCard.Size.FULL, template.getName(),
+            seen ? template.getName() : "???", null, hudArt, this::select);
+    card.setStatus(seen ? "seen" : "not encountered");
+    card.setEnabled(seen);
+    card.setSelected(seen && template.getName().equals(selected));
+    return card;
+  }
+
+  private void select(String key) {
+    selected = key;
+    refresh();
   }
 
   private ScrollPane detailsPane(User user) {
@@ -292,5 +268,6 @@ public final class CollectionScreen extends MenuScreen {
   public void dispose() {
     super.dispose();
     plantArt.dispose();
+    hudArt.dispose();
   }
 }

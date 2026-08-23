@@ -14,42 +14,47 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
 
 import model.core.GameManager;
 import model.game.plant.PlantParts.PlantTemplate;
+
 /**
- * Scene2D layer for the in-match UI: sun counter, seed bar, plant food, wave banner, pause button.
+ * Scene2D layer for the in-match UI: sun counter, seed bar, the shovel and plant food tools, the
+ * pause button and the pause menu itself.
  *
  * <p>Has its own ScreenViewport rather than sharing the world one. The world is letterboxed to a
  * fixed size so the lawn keeps its shape, but the HUD wants one unit per real pixel so the text
  * stays sharp at any window size.
  *
- * <p>What is filled in so far is the part the menus share: the coin and diamond readout, the debug
- * cheats and a way back out. It uses the same CurrencyHud and DebugPanel the menus do, so the
- * balances shown during a match are the same ones shown outside it. The match-specific widgets are
- * still to come.
+ * <p>Owns no game state. The tool buttons only report a press; what is armed lives in
+ * GameplayInputHandler and comes back through {@link #updateTools}, so they cannot disagree with
+ * the cursor.
  *
  * <p>build() does nothing while there's no skin, see UiSkinProvider.
  */
 public final class HudStage implements Disposable {
 
-private final Stage stage;
+  private static final Color TOOL_ARMED = new Color(1f, 1f, 1f, 1f);
+  private static final Color TOOL_IDLE = new Color(0.62f, 0.62f, 0.66f, 1f);
 
-private final HudArt hudArt = new HudArt();
+  private final Stage stage;
+  private final HudArt hudArt = new HudArt();
 
-private Label sunCount;
-private Label status;
+  private Skin skin;
+  private Label sunCount;
+  private Label status;
 
-private Table seedBar;
-private SeedBar seeds;
+  private Table seedBar;
+  private SeedBar seeds;
 
-private Table toolsRow;
-private TextButton shovelButton;
-private TextButton plantFoodButton;
+  private TextButton shovelButton;
+  private TextButton plantFoodButton;
 
-private String selected;
+  private String selected;
+
   public HudStage() {
     this.stage = new Stage(new ScreenViewport());
   }
@@ -68,7 +73,7 @@ private String selected;
     if (!skinProvider.isAvailable()) {
       return;
     }
-    Skin skin = skinProvider.get();
+    this.skin = skinProvider.get();
 
     Table root = new Table();
     root.setFillParent(true);
@@ -89,14 +94,8 @@ private String selected;
     seedBar = new Table();
     root.add(seedBar).left().padTop(2f).row();
 
-    toolsRow = new Table();
-    root.add(toolsRow).left().padTop(2f).row();
-
     if (DebugPanel.isEnabled()) {
-      root.add(new DebugPanel(skin, message -> Toast.show(stage, skin, message)))
-          .colspan(onExit != null ? 2 : 1)
-          .right()
-          .padTop(12f);
+      root.add(new DebugPanel(skin, this::toast)).right().padTop(12f);
       root.row();
     }
   }
@@ -133,59 +132,58 @@ private String selected;
     return button;
   }
 
-
-  /** Seed packets for this match. Clicking one arms it for the next click on the lawn. */
-  public void buildSeedBar(Skin skin, java.util.List<model.game.plant.PlantParts.PlantTemplate> templates,
-      java.util.function.Consumer<String> onPick) {
+  // Seeds and tools share a row: the lawn starts right underneath and a second row would cover
+  // the top lane.
+  public void buildSeedBar(Skin skin, List<PlantTemplate> templates, Consumer<String> onPick,
+      Runnable onShovel, Runnable onPlantFood, Runnable onPause) {
     if (seedBar == null || skin == null) {
       return;
     }
     seedBar.clear();
-    seeds = new SeedBar(skin, null, templates, plant -> {
+    seeds = new SeedBar(skin, templates, plant -> {
       selected = plant;
       onPick.accept(plant);
     });
-    seedBar.add(seeds);
+    seedBar.add(seeds).left();
+
+    Table tools = new Table();
+    tools.defaults().pad(3f).width(112f).height(48f);
+    shovelButton = toolButton(skin, "Shovel", onShovel);
+    plantFoodButton = toolButton(skin, "Food 0", onPlantFood);
+    tools.add(shovelButton).row();
+    tools.add(plantFoodButton).row();
+    tools.add(toolButton(skin, "Pause", onPause)).row();
+    seedBar.add(tools).left().padLeft(10f).top();
   }
 
-  public void updateSeeds(model.core.GameManager match, String selected,
-      java.util.function.ToIntFunction<String> levelOf) {
-    if (seeds != null) {
-      seeds.update(match, selected, levelOf);
-    }
+  private TextButton toolButton(Skin skin, String label, Runnable action) {
+    TextButton button = new TextButton(label, skin, UiSkinProvider.BUTTON_BROWN);
+    button.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            if (action != null) {
+              action.run();
+            }
+          }
+        });
+    return button;
   }
 
-  /** Shovel (pluck) and plant food toggle buttons, next to the seed bar. */
-  public void buildTools(Skin skin, Runnable onShovel, Runnable onPlantFood) {
-    if (toolsRow == null || skin == null) {
-      return;
-    }
-    toolsRow.clear();
-    shovelButton = new TextButton("Shovel", skin, UiSkinProvider.BUTTON_BROWN);
-    shovelButton.addListener(new ClickListener() {
-      @Override
-      public void clicked(InputEvent event, float x, float y) {
-        onShovel.run();
-      }
-    });
-    plantFoodButton = new TextButton("Plant Food", skin, UiSkinProvider.BUTTON_BROWN);
-    plantFoodButton.addListener(new ClickListener() {
-      @Override
-      public void clicked(InputEvent event, float x, float y) {
-        onPlantFood.run();
-      }
-    });
-    toolsRow.add(shovelButton).width(110f).height(48f).padRight(6f);
-    toolsRow.add(plantFoodButton).width(110f).height(48f);
-  }
-
-  /** Highlights whichever tool is currently armed, so the player can tell what a click will do. */
-  public void updateTools(boolean shovelArmed, boolean plantFoodArmed) {
+  /** Repaints the tool buttons from what the input handler has armed. */
+  public void updateTools(boolean shovelArmed, boolean plantFoodArmed, int plantFoodCount) {
     if (shovelButton != null) {
-      shovelButton.setColor(shovelArmed ? Color.YELLOW : Color.WHITE);
+      shovelButton.setColor(shovelArmed ? TOOL_ARMED : TOOL_IDLE);
     }
     if (plantFoodButton != null) {
-      plantFoodButton.setColor(plantFoodArmed ? Color.YELLOW : Color.WHITE);
+      plantFoodButton.setColor(plantFoodArmed ? TOOL_ARMED : TOOL_IDLE);
+      plantFoodButton.setText("Food " + plantFoodCount);
+    }
+  }
+
+  public void updateSeeds(GameManager match, String selected, ToIntFunction<String> levelOf) {
+    if (seeds != null) {
+      seeds.update(match, selected, levelOf);
     }
   }
 
@@ -197,6 +195,19 @@ private String selected;
 
   public String getSelected() {
     return selected;
+  }
+
+  /** In-match message, for a refused plant or a collected reward. */
+  public void toast(String message) {
+    Toast.show(stage, skin, message);
+  }
+
+  /** Modal, so nothing underneath is clickable while the game is frozen. */
+  public void showPauseMenu(Runnable onResume, Runnable onRestart, Runnable onSaveExit) {
+    Popup.show(stage, skin, "Paused", null,
+        new Popup.Choice("Resume", UiSkinProvider.BUTTON_GREEN, onResume),
+        new Popup.Choice("Restart", UiSkinProvider.BUTTON_PURPLE, onRestart),
+        new Popup.Choice("Save & Exit", UiSkinProvider.BUTTON_BROWN, onSaveExit));
   }
 
   public void act(float delta) {

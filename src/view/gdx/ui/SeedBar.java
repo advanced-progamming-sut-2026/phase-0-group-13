@@ -1,30 +1,24 @@
 package view.gdx.ui;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.Scaling;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
 import model.core.GameManager;
+import model.core.MatchSetup;
 import model.game.plant.PlantParts.PlantLevel;
 import model.game.plant.PlantParts.PlantTemplate;
 
 /**
- * The seed packets: plant picture, sun cost, and whether it can be planted right now.
+ * The seed packets during a match: plant picture, sun cost, and whether it can be planted now.
  *
- * <p>Recharge comes from the same numbers GamePlayController checks, so a card only looks ready
- * when the model would actually accept the plant.
+ * <p>The cards are {@link SeedCard}, shared with the almanac and the deck builder. Only the match
+ * reading lives here: recharge uses the same numbers GamePlayController checks, so a card looks
+ * ready exactly when the model would accept the plant.
  */
 public final class SeedBar extends Table implements Disposable {
 
@@ -34,24 +28,58 @@ public final class SeedBar extends Table implements Disposable {
 
   private final PlantArt plantArt = new PlantArt();
   private final HudArt hudArt = new HudArt();
-  private final List<Card> cards = new ArrayList<>();
-  private final Skin skin;
+  private final List<PlantTemplate> templates = new ArrayList<>();
+  private final List<SeedCard> cards = new ArrayList<>();
 
-  public SeedBar(Skin skin, List<String> deck, List<PlantTemplate> templates,
-      Consumer<String> onPick) {
-    this.skin = skin;
+  public SeedBar(Skin skin, List<PlantTemplate> templates, Consumer<String> onPick) {
     defaults().pad(3f);
     for (PlantTemplate template : templates) {
-      Card card = new Card(template, onPick);
+      SeedCard card = new SeedCard(skin, SeedCard.Size.COMPACT, template.name, template.name,
+          plantArt.find(template.name), hudArt, onPick)
+          .withCost(template.cost);
+      card.setBoosted(isBoosted(template.name));
+      this.templates.add(template);
       cards.add(card);
-      add(card).width(92f).height(108f);
+      add(card).width(96f).height(110f);
     }
+  }
+
+  /** Boosts bought on the selection screen, locked in when the match started. */
+  private static boolean isBoosted(String plantName) {
+    List<String> boosted = MatchSetup.getInstance().getBoostedPlants();
+    return plantName != null && boosted != null
+        && boosted.contains(plantName.toLowerCase().trim());
   }
 
   /** Repaints the cards from the live match. */
   public void update(GameManager match, String selected, ToIntFunction<String> levelOf) {
-    for (Card card : cards) {
-      card.refresh(match, selected, levelOf);
+    if (match == null) {
+      return;
+    }
+    for (int i = 0; i < cards.size(); i++) {
+      refresh(cards.get(i), templates.get(i), match, selected, levelOf);
+    }
+  }
+
+  private void refresh(SeedCard card, PlantTemplate template, GameManager match, String selected,
+      ToIntFunction<String> levelOf) {
+    card.setSelected(template.name.equalsIgnoreCase(selected));
+
+    int recharge = Math.max(0, template.recharge
+        + PlantLevel.cumulative(template, levelOf.applyAsInt(template.name))
+            .getCooldownDeltaSeconds());
+    int ticksLeft = match.ticksUntilPlantReady(template.name, recharge);
+    boolean affordable = match.isFreePlanting() || match.getSunAmount() >= template.cost;
+
+    if (ticksLeft > 0) {
+      card.setTint(RECHARGING);
+      card.setStatus(String.format("%.1fs", ticksLeft / 10.0));
+    } else if (!affordable) {
+      card.setTint(BROKE);
+      card.setStatus("need sun");
+    } else {
+      card.setTint(READY);
+      card.setStatus(card.isSelected() ? "selected" : "ready");
     }
   }
 
@@ -59,84 +87,5 @@ public final class SeedBar extends Table implements Disposable {
   public void dispose() {
     plantArt.dispose();
     hudArt.dispose();
-  }
-
-  private final class Card extends Table {
-
-    private final PlantTemplate template;
-    private final Label costLabel;
-    private final Label stateLabel;
-    private final Image portrait;
-
-    private Card(PlantTemplate template, Consumer<String> onPick) {
-      this.template = template;
-      setBackground(skin.getDrawable(UiSkinProvider.PANEL_BACKGROUND));
-      pad(4f);
-
-      TextureRegion art = plantArt.find(template.name);
-      portrait = new Image(art);
-      portrait.setScaling(Scaling.fit);
-      if (art != null) {
-        add(portrait).size(56f, 48f).colspan(2).row();
-      } else {
-        Label none = new Label("no art", skin, "secondary");
-        none.setAlignment(Align.center);
-        add(none).size(56f, 48f).colspan(2).row();
-      }
-
-      Label name = new Label(template.name, skin, "secondary");
-      name.setAlignment(Align.center);
-      name.setFontScale(0.85f);
-      add(name).width(84f).colspan(2).row();
-
-      costLabel = new Label(String.valueOf(template.cost), skin, UiSkinProvider.LABEL_MEDIUM);
-      costLabel.setAlignment(Align.center);
-      TextureRegion sun = hudArt.find("sun");
-      if (sun != null) {
-        Image sunIcon = new Image(sun);
-        sunIcon.setScaling(Scaling.fit);
-        add(sunIcon).size(18f, 18f).right();
-        add(costLabel).left().padLeft(3f).row();
-      } else {
-        add(costLabel).width(84f).colspan(2).row();
-      }
-
-      stateLabel = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
-      stateLabel.setAlignment(Align.center);
-      add(stateLabel).width(84f).colspan(2);
-
-      setTouchable(Touchable.enabled);
-      addListener(new ClickListener() {
-        @Override
-        public void clicked(InputEvent event, float x, float y) {
-          onPick.accept(template.name);
-        }
-      });
-    }
-
-    private void refresh(GameManager match, String selected, ToIntFunction<String> levelOf) {
-      boolean chosen = template.name.equalsIgnoreCase(selected);
-      setBackground(skin.getDrawable(
-          chosen ? UiSkinProvider.DIALOG_BORDER : UiSkinProvider.PANEL_BACKGROUND));
-      if (match == null) {
-        return;
-      }
-      int recharge = Math.max(0, template.recharge
-          + PlantLevel.cumulative(template, levelOf.applyAsInt(template.name))
-              .getCooldownDeltaSeconds());
-      int ticksLeft = match.ticksUntilPlantReady(template.name, recharge);
-      boolean affordable = match.isFreePlanting() || match.getSunAmount() >= template.cost;
-
-      if (ticksLeft > 0) {
-        setColor(RECHARGING);
-        stateLabel.setText(String.format("%.1fs", ticksLeft / 10.0));
-      } else if (!affordable) {
-        setColor(BROKE);
-        stateLabel.setText("need sun");
-      } else {
-        setColor(READY);
-        stateLabel.setText(chosen ? "selected" : "ready");
-      }
-    }
   }
 }

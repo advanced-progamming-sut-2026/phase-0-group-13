@@ -1,17 +1,10 @@
 package view.gdx.screens;
 
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Scaling;
 import data.GameDataManager;
 import data.persistence.UserManager;
 import java.util.List;
@@ -24,47 +17,53 @@ import model.core.MatchSetup;
 import model.game.minigame.SpecialStageRule;
 import model.game.plant.PlantParts.PlantTemplate;
 import view.gdx.core.PvzGdxGame;
+import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
+import view.gdx.ui.Popup;
+import view.gdx.ui.SeedCard;
 import view.gdx.ui.UiSkinProvider;
 
-
 /**
- * Graphical "choose your plants" screen, shown before a level that isn't a Conveyor Belt stage.
+ * The deck builder between the Adventure map and the lawn.
  *
- * <p>Same underlying model calls as the terminal's PlantSelectionMenuController: clicking a card
- * toggles it in/out of {@code User.getSelectedDeck()} via addToDeck/removeFromDeck, so cooldowns,
- * the seed bank cap and per-stage plant locks (a level's {@link SpecialStageRule}) behave exactly
- * the same in both builds. The layout mirrors CollectionScreen's card grid, just with a picked
- * state and a cost line instead of an almanac entry.
+ * <p>No rules of its own: User owns the eight-slot limit and the boost price, MatchLauncher says
+ * which plants a stage locks out and when Start is allowed. Same calls the typed
+ * PlantSelectionMenuController makes. Cards are {@link SeedCard}.
  */
 public final class PlantSelectionScreen extends MenuScreen {
 
-  private static final int COLUMNS = 4;
+  private static final int GRID_COLUMNS = 6;
 
-  private final int stage;
-  private final int level;
+  private final int chapter;
   private final PlantArt plantArt = new PlantArt();
+  private final HudArt hudArt = new HudArt();
+
   private Table content;
 
-  public PlantSelectionScreen(PvzGdxGame game, int stage, int level) {
+  public PlantSelectionScreen(PvzGdxGame game, int chapter) {
     super(game);
-    this.stage = stage;
-    this.level = level;
+    this.chapter = chapter;
   }
 
   @Override
   protected String title() {
-    return "Level " + level + " - Choose your plants";
+    return "Choose your plants";
   }
 
   @Override
   protected Screen backTarget() {
-    return new AdventureScreen(game, stage);
+    // Back into this chapter's level grid, not the chapter list the player already stepped past.
+    return new AdventureScreen(game, chapter);
   }
 
   @Override
   protected String backgroundAtlasPath() {
-    return "textures/environment/" + worldAtlas(stage);
+    return "textures/environment/" + switch (chapter) {
+      case 1 -> "ancientegyptseason.atlas";
+      case 2 -> "frostbitecavesseason.atlas";
+      case 3 -> "bigwavebeachseason.atlas";
+      default -> "darkagesseason.atlas";
+    };
   }
 
   @Override
@@ -85,124 +84,166 @@ public final class PlantSelectionScreen extends MenuScreen {
       return;
     }
 
-    SpecialStageRule rule = MatchLauncher.selectionRule();
-
-    Table grid = panel();
-    grid.top();
-    grid.defaults().pad(8f).width(168f).height(172f);
-    int column = 0;
-    for (PlantTemplate template : plants()) {
-      grid.add(plantCard(user, template, rule));
-      if (++column % COLUMNS == 0) {
-        grid.row();
-      }
-    }
-    ScrollPane scroll = new ScrollPane(grid, skin);
-    scroll.setFadeScrollBars(false);
-    scroll.setScrollingDisabled(true, false);
-    content.add(scroll).growX().maxHeight(440f).row();
-
-    content.add(new Label(
-            "Selected: " + user.getSelectedDeck().size() + " / " + User.MAX_DECK_SLOTS,
-            skin, UiSkinProvider.LABEL_MEDIUM))
-        .padTop(10f)
-        .row();
-
-    Table actionsRow = new Table();
-    actionsRow.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget())))
-        .width(200f)
-        .padRight(12f);
-    actionsRow.add(button("Start battle", UiSkinProvider.BUTTON_GREEN, this::startBattle))
-        .width(240f);
-    content.add(actionsRow).padTop(8f);
+    content.add(seedBank(user)).growX().padBottom(10f).row();
+    content.add(almanac(user)).growX().maxHeight(340f).row();
+    content.add(footer(user)).padTop(8f);
   }
 
-  private Table plantCard(User user, PlantTemplate template, SpecialStageRule rule) {
-    boolean unlocked = user.hasUnlockedPlant(template.name);
-    boolean allowed = unlocked && (rule == null || rule.isPlantAllowed(template.name));
-    boolean selected = user.getSelectedDeck().contains(template.name);
-    boolean boosted = user.isPlantBoosted(template.name);
+  private Table seedBank(User user) {
+    Table panel = panel();
+    List<String> deck = user.getSelectedDeck();
+    int required = MatchLauncher.requiredDeckSlots(user);
 
-    Table card = new Table();
-    card.setBackground(skin.getDrawable(
-        selected ? UiSkinProvider.DIALOG_BORDER : UiSkinProvider.PANEL_BACKGROUND));
-    card.pad(6f);
+    panel.add(new Label("Seed bank  " + deck.size() + " / " + User.MAX_DECK_SLOTS
+            + "   (at least " + required + " to start)", skin, UiSkinProvider.LABEL_MEDIUM))
+            .left().padBottom(8f).row();
 
-    TextureRegion art = plantArt.find(template.name);
-    if (art != null) {
-      Image image = new Image(art);
-      image.setScaling(Scaling.fit);
-      card.add(image).size(96f, 66f).padBottom(2f).row();
-    } else {
-      Label none = new Label(unlocked ? "no art" : "???", skin, "secondary");
-      none.setAlignment(Align.center);
-      card.add(none).size(96f, 66f).padBottom(2f).row();
+    Table slots = new Table();
+    // compact: eight menu-sized cards plus the almanac do not fit on a 720-tall screen
+    slots.defaults().pad(4f).width(96f).height(110f);
+    for (String plant : deck) {
+      slots.add(chosenCard(user, plant));
     }
-
-    Label name = new Label(template.name, skin, UiSkinProvider.LABEL_MEDIUM);
-    name.setWrap(true);
-    name.setAlignment(Align.center);
-    card.add(name).width(150f).row();
-
-    String state = !unlocked ? "locked"
-        : !allowed ? "locked this stage"
-        : selected ? (boosted ? "selected (boosted)" : "selected")
-        : "cost " + template.cost;
-    card.add(new Label(state, skin, "secondary")).row();
-
-    if (allowed) {
-      card.setTouchable(Touchable.enabled);
-      card.addListener(new ClickListener() {
-        @Override
-        public void clicked(InputEvent event, float x, float y) {
-          toggle(user, template.name);
-        }
-      });
-      if (selected && !boosted) {
-        TextButton boost = new TextButton("Boost (2 gems)", skin, UiSkinProvider.BUTTON_BROWN);
-        boost.addListener(new ClickListener() {
-          @Override
-          public void clicked(InputEvent event, float x, float y) {
-            event.stop();
-            Result result = user.boostPlant(template.name);
-            toast(result.message());
-            refresh();
-          }
-        });
-        card.add(boost).padTop(4f);
-      }
-    } else {
-      card.getColor().a = 0.6f;
+    for (int i = deck.size(); i < User.MAX_DECK_SLOTS; i++) {
+      slots.add(emptySlot());
     }
+    panel.add(slots).row();
+    return panel;
+  }
+
+  /** Tapping a card in the bank offers boost or remove. */
+  private SeedCard chosenCard(User user, String plant) {
+    PlantTemplate template = template(plant);
+    SeedCard card = new SeedCard(skin, SeedCard.Size.COMPACT, plant, displayName(plant, template),
+            plantArt.find(plant), hudArt, key -> openSlotActions(user, key));
+    if (template != null) {
+      card.withCost(template.cost);
+    }
+    card.setStatus(upgradeLine(user, plant));
+    card.setBoosted(user.isPlantBoosted(plant));
+    card.setSelected(true);
     return card;
   }
 
-  private void toggle(User user, String plantName) {
-    boolean selected = user.getSelectedDeck().contains(plantName);
-    Result result = selected ? user.removeFromDeck(plantName) : user.addToDeck(plantName);
-    if (!result.success()) {
-      toast(result.message());
+  private Table emptySlot() {
+    Table slot = new Table();
+    slot.setBackground(skin.getDrawable(UiSkinProvider.PANEL_BACKGROUND));
+    Label label = new Label("empty", skin, "secondary");
+    slot.add(label);
+    slot.getColor().a = 0.55f;
+    return slot;
+  }
+
+  /** Everything the player owns, taken or not. */
+  private ScrollPane almanac(User user) {
+    SpecialStageRule rule = MatchLauncher.selectionRule();
+    Table grid = panel();
+    grid.top();
+    grid.defaults().pad(6f).width(168f).height(180f);
+
+    int column = 0;
+    for (String plant : user.getUnlockedPlants()) {
+      grid.add(almanacCard(user, plant, rule));
+      if (++column % GRID_COLUMNS == 0) {
+        grid.row();
+      }
+    }
+
+    ScrollPane scroll = new ScrollPane(grid, skin);
+    scroll.setFadeScrollBars(false);
+    scroll.setScrollingDisabled(true, false);
+    return scroll;
+  }
+
+  private SeedCard almanacCard(User user, String plant, SpecialStageRule rule) {
+    PlantTemplate template = template(plant);
+    boolean allowed = rule == null || rule.isPlantAllowed(plant);
+    boolean chosen = user.getSelectedDeck().contains(plant);
+
+    SeedCard card = new SeedCard(skin, SeedCard.Size.FULL, plant, displayName(plant, template),
+            plantArt.find(plant), hudArt, key -> toggle(user, key, rule));
+    if (template != null) {
+      card.withCost(template.cost);
+    }
+    card.setStatus(allowed ? upgradeLine(user, plant) : "locked in this stage");
+    card.setBoosted(user.isPlantBoosted(plant));
+    card.setEnabled(allowed);
+    card.setSelected(chosen);
+    return card;
+  }
+
+  /** Level plus packets held. The upgrade price stays in CollectionMenuController. */
+  private String upgradeLine(User user, String plant) {
+    int packets = user.getInventory().getItemCount("seed_" + plant.toLowerCase().trim());
+    return "Lv " + user.getPlantLevel(plant) + "   " + packets + " pkt";
+  }
+
+  /** Click to add, click again to remove. */
+  private void toggle(User user, String plant, SpecialStageRule rule) {
+    if (rule != null && !rule.isPlantAllowed(plant)) {
+      toast("error: " + plant + " is locked in this stage");
+      return;
+    }
+    Result result = user.getSelectedDeck().contains(plant)
+            ? user.removeFromDeck(plant)
+            : user.addToDeck(plant);
+    toast(result.message());
+    refresh();
+  }
+
+  private void openSlotActions(User user, String plant) {
+    Table body = new Table();
+    body.add(new Label(user.isPlantBoosted(plant)
+            ? plant + " is already boosted."
+            : "Boosting costs 2 diamonds and fires its\nPlant Food effect the moment it is planted.",
+            skin, UiSkinProvider.LABEL_MEDIUM));
+
+    Popup.show(stage, skin, plant, body,
+            new Popup.Choice("Boost", UiSkinProvider.BUTTON_PURPLE, () -> boost(user, plant)),
+            new Popup.Choice("Remove", UiSkinProvider.BUTTON_BROWN,
+                () -> toggle(user, plant, MatchLauncher.selectionRule())),
+            new Popup.Choice("Keep", UiSkinProvider.BUTTON_GREEN, null));
+  }
+
+  private void boost(User user, String plant) {
+    Result result = user.boostPlant(plant);
+    toast(result.message());
+    if (result.success()) {
+      save();
     }
     refresh();
   }
 
-  private void startBattle() {
-    User user = UserManager.getInstance().getCurrentUser();
-    if (user == null) {
-      toast("error: no user logged in");
-      return;
-    }
+  private Table footer(User user) {
+    Table row = new Table();
+    row.defaults().pad(6f).width(240f).height(64f);
+    row.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget())));
+    row.add(button("Clear", UiSkinProvider.BUTTON_PURPLE, () -> {
+      user.clearDeck();
+      refresh();
+    }));
 
-    SpecialStageRule rule = MatchLauncher.selectionRule();
-    int selectable = (int) user.getUnlockedPlants().stream()
-        .filter(name -> rule == null || rule.isPlantAllowed(name))
-        .count();
-    int required = Math.min(User.MIN_DECK_SLOTS, selectable);
-    int deckSize = user.getSelectedDeck().size();
-    if (deckSize < required) {
-      toast("Pick at least " + required + " plants (" + deckSize + "/" + required + ")");
+    int required = MatchLauncher.requiredDeckSlots(user);
+    if (user.getSelectedDeck().size() < required) {
+      TextButton start = new TextButton("Start", skin, UiSkinProvider.BUTTON_GREEN);
+      start.setDisabled(true);
+      start.getColor().a = 0.6f;
+      row.add(start);
+    } else {
+      row.add(button("Start", UiSkinProvider.BUTTON_GREEN, () -> start(user)));
+    }
+    return row;
+  }
+
+  /** Same hand-off the typed menu does: lock the setup in, then let MatchLauncher build it. */
+  private void start(User user) {
+    int required = MatchLauncher.requiredDeckSlots(user);
+    if (user.getSelectedDeck().size() < required) {
+      toast("error: select at least " + required + " plants before starting ("
+              + user.getSelectedDeck().size() + "/" + required + ")");
       return;
     }
+    save();
 
     MatchSetup.getInstance().setSelectedPlants(user.getSelectedDeck());
     MatchSetup.getInstance().setBoostedPlants(user.getBoostedPlants());
@@ -214,27 +255,31 @@ public final class PlantSelectionScreen extends MenuScreen {
       toast("could not start the level");
       return;
     }
-    go(new GameplayScreen(game, started, null));
+    go(new GameplayScreen(game, started));
   }
 
-  private List<PlantTemplate> plants() {
+  private void save() {
+    try {
+      UserManager.getInstance().updateCurrentUserGameState();
+    } catch (Exception e) {
+      toast(e.getMessage());
+    }
+  }
+
+  /** The deck stores lowercase keys, the almanac has the real spelling. */
+  private static String displayName(String plant, PlantTemplate template) {
+    return template == null ? plant : template.name;
+  }
+
+  private static PlantTemplate template(String plant) {
     return GameDataManager.plantRepository == null
-        ? List.of() : GameDataManager.plantRepository.getAll();
-  }
-
-  /** Same stage-to-atlas mapping AdventureScreen uses for its own backgrounds. */
-  private static String worldAtlas(int stage) {
-    return switch (stage) {
-      case 1 -> "ancientegyptseason.atlas";
-      case 2 -> "frostbitecavesseason.atlas";
-      case 3 -> "bigwavebeachseason.atlas";
-      default -> "darkagesseason.atlas";
-    };
+            ? null : GameDataManager.plantRepository.find(plant);
   }
 
   @Override
   public void dispose() {
     super.dispose();
     plantArt.dispose();
+    hudArt.dispose();
   }
 }

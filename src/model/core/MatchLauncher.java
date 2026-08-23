@@ -135,6 +135,21 @@ public final class MatchLauncher {
     }
   }
 
+  /**
+   * How many plants the seed bank needs before the stage will start. Normally MIN_DECK_SLOTS, but
+   * a stage that locks most plants out can't ask for more than it allows. Shared by the typed and
+   * the graphical Plant Selection menus so they can't disagree.
+   */
+  public static int requiredDeckSlots(User user) {
+    if (user == null) {
+      return 0;
+    }
+    SpecialStageRule rule = selectionRule();
+    int selectable = (int) user.getUnlockedPlants().stream()
+            .filter(name -> rule == null || rule.isPlantAllowed(name)).count();
+    return Math.min(User.MIN_DECK_SLOTS, selectable);
+  }
+
   public static SpecialStageRule selectionRule() {
     if (MatchSetup.getInstance().getCurrentMiniGame() != model.enums.MiniGameType.NONE) {
       return null;
