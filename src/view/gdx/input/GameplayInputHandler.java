@@ -1,34 +1,33 @@
 package view.gdx.input;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
+import java.util.List;
 import view.gdx.render.LawnGeometry;
 import view.gdx.render.RenderContext;
 
-
 /**
- * Turns clicks and key presses into GameActionBridge calls.
+ * Turns lawn clicks and a few keys into {@link GameActionBridge} calls.
  *
- * <p>Sits under the HUD in an InputMultiplexer, so Scene2D sees a click first and buttons win.
- * Whatever it doesn't take falls through to the lawn.
- *
- * <p>The unprojecting and the tile lookup are done, but nothing gets dispatched until
- * GameActionBridge has an implementation.
+ * <p>Only one of a selected seed, the shovel or plant food is armed at a time, same as the real
+ * game: picking one clears the others. A click either uses whichever is armed, or falls back to
+ * collectSunAt (harmless if there is no sun on that tile).
  */
 public final class GameplayInputHandler extends InputAdapter {
-
   private final RenderContext context;
   private final LawnGeometry geometry;
   private final GameActionBridge actions;
-
-  /** Reused so we don't make a new Vector2 on every event. */
   private final Vector2 scratch = new Vector2();
 
-  /** Template name of the seed the player picked, or null. */
   private String selectedPlantType;
+  private boolean shovelArmed;
+  private boolean plantFoodArmed;
+  private List<String> deck = List.of();
+  private Runnable onPauseRequested;
+  private boolean paused;
 
-  public GameplayInputHandler(
-      RenderContext context, LawnGeometry geometry, GameActionBridge actions) {
+  public GameplayInputHandler(RenderContext context, LawnGeometry geometry, GameActionBridge actions) {
     this.context = context;
     this.geometry = geometry;
     this.actions = actions;
@@ -36,33 +35,109 @@ public final class GameplayInputHandler extends InputAdapter {
 
   public void setSelectedPlantType(String plantType) {
     this.selectedPlantType = plantType;
+    this.shovelArmed = false;
+    this.plantFoodArmed = false;
   }
 
   public String getSelectedPlantType() {
     return selectedPlantType;
   }
 
+  /** Arms/disarms the shovel; a second click on the shovel button cancels it. */
+  public void armShovel() {
+    shovelArmed = !shovelArmed;
+    if (shovelArmed) {
+      plantFoodArmed = false;
+      selectedPlantType = null;
+    }
+  }
+
+  public boolean isShovelArmed() {
+    return shovelArmed;
+  }
+
+  /** Arms/disarms plant food; a second click on the button cancels it. */
+  public void armPlantFood() {
+    plantFoodArmed = !plantFoodArmed;
+    if (plantFoodArmed) {
+      shovelArmed = false;
+      selectedPlantType = null;
+    }
+  }
+
+  public boolean isPlantFoodArmed() {
+    return plantFoodArmed;
+  }
+
+  /** The seed bank in bar order, so number keys can pick a seed by position. */
+  public void setDeck(List<String> deck) {
+    this.deck = deck == null ? List.of() : deck;
+  }
+
+  /** What Escape and Space do; GameplayScreen wires this to opening the pause menu. */
+  public void setOnPauseRequested(Runnable onPauseRequested) {
+    this.onPauseRequested = onPauseRequested;
+  }
+
+  /** While paused, clicks and keys should not reach the match. */
+  public void setPaused(boolean paused) {
+    this.paused = paused;
+  }
+
   @Override
   public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+    if (paused) {
+      return false;
+    }
     scratch.set(screenX, screenY);
     context.getViewport().unproject(scratch);
-
     int row = geometry.yToRow(scratch.y);
     int column = geometry.xToColumn(scratch.x);
     if (row < 0 || column < 0) {
       return false;
     }
 
-    // TODO if there's a sun here, actions.collectSunAt(row, column) and take the click
-    // TODO else if a seed is picked, actions.plantAt(row, column, selectedPlantType)
-    // TODO else if the shovel is on, actions.pluckAt(row, column)
-    // TODO else if plant food is armed, actions.feedPlantAt(row, column)
-    return false;
+    if (shovelArmed) {
+      actions.pluckAt(row, column);
+      shovelArmed = false;
+      return true;
+    }
+    if (plantFoodArmed) {
+      actions.feedPlantAt(row, column);
+      plantFoodArmed = false;
+      return true;
+    }
+    if (selectedPlantType != null) {
+      actions.plantAt(row, column, selectedPlantType);
+      return true;
+    }
+    actions.collectSunAt(row, column);
+    return true;
   }
 
   @Override
   public boolean keyDown(int keycode) {
-    // TODO escape quits, number keys pick a seed, space pauses
+    if (paused) {
+      return false;
+    }
+    if (keycode == Input.Keys.ESCAPE || keycode == Input.Keys.SPACE) {
+      if (onPauseRequested != null) {
+        onPauseRequested.run();
+      }
+      return true;
+    }
+    int index = numberKeyIndex(keycode);
+    if (index >= 0 && index < deck.size()) {
+      setSelectedPlantType(deck.get(index));
+      return true;
+    }
     return false;
+  }
+
+  private static int numberKeyIndex(int keycode) {
+    if (keycode >= Input.Keys.NUM_1 && keycode <= Input.Keys.NUM_9) {
+      return keycode - Input.Keys.NUM_1;
+    }
+    return -1;
   }
 }

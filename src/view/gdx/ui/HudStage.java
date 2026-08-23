@@ -45,6 +45,10 @@ private Label status;
 private Table seedBar;
 private SeedBar seeds;
 
+private Table toolsRow;
+private TextButton shovelButton;
+private TextButton plantFoodButton;
+
 private String selected;
   public HudStage() {
     this.stage = new Stage(new ScreenViewport());
@@ -84,6 +88,9 @@ private String selected;
 
     seedBar = new Table();
     root.add(seedBar).left().padTop(2f).row();
+
+    toolsRow = new Table();
+    root.add(toolsRow).left().padTop(2f).row();
 
     if (DebugPanel.isEnabled()) {
       root.add(new DebugPanel(skin, message -> Toast.show(stage, skin, message)))
@@ -145,6 +152,40 @@ private String selected;
       java.util.function.ToIntFunction<String> levelOf) {
     if (seeds != null) {
       seeds.update(match, selected, levelOf);
+    }
+  }
+
+  /** Shovel (pluck) and plant food toggle buttons, next to the seed bar. */
+  public void buildTools(Skin skin, Runnable onShovel, Runnable onPlantFood) {
+    if (toolsRow == null || skin == null) {
+      return;
+    }
+    toolsRow.clear();
+    shovelButton = new TextButton("Shovel", skin, UiSkinProvider.BUTTON_BROWN);
+    shovelButton.addListener(new ClickListener() {
+      @Override
+      public void clicked(InputEvent event, float x, float y) {
+        onShovel.run();
+      }
+    });
+    plantFoodButton = new TextButton("Plant Food", skin, UiSkinProvider.BUTTON_BROWN);
+    plantFoodButton.addListener(new ClickListener() {
+      @Override
+      public void clicked(InputEvent event, float x, float y) {
+        onPlantFood.run();
+      }
+    });
+    toolsRow.add(shovelButton).width(110f).height(48f).padRight(6f);
+    toolsRow.add(plantFoodButton).width(110f).height(48f);
+  }
+
+  /** Highlights whichever tool is currently armed, so the player can tell what a click will do. */
+  public void updateTools(boolean shovelArmed, boolean plantFoodArmed) {
+    if (shovelButton != null) {
+      shovelButton.setColor(shovelArmed ? Color.YELLOW : Color.WHITE);
+    }
+    if (plantFoodButton != null) {
+      plantFoodButton.setColor(plantFoodArmed ? Color.YELLOW : Color.WHITE);
     }
   }
 

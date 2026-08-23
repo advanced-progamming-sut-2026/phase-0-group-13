@@ -34,7 +34,13 @@ public final class AdventureScreen extends MenuScreen {
   private int openChapter;
 
   public AdventureScreen(PvzGdxGame game) {
+    this(game, 0);
+  }
+
+  /** Opens straight into a chapter's level grid, e.g. coming back from plant selection. */
+  public AdventureScreen(PvzGdxGame game, int openChapter) {
     super(game);
+    this.openChapter = openChapter;
   }
 
   @Override
@@ -121,6 +127,10 @@ public final class AdventureScreen extends MenuScreen {
     final int target = stage;
     if (unlocked) {
       row.add(button("Enter", UiSkinProvider.BUTTON_GREEN, () -> {
+        // Same as the terminal's "enter chapter": a fresh seed bank for whichever level gets
+        // picked next, so a deck chosen for a different chapter doesn't leak in.
+        user.clearDeck();
+        MatchSetup.getInstance().setTargetChapter(String.valueOf(target));
         openChapter = target;
         refresh();
       })).width(180f);
@@ -165,15 +175,22 @@ public final class AdventureScreen extends MenuScreen {
     return button(label, UiSkinProvider.BUTTON_GREEN, () -> startLevel(target));
   }
 
-  /** Same route the terminal build takes: pick a chapter, lock in a deck, let MatchLauncher build it. */
+  /**
+   * Same route the terminal build takes: the Conveyor Belt level hands out plants itself and
+   * skips straight to the match, everything else goes through plant selection first.
+   */
   private void startLevel(int level) {
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) {
       toast("error: no user logged in");
       return;
     }
-    MatchSetup.getInstance().setTargetChapter(String.valueOf(openChapter));
-    MatchSetup.getInstance().setSelectedPlants(deckFor(user));
+    if (!MatchLauncher.skipsPlantSelection(openChapter, level)) {
+      go(new PlantSelectionScreen(game, openChapter, level));
+      return;
+    }
+
+    MatchSetup.getInstance().setSelectedPlants(user.getUnlockedPlants());
     MatchSetup.getInstance().setBoostedPlants(user.getBoostedPlants());
     MatchSetup.getInstance().setDifficultyLevel(user.getDifficultyLevel());
 
@@ -184,15 +201,6 @@ public final class AdventureScreen extends MenuScreen {
       return;
     }
     go(new GameplayScreen(game, started, null));
-  }
-
-  // The seed bank only holds so many, and the bar has to fit on screen.
-  private static java.util.List<String> deckFor(User user) {
-    java.util.List<String> unlocked = user.getUnlockedPlants();
-    int slots = MatchSetup.getInstance().getMaxDeckSlots();
-    return unlocked.size() <= slots
-        ? unlocked
-        : new java.util.ArrayList<>(unlocked.subList(0, slots));
   }
 
   /** Levels of this chapter the player has already cleared. */

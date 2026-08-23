@@ -9,9 +9,11 @@ import data.persistence.UserManager;
 import java.util.ArrayList;
 import java.util.List;
 import model.account.User;
+import model.game.minigame.SpecialStageRule;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.core.GameManager;
 import model.core.GameSession;
+import model.core.MatchLauncher;
 import model.core.MatchSetup;
 import view.gdx.core.FixedStepClock;
 import view.gdx.core.GdxConfig;
@@ -48,6 +50,7 @@ public final class GameplayScreen extends BaseScreen {
   private GameplayInputHandler input;
   private GdxGameActions actions;
   private boolean ended;
+  private boolean paused;
 
   public GameplayScreen(PvzGdxGame game, GameManager match, GameActionBridge unused) {
     super(game);
@@ -61,14 +64,18 @@ public final class GameplayScreen extends BaseScreen {
     entityRenderer = new EntityRenderer(geometry);
     actions = new GdxGameActions(match, this::leave);
     input = new GameplayInputHandler(context(), geometry, actions);
+    input.setDeck(MatchSetup.getInstance().getSelectedPlants());
+    input.setOnPauseRequested(this::openPauseMenu);
 
     hud = new HudStage();
-    hud.build(game.getUiSkin(), this::leave);
+    hud.build(game.getUiSkin(), this::openPauseMenu);
     hud.buildSeedBar(game.getUiSkin().get(), deckTemplates(), input::setSelectedPlantType);
+    hud.buildTools(game.getUiSkin().get(), input::armShovel, input::armPlantFood);
     clock.reset();
 
     Gdx.input.setInputProcessor(new InputMultiplexer(hud.getStage(), input));
     layout();
+    showBriefing();
   }
 
   private static List<PlantTemplate> deckTemplates() {
@@ -95,6 +102,65 @@ public final class GameplayScreen extends BaseScreen {
     game.switchScreen(new AdventureScreen(game));
   }
 
+  /**
+   * Opens the pause menu. While it is up, the match clock and both renderers' cosmetic clocks are
+   * frozen (see render()) -- only the HUD stage (which the popup itself lives on) keeps ticking.
+   */
+  private void openPauseMenu() {
+    if (paused || game.getUiSkin().get() == null) {
+      return;
+    }
+    paused = true;
+    input.setPaused(true);
+
+    Table body = new Table();
+    body.add(new Label("The game is paused.", game.getUiSkin().get(), UiSkinProvider.LABEL_MEDIUM));
+    List<Popup.Action> actions = new ArrayList<>();
+    actions.add(new Popup.Action("Resume", UiSkinProvider.BUTTON_GREEN, this::resumeMatch));
+    actions.add(new Popup.Action("Restart", UiSkinProvider.BUTTON_BROWN, this::restart));
+    actions.add(new Popup.Action("Save & Exit", UiSkinProvider.BUTTON_BROWN, this::leave));
+    Popup.show(hud.getStage(), game.getUiSkin().get(), "Paused", body, actions);
+  }
+
+  private void resumeMatch() {
+    paused = false;
+    input.setPaused(false);
+  }
+
+  /** Rebuilds the level from scratch, same setup (chapter, deck, boosts, difficulty) as before. */
+  private void restart() {
+    MatchLauncher.launch();
+    game.switchScreen(new GameplayScreen(game, GameSession.getActiveGame(), null));
+  }
+
+  /** Shown once when the level starts: what to expect this level, per the Phase 2 spec. */
+  private void showBriefing() {
+    if (match == null || game.getUiSkin().get() == null) {
+      return;
+    }
+    Label text = new Label(briefingText(), game.getUiSkin().get(), UiSkinProvider.LABEL_MEDIUM);
+    text.setWrap(true);
+    Table body = new Table();
+    body.add(text).width(420f);
+    List<Popup.Action> actions = new ArrayList<>();
+    actions.add(new Popup.Action("Let's go", UiSkinProvider.BUTTON_GREEN, null));
+    Popup.show(hud.getStage(), game.getUiSkin().get(), "Level start", body, actions);
+  }
+
+  private String briefingText() {
+    StringBuilder text = new StringBuilder();
+    text.append(match.getTotalWaves()).append(" waves of zombies incoming.\n");
+    if (match.getBoard() != null && match.getBoard().getGameState().isSkySunDisabled()) {
+      text.append("No sun will fall from the sky -- grow your own.\n");
+    }
+    SpecialStageRule rule = match.getSpecialStageRule();
+    if (rule != null) {
+      text.append(rule.getClass().getSimpleName()).append(" is active this level.\n");
+    }
+    text.append("Defend your lawn -- don't let the zombies reach the house!");
+    return text.toString();
+  }
+
   private void layout() {
     float[] box = LawnRenderer.lawnBounds(match);
     geometry.setBounds(box[0], box[1], box[2], box[3]);
@@ -102,16 +168,18 @@ public final class GameplayScreen extends BaseScreen {
 
   @Override
   public void render(float delta) {
-    if (match != null && match.isRunning()) {
+    if (!paused && match != null && match.isRunning()) {
       clock.update(delta, actions::advanceOneTick);
     }
 
     context().applyCamera();
-    lawnRenderer.render(context(), match, delta);
-    entityRenderer.render(context(), match, delta);
+    float worldDelta = paused ? 0f : delta;
+    lawnRenderer.render(context(), match, worldDelta);
+    entityRenderer.render(context(), match, worldDelta);
 
     updateStatus();
     hud.updateSeeds(match, input.getSelectedPlantType(), GameplayScreen::plantLevel);
+    hud.updateTools(input.isShovelArmed(), input.isPlantFoodArmed());
     if (match != null && !match.isRunning()) {
       showResult();
     }
