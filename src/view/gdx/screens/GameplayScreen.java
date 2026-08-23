@@ -12,13 +12,14 @@ import model.account.User;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.core.GameManager;
 import model.core.GameSession;
+import model.core.MatchLauncher;
 import model.core.MatchSetup;
 import view.gdx.core.FixedStepClock;
 import view.gdx.core.GdxConfig;
 import view.gdx.core.PvzGdxGame;
-import view.gdx.input.GameActionBridge;
 import view.gdx.input.GameplayInputHandler;
 import view.gdx.input.GdxGameActions;
+import view.gdx.render.CursorRenderer;
 import view.gdx.render.EntityRenderer;
 import view.gdx.render.LawnGeometry;
 import view.gdx.render.LawnRenderer;
@@ -35,6 +36,9 @@ import view.gdx.ui.UiSkinProvider;
  *
  * <p>Two clocks on purpose: FixedStepClock runs the simulation at the model's tick rate, and the
  * frame delta is only for drawing.
+ *
+ * <p>Pausing stops both: no tick, and the renderers get a delta of zero so animations freeze
+ * too. Only the HUD keeps acting, since the pause menu lives in it.
  */
 public final class GameplayScreen extends BaseScreen {
 
@@ -44,12 +48,14 @@ public final class GameplayScreen extends BaseScreen {
 
   private LawnRenderer lawnRenderer;
   private EntityRenderer entityRenderer;
+  private CursorRenderer cursorRenderer;
   private HudStage hud;
   private GameplayInputHandler input;
   private GdxGameActions actions;
   private boolean ended;
+  private boolean paused;
 
-  public GameplayScreen(PvzGdxGame game, GameManager match, GameActionBridge unused) {
+  public GameplayScreen(PvzGdxGame game, GameManager match) {
     super(game);
     this.match = match;
     this.geometry = new LawnGeometry(boardRows(match), boardColumns(match));
@@ -59,12 +65,19 @@ public final class GameplayScreen extends BaseScreen {
   public void show() {
     lawnRenderer = new LawnRenderer(geometry);
     entityRenderer = new EntityRenderer(geometry);
-    actions = new GdxGameActions(match, this::leave);
-    input = new GameplayInputHandler(context(), geometry, actions);
 
     hud = new HudStage();
     hud.build(game.getUiSkin(), this::leave);
-    hud.buildSeedBar(game.getUiSkin().get(), deckTemplates(), input::setSelectedPlantType);
+
+    // refusals go to the HUD toast, not a console the player never sees
+    actions = new GdxGameActions(match, this::leave, hud::toast);
+    input = new GameplayInputHandler(context(), geometry, actions, this::togglePause);
+    cursorRenderer = new CursorRenderer(geometry, input);
+
+    List<PlantTemplate> deck = deckTemplates();
+    hud.buildSeedBar(game.getUiSkin().get(), deck, input::setSelectedPlantType,
+        input::toggleShovel, input::togglePlantFood, this::togglePause);
+    input.setSeedOrder(deckNames(deck));
     clock.reset();
 
     Gdx.input.setInputProcessor(new InputMultiplexer(hud.getStage(), input));
@@ -85,6 +98,15 @@ public final class GameplayScreen extends BaseScreen {
     return templates;
   }
 
+  /** The same order the seed bar draws, so key 1 arms the leftmost card. */
+  private static List<String> deckNames(List<PlantTemplate> templates) {
+    List<String> names = new ArrayList<>();
+    for (PlantTemplate template : templates) {
+      names.add(template.name);
+    }
+    return names;
+  }
+
   private static int plantLevel(String plant) {
     User user = UserManager.getInstance().getCurrentUser();
     return user == null ? 1 : Math.max(1, user.getPlantLevel(plant));
@@ -95,6 +117,43 @@ public final class GameplayScreen extends BaseScreen {
     game.switchScreen(new AdventureScreen(game));
   }
 
+  /** Save & Exit: keep whatever the match already awarded, then back out. */
+  private void saveAndLeave() {
+    try {
+      UserManager.getInstance().updateCurrentUserGameState();
+    } catch (Exception e) {
+      // worth saying, but must not trap the player in the match
+      hud.toast(e.getMessage() == null ? "could not save your progress" : e.getMessage());
+    }
+    leave();
+  }
+
+  /** Rebuilds the level from the same MatchSetup. */
+  private void restart() {
+    GameSession.end();
+    MatchLauncher.launch();
+    GameManager restarted = GameSession.getActiveGame();
+    if (restarted == null) {
+      leave();
+      return;
+    }
+    game.switchScreen(new GameplayScreen(game, restarted));
+  }
+
+  private void togglePause() {
+    if (ended) {
+      return;
+    }
+    paused = !paused;
+    input.setPaused(paused);
+    if (paused) {
+      hud.showPauseMenu(this::togglePause, this::restart, this::saveAndLeave);
+    } else {
+      // do not let the match catch up on time spent in the menu
+      clock.reset();
+    }
+  }
+
   private void layout() {
     float[] box = LawnRenderer.lawnBounds(match);
     geometry.setBounds(box[0], box[1], box[2], box[3]);
@@ -102,16 +161,26 @@ public final class GameplayScreen extends BaseScreen {
 
   @Override
   public void render(float delta) {
-    if (match != null && match.isRunning()) {
+    if (!paused && match != null && match.isRunning()) {
       clock.update(delta, actions::advanceOneTick);
     }
+    // renderers keep their own animation clocks, so freezing means giving them no time
+    float worldDelta = paused ? 0f : delta;
+
+    input.updateHover(Gdx.input.getX(), Gdx.input.getY());
 
     context().applyCamera();
-    lawnRenderer.render(context(), match, delta);
-    entityRenderer.render(context(), match, delta);
+    lawnRenderer.render(context(), match, worldDelta);
+    entityRenderer.render(context(), match, worldDelta);
+    if (!paused) {
+      cursorRenderer.render(context(), match, worldDelta);
+    }
 
     updateStatus();
     hud.updateSeeds(match, input.getSelectedPlantType(), GameplayScreen::plantLevel);
+    hud.updateTools(input.getTool() == GameplayInputHandler.Tool.SHOVEL,
+        input.getTool() == GameplayInputHandler.Tool.PLANT_FOOD,
+        match == null ? 0 : match.getPlantFoodCount());
     if (match != null && !match.isRunning()) {
       showResult();
     }
@@ -125,13 +194,29 @@ public final class GameplayScreen extends BaseScreen {
       hud.setStatus("no match running");
       return;
     }
-    String picked = input.getSelectedPlantType();
-    hud.setSun(match.getSunAmount());
+    if (paused) {
+      hud.setStatus("paused");
+      return;
+    }
     hud.setStatus("wave " + Math.min(match.getCurrentWaveIndex() + 1, match.getTotalWaves())
         + "/" + match.getTotalWaves()
         + "   plant food " + match.getPlantFoodCount()
         + nightNote()
-        + (picked == null ? "   pick a seed, then click the lawn" : "   placing: " + picked));
+        + hint());
+  }
+
+  /** What the next click will do. */
+  private String hint() {
+    switch (input.getTool()) {
+      case SEED:
+        return "   placing: " + input.getSelectedPlantType();
+      case SHOVEL:
+        return "   shovel armed - click a plant to dig it up";
+      case PLANT_FOOD:
+        return "   plant food armed - click a plant to feed it";
+      default:
+        return "   pick a seed, then click the lawn";
+    }
   }
 
   /**
@@ -149,6 +234,7 @@ public final class GameplayScreen extends BaseScreen {
       return;
     }
     ended = true;
+    paused = false;
     if (game.getUiSkin().get() == null) {
       return;
     }
@@ -180,6 +266,9 @@ public final class GameplayScreen extends BaseScreen {
     }
     if (entityRenderer != null) {
       entityRenderer.dispose();
+    }
+    if (cursorRenderer != null) {
+      cursorRenderer.dispose();
     }
     if (hud != null) {
       hud.dispose();

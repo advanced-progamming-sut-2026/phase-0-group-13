@@ -165,7 +165,9 @@ public final class AdventureScreen extends MenuScreen {
     return button(label, UiSkinProvider.BUTTON_GREEN, () -> startLevel(target));
   }
 
-  /** Same route the terminal build takes: pick a chapter, lock in a deck, let MatchLauncher build it. */
+  // The chapter has to be in MatchSetup before the selection screen opens: selectionRule() reads
+  // it to work out which plants this stage locks out. The conveyor level has no selection at all
+  // (the belt hands out the plants), so it goes straight to the lawn.
   private void startLevel(int level) {
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) {
@@ -173,26 +175,22 @@ public final class AdventureScreen extends MenuScreen {
       return;
     }
     MatchSetup.getInstance().setTargetChapter(String.valueOf(openChapter));
-    MatchSetup.getInstance().setSelectedPlants(deckFor(user));
-    MatchSetup.getInstance().setBoostedPlants(user.getBoostedPlants());
     MatchSetup.getInstance().setDifficultyLevel(user.getDifficultyLevel());
 
+    if (!MatchLauncher.skipsPlantSelection(openChapter, user.getProgress().getCurrentLevel())) {
+      go(new PlantSelectionScreen(game, openChapter));
+      return;
+    }
+
+    MatchSetup.getInstance().setSelectedPlants(user.getSelectedDeck());
+    MatchSetup.getInstance().setBoostedPlants(user.getBoostedPlants());
     MatchLauncher.launch();
     GameManager started = GameSession.getActiveGame();
     if (started == null) {
       toast("could not start the level");
       return;
     }
-    go(new GameplayScreen(game, started, null));
-  }
-
-  // The seed bank only holds so many, and the bar has to fit on screen.
-  private static java.util.List<String> deckFor(User user) {
-    java.util.List<String> unlocked = user.getUnlockedPlants();
-    int slots = MatchSetup.getInstance().getMaxDeckSlots();
-    return unlocked.size() <= slots
-        ? unlocked
-        : new java.util.ArrayList<>(unlocked.subList(0, slots));
+    go(new GameplayScreen(game, started));
   }
 
   /** Levels of this chapter the player has already cleared. */

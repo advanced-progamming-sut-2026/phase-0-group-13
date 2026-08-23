@@ -117,10 +117,7 @@ public class PlantSelectionMenuController implements BaseController {
     if (user == null) return;
 
     int deckSize = user.getSelectedDeck().size();
-    SpecialStageRule rule = MatchLauncher.selectionRule();
-    int selectable = (int) user.getUnlockedPlants().stream()
-            .filter(name -> rule == null || rule.isPlantAllowed(name)).count();
-    int requiredSlots = Math.min(User.MIN_DECK_SLOTS, selectable);
+    int requiredSlots = MatchLauncher.requiredDeckSlots(user);
     if (deckSize < requiredSlots) {
       System.out.println(
               "error: select at least "
