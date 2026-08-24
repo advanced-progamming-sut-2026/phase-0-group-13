@@ -18,10 +18,10 @@ import model.game.zombie.ZombieParts.ZombieTypeResolver;
 public class CollectionMenuController implements BaseController {
 
   private static final String ZOMBIE_PREFIX = "zombie_";
-  private static final int PURCHASE_COST_COINS = 2000;
-  private static final int UPGRADE_COIN_COST = 500;
-  private static final int UPGRADE_SEED_COST = 10;
-  private static final int MAX_PLANT_LEVEL = 4;
+  public static final int PURCHASE_COST_COINS = 2000;
+  public static final int UPGRADE_COIN_COST = 500;
+  public static final int UPGRADE_SEED_COST = 10;
+  public static final int MAX_PLANT_LEVEL = 4;
 
   @Override
   public void initController() {}

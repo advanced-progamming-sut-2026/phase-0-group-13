@@ -19,6 +19,7 @@ import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
 
 import model.core.GameManager;
+import model.game.minigame.ConveyorRule;
 import model.game.plant.PlantParts.PlantTemplate;
 
 /**
@@ -46,12 +47,18 @@ public final class HudStage implements Disposable {
   private Skin skin;
   private Label sunCount;
   private Label status;
+  private Label objective;
 
+  private Table waveSlot;
+  private WaveBar waveBar;
   private Table seedBar;
+  private Table extras;
   private SeedBar seeds;
+  private ConveyorBar conveyor;
 
   private TextButton shovelButton;
   private TextButton plantFoodButton;
+  private TextButton startWavesButton;
 
   private String selected;
 
@@ -69,7 +76,7 @@ public final class HudStage implements Disposable {
    *
    * @param onExit what the Menu button does, or null to leave it out
    */
-  public void build(UiSkinProvider skinProvider, Runnable onExit) {
+  public void build(UiSkinProvider skinProvider, Runnable onExit, GameManager match) {
     if (!skinProvider.isAvailable()) {
       return;
     }
@@ -84,6 +91,8 @@ public final class HudStage implements Disposable {
     Table topRow = new Table();
     topRow.add(new CurrencyHud(skin)).left();
     topRow.add(sunCounter(skin)).left().padLeft(22f);
+    waveSlot = new Table();
+    topRow.add(waveSlot).left().padLeft(22f);
     status = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
     topRow.add(status).left().padLeft(22f).expandX();
     if (onExit != null) {
@@ -91,13 +100,51 @@ public final class HudStage implements Disposable {
     }
     root.add(topRow).growX().row();
 
+    // What this stage wants from the player, when it wants something unusual.
+    objective = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
+    root.add(objective).left().padLeft(4f).row();
+
     seedBar = new Table();
     root.add(seedBar).left().padTop(2f).row();
 
+    extras = new Table();
+    root.add(extras).left().padTop(4f).row();
+
     if (DebugPanel.isEnabled()) {
-      root.add(new DebugPanel(skin, this::toast)).right().padTop(12f);
-      root.row();
+      // Out of the way in the corner - the HUD flows from the top and the lawn is under it.
+      Table corner = new Table();
+      corner.setFillParent(true);
+      corner.bottom().right().pad(8f);
+      corner.add(new DebugPanel(skin, this::toast, match));
+      stage.addActor(corner);
     }
+  }
+
+  /** One marker per wave. Needs the match's wave count, so it comes after build(). */
+  public void buildWaveBar(int totalWaves) {
+    if (waveSlot == null || skin == null) {
+      return;
+    }
+    waveBar = new WaveBar(skin, totalWaves);
+    waveSlot.clear();
+    waveSlot.add(waveBar);
+  }
+
+  public void updateWave(int currentWaveIndex) {
+    if (waveBar != null) {
+      waveBar.update(currentWaveIndex);
+    }
+  }
+
+  public void setObjective(String text) {
+    if (objective != null) {
+      objective.setText(text == null ? "" : text);
+    }
+  }
+
+  /** The red warning: a wave landing, necromancy, the tide turning. */
+  public void alert(String message) {
+    Toast.showAlert(stage, skin, message);
   }
 
   /** Sun gets its own icon and a bigger number, it is the one figure the player watches. */
@@ -145,7 +192,46 @@ public final class HudStage implements Disposable {
       onPick.accept(plant);
     });
     seedBar.add(seeds).left();
+    seedBar.add(toolsColumn(skin, onShovel, onPlantFood, onPause)).left().padLeft(10f).top();
+  }
 
+  /** Conveyor Belt stages have no seed bank to draw: the belt is the bar. */
+  public void buildConveyorBar(ConveyorRule rule, Consumer<String> onPick, Runnable onShovel,
+      Runnable onPlantFood, Runnable onPause) {
+    if (seedBar == null || skin == null) {
+      return;
+    }
+    seedBar.clear();
+    conveyor = new ConveyorBar(skin, rule, plant -> {
+      selected = plant;
+      onPick.accept(plant);
+    });
+    seedBar.add(conveyor).left();
+    seedBar.add(toolsColumn(skin, onShovel, onPlantFood, onPause)).left().padLeft(10f).top();
+  }
+
+  public void updateConveyor() {
+    if (conveyor != null) {
+      conveyor.update();
+    }
+  }
+
+  /** The free-build stages: plant what you like, then let the zombies in. */
+  public void buildStartWavesButton(Runnable onStart) {
+    if (extras == null || skin == null) {
+      return;
+    }
+    startWavesButton = toolButton(skin, "Start the waves", onStart);
+    extras.add(startWavesButton).width(230f).height(48f);
+  }
+
+  public void setStartWavesVisible(boolean visible) {
+    if (startWavesButton != null) {
+      startWavesButton.setVisible(visible);
+    }
+  }
+
+  private Table toolsColumn(Skin skin, Runnable onShovel, Runnable onPlantFood, Runnable onPause) {
     Table tools = new Table();
     tools.defaults().pad(3f).width(112f).height(48f);
     shovelButton = toolButton(skin, "Shovel", onShovel);
@@ -153,7 +239,7 @@ public final class HudStage implements Disposable {
     tools.add(shovelButton).row();
     tools.add(plantFoodButton).row();
     tools.add(toolButton(skin, "Pause", onPause)).row();
-    seedBar.add(tools).left().padLeft(10f).top();
+    return tools;
   }
 
   private TextButton toolButton(Skin skin, String label, Runnable action) {
@@ -227,6 +313,9 @@ public final class HudStage implements Disposable {
   public void dispose() {
     if (seeds != null) {
       seeds.dispose();
+    }
+    if (conveyor != null) {
+      conveyor.dispose();
     }
     hudArt.dispose();
     stage.dispose();

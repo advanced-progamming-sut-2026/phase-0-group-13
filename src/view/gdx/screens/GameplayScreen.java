@@ -9,13 +9,24 @@ import data.persistence.UserManager;
 import java.util.ArrayList;
 import java.util.List;
 import model.account.User;
+import model.game.minigame.BossStageRule;
+import model.game.minigame.ConveyorRule;
+import model.game.minigame.DeadLineRule;
+import model.game.minigame.LoveYourPlantsRule;
+import model.game.minigame.PlantWhatYouGetRule;
+import model.game.minigame.SaveOurSeedsRule;
 import model.game.minigame.SpecialStageRule;
+import model.game.minigame.TimedWarRule;
+import model.game.plant.Plant;
 import model.game.plant.PlantParts.PlantTemplate;
+import model.game.zombie.Zombie;
 import model.core.GameManager;
 import model.core.GameSession;
+import model.core.MatchCompletion;
 import model.core.MatchLauncher;
 import model.core.MatchSetup;
 import view.gdx.core.FixedStepClock;
+import view.gdx.core.GameSettings;
 import view.gdx.core.GdxConfig;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.input.GameplayInputHandler;
@@ -24,6 +35,8 @@ import view.gdx.render.CursorRenderer;
 import view.gdx.render.EntityRenderer;
 import view.gdx.render.LawnGeometry;
 import view.gdx.render.LawnRenderer;
+import view.gdx.render.StageRuleRenderer;
+import view.gdx.ui.Dialogue;
 import view.gdx.ui.HudStage;
 import view.gdx.ui.Popup;
 import view.gdx.ui.UiSkinProvider;
@@ -49,12 +62,16 @@ public final class GameplayScreen extends BaseScreen {
 
   private LawnRenderer lawnRenderer;
   private EntityRenderer entityRenderer;
+  private StageRuleRenderer stageRuleRenderer;
   private CursorRenderer cursorRenderer;
   private HudStage hud;
   private GameplayInputHandler input;
   private GdxGameActions actions;
   private boolean ended;
   private boolean paused;
+  /** True while the level-start popups are up, so nobody loses the lawn while reading them. */
+  private boolean intro;
+  private int lastWave;
 
   public GameplayScreen(PvzGdxGame game, GameManager match) {
     super(game);
@@ -66,24 +83,49 @@ public final class GameplayScreen extends BaseScreen {
   public void show() {
     lawnRenderer = new LawnRenderer(geometry);
     entityRenderer = new EntityRenderer(geometry);
+    stageRuleRenderer = new StageRuleRenderer(geometry);
 
     hud = new HudStage();
-    hud.build(game.getUiSkin(), this::leave);
+    hud.build(game.getUiSkin(), this::leave, match);
+    hud.buildWaveBar(match == null ? 1 : match.getTotalWaves());
 
     // refusals go to the HUD toast, not a console the player never sees
     actions = new GdxGameActions(match, this::leave, hud::toast);
     input = new GameplayInputHandler(context(), geometry, actions, this::togglePause);
     cursorRenderer = new CursorRenderer(geometry, input);
 
-    List<PlantTemplate> deck = deckTemplates();
-    hud.buildSeedBar(game.getUiSkin().get(), deck, input::setSelectedPlantType,
-        input::toggleShovel, input::togglePlantFood, this::togglePause);
-    input.setSeedOrder(deckNames(deck));
+    buildBar();
+    if (match != null && !match.isZombieWavesStarted()) {
+      hud.buildStartWavesButton(this::startWaves);
+    }
     clock.reset();
 
     Gdx.input.setInputProcessor(new InputMultiplexer(hud.getStage(), input));
     layout();
     showBriefing();
+  }
+
+  /** The belt hands out its own plants, so on a conveyor stage it stands in for the seed bank. */
+  private void buildBar() {
+    if (match != null && match.getSpecialStageRule() instanceof ConveyorRule belt) {
+      hud.buildConveyorBar(belt, input::setSelectedPlantType, input::toggleShovel,
+          input::togglePlantFood, this::togglePause);
+      return;
+    }
+    List<PlantTemplate> deck = deckTemplates();
+    hud.buildSeedBar(game.getUiSkin().get(), deck, input::setSelectedPlantType,
+        input::toggleShovel, input::togglePlantFood, this::togglePause);
+    input.setSeedOrder(deckNames(deck));
+  }
+
+  /** Ends the free build phase of a "whatever comes" stage. */
+  private void startWaves() {
+    if (match == null) {
+      return;
+    }
+    match.startZombieWaves();
+    hud.setStartWavesVisible(false);
+    hud.alert("Here they come!");
   }
 
   private static List<PlantTemplate> deckTemplates() {
@@ -161,12 +203,31 @@ public final class GameplayScreen extends BaseScreen {
     if (match == null || game.getUiSkin().get() == null) {
       return;
     }
+    intro = true;
     Label text = new Label(briefingText(), game.getUiSkin().get(), UiSkinProvider.LABEL_MEDIUM);
     text.setWrap(true);
     Table body = new Table();
     body.add(text).width(420f);
     Popup.show(hud.getStage(), game.getUiSkin().get(), "Level start", body,
-        new Popup.Choice("Let's go", UiSkinProvider.BUTTON_GREEN, null));
+        new Popup.Choice("Let's go", UiSkinProvider.BUTTON_GREEN, this::showStageDialogue));
+  }
+
+  /** Penny sets the scene, then the red banner says what happens next. */
+  private void showStageDialogue() {
+    Dialogue.show(hud.getStage(), game.getUiSkin().get(), Dialogue.PENNY,
+        Dialogue.stageStart(seasonName()), this::beginPlaying);
+  }
+
+  private void beginPlaying() {
+    intro = false;
+    clock.reset();
+    hud.alert(match.isZombieWavesStarted()
+        ? "The first wave is on its way!"
+        : "Plant freely, then start the waves when you are ready.");
+  }
+
+  private String seasonName() {
+    return match == null || match.getSeason() == null ? "" : match.getSeason().getName();
   }
 
   private String briefingText() {
@@ -190,22 +251,28 @@ public final class GameplayScreen extends BaseScreen {
 
   @Override
   public void render(float delta) {
-    if (!paused && match != null && match.isRunning()) {
-      clock.update(delta, actions::advanceOneTick);
+    if (!paused && !intro && match != null && match.isRunning()) {
+      // speed is a view setting: more ticks per frame, same tick rate in the model
+      clock.update(delta * GameSettings.getGameSpeed(), actions::advanceOneTick);
     }
     // renderers keep their own animation clocks, so freezing means giving them no time
-    float worldDelta = paused ? 0f : delta;
+    float worldDelta = paused || intro ? 0f : delta;
 
     input.updateHover(Gdx.input.getX(), Gdx.input.getY());
 
     context().applyCamera();
     lawnRenderer.render(context(), match, worldDelta);
+    // under the entities: these mark cells, they shouldn't cover what stands on them
+    stageRuleRenderer.render(context(), match, worldDelta);
     entityRenderer.render(context(), match, worldDelta);
     if (!paused) {
       cursorRenderer.render(context(), match, worldDelta);
     }
 
+    watchWaves();
     updateStatus();
+    hud.updateWave(match == null ? 0 : match.getCurrentWaveIndex());
+    hud.updateConveyor();
     hud.updateSeeds(match, input.getSelectedPlantType(), GameplayScreen::plantLevel);
     hud.updateTools(input.getTool() == GameplayInputHandler.Tool.SHOVEL,
         input.getTool() == GameplayInputHandler.Tool.PLANT_FOOD,
@@ -226,15 +293,95 @@ public final class GameplayScreen extends BaseScreen {
     // Ahead of the paused check: the counter is frozen either way, but it should read the real
     // total rather than whatever it happened to show when the menu opened.
     hud.setSun(match.getSunAmount());
+    hud.setObjective(objectiveText());
     if (paused) {
       hud.setStatus("paused");
       return;
     }
-    hud.setStatus("wave " + Math.min(match.getCurrentWaveIndex() + 1, match.getTotalWaves())
-        + "/" + match.getTotalWaves()
-        + "   plant food " + match.getPlantFoodCount()
-        + nightNote()
-        + hint());
+    // the wave count moved to the wave bar
+    hud.setStatus("plant food " + match.getPlantFoodCount() + nightNote() + hint());
+  }
+
+  /** Red banner every time the match rolls into a new wave. */
+  private void watchWaves() {
+    if (match == null || paused || intro || !match.isRunning()) {
+      return;
+    }
+    int wave = match.getCurrentWaveIndex();
+    if (wave == lastWave || wave >= match.getTotalWaves()) {
+      return;
+    }
+    lastWave = wave;
+    hud.alert("Wave " + (wave + 1) + " of " + match.getTotalWaves() + waveWarning());
+  }
+
+  /** The two seasons that do something extra at the start of every wave say so. */
+  private String waveWarning() {
+    String season = seasonName().toLowerCase();
+    if (season.contains("dark")) {
+      return "   -   graves are rising, necromancy incoming!";
+    }
+    if (season.contains("beach") || season.contains("wave")) {
+      return "   -   the tide is turning, zombies from the back coast!";
+    }
+    return "";
+  }
+
+  /** What this stage wants, for the rules the lawn doesn't explain on its own. */
+  private String objectiveText() {
+    SpecialStageRule rule = match.getSpecialStageRule();
+    if (rule instanceof TimedWarRule timed) {
+      int survived = timed.getTimeLimitTicks() - timed.remainingTicks();
+      return String.format("hold out %.1fs more   -   %d zombies left   -   %d%% survived",
+          timed.remainingTicks() / 10.0, countZombies(),
+          Math.round(100f * survived / Math.max(1, timed.getTimeLimitTicks())));
+    }
+    if (rule instanceof LoveYourPlantsRule love) {
+      int left = love.getLossBudget() - match.getMatchContext().getPlantsLost();
+      return "don't lose your plants   -   " + countPlants() + " on the lawn, "
+          + Math.max(0, left) + " of " + love.getLossBudget() + " losses to spare";
+    }
+    if (rule instanceof DeadLineRule) {
+      return "no zombie may cross the red line";
+    }
+    if (rule instanceof SaveOurSeedsRule) {
+      return "keep every highlighted plant alive";
+    }
+    if (rule instanceof ConveyorRule) {
+      return "plant whatever the belt gives you";
+    }
+    if (rule instanceof PlantWhatYouGetRule offer) {
+      return (match.isZombieWavesStarted() ? "" : "free build   -   ")
+          + "the lawn is handing you: " + offer.getCurrentOffer();
+    }
+    return match.isZombieWavesStarted()
+        ? "" : "free build   -   plant what you like, then start the waves";
+  }
+
+  private int countZombies() {
+    if (match.getBoard() == null) {
+      return 0;
+    }
+    int alive = 0;
+    for (Zombie zombie : match.getBoard().getZombies()) {
+      if (!zombie.isDead()) {
+        alive++;
+      }
+    }
+    return alive;
+  }
+
+  private int countPlants() {
+    if (match.getBoard() == null) {
+      return 0;
+    }
+    int alive = 0;
+    for (Plant plant : match.getBoard().getPlants()) {
+      if (!plant.isDead()) {
+        alive++;
+      }
+    }
+    return alive;
   }
 
   /** What the next click will do. */
@@ -266,11 +413,22 @@ public final class GameplayScreen extends BaseScreen {
       return;
     }
     ended = true;
+    MatchCompletion.apply(match);
     paused = false;
     if (game.getUiSkin().get() == null) {
       return;
     }
     boolean won = match.getMatchResult() != null && match.getMatchResult().isWon();
+    // Crazy Dave gets the first word after a Zomboss goes down, then the result.
+    if (won && match.getSpecialStageRule() instanceof BossStageRule) {
+      Dialogue.show(hud.getStage(), game.getUiSkin().get(), Dialogue.CRAZY_DAVE,
+          Dialogue.afterZomboss(seasonName()), () -> showOutcome(true));
+      return;
+    }
+    showOutcome(won);
+  }
+
+  private void showOutcome(boolean won) {
     Table body = new Table();
     body.add(new Label(won ? "Level cleared!" : "The zombies ate your brains!",
         game.getUiSkin().get(), UiSkinProvider.LABEL_MEDIUM));
@@ -298,6 +456,9 @@ public final class GameplayScreen extends BaseScreen {
     }
     if (entityRenderer != null) {
       entityRenderer.dispose();
+    }
+    if (stageRuleRenderer != null) {
+      stageRuleRenderer.dispose();
     }
     if (cursorRenderer != null) {
       cursorRenderer.dispose();

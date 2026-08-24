@@ -1,6 +1,7 @@
 package model.game;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import model.enums.StatusEffect;
 import model.game.plant.Plant;
@@ -29,6 +30,10 @@ public class Projectile {
   private boolean bouncing;
   private int remainingLifeTicks = -1;
   private int pierceLimit;
+  private double splashRadius;
+  private int stunTicks;
+  private final double launchX;
+  private double targetX;
 
   private final Set<Zombie> alreadyHit = new HashSet<>();
   // چند زامبی رو همین یه تیر (پیرسینگ/strike-through) کشته؛ برای امتیاز MULTI_KILL_ONE_SHOT
@@ -52,6 +57,8 @@ public class Projectile {
     this.lobbed = lobbed;
     this.isFromZombie = isFromZombie;
     this.isActive = true;
+    this.launchX = x;
+    this.targetX = x;
   }
 
   public Projectile(int damage, double speed, double x, int y, boolean isSlowing, boolean isFromZombie) {
@@ -91,6 +98,39 @@ public class Projectile {
 
   public int getPierceLimit() {
     return pierceLimit;
+  }
+
+  /** شعاع پاشش برحسب خانه؛ صفر یعنی تیر فقط به همان هدف می‌خورد. */
+  public Projectile withSplash(double tiles) {
+    this.splashRadius = Math.max(0, tiles);
+    return this;
+  }
+
+  public double getSplashRadius() {
+    return splashRadius;
+  }
+
+  /** کره‌ی Kernel-pult: برخورد علاوه بر دمیج، زامبی را چند تیک میخکوب می‌کند. */
+  public Projectile withStun(int ticks) {
+    this.stunTicks = Math.max(0, ticks);
+    return this;
+  }
+
+  /**
+   * خانه‌ای که تیر کمانی به سمتش پرتاب شده. مدل همچنان مستقیم حرکت می‌کند؛ این فقط بازه‌ای است
+   * که نمای گرافیکی قوس را رویش می‌کشد.
+   */
+  public Projectile aimedAt(double column) {
+    this.targetX = column;
+    return this;
+  }
+
+  public double getLaunchX() {
+    return launchX;
+  }
+
+  public double getTargetX() {
+    return targetX;
   }
 
   /** این پرتابه از دیواره‌ها کمانه می‌کند و بعد از {@code lifeTicks} تیک ناپدید می‌شود. */
@@ -138,6 +178,37 @@ public class Projectile {
       return;
     }
 
+    applyHit(zombie);
+    alreadyHit.add(zombie);
+
+    if (!piercing) {
+      this.isActive = false;
+    } else if (pierceLimit > 0 && alreadyHit.size() >= pierceLimit) {
+      this.isActive = false;
+    }
+
+  }
+
+  /**
+   * برخورد یک پرتابه‌ی انفجاری: اول هرچه در شعاع پاشش است، بعد خود هدف.
+   *
+   * <p>پاشش قبل از هدف اعمال می‌شود چون خوردن به هدف تیر غیرپیرسینگ را غیرفعال می‌کند.
+   */
+  public void hitArea(List<Zombie> others, Zombie landedOn) {
+    if (!isActive || isFromZombie) return;
+
+    if (splashRadius > 0) {
+      for (Zombie other : others) {
+        if (other != landedOn && !other.isDead() && other.getRow() == landedOn.getRow()
+                && Math.abs(other.getX() - landedOn.getX()) <= splashRadius) {
+          applyHit(other);
+        }
+      }
+    }
+    hitZombie(landedOn);
+  }
+
+  private void applyHit(Zombie zombie) {
     int finalDamage = (effect == ProjectileEffect.FIRE) ? damage * 2 : damage;
     boolean ignoresArmor = (effect == ProjectileEffect.POISON);
 
@@ -152,15 +223,11 @@ public class Projectile {
     if (effect == ProjectileEffect.FIRE) {
       zombie.extinguishFrozenStatus();
     }
-
-    alreadyHit.add(zombie);
-
-    if (!piercing) {
-      this.isActive = false;
-    } else if (pierceLimit > 0 && alreadyHit.size() >= pierceLimit) {
-      this.isActive = false;
+    if (stunTicks > 0) {
+      // کره‌ی Kernel-pult: زامبی برای لحظه‌ای میخکوب می‌شود
+      zombie.setEating(false);
+      zombie.applyEffect(StatusEffect.FROZEN, stunTicks);
     }
-
   }
 
   // FIX (GDD Target 1.4 - Jester Zombie): قبلا این متود اصلا از هیچ‌جا صدا زده نمیشد (پرتابه‌های
@@ -242,6 +309,9 @@ public class Projectile {
     lit.setDirection(stepCol, stepRow);
     lit.alreadyHit.addAll(this.alreadyHit);
     lit.withPierceLimit(pierceLimit);
+    lit.withSplash(splashRadius);
+    lit.withStun(stunTicks);
+    lit.aimedAt(targetX);
     return lit;
   }
 }

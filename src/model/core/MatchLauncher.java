@@ -4,6 +4,7 @@ import data.GameDataManager;
 import data.persistence.UserManager;
 import java.util.ArrayList;
 import java.util.List;
+import model.account.AdventureMap;
 import model.account.User;
 import model.enums.Menu;
 import model.environment.AncientEgyptSeason;
@@ -32,12 +33,12 @@ import model.game.zombie.Zombie;
 public final class MatchLauncher {
   private static final int ROWS = 5;
   private static final int COLS = 9;
-  private static final int LEVELS_PER_STAGE = 4;
+  private static final int LEVELS_PER_STAGE = AdventureMap.LEVELS_PER_STAGE;
 
   private MatchLauncher() {}
 
   public static void launch() {
-    int stage = resolveStageNumber();
+    int stage = stageNumber();
     Season season = seasonForStage(stage);
 
     GameManager gameManager = new GameManager();
@@ -65,7 +66,7 @@ public final class MatchLauncher {
    * across the adventure. Level 1 is a normal level and level 4 is the boss (next phase).
    */
   private static void attachSpecialRule(GameManager gameManager, int stage) {
-    int levelInStage = currentLevelInStage();
+    int levelInStage = levelInStage();
     List<String> deck = new ArrayList<>(MatchSetup.getInstance().getSelectedPlants());
     String bossName = gameManager.getSeason() == null ? null : gameManager.getSeason().getBossZombieName();
 
@@ -106,9 +107,17 @@ public final class MatchLauncher {
       if (guarded != null) {
         gameManager.getBoard().placePlant(guarded);
         System.out.printf("PROTECT THIS: %s at (1, %d)%n", guarded.getName(), row + 1);}}}
-  private static final int BOSS_LEVEL_IN_STAGE = 4;
+  private static final int BOSS_LEVEL_IN_STAGE = AdventureMap.LEVELS_PER_STAGE;
 
-  private static int currentLevelInStage() {
+  /**
+   * Which level of the chapter is being played. The map screen puts the clicked level in
+   * MatchSetup; without one -- the typed menu -- it is wherever the account has got to.
+   */
+  public static int levelInStage() {
+    int chosen = MatchSetup.getInstance().getTargetLevel();
+    if (chosen > 0) {
+      return chosen;
+    }
     User user = UserManager.getInstance().getCurrentUser();
     return user != null ? user.getProgress().getCurrentLevel() : 1;
   }
@@ -155,11 +164,12 @@ public final class MatchLauncher {
       return null;
     }
     SpecialStageRule rule =
-            specialRuleFor(null, resolveStageNumber(), currentLevelInStage(), List.of());
+            specialRuleFor(null, stageNumber(), levelInStage(), List.of());
     return rule != null && rule.restrictsSelection() ? rule : null;
   }
 
-  private static int resolveStageNumber() {
+  /** The chapter being played, from whatever the menus put in MatchSetup. */
+  public static int stageNumber() {
     String chapter = MatchSetup.getInstance().getTargetChapter();
     if (chapter == null) {
       return 1;
@@ -209,7 +219,7 @@ public final class MatchLauncher {
     List<Wave> waves = WaveGenerator.generate(level, pool);
 
     // مرحله‌ی آخر هر فصل با یه موج اضافه که فقط زامباس توشه تموم میشه
-    if (currentLevelInStage() == BOSS_LEVEL_IN_STAGE && season.getBossZombieName() != null) {
+    if (levelInStage() == BOSS_LEVEL_IN_STAGE && season.getBossZombieName() != null) {
       List<Wave.SpawnEntry> spawns = new ArrayList<>();
       spawns.add(new Wave.SpawnEntry(season.getBossZombieName(), ROWS / 2, 0, 1000));
       waves.add(new Wave(waves.size() + 1, true, spawns));
@@ -244,8 +254,6 @@ public final class MatchLauncher {
 
   /** Overall level index across chapters, used to scale wave difficulty. */
   private static int levelNumber(int stage) {
-    User user = UserManager.getInstance().getCurrentUser();
-    int levelInStage = user != null ? user.getProgress().getCurrentLevel() : 1;
-    return (stage - 1) * LEVELS_PER_STAGE + levelInStage;
+    return (stage - 1) * LEVELS_PER_STAGE + levelInStage();
   }
 }

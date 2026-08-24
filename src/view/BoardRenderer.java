@@ -306,7 +306,7 @@ public final class BoardRenderer {
       list.append(upgrade.from.label).append("->").append(upgrade.to.label)
               .append('(').append(upgrade.cost).append(")  ");}
     return list.toString();}
-  private static String[] getBowlingCellDetails(WallnutBowlingEngine engine, int row, int col) {
+  public static String[] getBowlingCellDetails(WallnutBowlingEngine engine, int row, int col) {
     StringBuilder entities = new StringBuilder();
     StringBuilder healths = new StringBuilder();
 
@@ -327,7 +327,7 @@ public final class BoardRenderer {
     return new String[] {entities.length() == 0 ? "." : entities.toString(),
             healths.length() == 0 ? "-" : healths.toString()};
   }
-  private static String[] getIZombieCellDetails(IZombieEngine engine, int row, int col) {
+  public static String[] getIZombieCellDetails(IZombieEngine engine, int row, int col) {
     StringBuilder entities = new StringBuilder();
     StringBuilder healths = new StringBuilder();
 
@@ -348,7 +348,7 @@ public final class BoardRenderer {
     return new String[] {entities.length() == 0 ? "." : entities.toString(),
             healths.length() == 0 ? "-" : healths.toString()};
   }
-  private static String[] getBeghouledCellDetails(BeghouledEngine engine, int row, int col) {
+  public static String[] getBeghouledCellDetails(BeghouledEngine engine, int row, int col) {
     StringBuilder entities = new StringBuilder();
     StringBuilder healths = new StringBuilder();
     BeghouledEngine.PlantKind kind = engine.getPlantAt(row, col);
@@ -364,7 +364,7 @@ public final class BoardRenderer {
     return new String[] {entities.length() == 0 ? "." : entities.toString(),
             healths.length() == 0 ? "-" : healths.toString()};
   }
-  private static String[] getVaseCellDetails(VasebreakerEngine engine, int row, int col) {
+  public static String[] getVaseCellDetails(VasebreakerEngine engine, int row, int col) {
     StringBuilder entities = new StringBuilder();
     StringBuilder healths = new StringBuilder();
     for (VasebreakerEngine.ArcadeZombie zombie : engine.getZombies()) {

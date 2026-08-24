@@ -12,6 +12,7 @@ import model.Result;
 import model.account.User;
 import model.environment.greenhouse.GreenHouse;
 import model.environment.greenhouse.Pot;
+import model.game.shop.Shop;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.PlantArt;
 import view.gdx.ui.Popup;
@@ -29,8 +30,14 @@ public final class GreenhouseScreen extends MenuScreen {
 
   private static final int COLUMNS = 5;
   private static final int ROWS = 4;
+  /** Same price the shop's pot_1 item charges. */
+  private static final String POT_ITEM = "pot_1";
+  private static final int POT_PRICE = 2000;
+  private static final long MILLIS_PER_HOUR = 60L * 60 * 1000;
+  private static final int MARIGOLD_COINS = 500;
 
   private final PlantArt art = new PlantArt();
+  private final Shop shop = new Shop();
   private Table content;
 
   public GreenhouseScreen(PvzGdxGame game) {
@@ -105,9 +112,8 @@ public final class GreenhouseScreen extends MenuScreen {
     card.defaults().pad(2f);
 
     if (pot == null || !pot.isUnlocked()) {
-      TextButton locked = new TextButton("Locked", skin, UiSkinProvider.BUTTON_BROWN);
-      locked.setDisabled(true);
-      card.add(locked).grow();
+      card.add(button("Buy pot\n" + POT_PRICE + " coins", UiSkinProvider.BUTTON_BROWN,
+          () -> buyPot(user))).grow();
       return card;
     }
 
@@ -169,23 +175,71 @@ public final class GreenhouseScreen extends MenuScreen {
             ? "Fully grown and ready to collect."
             : "Ready in " + remaining(pot)
               + "   (" + Math.round(pot.getGrowthProgress() * 100) + "% grown)",
-            skin, "secondary")).row();
+            skin, UiSkinProvider.LABEL_MEDIUM)).row();
 
     if (pot.isFullyGrown()) {
-      Popup.show(stage, skin, "Pot " + (index + 1), body, "Collect", () -> {
-        Result result = user.getGreenHouse().collectSeed(index);
-        toast(result.message());
-        saveState();
-        refresh();
-      });
-    } else {
-      Popup.show(stage, skin, "Pot " + (index + 1), body, "Grow now", () -> {
-        Result result = user.getGreenHouse().forceGrow(index);
-        toast(result.message());
-        saveState();
-        refresh();
-      });
+      Popup.show(stage, skin, "Pot " + (index + 1), body, "Collect", () -> collect(user, index));
+      return;
     }
+    int diamonds = diamondCost(pot);
+    body.add(new Label("Growing it now costs " + diamonds + " diamond(s).",
+        skin, UiSkinProvider.LABEL_MEDIUM))
+        .row();
+    Popup.show(stage, skin, "Pot " + (index + 1), body,
+        "Grow for " + diamonds, () -> forceGrow(user, index));
+  }
+
+  /** The shop owns the price and the unlock; this only reports the Result. */
+  private void buyPot(User user) {
+    Result result = shop.buyItem(user, POT_ITEM, 1, null);
+    toast(result.message());
+    if (result.success()) {
+      saveState();
+    }
+    refresh();
+  }
+
+  /** Same charge the typed "grow" command makes: one diamond per hour still to run. */
+  private static int diamondCost(Pot pot) {
+    return (int) Math.ceil(pot.getRemainingGrowTime() / (double) MILLIS_PER_HOUR);
+  }
+
+  private void forceGrow(User user, int index) {
+    Pot pot = user.getGreenHouse().getPotAt(index);
+    if (pot == null || pot.isEmpty() || pot.isFullyGrown()) {
+      toast("error: invalid pot for growing");
+      return;
+    }
+    int diamonds = diamondCost(pot);
+    if (user.getDiamonds() < diamonds) {
+      toast("error: not enough diamonds. You need " + diamonds + " diamonds.");
+      return;
+    }
+    user.addDiamonds(-diamonds);
+    Result result = user.getGreenHouse().forceGrow(index);
+    toast(result.message() + " (-" + diamonds + " diamonds)");
+    saveState();
+    refresh();
+  }
+
+  /** Harvesting pays out, same as the typed menu, and says what it paid. */
+  private void collect(User user, int index) {
+    Result result = user.getGreenHouse().collectSeed(index);
+    if (!result.success()) {
+      toast(result.message());
+      refresh();
+      return;
+    }
+    String seed = String.valueOf(result.getObject());
+    if ("marigold".equalsIgnoreCase(seed)) {
+      user.addCoins(MARIGOLD_COINS);
+      toast("Collected a Marigold! +" + MARIGOLD_COINS + " coins.");
+    } else {
+      Result boost = user.addFreeBoost(seed);
+      toast("Harvested " + seed + ": " + boost.message());
+    }
+    saveState();
+    refresh();
   }
 
   private String remaining(Pot pot) {

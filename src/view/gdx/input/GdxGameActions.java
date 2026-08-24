@@ -7,6 +7,7 @@ import model.account.User;
 import model.core.GameManager;
 import model.game.Board;
 import model.game.Tile;
+import model.game.minigame.ConveyorRule;
 import model.game.minigame.SpecialStageRule;
 import model.game.plant.Plant;
 import model.game.plant.Factory.PlantFactory;
@@ -84,6 +85,10 @@ public final class GdxGameActions implements GameActionBridge {
       return report(explainRefusedPlanting(plant, row, column));
     }
     match.recordPlanting(plantType);
+    // Same hand-off GamePlayController makes: the belt slot is spent, so the next click waits.
+    if (match.getSpecialStageRule() instanceof ConveyorRule belt) {
+      belt.consumeReadyPlant();
+    }
     return true;
   }
 

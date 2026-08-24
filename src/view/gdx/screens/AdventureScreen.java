@@ -113,7 +113,6 @@ public final class AdventureScreen extends MenuScreen {
     Table row = new Table();
     row.left();
 
-    // Stages 4 and 5 are both Dark Ages, so the number is what tells the rows apart.
     row.add(new Label(stage + ".  " + chapterName(stage), skin, UiSkinProvider.LABEL_BIG))
         .left()
         .expandX();
@@ -185,9 +184,10 @@ public final class AdventureScreen extends MenuScreen {
       return;
     }
     MatchSetup.getInstance().setTargetChapter(String.valueOf(openChapter));
+    MatchSetup.getInstance().setTargetLevel(level);
     MatchSetup.getInstance().setDifficultyLevel(user.getDifficultyLevel());
 
-    if (!MatchLauncher.skipsPlantSelection(openChapter, user.getProgress().getCurrentLevel())) {
+    if (!MatchLauncher.skipsPlantSelection(openChapter, level)) {
       go(new PlantSelectionScreen(game, openChapter));
       return;
     }

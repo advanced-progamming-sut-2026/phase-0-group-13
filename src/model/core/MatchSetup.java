@@ -8,6 +8,7 @@ public class MatchSetup {
   private static MatchSetup instance;
 
   private String targetChapter;
+  private int targetLevel;
   private List<String> selectedPlants;
   private List<String> boostedPlants;
 
@@ -36,6 +37,7 @@ public class MatchSetup {
 
   public void setTargetChapter(String targetChapter) {
     this.targetChapter = targetChapter;
+    this.targetLevel = 0;
     this.currentMiniGame = MiniGameType.NONE;
   }
 
@@ -43,10 +45,20 @@ public class MatchSetup {
     return targetChapter;
   }
 
+  /** Which level of the chapter the player picked; 0 means "wherever the account is up to". */
+  public void setTargetLevel(int targetLevel) {
+    this.targetLevel = Math.max(0, targetLevel);
+  }
+
+  public int getTargetLevel() {
+    return targetLevel;
+  }
+
   public void setMiniGame(MiniGameType type, int level) {
     this.currentMiniGame = type;
     this.miniGameLevel = level;
     this.targetChapter = null;
+    this.targetLevel = 0;
   }
 
   public MiniGameType getCurrentMiniGame() {

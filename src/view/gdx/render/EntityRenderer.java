@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import model.core.GameManager;
+import model.enums.StatusEffect;
+import model.enums.SunType;
 import model.game.Board;
 import model.game.Projectile;
 import model.game.Sun;
@@ -14,8 +16,12 @@ import model.game.zombie.Zombie;
 import model.game.zombie.behavior.JesterZombieAction;
 import model.game.zombie.behavior.KingAuraZombieAction;
 import model.game.zombie.behavior.ZombossAction;
+import view.gdx.animation.AnimationLibrary;
+import view.gdx.animation.AnimationStates;
+import view.gdx.animation.EntityAnimation;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
+import view.gdx.ui.ProjectileArt;
 import view.gdx.ui.ZombieArt;
 
 /** Plants, zombies, projectiles and suns on top of the lawn. */
@@ -32,22 +38,38 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float ZOMBOSS_ROW_FILL = 2.4f;
   private static final float ZOMBIE_FOOT_INSET = 0.08f;
   private static final float PLANT_FOOT_INSET = 0.14f;
-  // Plants have no idle cycle of their own (see the .PAM note on ZombieArt); this tiny bob on
-  // the footInset fraction is the whole stand-in the doc allows for plants, and it costs nothing
-  // beyond what drawStanding already computes.
+  // The stand-in for the entities that still have no rig: a tiny bob on the footInset fraction.
   private static final float PLANT_IDLE_SPEED = 2.2f;
   private static final float PLANT_IDLE_BOB_FRACTION = 0.02f;
+  // Animated art is measured in PAM units off a shared 390-unit canvas, so one reference per side
+  // keeps the relative sizes the artists drew: a gargantuar stays bigger than an imp.
+  private static final float PLANT_ANIM_UNITS = 90f;
+  private static final float ZOMBIE_ANIM_UNITS = 150f;
+  // Chilled zombies walk at half speed, so their legs have to as well.
+  private static final float CHILLED_ANIM_RATE = 0.5f;
+  // How far above its lane a lobbed shot rises at the top of the arc.
+  private static final float LOB_ARC_HEIGHT = 0.85f;
+  private static final float FREEZE_LEVELS = Plant.MAX_FREEZE_LEVEL;
 
   private final LawnGeometry geometry;
   private final PlantArt plantArt = new PlantArt();
   private final ZombieArt zombieArt = new ZombieArt();
   private final HudArt hudArt = new HudArt();
+  private final ProjectileArt projectileArt = new ProjectileArt();
+  private final AnimationLibrary animations = new AnimationLibrary();
+  private final AnimationStates playback = new AnimationStates();
   private final Color healthBack = new Color(0f, 0f, 0f, 0.55f);
   private final Color healthFront = new Color(0.25f, 0.85f, 0.3f, 0.95f);
   private final Color healthLow = new Color(0.9f, 0.5f, 0.15f, 0.95f);
   private final Color peaColor = new Color(0.55f, 0.9f, 0.3f, 1f);
   private final Color sunColor = new Color(1f, 0.85f, 0.2f, 1f);
   private final Color noArt = new Color(1f, 1f, 1f, 0.85f);
+  private final Color frozenTint = new Color(0.45f, 0.7f, 1f, 1f);
+  private final Color chilledTint = new Color(0.72f, 0.88f, 1f, 1f);
+  private final Color hypnoTint = new Color(0.85f, 0.6f, 1f, 1f);
+  private final Color icedTint = new Color(0.55f, 0.8f, 1f, 1f);
+  private final Color frostStep = new Color();
+  private final Color radioactiveSun = new Color(0.6f, 1f, 0.45f, 1f);
   // Reflected shots belong to the zombie now, so they must not read as one of your peas.
   private final Color reflectedPea = new Color(1f, 0.42f, 0.3f, 1f);
   // King's aura pulse and the Juggler's spin both read this; it only ticks in render().
@@ -68,17 +90,22 @@ public final class EntityRenderer implements WorldRenderer {
     }
     Board board = game.getBoard();
     clock += delta;
-    drawSprites(context, board);
+    drawSprites(context, board, delta);
     drawShapes(context, board);
+    playback.endFrame();
   }
 
-  private void drawSprites(RenderContext context, Board board) {
+  private void drawSprites(RenderContext context, Board board, float delta) {
     context.getBatch().begin();
     TextureRegion sheep = hudArt.find("sheep");
     for (Plant plant : board.getPlants()) {
       // A Wizard's curse turns the plant into a harmless sheep until the wizard dies, so the
       // board has to show a sheep, not a plant that has quietly stopped shooting.
       boolean cursed = plant.isCursed() && sheep != null;
+      context.getBatch().setColor(plantTint(plant));
+      if (!cursed && drawPlantAnimation(context, plant, delta)) {
+        continue;
+      }
       TextureRegion art = cursed ? sheep : plantArt.find(plant.getName());
       if (art == null) {
         continue;
@@ -90,33 +117,33 @@ public final class EntityRenderer implements WorldRenderer {
       drawStanding(context, art, plant.getCol(), plant.getRow(), scale,
           PLANT_FOOT_INSET + idleBobFraction(plant));
     }
+    context.getBatch().setColor(Color.WHITE);
     for (Zombie zombie : board.getZombies()) {
       if (zombie.isDead()) {
         continue;
       }
       drawKingAura(context, zombie);
+      context.getBatch().setColor(zombieTint(zombie));
+      if (drawZombieAnimation(context, zombie, delta)) {
+        continue;
+      }
       TextureRegion art = zombieArt.find(zombie.getName());
       if (art != null) {
         drawStanding(context, art, onBoard(zombie.getX()), zombie.getRow(),
             zombieScale(zombie, art), ZOMBIE_FOOT_INSET, spinAngle(zombie));
       }
     }
-    TextureRegion pea = hudArt.find("pea");
-    if (pea != null) {
-      for (Projectile projectile : board.getProjectiles()) {
-        // the juggler throws your own shots back at you; those have to look wrong
-        context.getBatch().setColor(projectile.isFromZombie() ? reflectedPea : Color.WHITE);
-        drawCentred(context, pea, projectile.getXCoordinate(),
-            Math.round(projectile.getYCoordinate()), geometry.getCellHeight()
-                * (projectile.isFromZombie() ? 0.28f : 0.22f));
-      }
-      context.getBatch().setColor(Color.WHITE);
-    }
+    context.getBatch().setColor(Color.WHITE);
+    drawProjectiles(context, board);
     TextureRegion sun = hudArt.find("sun");
     if (sun != null) {
       for (Sun s : board.getSuns()) {
-        drawCentred(context, sun, s.getX(), s.getY(), geometry.getCellHeight() * 0.42f);
+        // the doc wants the sun kinds told apart; a big one is bigger and a radioactive one glows
+        context.getBatch().setColor(s.getType() == SunType.RADIOACTIVE ? radioactiveSun : Color.WHITE);
+        drawCentred(context, sun, s.getX(), s.getY(),
+            geometry.getCellHeight() * (s.getType() == SunType.LARGE ? 0.58f : 0.42f));
       }
+      context.getBatch().setColor(Color.WHITE);
     }
     context.getBatch().end();
   }
@@ -127,10 +154,117 @@ public final class EntityRenderer implements WorldRenderer {
     return Math.max(0.0, column);
   }
 
+
+  /**
+   * Frozen and chilled have to read on sight, and the animation layer already multiplies whatever
+   * colour the batch is set to, so a tint covers rigged and portrait entities alike.
+   */
+  private Color zombieTint(Zombie zombie) {
+    if (zombie.getActiveEffects().containsKey(StatusEffect.FROZEN)) {
+      return frozenTint;
+    }
+    if (zombie.getActiveEffects().containsKey(StatusEffect.CHILLED)) {
+      return chilledTint;
+    }
+    return zombie.isHypnotized() ? hypnoTint : Color.WHITE;
+  }
+
+  /** The three freeze levels a plant goes through, then the solid block once it is encased. */
+  private Color plantTint(Plant plant) {
+    if (plant.getIceHealth() > 0) {
+      return icedTint;
+    }
+    int level = plant.getFreezeLevel();
+    if (level <= 0) {
+      return Color.WHITE;
+    }
+    float depth = Math.min(1f, level / FREEZE_LEVELS);
+    return frostStep.set(1f - 0.4f * depth, 1f - 0.18f * depth, 1f, 1f);
+  }
   /** Slow up/down drift, phase-shifted per tile so neighbouring plants do not bob in lockstep. */
   private float idleBobFraction(Plant plant) {
     float phase = (plant.getRow() * 3 + plant.getCol()) * 0.9f;
     return PLANT_IDLE_BOB_FRACTION * (float) Math.sin(clock * PLANT_IDLE_SPEED + phase);
+  }
+
+  /**
+   * Draws the plant's own idle cycle, or false if it has no rig and the portrait has to do.
+   *
+   * <p>Idle is all a plant needs, the doc calls the rest Polish. Clips are asked for by name, so
+   * adding "attack" or "plantfood" later is a line here and nothing anywhere else.
+   */
+  private boolean drawPlantAnimation(RenderContext context, Plant plant, float delta) {
+    EntityAnimation animation = animations.find(AnimationLibrary.PLANTS, plant.getName());
+    String clip = animation == null ? null : animation.pickClip("idle");
+    if (clip == null) {
+      return false;
+    }
+    animation.draw(context.getBatch(), clip, playback.advance(plant, clip, delta),
+        geometry.columnCentreX(plant.getCol()),
+        geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * PLANT_FOOT_INSET,
+        scaleFor(animation.width(clip), PLANT_ANIM_UNITS, PLANT_ROW_FILL), false);
+    return true;
+  }
+
+  /** Same for a zombie, which unlike a plant has to switch clips as it goes. */
+  private boolean drawZombieAnimation(RenderContext context, Zombie zombie, float delta) {
+    EntityAnimation animation = zombieAnimation(zombie);
+    if (animation == null) {
+      return false;
+    }
+    String clip = zombieClip(animation, zombie);
+    animation.draw(context.getBatch(), clip,
+        playback.advance(zombie, clip, delta * animationRate(zombie)),
+        geometry.columnCentreX(onBoard(zombie.getX())),
+        geometry.rowToY(zombie.getRow()) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET,
+        zombieAnimationScale(zombie, animation, clip), zombie.isHypnotized());
+    return true;
+  }
+
+  /** Null unless this zombie has a rig with a clip worth playing. */
+  private EntityAnimation zombieAnimation(Zombie zombie) {
+    EntityAnimation animation = animations.find(AnimationLibrary.ZOMBIES, zombie.getName());
+    return animation != null && zombieClip(animation, zombie) != null ? animation : null;
+  }
+
+  /** Eating while it chews a plant, walking the rest of the time. */
+  private static String zombieClip(EntityAnimation animation, Zombie zombie) {
+    if (zombie.isEating()) {
+      String eat = animation.pickClip("eat");
+      if (eat != null) {
+        return eat;
+      }
+    }
+    return animation.pickClip("walk", "idle");
+  }
+
+  /** Frozen holds the pose and chilled halves it, matching what Zombie.move() actually does. */
+  private static float animationRate(Zombie zombie) {
+    if (zombie.getActiveEffects().containsKey(StatusEffect.FROZEN)) {
+      return 0f;
+    }
+    return zombie.getActiveEffects().containsKey(StatusEffect.CHILLED) ? CHILLED_ANIM_RATE : 1f;
+  }
+
+  private float zombieAnimationScale(Zombie zombie, EntityAnimation animation, String clip) {
+    float height = animation.height(clip);
+    if (isBoss(zombie)) {
+      return height > 0f ? geometry.getCellHeight() * ZOMBOSS_ROW_FILL / height : 0f;
+    }
+    return scaleFor(animation.width(clip), ZOMBIE_ANIM_UNITS, ZOMBIE_ROW_FILL);
+  }
+
+  /** How tall the zombie is drawn, whichever way it is being drawn. */
+  private float zombieSpriteHeight(Zombie zombie) {
+    EntityAnimation animation = zombieAnimation(zombie);
+    if (animation != null) {
+      String clip = zombieClip(animation, zombie);
+      return animation.height(clip) * zombieAnimationScale(zombie, animation, clip);
+    }
+    TextureRegion art = zombieArt.find(zombie.getName());
+    return art == null
+        ? geometry.getCellHeight() * 0.6f
+        : art.getRegionHeight() * zombieScale(zombie, art);
   }
 
   private static boolean isBoss(Zombie zombie) {
@@ -145,11 +279,15 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   private float scaleFor(TextureRegion region, float referenceHeight, float rowFill) {
+    return scaleFor(region.getRegionWidth(), referenceHeight, rowFill);
+  }
+
+  private float scaleFor(float spriteWidth, float referenceHeight, float rowFill) {
     float scale = geometry.getCellHeight() * rowFill / referenceHeight;
     // nothing may spill sideways into the neighbouring lane
     float widest = geometry.getCellWidth() * 0.95f;
-    if (region.getRegionWidth() * scale > widest) {
-      scale = widest / region.getRegionWidth();
+    if (spriteWidth * scale > widest) {
+      scale = widest / spriteWidth;
     }
     return scale;
   }
@@ -198,12 +336,53 @@ public final class EntityRenderer implements WorldRenderer {
     context.getBatch().setColor(Color.WHITE);
   }
 
+  private void drawProjectiles(RenderContext context, Board board) {
+    for (Projectile projectile : board.getProjectiles()) {
+      ProjectileArt.Shot shot = projectileArt.find(projectile);
+      if (shot == null) {
+        continue;
+      }
+      // the juggler throws your own shots back at you; those have to look wrong
+      context.getBatch().setColor(projectile.isFromZombie() ? reflectedPea : Color.WHITE);
+      drawCentred(context, shot.region(), projectile.getXCoordinate(),
+          projectile.getYCoordinate(), geometry.getCellHeight() * shot.rowFraction(),
+          arcLift(projectile), shot.angle());
+    }
+    context.getBatch().setColor(Color.WHITE);
+  }
+
+  /**
+   * How high above its lane an arcing shot is right now: nothing as it leaves the plant, a full
+   * arc in the middle, back down where it was aimed. Straight shots stay on the lane.
+   */
+  private float arcLift(Projectile projectile) {
+    if (!projectile.isLobbed()) {
+      return 0f;
+    }
+    double span = projectile.getTargetX() - projectile.getLaunchX();
+    if (span <= 0) {
+      return 0f;
+    }
+    double travelled = (projectile.getXCoordinate() - projectile.getLaunchX()) / span;
+    if (travelled <= 0 || travelled >= 1) {
+      return 0f;
+    }
+    return (float) (4 * travelled * (1 - travelled))
+        * geometry.getCellHeight() * LOB_ARC_HEIGHT;
+  }
+
   private void drawCentred(RenderContext context, TextureRegion region, double col, double row,
       float targetHeight) {
+    drawCentred(context, region, col, row, targetHeight, 0f, 0f);
+  }
+
+  private void drawCentred(RenderContext context, TextureRegion region, double col, double row,
+      float targetHeight, float lift, float angle) {
     float scale = targetHeight / region.getRegionHeight();
     float width = region.getRegionWidth() * scale;
     context.getBatch().draw(region, geometry.columnCentreX(col) - width / 2f,
-        geometry.rowCentreY((int) Math.round(row)) - targetHeight / 2f, width, targetHeight);
+        geometry.rowCentreY((int) Math.round(row)) - targetHeight / 2f + lift,
+        width / 2f, targetHeight / 2f, width, targetHeight, 1f, 1f, angle);
   }
 
   private void drawShapes(RenderContext context, Board board) {
@@ -211,9 +390,9 @@ public final class EntityRenderer implements WorldRenderer {
     Gdx.gl.glEnable(GL20.GL_BLEND);
     shapes.begin(ShapeRenderer.ShapeType.Filled);
 
-    if (hudArt.find("pea") == null) {
-      shapes.setColor(peaColor);
-      for (Projectile projectile : board.getProjectiles()) {
+    shapes.setColor(peaColor);
+    for (Projectile projectile : board.getProjectiles()) {
+      if (projectileArt.find(projectile) == null) {
         shapes.circle(geometry.columnCentreX(projectile.getXCoordinate()),
             geometry.rowCentreY(Math.round(projectile.getYCoordinate())), 7f);
       }
@@ -236,7 +415,8 @@ public final class EntityRenderer implements WorldRenderer {
     shapes.begin(ShapeRenderer.ShapeType.Line);
     shapes.setColor(noArt);
     for (Zombie zombie : board.getZombies()) {
-      if (!zombie.isDead() && zombieArt.find(zombie.getName()) == null) {
+      if (!zombie.isDead() && zombieArt.find(zombie.getName()) == null
+          && zombieAnimation(zombie) == null) {
         shapes.rect(geometry.columnCentreX(onBoard(zombie.getX())) - geometry.getCellWidth() * 0.25f,
             geometry.rowToY(zombie.getRow()) + geometry.getCellHeight() * 0.1f,
             geometry.getCellWidth() * 0.5f, geometry.getCellHeight() * 0.7f);
@@ -247,10 +427,7 @@ public final class EntityRenderer implements WorldRenderer {
 
   /** Sits just above the sprite, so a tall zombie does not wear its bar on its chest. */
   private void healthBar(ShapeRenderer shapes, Zombie zombie) {
-    TextureRegion art = zombieArt.find(zombie.getName());
-    float spriteHeight = art == null
-        ? geometry.getCellHeight() * 0.6f
-        : art.getRegionHeight() * zombieScale(zombie, art);
+    float spriteHeight = zombieSpriteHeight(zombie);
     // the chapter ends when this one dies, so its bar has to be readable from across the lawn
     float width = geometry.getCellWidth() * (isBoss(zombie) ? 1.9f : 0.55f);
     float x = geometry.columnCentreX(onBoard(zombie.getX())) - width / 2f;
@@ -272,5 +449,7 @@ public final class EntityRenderer implements WorldRenderer {
     plantArt.dispose();
     zombieArt.dispose();
     hudArt.dispose();
+    projectileArt.dispose();
+    animations.dispose();
   }
 }

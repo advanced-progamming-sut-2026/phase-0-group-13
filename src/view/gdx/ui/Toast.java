@@ -29,8 +29,21 @@ public final class Toast {
   private Toast() {
   }
 
+  private static final com.badlogic.gdx.graphics.Color ALERT =
+      new com.badlogic.gdx.graphics.Color(1f, 0.28f, 0.24f, 1f);
+
   /** Drops a message onto the stage that fades out and removes itself. */
   public static void show(Stage stage, Skin skin, String message) {
+    show(stage, skin, message, null);
+  }
+
+  /** The red in-match warning: a new wave, necromancy, the tide turning. */
+  public static void showAlert(Stage stage, Skin skin, String message) {
+    show(stage, skin, message, ALERT);
+  }
+
+  private static void show(
+      Stage stage, Skin skin, String message, com.badlogic.gdx.graphics.Color colour) {
     if (stage == null || skin == null || message == null || message.isEmpty()) {
       return;
     }
@@ -39,6 +52,9 @@ public final class Toast {
     Label label = new Label(message, skin, UiSkinProvider.LABEL_MEDIUM);
     label.setWrap(true);
     label.setAlignment(Align.center);
+    if (colour != null) {
+      label.setColor(colour);
+    }
 
     Table holder = new Table();
     holder.setFillParent(true);
