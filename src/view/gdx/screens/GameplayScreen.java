@@ -22,6 +22,7 @@ import model.game.plant.PlantParts.PlantTemplate;
 import model.game.zombie.Zombie;
 import model.core.GameManager;
 import model.core.GameSession;
+import model.core.MatchCompletion;
 import model.core.MatchLauncher;
 import model.core.MatchSetup;
 import view.gdx.core.FixedStepClock;
@@ -412,6 +413,7 @@ public final class GameplayScreen extends BaseScreen {
       return;
     }
     ended = true;
+    MatchCompletion.apply(match);
     paused = false;
     if (game.getUiSkin().get() == null) {
       return;

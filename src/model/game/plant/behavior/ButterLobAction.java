@@ -3,6 +3,7 @@ package model.game.plant.behavior;
 import java.util.Random;
 import model.enums.StatusEffect;
 import model.game.Board;
+import model.game.Projectile;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
@@ -59,17 +60,19 @@ public class ButterLobAction implements PlantAction {
       return;
     }
 
-    Zombie target = findNearestZombieAhead(board, plant);
+    Zombie target = LobAction.findNearestZombieAhead(board, plant);
     if (target == null) {
       return;
     }
-    if (random.nextInt(100) < butterChancePercent) {
-      hitWithButter(target);
-      System.out.printf("%s buttered %s, stunning it!%n", plant.getName(), target.getName());
-    } else {
-      target.takeDamage(kernelDamage, false);
-      System.out.printf("%s lobbed a kernel at %s.%n", plant.getName(), target.getName());
+    boolean butter = random.nextInt(100) < butterChancePercent;
+    Projectile shot = LobAction.lob(plant, target, butter ? butterDamage : kernelDamage,
+            Projectile.ProjectileEffect.NORMAL);
+    if (butter) {
+      shot.withStun(STUN_TICKS);
     }
+    board.addProjectile(shot);
+    System.out.printf("%s lobbed %s at %s.%n", plant.getName(),
+            butter ? "butter" : "a kernel", target.getName());
     plant.setLastActionTick(currentTick);
   }
 
@@ -77,22 +80,5 @@ public class ButterLobAction implements PlantAction {
     zombie.takeDamage(butterDamage, false);
     zombie.setEating(false);
     zombie.applyEffect(StatusEffect.FROZEN, STUN_TICKS);
-  }
-
-  private Zombie findNearestZombieAhead(Board board, Plant plant) {
-    Zombie nearest = null;
-    double bestDistance = Double.MAX_VALUE;
-    for (Zombie zombie : board.getZombies()) {
-      if (zombie.isDead() || zombie.getRow() != plant.getRow()
-              || zombie.getX() < plant.getCol()) {
-        continue;
-      }
-      double distance = zombie.getX() - plant.getCol();
-      if (distance < bestDistance) {
-        bestDistance = distance;
-        nearest = zombie;
-      }
-    }
-    return nearest;
   }
 }

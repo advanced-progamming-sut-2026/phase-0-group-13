@@ -184,9 +184,10 @@ public final class AdventureScreen extends MenuScreen {
       return;
     }
     MatchSetup.getInstance().setTargetChapter(String.valueOf(openChapter));
+    MatchSetup.getInstance().setTargetLevel(level);
     MatchSetup.getInstance().setDifficultyLevel(user.getDifficultyLevel());
 
-    if (!MatchLauncher.skipsPlantSelection(openChapter, user.getProgress().getCurrentLevel())) {
+    if (!MatchLauncher.skipsPlantSelection(openChapter, level)) {
       go(new PlantSelectionScreen(game, openChapter));
       return;
     }

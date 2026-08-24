@@ -388,7 +388,7 @@ public class Board {
       for (Zombie zombie : zombies) {
         if (zombie.getRow() == p.getYCoordinate()
                 && Math.abs(zombie.getX() - p.getXCoordinate()) < 0.5) {
-          p.hitZombie(zombie);
+          p.hitArea(zombies, zombie);
           if (zombiesResistIce) {
             // غارهای یخی: تیر یخی گیاهان این زامبی‌ها را یخ نمی‌زند
             zombie.extinguishFrozenStatus();
@@ -439,6 +439,10 @@ public class Board {
   }
   // طبق داک، یخِ روی گیاه باید با تیر گیاهان شکسته شود و تیر آتشین آن را فورا آب می‌کند
   private boolean breaksIceBlock(Projectile p) {
+    if (p.isLobbed()) {
+      // تیر کمانی از روی گیاه یخ‌زده رد می‌شود، مثل بقیه‌ی موانع
+      return false;
+    }
     Plant iced = getPlantAt(Math.round(p.getYCoordinate()), p.getXCoordinate());
     if (iced == null || iced.getIceHealth() <= 0) {
       return false;

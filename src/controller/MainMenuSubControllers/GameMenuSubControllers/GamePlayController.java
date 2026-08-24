@@ -5,20 +5,16 @@ import data.GameDataManager;
 import data.persistence.UserManager;
 import java.util.List;
 import java.util.regex.Matcher;
-import model.account.AdventureMap;
-import model.account.Progress;
 import model.account.User;
 import model.core.App;
 import model.core.GameManager;
 import model.core.GameSession;
+import model.core.MatchCompletion;
 import model.core.MatchSetup;
 import model.enums.Commands.GamePlayMenuCommands;
 import model.enums.Commands.MenuCommands;
 import model.enums.Menu;
-import model.enums.ScoreEvent;
 import model.game.Board;
-import model.game.Lawnmower;
-import model.game.MatchResult;
 import model.game.Tile;
 import model.game.plant.Plant;
 import model.game.plant.Factory.PlantFactory;
@@ -408,121 +404,11 @@ public class GamePlayController implements BaseController {
     }
   }
   private void finishMatch(GameManager gm) {
-    MatchResult result = gm.getMatchResult();
-
-    if (result.isWon() && allLawnmowersUnused(gm)) {
-      gm.registerCombatEvent(ScoreEvent.WAVE_CLEARED_NO_LOSS);
-    }
-
-    // پیام برد/باخت را خود GameManager.endGame چاپ می‌کند؛ اینجا فقط پیام مخصوص بازی امتیازی
-    if (gm.isBonusMatch()) {
-      System.out.println(
-              "Game Bonus finished! MyoPoints earned this run: " + gm.getScoreManager().getCurrentMatchScore());
-    }
-
-    applyProgression(gm, result);
-
+    // پیام برد/باخت را خود GameManager.endGame چاپ می‌کند
+    MatchCompletion.apply(gm);
     Menu back = GameSession.getReturnMenu();
     GameSession.end();
     App.setCurrentMenu(back);
-  }
-
-  private boolean allLawnmowersUnused(GameManager gm) {
-    for (Lawnmower lawnmower : gm.getBoard().getLawnmowers()) {
-      if (!lawnmower.isActive()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private void applyProgression(GameManager gm, MatchResult result) {
-    User user = UserManager.getInstance().getCurrentUser();
-    if (user == null) {
-      return;
-    }
-
-    gm.getScoreManager().applyScoresToUser(user);
-
-    if (gm.isBonusMatch()) {
-      saveUserState();
-      return;
-    }
-
-    user.addMatchResult(result);
-    user.updateDifficultyWinStreak(result.isWon());
-    gm.getMatchContext().setMatchWon(result.isWon());
-    user.evaluateContextualQuests(gm.getMatchContext());
-
-    for (model.game.reward.Reward earned : result.getEarnedRewards()) {
-      earned.apply(user);
-    }
-
-    model.enums.MiniGameType miniGame = MatchSetup.getInstance().getCurrentMiniGame();
-    if (miniGame != model.enums.MiniGameType.NONE) {
-      // مینی‌گیم پیشرفت ادونچر رو جلو نمیبره؛ فقط مرحله‌ی خودش ثبت میشه
-      if (result.isWon()) {
-        System.out.println("You cleared " + miniGame + " (Level "
-                + MatchSetup.getInstance().getMiniGameLevel() + ")!");
-        model.core.MiniGameLauncher.awardClear(
-                user, miniGame, MatchSetup.getInstance().getMiniGameLevel());
-      }
-      saveUserState();
-      return;
-    }
-
-    if (result.isWon()) {
-      Progress progress = user.getProgress();
-      model.Result reward =
-              AdventureMap.getLevelReward(progress.getCurrentStage(), progress.getCurrentLevel());
-      grantLevelReward(user, reward);
-      System.out.println(progress.advanceAdventure().message());
-      user.unlockItem("stage_" + progress.getCurrentStage());
-      user.triggerQuestEvent("STAGE_CLEAR", 1);
-    }
-
-    saveUserState();
-  }
-
-  /**
-   * جایزه‌ی مرحله را می‌دهد. اگر جایزه‌ی از پیش تعیین‌شده گیاهی باشد که بازیکن همین الان دارد،
-   * به جایش اولین گیاه قفل‌بودهٔ بازی داده می‌شود تا جایزه همیشه چیز جدیدی باشد.
-   */
-  private void grantLevelReward(User user, model.Result reward) {
-    String unlockId = reward.success() && reward.getObject() instanceof String id ? id : null;
-
-    if (unlockId != null && unlockId.contains("trophy")) {
-      System.out.println(reward.message());
-      return;
-    }
-
-    if (unlockId == null || user.hasUnlockedPlant(unlockId)) {
-      unlockId = firstLockedPlant(user);
-    }
-
-    if (unlockId == null) {
-      System.out.println("You already own every plant in the game!");
-      return;
-    }
-
-    model.Result unlocked = user.unlockPlant(unlockId);
-    System.out.println("Reward Unlocked: " + unlockId + "!");
-    if (!unlocked.success()) {
-      System.out.println(unlocked.message());
-    }
-  }
-
-  /** اولین گیاهی که بازیکن هنوز باز نکرده (ترتیب فایل plants.json = ترتیب پیشرفت). */
-  private String firstLockedPlant(User user) {
-    if (GameDataManager.plantRepository == null) {
-      return null;
-    }
-    for (PlantTemplate template : GameDataManager.plantRepository.getAll()) {
-      if (template.name != null && !user.hasUnlockedPlant(template.name)) {
-        return template.name.toLowerCase();
-      }
-    }
-    return null;
   }
 
   private void saveUserState() {
