@@ -54,6 +54,7 @@ public class LobAction implements PlantAction {
           Projectile.ProjectileEffect effect) {
     return new Projectile(damage, LOB_SPEED, plant.getCol(), plant.getRow(), effect,
             false, true, false)
+            .firedBy(plant.getName())
             .aimedAt(target.getX());
   }
 

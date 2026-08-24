@@ -9,8 +9,10 @@ import com.badlogic.gdx.utils.NumberUtils;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -101,6 +103,24 @@ public final class EntityAnimation {
       }
     }
     return best;
+  }
+
+  /**
+   * Every part name in this rig, for a caller that wants to build a visibility map.
+   *
+   * <p>Armour, butter and ink are authored as parts of the body rig rather than as separate
+   * entities, and {@link Part#isOptional} hides them by default. A caller that knows a zombie is
+   * still wearing its cone needs the rig's own name for that cone to switch it back on, and the
+   * names differ between rigs, so they are read off the rig instead of being listed anywhere.
+   */
+  public Set<String> partNames() {
+    Set<String> names = new LinkedHashSet<>();
+    for (Part part : parts) {
+      if (part.name != null && !part.name.isEmpty()) {
+        names.add(part.name);
+      }
+    }
+    return names;
   }
 
   /** Height of the drawn art in PAM units, for sizing the sprite against a lane. */

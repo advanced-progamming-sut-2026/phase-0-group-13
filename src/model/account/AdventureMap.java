@@ -31,13 +31,21 @@ public class AdventureMap {
     return new Result(false, "No specific plant reward for this level.", null);
   }
 
+  /**
+   * The season a chapter is set in. This used to answer "DAY"/"NIGHT" for the first two stages and
+   * null for the rest, which was left over from before the map became four seasons; it now matches
+   * the stage-to-season mapping MatchLauncher and the adventure screen already use.
+   */
   public static String getEnvironmentForStage(int stage) {
-    // کامل نیست
     switch (stage) {
       case 1:
-        return "DAY";
+        return "ANCIENT_EGYPT";
       case 2:
-        return "NIGHT";
+        return "FROSTBITE_CAVES";
+      case 3:
+        return "BIG_WAVE_BEACH";
+      case 4:
+        return "DARK_AGES";
       default:
         return null;
     }

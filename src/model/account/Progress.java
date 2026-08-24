@@ -21,11 +21,19 @@ public class Progress {
   private int maxClearedStage;
   private int maxClearedLevel;
 
+  /**
+   * True once {@code MAX_STAGES}-{@code LEVELS_PER_STAGE} (4-4) has been cleared. The map has no
+   * stage 5 to move on to, so instead of walking past the end the cursor stays on the last level
+   * and this flag records that the adventure is finished.
+   */
+  private boolean adventureCompleted;
+
   public Progress() {
     this.currentStage = 1;
     this.currentLevel = 1;
     this.maxClearedStage = 0;
     this.maxClearedLevel = 0;
+    this.adventureCompleted = false;
     this.miniGamesUnlocked = false;
     this.survivalModeUnlocked = false;
     this.unlockedMiniGames = new HashSet<>();
@@ -72,6 +80,16 @@ public class Progress {
   }
 
   public Result advanceAdventure() {
+    normalize();
+    if (this.adventureCompleted) {
+      return new Result(
+          true,
+          String.format(
+              "The adventure is already complete -- %d-%d was the final level.",
+              AdventureMap.MAX_STAGES, AdventureMap.LEVELS_PER_STAGE),
+          this);
+    }
+
     if (this.currentStage > this.maxClearedStage
         || (this.currentStage == this.maxClearedStage
             && this.currentLevel > this.maxClearedLevel)) {
@@ -84,9 +102,19 @@ public class Progress {
 
     if (this.currentLevel < AdventureMap.LEVELS_PER_STAGE) {
       this.currentLevel++;
-    } else {
+    } else if (this.currentStage < AdventureMap.MAX_STAGES) {
       this.currentStage++;
       this.currentLevel = 1;
+    } else {
+      // 4-4 is the last level on the map. There is no stage 5 to walk into, so the cursor stays
+      // where it is and the adventure is marked finished instead.
+      this.adventureCompleted = true;
+      return new Result(
+          true,
+          String.format(
+              "Adventure complete! %d-%d was the final level -- every chapter is cleared.",
+              previousStage, previousLevel),
+          this);
     }
 
     String unlockMessage = "";
@@ -126,7 +154,16 @@ public class Progress {
   }
 
   public boolean isLevelAccessible(int stage, int level) {
-    if (stage < 1 || level < 1 || level > AdventureMap.LEVELS_PER_STAGE) return false;
+    if (stage < 1
+        || stage > AdventureMap.MAX_STAGES
+        || level < 1
+        || level > AdventureMap.LEVELS_PER_STAGE) {
+      return false;
+    }
+    normalize();
+
+    // Once the map is finished every level stays open for replay.
+    if (this.adventureCompleted) return true;
 
     if (stage < this.currentStage) return true;
 
@@ -142,11 +179,52 @@ public class Progress {
   }
 
   public int getCurrentStage() {
+    normalize();
     return currentStage;
   }
 
   public int getCurrentLevel() {
+    normalize();
     return currentLevel;
+  }
+
+  /** True once 4-4 has been cleared: the map is finished and there is nothing left to unlock. */
+  public boolean isAdventureCompleted() {
+    normalize();
+    return adventureCompleted;
+  }
+
+  /**
+   * Pulls the cursor back inside the 4x4 map.
+   *
+   * <p>Gson builds this object field-by-field without running the constructor, so a save written
+   * by an older build -- when the map was 5 stages of 10 levels, and when clearing the last level
+   * still incremented the stage -- can arrive holding a stage or level that no longer exists.
+   * Rather than let those values reach the menus, they are clamped to the last real level and the
+   * adventure is treated as finished, which is what walking off the end of the map meant.
+   */
+  private void normalize() {
+    if (currentStage < 1) {
+      currentStage = 1;
+    }
+    if (currentLevel < 1) {
+      currentLevel = 1;
+    }
+    if (currentStage > AdventureMap.MAX_STAGES) {
+      currentStage = AdventureMap.MAX_STAGES;
+      currentLevel = AdventureMap.LEVELS_PER_STAGE;
+      adventureCompleted = true;
+    }
+    if (currentLevel > AdventureMap.LEVELS_PER_STAGE) {
+      currentLevel = AdventureMap.LEVELS_PER_STAGE;
+    }
+    if (maxClearedStage > AdventureMap.MAX_STAGES) {
+      maxClearedStage = AdventureMap.MAX_STAGES;
+      maxClearedLevel = AdventureMap.LEVELS_PER_STAGE;
+    }
+    if (maxClearedLevel > AdventureMap.LEVELS_PER_STAGE) {
+      maxClearedLevel = AdventureMap.LEVELS_PER_STAGE;
+    }
   }
 
   public boolean isMiniGamesUnlocked() {
@@ -169,10 +247,18 @@ public class Progress {
     return maxClearedLevel;
   }
 
+  /**
+   * Moves the cursor to a level that exists on the map. Anything outside the 4x4 grid is refused
+   * rather than clamped, so a bad call cannot silently send the player somewhere else.
+   */
   public void setAdventureProgress(int stage, int level) {
-    if (stage > 0 && level > 0 && level <= 10) {
+    if (stage >= 1
+        && stage <= AdventureMap.MAX_STAGES
+        && level >= 1
+        && level <= AdventureMap.LEVELS_PER_STAGE) {
       this.currentStage = stage;
       this.currentLevel = level;
+      this.adventureCompleted = false;
     }
   }
 }

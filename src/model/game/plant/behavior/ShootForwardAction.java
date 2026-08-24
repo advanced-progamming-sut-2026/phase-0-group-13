@@ -69,6 +69,7 @@ public class ShootForwardAction implements PlantAction {
         for (int shot = Math.max(1, plant.getStackCount()); shot > 0; shot--) {
           Projectile projectile =
                   new Projectile(damage, 0.5, plant.getCol(), row, effect, piercing, false, false);
+          projectile.firedBy(plant.getName());
           projectile.withPierceLimit(pierceLimit);
           projectile.setDirection(direction[0], direction[1]);
           if (ricochetLifeTicks > 0) {

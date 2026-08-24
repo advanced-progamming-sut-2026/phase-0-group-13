@@ -6,6 +6,7 @@ import model.enums.PlantTag;
 import model.enums.StatusEffect;
 import model.game.Board;
 import model.game.GameState;
+import model.enums.ZombieType;
 import model.game.Tile;
 import model.game.TileEffects.IceTrailEffect;
 import model.game.plant.Plant;
@@ -37,7 +38,8 @@ public class FrostbiteCavesSeason extends Season {
 
   @Override
   public List<Zombie> getAvailableZombies() {
-    return zombiesByAliasKeyword("iceage");
+    // Frostbite Caves: Dodo Rider, Hunter, Troglobite
+    return rosterOf(ZombieType.DODO_RIDER, ZombieType.HUNTER, ZombieType.TROGLOBITE);
   }
 
   @Override

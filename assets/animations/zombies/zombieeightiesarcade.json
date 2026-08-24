@@ -1,0 +1,23 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "die": 3.5,
+        "eat": 8.4667,
+        "idle": 3.3333,
+        "particles": 0.0333,
+        "push": 4.0333,
+        "walk": 4.0333
+      },
+      "name": "ZOMBIE_80S_ARCADE",
+      "pam": "768/FULL/ZOMBIE/ZOMBIE_80S_ARCADE/ZOMBIE_80S_ARCADE.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombieeightiesarcade.atlas",
+  "entity": "ZombieEightiesArcade",
+  "source_folder": "images/768/.../zombie_80s_arcade"
+}

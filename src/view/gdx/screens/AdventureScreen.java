@@ -207,6 +207,11 @@ public final class AdventureScreen extends MenuScreen {
 
   /** Levels of this chapter the player has already cleared. */
   private int clearedLevels(Progress progress, int stage) {
+    // The cursor stops on 4-4 rather than running off the map, so once the adventure is finished
+    // "levels cleared" has to come from the flag or the last chapter would read 3 / 4 forever.
+    if (progress.isAdventureCompleted()) {
+      return AdventureMap.LEVELS_PER_STAGE;
+    }
     if (stage < progress.getCurrentStage()) {
       return AdventureMap.LEVELS_PER_STAGE;
     }

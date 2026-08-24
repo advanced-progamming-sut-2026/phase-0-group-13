@@ -54,64 +54,98 @@ public abstract class Season {
   // این را override می‌کنند تا زامبی‌های تازه‌وارد را همان لحظهٔ ورود جابه‌جا کنند
   public void onFinalWaveTick(model.game.Board board, int currentTick) {}
 
-  // چون Zombies.json فیلد جدا برای فصل/چپتر نداره، از روی alias خام زامبی‌ها فیلتر میکنیم (مثلا
-  // "ZombieEgyptImpDefault" یا "ZombieIceAgeDodo")؛ همون قراردادی که ZombieTypeResolver هم برای
-  // تشخیص نوع زامبی از روی اسم استفاده میکنه
-  protected List<Zombie> zombiesByAliasKeyword(String... keywords) {
+  /**
+   * The zombies the spec lists under "common between all chapters" -- every chapter draws from
+   * these on top of its own. Kept as types rather than aliases because the type is what the spec
+   * names and what {@link ZombieFactory} gives a behaviour to; the alias is just how one
+   * particular art set happens to be filed.
+   */
+  protected static final ZombieType[] COMMON_ZOMBIES = {
+    ZombieType.NORMAL,
+    ZombieType.CONEHEAD,
+    ZombieType.BUCKETHEAD,
+    ZombieType.KNIGHT,
+    ZombieType.BLOCKHEAD,
+    ZombieType.GARGANTUAR,
+    ZombieType.IMP,
+    ZombieType.FOOTBALLER,
+    ZombieType.ARCADE,
+    ZombieType.PARASOL,
+    ZombieType.TURQUOISE,
+    ZombieType.PROSPECTOR,
+    ZombieType.PIANIST,
+    ZombieType.NEWSPAPER,
+    ZombieType.BARREL_ROLLER,
+  };
+
+  /**
+   * This chapter's spawn pool: the common zombies plus the ones only it gets.
+   *
+   * <p>This used to filter Zombies.json by a keyword in the raw alias ("iceage", "beach", ...).
+   * That read the art's world token rather than the roster, so a chapter got whichever zombies
+   * upstream happened to file under its world name: Frostbite Caves and Big Wave Beach ended up
+   * with three zombies each and no basic walker at all, while All-Star, Arcade, Newspaper,
+   * Prospector and Parasol never spawned anywhere. The roster is now stated outright, from the
+   * spec's own two lists, so what a chapter spawns no longer depends on how the art is filed.
+   */
+  protected List<Zombie> rosterOf(ZombieType... seasonOnly) {
     List<Zombie> result = new ArrayList<>();
     if (GameDataManager.zombieRepository == null) {
       return result;
     }
 
+    List<ZombieType> wanted = new ArrayList<>(List.of(COMMON_ZOMBIES));
+    for (ZombieType type : seasonOnly) {
+      if (!wanted.contains(type)) {
+        wanted.add(type);
+      }
+    }
+
     ZombieFactory factory = new ZombieFactory(GameDataManager.zombieRepository);
-    for (ZombieTemplate template : GameDataManager.zombieRepository.getAll()) {
-      String alias = template.getName();
-      if (alias == null || isBossTier(template)) {
+    for (ZombieType type : wanted) {
+      ZombieTemplate template = templateFor(type);
+      if (template == null) {
+        // The roster asks for something Zombies.json has no sheet for. Say so rather than
+        // quietly shipping a chapter that is short a zombie.
+        System.err.printf("Season %s: no zombie template resolves to %s%n", name, type);
         continue;
       }
-      for (String keyword : keywords) {
-        if (matchesAliasSegment(alias, keyword)) {
-          Zombie zombie = factory.createZombie(template.getName(), 0, 9.0);
-          if (zombie != null) {
-            result.add(zombie);
-          }
-          break;
-        }
+      Zombie zombie = factory.createZombie(template.getName(), 0, 9.0);
+      if (zombie != null) {
+        result.add(zombie);
       }
     }
     return result;
   }
 
+  /**
+   * The sheet that stands for a type. First match in file order wins, which matters for NORMAL:
+   * several sheets fall through {@link ZombieTypeResolver} to it, and the plain mummy is the one
+   * listed first and the one with art.
+   */
+  private static ZombieTemplate templateFor(ZombieType type) {
+    for (ZombieTemplate template : GameDataManager.zombieRepository.getAll()) {
+      String alias = template.getName();
+      // GridItem* entries share the file with the zombies but are scenery, not spawnables
+      if (alias == null || !alias.startsWith("Zombie") || isBossTier(template)) {
+        continue;
+      }
+      if (ZombieTypeResolver.resolve(template) == type) {
+        return template;
+      }
+    }
+    return null;
+  }
+
   // باس‌ها (Zomboss) با اینکه ممکنه اسمشون با کلیدواژه فصل مطابقت داشته باشه (مثلا
   // "ZombieZombossMechEgypt" با "egypt")، نباید تو استخر موج‌های معمولی قرار بگیرن؛ اونا مخصوص یه
   // مرحله باس‌فایت جدا هستن، نه اسپاون رندوم وسط یه موج عادی
-  private boolean isBossTier(ZombieTemplate template) {
+  private static boolean isBossTier(ZombieTemplate template) {
     ZombieType type = ZombieTypeResolver.resolve(template);
     return type == ZombieType.ZOMBOSS_EGYPT
             || type == ZombieType.ZOMBOSS_PIRATE
             || type == ZombieType.ZOMBOSS_COWBOY
             || type == ZombieType.ZOMBOSS_DARK;
-  }
-
-  private boolean matchesAliasSegment(String alias, String keyword) {
-    String lower = alias.toLowerCase();
-    String keywordLower = keyword.toLowerCase();
-    int idx = 0;
-    while ((idx = lower.indexOf(keywordLower, idx)) != -1) {
-      boolean startsOnBoundary =
-              idx == 0 || Character.isUpperCase(alias.charAt(idx)) || !Character.isLetter(alias.charAt(idx - 1));
-      int endIdx = idx + keywordLower.length();
-      boolean endsOnBoundary =
-              endIdx == alias.length()
-                      || Character.isUpperCase(alias.charAt(endIdx))
-                      || !Character.isLetter(alias.charAt(endIdx));
-
-      if (startsOnBoundary && endsOnBoundary) {
-        return true;
-      }
-      idx++;
-    }
-    return false;
   }
 
   // فعلا فقط یه شبکه‌ی صاف از خونه‌های معمولی میسازه؛ چون Board الان خودش تایل‌هاش رو مستقل میسازه

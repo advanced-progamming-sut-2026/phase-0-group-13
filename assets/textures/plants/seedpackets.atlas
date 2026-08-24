@@ -199,6 +199,13 @@ iceshroom
   orig: 76, 67
   offset: 0, 0
   index: -1
+iceberglettuce
+  rotate: false
+  xy: 1, 997
+  size: 71, 68
+  orig: 71, 68
+  offset: 0, 0
+  index: -1
 imitater
   rotate: false
   xy: 82, 892
