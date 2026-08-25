@@ -69,6 +69,8 @@ public final class MainMenuScreen extends MenuScreen {
     Table shortcuts2 = new Table();
     shortcuts2.defaults().pad(6f).width(190f).height(64f);
     shortcuts2.add(gated("Travel Log", () -> go(new QuestScreen(game)), loggedIn));
+    // The doc asks for the leaderboard to be reachable from the main menu.
+    shortcuts2.add(gated("Leaderboard", () -> go(new LeaderboardScreen(game)), loggedIn));
     shortcuts2.add(gated("Profile", () -> go(new ProfileScreen(game)), loggedIn));
     shortcuts2.add(gated("Settings", () -> go(new SettingsScreen(game)), loggedIn));
     menu.add(shortcuts2).row();

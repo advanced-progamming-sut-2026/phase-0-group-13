@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Set;
 import model.game.Board;
 import model.game.GameState;
+import model.enums.ZombieType;
 import model.game.Tile;
 import model.game.zombie.Zombie;
 
@@ -83,7 +84,8 @@ public class AncientEgyptSeason extends Season {
 
   @Override
   public List<Zombie> getAvailableZombies() {
-    return zombiesByAliasKeyword("egypt", "mummy", "ra", "tombraiser");
+    // Ancient Egypt: Ra, Explorer, Tomb Raiser
+    return rosterOf(ZombieType.RA, ZombieType.EXPLORER, ZombieType.TOMBRAISER);
   }
 
   @Override

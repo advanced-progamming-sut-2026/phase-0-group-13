@@ -395,6 +395,19 @@
         "ATLASIMAGE_ATLAS_PLANTICESHROOM_768_00"
       ]
     },
+    "Iceberg Lettuce": {
+      "animation_data": "animations/plants/iceberglettuce.json",
+      "atlas": "iceberglettuce.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "planticeburg_768_00.png"
+      ],
+      "regions": 38,
+      "source_folder": "images/768/.../iceburg",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTICEBURG_768_00"
+      ]
+    },
     "Imitater": {
       "animation_data": "animations/plants/imitater.json",
       "atlas": "imitater.atlas",
@@ -419,6 +432,19 @@
       "source_folder": "images/768/.../jalapeno",
       "source_pages": [
         "ATLASIMAGE_ATLAS_PLANTJALAPENO_768_00"
+      ]
+    },
+    "Kernel-pult": {
+      "animation_data": "animations/plants/kernelpult.json",
+      "atlas": "kernelpult.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantkernelpult_768_00.png"
+      ],
+      "regions": 29,
+      "source_folder": "images/768/.../kernalpult",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTKERNELPULT_768_00"
       ]
     },
     "Kiwibeast": {
@@ -458,6 +484,19 @@
       "source_folder": "images/768/.../magnetshroom",
       "source_pages": [
         "ATLASIMAGE_ATLAS_PLANTMAGNETSHROOM_768_00"
+      ]
+    },
+    "Mega Gatling Pea": {
+      "animation_data": "animations/plants/megagatlingpea.json",
+      "atlas": "megagatlingpea.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantmegagatling_768_00.png"
+      ],
+      "regions": 43,
+      "source_folder": "images/768/.../megagatling",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTMEGAGATLING_768_00"
       ]
     },
     "Melon-pult": {
@@ -510,6 +549,19 @@
       "source_folder": "images/768/.../pepperpult",
       "source_pages": [
         "ATLASIMAGE_ATLAS_PLANTPEPPERPULT_768_00"
+      ]
+    },
+    "Phat Beet": {
+      "animation_data": "animations/plants/phatbeet.json",
+      "atlas": "phatbeet.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantphatbeet_768_00.png"
+      ],
+      "regions": 21,
+      "source_folder": "images/768/.../phatbeets",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTPHATBEET_768_00"
       ]
     },
     "Potato Mine": {
@@ -588,6 +640,19 @@
       "source_folder": "images/768/.../repeater",
       "source_pages": [
         "ATLASIMAGE_ATLAS_PLANTREPEATER_768_00"
+      ]
+    },
+    "Rotobaga": {
+      "animation_data": "animations/plants/rotobaga.json",
+      "atlas": "rotobaga.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantxshot_768_00.png"
+      ],
+      "regions": 44,
+      "source_folder": "images/768/.../rotorutabaga",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTXSHOT_768_00"
       ]
     },
     "Sea-shroom": {
@@ -759,6 +824,19 @@
         "ATLASIMAGE_ATLAS_PLANTTORCHWOOD_768_00"
       ]
     },
+    "Twin Sunflower": {
+      "animation_data": "animations/plants/twinsunflower.json",
+      "atlas": "twinsunflower.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "planttwinsunflower_768_00.png"
+      ],
+      "regions": 26,
+      "source_folder": "images/768/.../sunflower_twin",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTTWINSUNFLOWER_768_00"
+      ]
+    },
     "Wall-nut": {
       "animation_data": "animations/plants/wallnut.json",
       "atlas": "wallnut.atlas",
@@ -803,83 +881,13 @@
   "source": "resources/raw/pvz2/RESOURCES.json",
   "unresolved": [
     {
-      "entity": "ZombieBeachSnorkel",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieBeachSnorkelProps",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieCrystalSkullDefault",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieCrystalSkullProps",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieDarkArmor3Default",
-      "reason": "no 768 art folder matches the alias or the objclass ZombiePropertySheet",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieDarkBarrelRollerDefault",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieBarrelRollerPropertySheet",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieDarkJugglerDefault",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieDarkJugglerProps",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieDarkTurquoiseDefault",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieTurquoisePropertySheet",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieEightiesArcade",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieEightiesArcadeProps",
-      "roster": "Zombies.json"
-    },
-    {
       "entity": "ZombieEightiesArcadePushAction",
       "reason": "no 768 art folder matches the alias or the objclass ZombiePushGridItemActionDefinition",
       "roster": "Zombies.json"
     },
     {
-      "entity": "ZombieIceAgeDodo",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieIceAgeDodoProps",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieMummyArmor1Default",
-      "reason": "no 768 art folder matches the alias or the objclass ZombiePropertySheet",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieMummyArmor2Default",
-      "reason": "no 768 art folder matches the alias or the objclass ZombiePropertySheet",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieMummyArmor4Default",
-      "reason": "no 768 art folder matches the alias or the objclass ZombiePropertySheet",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieMummyDefault",
-      "reason": "no 768 art folder matches the alias or the objclass ZombiePropertySheet",
-      "roster": "Zombies.json"
-    },
-    {
       "entity": "ZombiePetDefault",
       "reason": "no 768 art folder matches the alias or the objclass ZombiePropertySheet",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieRaDefault",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieRaProps",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieTombRaiserDefault",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieTombRaiserProps",
       "roster": "Zombies.json"
     },
     {
@@ -1008,26 +1016,6 @@
       "roster": "plants.json"
     },
     {
-      "entity": "Iceberg Lettuce",
-      "reason": "no 768 art folder whose name normalises to iceberglettuce",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "Kernel-pult",
-      "reason": "no 768 art folder whose name normalises to kernelpult",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "Mega Gatling Pea",
-      "reason": "no 768 art folder whose name normalises to megagatlingpea",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "Phat Beet",
-      "reason": "no 768 art folder whose name normalises to phatbeet",
-      "roster": "plants.json"
-    },
-    {
       "entity": "Pierce-mint",
       "reason": "no 768 art folder whose name normalises to piercemint",
       "roster": "plants.json"
@@ -1035,16 +1023,6 @@
     {
       "entity": "Reinforce-mint",
       "reason": "no 768 art folder whose name normalises to reinforcemint",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "Rotobaga",
-      "reason": "no 768 art folder whose name normalises to rotobaga",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "Twin Sunflower",
-      "reason": "no 768 art folder whose name normalises to twinsunflower",
       "roster": "plants.json"
     },
     {
@@ -1080,6 +1058,58 @@
         "ATLASIMAGE_ATLAS_ZOMBIEBEACHOCTOPUSGROUP_768_00"
       ]
     },
+    "ZombieBeachSnorkel": {
+      "animation_data": "animations/zombies/zombiebeachsnorkel.json",
+      "atlas": "zombiebeachsnorkel.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombiebeachsnorkelgroup_768_00.png"
+      ],
+      "regions": 42,
+      "source_folder": "images/768/.../zombie_beach_snorkeler",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEBEACHSNORKELGROUP_768_00"
+      ]
+    },
+    "ZombieCrystalSkullDefault": {
+      "animation_data": "animations/zombies/zombiecrystalskulldefault.json",
+      "atlas": "zombiecrystalskulldefault.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombielostcitycrystalskullgroup_768_00.png"
+      ],
+      "regions": 49,
+      "source_folder": "images/768/.../zombie_lostcity_crystalskull",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIELOSTCITYCRYSTALSKULLGROUP_768_00"
+      ]
+    },
+    "ZombieDarkArmor3Default": {
+      "animation_data": "animations/zombies/zombiedarkarmor3default.json",
+      "atlas": "zombiedarkarmor3default.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombiedarkbasicgroup_768_00.png"
+      ],
+      "regions": 49,
+      "source_folder": "images/768/.../zombie_dark_basic",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEDARKBASICGROUP_768_00"
+      ]
+    },
+    "ZombieDarkBarrelRollerDefault": {
+      "animation_data": "animations/zombies/zombiedarkbarrelrollerdefault.json",
+      "atlas": "zombiedarkbarrelrollerdefault.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombiepiratebarrelpushergroup_768_00.png"
+      ],
+      "regions": 35,
+      "source_folder": "images/768/.../zombie_pirate_barrel_pusher",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEPIRATEBARRELPUSHERGROUP_768_00"
+      ]
+    },
     "ZombieDarkImpDragonDefault": {
       "animation_data": "animations/zombies/zombiedarkimpdragondefault.json",
       "atlas": "zombiedarkimpdragondefault.atlas",
@@ -1093,6 +1123,19 @@
         "ATLASIMAGE_ATLAS_ZOMBIEDARKIMPDRAGONGROUP_768_00"
       ]
     },
+    "ZombieDarkJugglerDefault": {
+      "animation_data": "animations/zombies/zombiedarkjugglerdefault.json",
+      "atlas": "zombiedarkjugglerdefault.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombiedarkjestergroup_768_00.png"
+      ],
+      "regions": 40,
+      "source_folder": "images/768/.../zombie_dark_jester",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEDARKJESTERGROUP_768_00"
+      ]
+    },
     "ZombieDarkKing": {
       "animation_data": "animations/zombies/zombiedarkking.json",
       "atlas": "zombiedarkking.atlas",
@@ -1104,6 +1147,19 @@
       "source_folder": "images/768/.../zombie_dark_king",
       "source_pages": [
         "ATLASIMAGE_ATLAS_ZOMBIEDARKKINGGROUP_768_00"
+      ]
+    },
+    "ZombieDarkTurquoiseDefault": {
+      "animation_data": "animations/zombies/zombiedarkturquoisedefault.json",
+      "atlas": "zombiedarkturquoisedefault.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombielostcitycrystalskullgroup_768_00.png"
+      ],
+      "regions": 49,
+      "source_folder": "images/768/.../zombie_lostcity_crystalskull",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIELOSTCITYCRYSTALSKULLGROUP_768_00"
       ]
     },
     "ZombieEgyptGargantuar": {
@@ -1132,6 +1188,19 @@
         "ATLASIMAGE_ATLAS_ZOMBIEEGYPTIMPGROUP_768_00"
       ]
     },
+    "ZombieEightiesArcade": {
+      "animation_data": "animations/zombies/zombieeightiesarcade.json",
+      "atlas": "zombieeightiesarcade.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombieeightiesarcadegroup_768_00.png"
+      ],
+      "regions": 35,
+      "source_folder": "images/768/.../zombie_80s_arcade",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEEIGHTIESARCADEGROUP_768_00"
+      ]
+    },
     "ZombieExplorerDefault": {
       "animation_data": "animations/zombies/zombieexplorerdefault.json",
       "atlas": "zombieexplorerdefault.atlas",
@@ -1143,6 +1212,19 @@
       "source_folder": "images/768/.../zombie_explorer",
       "source_pages": [
         "ATLASIMAGE_ATLAS_ZOMBIEEGYPTEXPLORERGROUP_768_00"
+      ]
+    },
+    "ZombieIceAgeDodo": {
+      "animation_data": "animations/zombies/zombieiceagedodo.json",
+      "atlas": "zombieiceagedodo.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombieiceagedodogroup_768_00.png"
+      ],
+      "regions": 72,
+      "source_folder": "images/768/.../zombie_iceage_dodorider",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEICEAGEDODOGROUP_768_00"
       ]
     },
     "ZombieIceAgeHunter": {
@@ -1210,6 +1292,71 @@
         "ATLASIMAGE_ATLAS_ZOMBIEMODERNNEWSPAPERGROUP_768_00"
       ]
     },
+    "ZombieMummyArmor1Default": {
+      "animation_data": "animations/zombies/zombiemummyarmor1default.json",
+      "atlas": "zombiemummyarmor1default.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombieegyptbasicgroup_768_00.png"
+      ],
+      "regions": 36,
+      "source_folder": "images/768/.../zombie_egypt_basic",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEEGYPTBASICGROUP_768_00"
+      ]
+    },
+    "ZombieMummyArmor2Default": {
+      "animation_data": "animations/zombies/zombiemummyarmor2default.json",
+      "atlas": "zombiemummyarmor2default.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombieegyptbasicgroup_768_00.png"
+      ],
+      "regions": 36,
+      "source_folder": "images/768/.../zombie_egypt_basic",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEEGYPTBASICGROUP_768_00"
+      ]
+    },
+    "ZombieMummyArmor4Default": {
+      "animation_data": "animations/zombies/zombiemummyarmor4default.json",
+      "atlas": "zombiemummyarmor4default.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombieegyptbasicgroup_768_00.png"
+      ],
+      "regions": 36,
+      "source_folder": "images/768/.../zombie_egypt_basic",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEEGYPTBASICGROUP_768_00"
+      ]
+    },
+    "ZombieMummyDefault": {
+      "animation_data": "animations/zombies/zombiemummydefault.json",
+      "atlas": "zombiemummydefault.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombieegyptbasicgroup_768_00.png"
+      ],
+      "regions": 36,
+      "source_folder": "images/768/.../zombie_egypt_basic",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEEGYPTBASICGROUP_768_00"
+      ]
+    },
+    "ZombieParasolDefault": {
+      "animation_data": "animations/zombies/zombieparasoldefault.json",
+      "atlas": "zombieparasoldefault.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombiebeachbasicgroup_768_00.png"
+      ],
+      "regions": 38,
+      "source_folder": "images/768/.../zombie_beach_basic",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEBEACHBASICGROUP_768_00"
+      ]
+    },
     "ZombiePianoDefault": {
       "animation_data": "animations/zombies/zombiepianodefault.json",
       "atlas": "zombiepianodefault.atlas",
@@ -1234,6 +1381,32 @@
       "source_folder": "images/768/.../zombie_prospector",
       "source_pages": [
         "ATLASIMAGE_ATLAS_ZOMBIEWESTPROSPECTORGROUP_768_00"
+      ]
+    },
+    "ZombieRaDefault": {
+      "animation_data": "animations/zombies/zombieradefault.json",
+      "atlas": "zombieradefault.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombieegyptragroup_768_00.png"
+      ],
+      "regions": 39,
+      "source_folder": "images/768/.../zombie_egypt_ra",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEEGYPTRAGROUP_768_00"
+      ]
+    },
+    "ZombieTombRaiserDefault": {
+      "animation_data": "animations/zombies/zombietombraiserdefault.json",
+      "atlas": "zombietombraiserdefault.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombieegypttombraisergroup_768_00.png"
+      ],
+      "regions": 30,
+      "source_folder": "images/768/.../zombie_egypt_tombraiser",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEEGYPTTOMBRAISERGROUP_768_00"
       ]
     },
     "ZombieWizardDefault": {

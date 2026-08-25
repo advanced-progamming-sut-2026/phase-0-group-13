@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 import model.game.Board;
 import model.game.GameState;
+import model.enums.ZombieType;
 import model.game.Tile;
 import model.game.TileEffects.TombStoneEffect;
 import model.game.zombie.Zombie;
@@ -34,7 +35,9 @@ public class DarkAgesSeason extends Season {
     // ویزارد تنها زامبی این فصل است که alias اش "Dark" ندارد (ZombieWizardDefault, با objclass
     // ZombieDarkWizardProps)، برای همین اسمش جدا آمده؛ بدون این، طلسم گوسفندکردن گیاه هیچ‌وقت
     // در بازی دیده نمی‌شود
-    return zombiesByAliasKeyword("dark", "piano", "wizard");
+    // Dark Ages: Jester, Wizard, King, Imp Dragon
+    return rosterOf(ZombieType.JUGGLER, ZombieType.WIZARD, ZombieType.KING,
+            ZombieType.IMP_DRAGON);
   }
 
   @Override

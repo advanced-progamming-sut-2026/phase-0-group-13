@@ -37,6 +37,16 @@ public final class Toast {
     show(stage, skin, message, null);
   }
 
+  /**
+   * Same message, further down the screen.
+   *
+   * <p>For a layout whose top strip is already full: the arcade mini-games put their picker where
+   * the default band is, and a refusal drawn behind a row of cards is a refusal nobody reads.
+   */
+  public static void show(Stage stage, Skin skin, String message, float topPadding) {
+    show(stage, skin, message, null, topPadding);
+  }
+
   /** The red in-match warning: a new wave, necromancy, the tide turning. */
   public static void showAlert(Stage stage, Skin skin, String message) {
     show(stage, skin, message, ALERT);
@@ -44,6 +54,11 @@ public final class Toast {
 
   private static void show(
       Stage stage, Skin skin, String message, com.badlogic.gdx.graphics.Color colour) {
+    show(stage, skin, message, colour, TOP_PADDING);
+  }
+
+  private static void show(Stage stage, Skin skin, String message,
+      com.badlogic.gdx.graphics.Color colour, float topPadding) {
     if (stage == null || skin == null || message == null || message.isEmpty()) {
       return;
     }
@@ -58,7 +73,7 @@ public final class Toast {
 
     Table holder = new Table();
     holder.setFillParent(true);
-    holder.top().padTop(TOP_PADDING);
+    holder.top().padTop(topPadding);
     holder.add(label).width(MAX_WIDTH);
     holder.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
     holder.setUserObject(Toast.class);

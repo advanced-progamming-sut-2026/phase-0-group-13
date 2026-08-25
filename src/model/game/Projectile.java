@@ -32,6 +32,7 @@ public class Projectile {
   private int pierceLimit;
   private double splashRadius;
   private int stunTicks;
+  private String sourceName;
   private final double launchX;
   private double targetX;
 
@@ -114,6 +115,25 @@ public class Projectile {
   public Projectile withStun(int ticks) {
     this.stunTicks = Math.max(0, ticks);
     return this;
+  }
+
+  public int getStunTicks() {
+    return stunTicks;
+  }
+
+  /**
+   * نام گیاهی که این تیر را شلیک کرده. روی خود شبیه‌سازی اثری ندارد؛ فقط برای نما است، چون
+   * دو تیر می‌توانند از نظر مدل یکسان باشند و باز هم دو چیز متفاوت باشند: کلم Cabbage-pult و
+   * دانهٔ ذرت Kernel-pult هر دو کمانی، بدون splash و بدون افکت‌اند.
+   */
+  public Projectile firedBy(String plantName) {
+    this.sourceName = plantName;
+    return this;
+  }
+
+  /** گیاه شلیک‌کننده، یا null اگر ثبت نشده باشد. */
+  public String getSourceName() {
+    return sourceName;
   }
 
   /**
@@ -311,6 +331,7 @@ public class Projectile {
     lit.withPierceLimit(pierceLimit);
     lit.withSplash(splashRadius);
     lit.withStun(stunTicks);
+    lit.firedBy(sourceName);
     lit.aimedAt(targetX);
     return lit;
   }

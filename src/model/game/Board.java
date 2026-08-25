@@ -384,6 +384,7 @@ public class Board {
         iterator.remove();
         continue;
       }
+      reaimLob(p);
       boolean hitRegistered = false;
       for (Zombie zombie : zombies) {
         if (zombie.getRow() == p.getYCoordinate()
@@ -412,6 +413,33 @@ public class Board {
       }
     }
   }
+  /**
+   * Keeps a lobbed shot's aim point on the zombie it is actually going to land on.
+   *
+   * <p>{@link Projectile#aimedAt} is view-only -- it does not steer anything, it is the span the
+   * graphical arc is drawn across. It was set once, to where the target stood when the shot left
+   * the plant, but zombies walk towards the plant while the melon is in the air, so the shot met
+   * them a good way short of that point: the arc was still climbing at the moment of impact and
+   * the melon hit a lane above the zombie's head. Re-reading the nearest target each tick makes
+   * the drawn arc come down exactly where the shot lands.
+   */
+  private void reaimLob(Projectile p) {
+    if (!p.isLobbed() || p.isFromZombie()) {
+      return;
+    }
+    int row = Math.round(p.getYCoordinate());
+    double nearest = Double.MAX_VALUE;
+    for (Zombie zombie : zombies) {
+      if (zombie.isDead() || zombie.getRow() != row || zombie.getX() < p.getXCoordinate()) {
+        continue;
+      }
+      nearest = Math.min(nearest, zombie.getX());
+    }
+    if (nearest != Double.MAX_VALUE && nearest > p.getLaunchX()) {
+      p.aimedAt(nearest);
+    }
+  }
+
   private boolean isBlockedByTombstone(Projectile p) {
     // تیرهای کمانی (lobber) طبق داک از روی موانع رد می‌شوند
     if (p.isFromZombie() || p.isLobbed()) {

@@ -5,6 +5,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import model.core.GameManager;
 import model.enums.StatusEffect;
 import model.enums.SunType;
@@ -13,6 +16,7 @@ import model.game.Projectile;
 import model.game.Sun;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
+import model.game.zombie.ZombieParts.Armor;
 import model.game.zombie.behavior.JesterZombieAction;
 import model.game.zombie.behavior.KingAuraZombieAction;
 import model.game.zombie.behavior.ZombossAction;
@@ -47,6 +51,12 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float ZOMBIE_ANIM_UNITS = 150f;
   // Chilled zombies walk at half speed, so their legs have to as well.
   private static final float CHILLED_ANIM_RATE = 0.5f;
+  // Fractions of an armour's health at which the rig's two damaged states take over.
+  private static final float ARMOUR_STAGE_1 = 0.66f;
+  private static final float ARMOUR_STAGE_2 = 0.33f;
+  // How long a shooter holds its attack clip after firing. The model runs at ten ticks a
+  // second, so this is a little under half a second.
+  private static final int PLANT_ATTACK_HOLD_TICKS = 4;
   // How far above its lane a lobbed shot rises at the top of the arc.
   private static final float LOB_ARC_HEIGHT = 0.85f;
   private static final float FREEZE_LEVELS = Plant.MAX_FREEZE_LEVEL;
@@ -74,6 +84,8 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color reflectedPea = new Color(1f, 0.42f, 0.3f, 1f);
   // King's aura pulse and the Juggler's spin both read this; it only ticks in render().
   private float clock;
+  // The match's own tick, for lining a plant's attack clip up with the shot it just fired.
+  private int currentTick;
 
   public EntityRenderer(LawnGeometry geometry) {
     this.geometry = geometry;
@@ -89,6 +101,7 @@ public final class EntityRenderer implements WorldRenderer {
       return;
     }
     Board board = game.getBoard();
+    currentTick = game.getCurrentTick();
     clock += delta;
     drawSprites(context, board, delta);
     drawShapes(context, board);
@@ -188,14 +201,15 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   /**
-   * Draws the plant's own idle cycle, or false if it has no rig and the portrait has to do.
+   * Draws the plant's own cycle, or false if it has no rig and the portrait has to do.
    *
-   * <p>Idle is all a plant needs, the doc calls the rest Polish. Clips are asked for by name, so
-   * adding "attack" or "plantfood" later is a line here and nothing anywhere else.
+   * <p>Idle is all the doc asks of a plant, but a rig that has an attack clip is worth playing
+   * when the plant has just acted: the model already records {@code lastActionTick}, so the swing
+   * or the shot lines up with the projectile leaving instead of the plant bobbing through it.
    */
   private boolean drawPlantAnimation(RenderContext context, Plant plant, float delta) {
     EntityAnimation animation = animations.find(AnimationLibrary.PLANTS, plant.getName());
-    String clip = animation == null ? null : animation.pickClip("idle");
+    String clip = animation == null ? null : plantClip(animation, plant);
     if (clip == null) {
       return false;
     }
@@ -204,6 +218,31 @@ public final class EntityRenderer implements WorldRenderer {
         geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * PLANT_FOOT_INSET,
         scaleFor(animation.width(clip), PLANT_ANIM_UNITS, PLANT_ROW_FILL), false);
     return true;
+  }
+
+  /**
+   * Attack for a moment after the plant acts, idle otherwise.
+   *
+   * <p>"idle" is asked for before "attack" so a plant that has both rests between shots, and
+   * "attack" is the fallback for the handful of rigs with no idle at all: Grave Buster is authored
+   * as attack / attack1 / water because chewing a grave is the only thing it ever does, and asking
+   * only for "idle" left it silently falling back to its seed packet.
+   */
+  private String plantClip(EntityAnimation animation, Plant plant) {
+    if (justActed(plant)) {
+      String attack = animation.pickClip("attack");
+      if (attack != null) {
+        return attack;
+      }
+    }
+    return animation.pickClip("idle", "attack");
+  }
+
+  /** True for {@link #PLANT_ATTACK_HOLD} seconds after the plant's last action tick. */
+  private boolean justActed(Plant plant) {
+    int sinceAction = currentTick - plant.getLastActionTick();
+    return plant.getLastActionTick() > 0 && sinceAction >= 0
+        && sinceAction < PLANT_ATTACK_HOLD_TICKS;
   }
 
   /** Same for a zombie, which unlike a plant has to switch clips as it goes. */
@@ -217,8 +256,80 @@ public final class EntityRenderer implements WorldRenderer {
         playback.advance(zombie, clip, delta * animationRate(zombie)),
         geometry.columnCentreX(onBoard(zombie.getX())),
         geometry.rowToY(zombie.getRow()) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET,
-        zombieAnimationScale(zombie, animation, clip), zombie.isHypnotized());
+        zombieAnimationScale(zombie, animation, clip), zombie.isHypnotized(),
+        armourVisibility(animation, zombie));
     return true;
+  }
+
+  /**
+   * Which armour pieces of the rig to show.
+   *
+   * <p>The walker rigs carry their armour with them: one body, plus a cone, a bucket, a brick, a
+   * crown and shoulder plates parked on the same skeleton and hidden by default. That is why the
+   * cone-head and the plain zombie are one sheet in Zombies.json's art and four rows in its data.
+   * Showing the pieces this zombie is actually wearing is what keeps the four apart on the lawn,
+   * and dropping a piece the moment its {@link Armor} is destroyed is the doc's "armour is visible
+   * while it has health and gone once it does not".
+   *
+   * <p>Returns null -- the rig's authored default, everything optional hidden -- for a zombie
+   * wearing nothing, which is every zombie whose armour is drawn into its own body art.
+   */
+  private static Map<String, Boolean> armourVisibility(EntityAnimation animation, Zombie zombie) {
+    List<Armor> armors = zombie.getArmors();
+    if (armors.isEmpty()) {
+      return null;
+    }
+    Map<String, Boolean> visibility = new HashMap<>();
+    boolean any = false;
+    for (String part : animation.partNames()) {
+      String lower = part.toLowerCase();
+      String group = ArmourParts.groupOf(lower);
+      if (group == null) {
+        continue;
+      }
+      Armor worn = wornArmour(armors, group);
+      // A damage stage only shows at its own wear level, so a bucket dents as it is shot off
+      boolean show = worn != null && stageMatches(lower, worn);
+      visibility.put(part, show);
+      any |= show;
+    }
+    return any ? visibility : null;
+  }
+
+  /** The still-intact armour this zombie wears in that group, or null. */
+  private static Armor wornArmour(List<Armor> armors, String group) {
+    for (Armor armor : armors) {
+      if (armor.isDestroyed() || armor.getType() == null) {
+        continue;
+      }
+      if (group.equals(switch (armor.getType()) {
+        case CONE -> ArmourParts.CONE;
+        case BUCKET -> ArmourParts.BUCKET;
+        case BLOCK -> ArmourParts.BRICK;
+        case HELMET -> ArmourParts.CROWN;
+        case SHOULDER_ARMOR -> ArmourParts.SHOULDER;
+        // newspaper, barrel and piano are drawn into their zombie's own body art
+        default -> "";
+      })) {
+        return armor;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Each armour is authored in three states -- whole, {@code damage_01}, {@code damage_02} -- so
+   * the one on show is chosen by how much of it is left, and only that one.
+   */
+  private static boolean stageMatches(String lowerPartName, Armor armor) {
+    float left = armor.getCurrentHealth() / (float) Math.max(1, armor.getMaxHealth());
+    boolean isStage1 = lowerPartName.contains("damage_01") || lowerPartName.endsWith("damaged1");
+    boolean isStage2 = lowerPartName.contains("damage_02") || lowerPartName.endsWith("damaged2");
+    if (!isStage1 && !isStage2) {
+      // the whole piece, plus the wrapper parts that hold the states together
+      return lowerPartName.contains("states") || left > ARMOUR_STAGE_1;
+    }
+    return isStage1 ? left <= ARMOUR_STAGE_1 && left > ARMOUR_STAGE_2 : left <= ARMOUR_STAGE_2;
   }
 
   /** Null unless this zombie has a rig with a clip worth playing. */
@@ -235,7 +346,9 @@ public final class EntityRenderer implements WorldRenderer {
         return eat;
       }
     }
-    return animation.pickClip("walk", "idle");
+    // "play" is the Pianist: his rig has no walk cycle because the piano-playing loop is how he
+    // travels, so asking only for walk left him standing still while he crossed the lawn.
+    return animation.pickClip("walk", "play", "idle");
   }
 
   /** Frozen holds the pose and chilled halves it, matching what Zombie.move() actually does. */
@@ -422,7 +535,28 @@ public final class EntityRenderer implements WorldRenderer {
             geometry.getCellWidth() * 0.5f, geometry.getCellHeight() * 0.7f);
       }
     }
+    // The same for a plant. Three of them -- Cat-tail, Pierce-mint and catTail-mint -- have
+    // neither a rig nor a seed packet anywhere in the asset library, and drawing nothing at all
+    // meant planting one left an apparently empty tile that still took a seed and still shot.
+    for (Plant plant : board.getPlants()) {
+      if (plant.isDead() || hasPlantArt(plant)) {
+        continue;
+      }
+      shapes.rect(geometry.columnCentreX(plant.getCol()) - geometry.getCellWidth() * 0.22f,
+          geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * 0.16f,
+          geometry.getCellWidth() * 0.44f, geometry.getCellHeight() * 0.56f);
+    }
     shapes.end();
+  }
+
+  /** Whether anything at all is drawn for this plant: its own rig, or failing that its packet. */
+  private boolean hasPlantArt(Plant plant) {
+    if (plant.isCursed() && hudArt.find("sheep") != null) {
+      return true;
+    }
+    EntityAnimation animation = animations.find(AnimationLibrary.PLANTS, plant.getName());
+    return (animation != null && plantClip(animation, plant) != null)
+        || plantArt.find(plant.getName()) != null;
   }
 
   /** Sits just above the sprite, so a tall zombie does not wear its bar on its chest. */

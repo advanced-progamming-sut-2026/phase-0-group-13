@@ -1,0 +1,23 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "idle": 2,
+        "plantfood": 0.5,
+        "plantfood_off": 0.6667,
+        "plantfood_on": 0.5,
+        "special": 1.5,
+        "water": 2
+      },
+      "name": "SUNFLOWER_TWIN",
+      "pam": "768/INITIAL/PLANT/SUNFLOWER_TWIN/SUNFLOWER_TWIN.PAM"
+    }
+  ],
+  "atlas": "textures/plants/twinsunflower.atlas",
+  "entity": "Twin Sunflower",
+  "source_folder": "images/768/.../sunflower_twin"
+}

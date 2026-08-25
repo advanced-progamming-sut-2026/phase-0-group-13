@@ -1,0 +1,26 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "die": 1.8333,
+        "eat": 8.3667,
+        "idle": 2.0333,
+        "particles": 0.0333,
+        "spin": 1.2,
+        "spin_walk": 1.4667,
+        "spindown": 0.5,
+        "spinup": 0.8667,
+        "walk": 2.0333
+      },
+      "name": "ZOMBIE_DARK_JESTER",
+      "pam": "768/FULL/ZOMBIE/ZOMBIE_DARK_JESTER/ZOMBIE_DARK_JESTER.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombiedarkjugglerdefault.atlas",
+  "entity": "ZombieDarkJugglerDefault",
+  "source_folder": "images/768/.../zombie_dark_jester"
+}

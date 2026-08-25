@@ -2,6 +2,7 @@ package model.core;
 
 import data.GameDataManager;
 import data.persistence.UserManager;
+import java.io.IOException;
 import model.account.AdventureMap;
 import model.account.Progress;
 import model.account.User;
@@ -11,6 +12,8 @@ import model.game.Lawnmower;
 import model.game.MatchResult;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.game.reward.Reward;
+import network.client.ClientSession;
+import network.protocol.Payloads;
 
 /**
  * Everything that happens to the account once a match is over: score, quests, level reward and
@@ -45,6 +48,7 @@ public final class MatchCompletion {
     }
     match.getScoreManager().applyScoresToUser(user);
     if (match.isBonusMatch()) {
+      submitBonusScore(match.getScoreManager().getCurrentMatchScore());
       save();
       return;
     }
@@ -83,14 +87,20 @@ public final class MatchCompletion {
   private static void advance(User user, int stage, int level) {
     Progress progress = user.getProgress();
     user.triggerQuestEvent("STAGE_CLEAR", 1);
-    if (stage != progress.getCurrentStage() || level != progress.getCurrentLevel()) {
+    if (progress.isAdventureCompleted()
+            || stage != progress.getCurrentStage()
+            || level != progress.getCurrentLevel()) {
       System.out.printf("Replayed level %d-%d; adventure progress is already past it.%n",
               stage, level);
       return;
     }
     grantLevelReward(user, AdventureMap.getLevelReward(stage, level));
     System.out.println(progress.advanceAdventure().message());
-    user.unlockItem("stage_" + progress.getCurrentStage());
+    // Clearing the last level does not move the cursor on, so there is no new chapter to unlock;
+    // unlocking blindly here is what used to create a "stage_5" that the map has no room for.
+    if (!progress.isAdventureCompleted()) {
+      user.unlockItem("stage_" + progress.getCurrentStage());
+    }
   }
 
   private static boolean allLawnmowersUnused(GameManager match) {
@@ -144,6 +154,29 @@ public final class MatchCompletion {
       }
     }
     return null;
+  }
+
+  /**
+   * Sends a bonus run's My-Point to the server, which is the only thing that ever fills the
+   * leaderboard's My Point column.
+   *
+   * <p>The server keeps the higher of the two, so sending a worse run is harmless and the record
+   * is decided there rather than here. A failure is reported and swallowed: the run itself already
+   * counted towards the account, and losing the connection should not lose the match.
+   */
+  private static void submitBonusScore(int score) {
+    ClientSession session = ClientSession.getInstance();
+    if (!session.isAuthenticated()) {
+      return;
+    }
+    try {
+      Payloads.ScoreResponse response = session.submitScore(score);
+      System.out.println(response.improved()
+              ? "New bonus-game record on the leaderboard: " + response.bestScore()
+              : "Bonus run scored " + score + "; your record is still " + response.bestScore());
+    } catch (IOException e) {
+      System.out.println("could not send the bonus score to the server: " + e.getMessage());
+    }
   }
 
   private static void save() {

@@ -5,6 +5,7 @@ import java.util.List;
 import model.enums.PlantTag;
 import model.game.Board;
 import model.game.GameState;
+import model.enums.ZombieType;
 import model.game.Tile;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
@@ -30,7 +31,8 @@ public class BigWaveBeachSeason extends Season {
 
   @Override
   public List<Zombie> getAvailableZombies() {
-    return zombiesByAliasKeyword("beach");
+    // Big Wave Beach: Fisherman, Snorkel, Octopus
+    return rosterOf(ZombieType.FISHERMAN, ZombieType.SNORKEL, ZombieType.OCTOPUS);
   }
 
   @Override

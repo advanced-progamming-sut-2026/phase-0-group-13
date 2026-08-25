@@ -1,0 +1,278 @@
+zombieegyptragroup_768_00.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+zombie_egypt_ra_100x96
+  rotate: false
+  xy: 1, 1
+  size: 64, 62
+  orig: 64, 62
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_100x96_2
+  rotate: false
+  xy: 67, 1
+  size: 64, 62
+  orig: 64, 62
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_135x8
+  rotate: false
+  xy: 169, 197
+  size: 87, 5
+  orig: 87, 5
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_14x35
+  rotate: false
+  xy: 138, 173
+  size: 9, 23
+  orig: 9, 23
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_17x39
+  rotate: false
+  xy: 78, 204
+  size: 11, 25
+  orig: 11, 25
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_18x38
+  rotate: false
+  xy: 157, 204
+  size: 12, 25
+  orig: 12, 25
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_1x1
+  rotate: false
+  xy: 249, 31
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_20x40
+  rotate: false
+  xy: 63, 204
+  size: 13, 26
+  orig: 13, 26
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_21x50
+  rotate: false
+  xy: 92, 173
+  size: 14, 32
+  orig: 14, 32
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_23x49
+  rotate: false
+  xy: 1, 172
+  size: 15, 32
+  orig: 15, 32
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_24x56
+  rotate: false
+  xy: 151, 165
+  size: 16, 36
+  orig: 16, 36
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_26x46
+  rotate: false
+  xy: 194, 165
+  size: 17, 30
+  orig: 17, 30
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_28x33
+  rotate: false
+  xy: 18, 198
+  size: 18, 21
+  orig: 18, 21
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_30x31
+  rotate: false
+  xy: 136, 203
+  size: 19, 20
+  orig: 19, 20
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_30x37
+  rotate: false
+  xy: 18, 172
+  size: 19, 24
+  orig: 19, 24
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_32x21
+  rotate: false
+  xy: 171, 204
+  size: 21, 14
+  orig: 21, 14
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_34x31
+  rotate: false
+  xy: 39, 183
+  size: 22, 20
+  orig: 22, 20
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_34x47
+  rotate: false
+  xy: 226, 123
+  size: 22, 30
+  orig: 22, 30
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_35x30
+  rotate: false
+  xy: 63, 183
+  size: 23, 19
+  orig: 23, 19
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_36x39
+  rotate: false
+  xy: 169, 165
+  size: 23, 25
+  orig: 23, 25
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_37x48
+  rotate: false
+  xy: 226, 90
+  size: 24, 31
+  orig: 24, 31
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_40x24
+  rotate: false
+  xy: 108, 191
+  size: 26, 16
+  orig: 26, 16
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_43x25
+  rotate: false
+  xy: 108, 173
+  size: 28, 16
+  orig: 28, 16
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_43x25_2
+  rotate: false
+  xy: 213, 178
+  size: 28, 16
+  orig: 28, 16
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_44x33
+  rotate: false
+  xy: 225, 155
+  size: 28, 21
+  orig: 28, 21
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_50x46
+  rotate: false
+  xy: 215, 31
+  size: 32, 30
+  orig: 32, 30
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_52x39
+  rotate: false
+  xy: 215, 63
+  size: 34, 25
+  orig: 34, 25
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_59x144
+  rotate: false
+  xy: 133, 1
+  size: 38, 92
+  orig: 38, 92
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_59x44
+  rotate: false
+  xy: 215, 1
+  size: 38, 28
+  orig: 38, 28
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_62x135
+  rotate: false
+  xy: 173, 1
+  size: 40, 87
+  orig: 40, 87
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_66x35
+  rotate: false
+  xy: 48, 158
+  size: 42, 23
+  orig: 42, 23
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_66x39
+  rotate: false
+  xy: 107, 146
+  size: 42, 25
+  orig: 42, 25
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_67x76
+  rotate: false
+  xy: 123, 95
+  size: 43, 49
+  orig: 43, 49
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_70x72
+  rotate: false
+  xy: 1, 124
+  size: 45, 46
+  orig: 45, 46
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_79x69
+  rotate: false
+  xy: 173, 90
+  size: 51, 44
+  orig: 51, 44
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_86x42
+  rotate: false
+  xy: 168, 136
+  size: 55, 27
+  orig: 55, 27
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_88x50
+  rotate: false
+  xy: 48, 124
+  size: 57, 32
+  orig: 57, 32
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_88x88
+  rotate: false
+  xy: 64, 65
+  size: 57, 57
+  orig: 57, 57
+  offset: 0, 0
+  index: -1
+zombie_egypt_ra_95x89
+  rotate: false
+  xy: 1, 65
+  size: 61, 57
+  orig: 61, 57
+  offset: 0, 0
+  index: -1

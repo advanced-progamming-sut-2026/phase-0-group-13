@@ -1,0 +1,348 @@
+zombiedarkbasicgroup_768_00.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+zombie_dark_basic_102x92
+  rotate: false
+  xy: 437, 67
+  size: 66, 59
+  orig: 66, 59
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_12x12
+  rotate: false
+  xy: 502, 51
+  size: 8, 8
+  orig: 8, 8
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_135x8
+  rotate: false
+  xy: 97, 385
+  size: 87, 5
+  orig: 87, 5
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_14x35
+  rotate: false
+  xy: 502, 1
+  size: 9, 23
+  orig: 9, 23
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_17x40
+  rotate: false
+  xy: 131, 95
+  size: 11, 26
+  orig: 11, 26
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_18x38
+  rotate: false
+  xy: 58, 125
+  size: 12, 25
+  orig: 12, 25
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_21x47
+  rotate: false
+  xy: 113, 152
+  size: 14, 30
+  orig: 14, 30
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_22x49
+  rotate: false
+  xy: 168, 185
+  size: 14, 32
+  orig: 14, 32
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_24x41
+  rotate: false
+  xy: 342, 385
+  size: 16, 26
+  orig: 16, 26
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_24x58
+  rotate: false
+  xy: 329, 134
+  size: 16, 37
+  orig: 16, 37
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_27x35
+  rotate: false
+  xy: 94, 402
+  size: 18, 23
+  orig: 18, 23
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_27x42
+  rotate: false
+  xy: 231, 285
+  size: 18, 27
+  orig: 18, 27
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_28x33
+  rotate: false
+  xy: 484, 421
+  size: 18, 21
+  orig: 18, 21
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_28x39
+  rotate: false
+  xy: 411, 352
+  size: 18, 25
+  orig: 18, 25
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_28x39_2
+  rotate: false
+  xy: 184, 358
+  size: 18, 25
+  orig: 18, 25
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_29x31
+  rotate: false
+  xy: 336, 413
+  size: 19, 20
+  orig: 19, 20
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_29x31_2
+  rotate: false
+  xy: 378, 416
+  size: 19, 20
+  orig: 19, 20
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_29x31_3
+  rotate: false
+  xy: 399, 416
+  size: 19, 20
+  orig: 19, 20
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_30x22
+  rotate: false
+  xy: 283, 57
+  size: 19, 14
+  orig: 19, 14
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_30x37
+  rotate: false
+  xy: 121, 347
+  size: 19, 24
+  orig: 19, 24
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_33x39
+  rotate: false
+  xy: 292, 339
+  size: 21, 25
+  orig: 21, 25
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_34x29
+  rotate: false
+  xy: 215, 395
+  size: 22, 19
+  orig: 22, 19
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_36x39
+  rotate: false
+  xy: 267, 339
+  size: 23, 25
+  orig: 23, 25
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_36x45
+  rotate: false
+  xy: 186, 327
+  size: 23, 29
+  orig: 23, 29
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_37x46
+  rotate: false
+  xy: 409, 73
+  size: 24, 30
+  orig: 24, 30
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_38x24
+  rotate: false
+  xy: 30, 403
+  size: 25, 16
+  orig: 25, 16
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_40x23
+  rotate: false
+  xy: 1, 404
+  size: 26, 15
+  orig: 26, 15
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_42x25
+  rotate: false
+  xy: 31, 385
+  size: 27, 16
+  orig: 27, 16
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_43x25
+  rotate: false
+  xy: 267, 366
+  size: 28, 16
+  orig: 28, 16
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_52x31
+  rotate: false
+  xy: 343, 318
+  size: 34, 20
+  orig: 34, 20
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_62x15
+  rotate: false
+  xy: 97, 373
+  size: 40, 10
+  orig: 40, 10
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_62x84
+  rotate: false
+  xy: 466, 128
+  size: 40, 54
+  orig: 40, 54
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_64x29
+  rotate: false
+  xy: 54, 247
+  size: 41, 19
+  orig: 41, 19
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_6x6
+  rotate: false
+  xy: 505, 89
+  size: 4, 4
+  orig: 4, 4
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_70x71
+  rotate: false
+  xy: 402, 231
+  size: 45, 46
+  orig: 45, 46
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_76x62
+  rotate: false
+  xy: 114, 273
+  size: 49, 40
+  orig: 49, 40
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_79x69
+  rotate: false
+  xy: 296, 183
+  size: 51, 44
+  orig: 51, 44
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_7x7
+  rotate: false
+  xy: 505, 61
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_82x69
+  rotate: false
+  xy: 1, 182
+  size: 53, 44
+  orig: 53, 44
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_83x62
+  rotate: false
+  xy: 252, 229
+  size: 53, 40
+  orig: 53, 40
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_83x73
+  rotate: false
+  xy: 274, 134
+  size: 53, 47
+  orig: 53, 47
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_83x73_2
+  rotate: false
+  xy: 131, 136
+  size: 53, 47
+  orig: 53, 47
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_85x85
+  rotate: false
+  xy: 217, 123
+  size: 55, 55
+  orig: 55, 55
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_85x85_2
+  rotate: false
+  xy: 1, 125
+  size: 55, 55
+  orig: 55, 55
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_87x85
+  rotate: false
+  xy: 351, 73
+  size: 56, 55
+  orig: 56, 55
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_91x54
+  rotate: false
+  xy: 54, 273
+  size: 58, 35
+  orig: 58, 35
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_91x54_2
+  rotate: false
+  xy: 252, 281
+  size: 58, 35
+  orig: 58, 35
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_98x109
+  rotate: false
+  xy: 307, 1
+  size: 63, 70
+  orig: 63, 70
+  offset: 0, 0
+  index: -1
+zombie_dark_basic_98x99
+  rotate: false
+  xy: 437, 1
+  size: 63, 64
+  orig: 63, 64
+  offset: 0, 0
+  index: -1

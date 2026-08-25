@@ -21,8 +21,10 @@ import view.gdx.ui.UiSkinProvider;
  * The mini-game half of the Travel Log, which used to be terminal-only.
  *
  * <p>The unlock and level rules are Progress's, the same ones QuestMenuController checks for
- * "play minigame". The four arcade modes open {@link ArcadeMiniGameScreen}; Zombotany is a normal
- * stage, so {@link MiniGameLauncher} builds it and it plays on GameplayScreen.
+ * "play minigame". Vase Breaker, Bowling and I, Zombie each have their own board screen; Beghouled
+ * is a grid of gems rather than a lawn, so it stays on the shared {@link ArcadeMiniGameScreen};
+ * Zombotany is a normal stage, so {@link MiniGameLauncher} builds it and it plays on
+ * GameplayScreen.
  */
 public final class MiniGamesScreen extends MenuScreen {
 
@@ -107,9 +109,26 @@ public final class MiniGamesScreen extends MenuScreen {
       return;
     }
     MatchSetup.getInstance().setMiniGame(type, level);
-    if (type != MiniGameType.ZOMBOTANY) {
-      go(new ArcadeMiniGameScreen(game, type, level));
-      return;
+    // The three that have a proper board play on their own screen; Beghouled is a grid of
+    // gems with no lawn behind it, so it stays on the shared clickable grid.
+    switch (type) {
+      case VASEBREAKER -> {
+        go(new VasebreakerScreen(game, level));
+        return;
+      }
+      case WALLNUT_BOWLING -> {
+        go(new WallnutBowlingScreen(game, level));
+        return;
+      }
+      case I_ZOMBIE -> {
+        go(new IZombieScreen(game, level));
+        return;
+      }
+      case BEGHOULED -> {
+        go(new ArcadeMiniGameScreen(game, type, level));
+        return;
+      }
+      default -> { }
     }
 
     // Zombotany is an ordinary stage. There is no deck builder on this route, so the seed bank is

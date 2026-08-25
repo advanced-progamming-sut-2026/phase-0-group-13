@@ -1,0 +1,306 @@
+plantmegagatling_768_00.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+megagatling_103x78
+  rotate: false
+  xy: 144, 1
+  size: 66, 50
+  orig: 66, 50
+  offset: 0, 0
+  index: -1
+megagatling_11x11
+  rotate: false
+  xy: 128, 91
+  size: 7, 7
+  orig: 7, 7
+  offset: 0, 0
+  index: -1
+megagatling_121x87
+  rotate: false
+  xy: 1, 1
+  size: 78, 56
+  orig: 78, 56
+  offset: 0, 0
+  index: -1
+megagatling_14x13
+  rotate: false
+  xy: 246, 37
+  size: 9, 9
+  orig: 9, 9
+  offset: 0, 0
+  index: -1
+megagatling_17x7
+  rotate: false
+  xy: 108, 91
+  size: 11, 5
+  orig: 11, 5
+  offset: 0, 0
+  index: -1
+megagatling_18x30
+  rotate: false
+  xy: 170, 160
+  size: 12, 19
+  orig: 12, 19
+  offset: 0, 0
+  index: -1
+megagatling_20x46
+  rotate: false
+  xy: 1, 136
+  size: 13, 30
+  orig: 13, 30
+  offset: 0, 0
+  index: -1
+megagatling_20x46_2
+  rotate: false
+  xy: 16, 136
+  size: 13, 30
+  orig: 13, 30
+  offset: 0, 0
+  index: -1
+megagatling_21x17
+  rotate: false
+  xy: 230, 37
+  size: 14, 11
+  orig: 14, 11
+  offset: 0, 0
+  index: -1
+megagatling_21x24
+  rotate: false
+  xy: 31, 161
+  size: 14, 16
+  orig: 14, 16
+  offset: 0, 0
+  index: -1
+megagatling_22x32
+  rotate: false
+  xy: 224, 152
+  size: 14, 21
+  orig: 14, 21
+  offset: 0, 0
+  index: -1
+megagatling_23x23
+  rotate: false
+  xy: 88, 116
+  size: 15, 15
+  orig: 15, 15
+  offset: 0, 0
+  index: -1
+megagatling_23x31
+  rotate: false
+  xy: 190, 152
+  size: 15, 20
+  orig: 15, 20
+  offset: 0, 0
+  index: -1
+megagatling_23x31_2
+  rotate: false
+  xy: 207, 152
+  size: 15, 20
+  orig: 15, 20
+  offset: 0, 0
+  index: -1
+megagatling_23x43
+  rotate: false
+  xy: 121, 61
+  size: 15, 28
+  orig: 15, 28
+  offset: 0, 0
+  index: -1
+megagatling_24x19
+  rotate: false
+  xy: 212, 37
+  size: 16, 12
+  orig: 16, 12
+  offset: 0, 0
+  index: -1
+megagatling_24x27
+  rotate: false
+  xy: 240, 152
+  size: 16, 18
+  orig: 16, 18
+  offset: 0, 0
+  index: -1
+megagatling_24x33
+  rotate: false
+  xy: 75, 152
+  size: 16, 21
+  orig: 16, 21
+  offset: 0, 0
+  index: -1
+megagatling_25x26
+  rotate: false
+  xy: 152, 153
+  size: 16, 17
+  orig: 16, 17
+  offset: 0, 0
+  index: -1
+megagatling_25x27
+  rotate: false
+  xy: 134, 153
+  size: 16, 18
+  orig: 16, 18
+  offset: 0, 0
+  index: -1
+megagatling_25x31
+  rotate: false
+  xy: 93, 152
+  size: 16, 20
+  orig: 16, 20
+  offset: 0, 0
+  index: -1
+megagatling_26x32
+  rotate: false
+  xy: 171, 137
+  size: 17, 21
+  orig: 17, 21
+  offset: 0, 0
+  index: -1
+megagatling_26x34
+  rotate: false
+  xy: 31, 137
+  size: 17, 22
+  orig: 17, 22
+  offset: 0, 0
+  index: -1
+megagatling_26x36
+  rotate: false
+  xy: 115, 134
+  size: 17, 23
+  orig: 17, 23
+  offset: 0, 0
+  index: -1
+megagatling_28x23
+  rotate: false
+  xy: 111, 159
+  size: 18, 15
+  orig: 18, 15
+  offset: 0, 0
+  index: -1
+megagatling_33x35
+  rotate: false
+  xy: 233, 127
+  size: 21, 23
+  orig: 21, 23
+  offset: 0, 0
+  index: -1
+megagatling_35x23
+  rotate: false
+  xy: 50, 147
+  size: 23, 15
+  orig: 23, 15
+  offset: 0, 0
+  index: -1
+megagatling_36x45
+  rotate: false
+  xy: 63, 116
+  size: 23, 29
+  orig: 23, 29
+  offset: 0, 0
+  index: -1
+megagatling_36x50
+  rotate: false
+  xy: 181, 103
+  size: 23, 32
+  orig: 23, 32
+  offset: 0, 0
+  index: -1
+megagatling_38x24
+  rotate: false
+  xy: 88, 134
+  size: 25, 16
+  orig: 25, 16
+  offset: 0, 0
+  index: -1
+megagatling_38x33
+  rotate: false
+  xy: 144, 130
+  size: 25, 21
+  orig: 25, 21
+  offset: 0, 0
+  index: -1
+megagatling_43x41
+  rotate: false
+  xy: 33, 109
+  size: 28, 26
+  orig: 28, 26
+  offset: 0, 0
+  index: -1
+megagatling_46x39
+  rotate: false
+  xy: 1, 109
+  size: 30, 25
+  orig: 30, 25
+  offset: 0, 0
+  index: -1
+megagatling_53x45
+  rotate: false
+  xy: 210, 96
+  size: 34, 29
+  orig: 34, 29
+  offset: 0, 0
+  index: -1
+megagatling_53x45_2
+  rotate: false
+  xy: 108, 103
+  size: 34, 29
+  orig: 34, 29
+  offset: 0, 0
+  index: -1
+megagatling_55x38
+  rotate: false
+  xy: 144, 103
+  size: 35, 25
+  orig: 35, 25
+  offset: 0, 0
+  index: -1
+megagatling_60x44
+  rotate: false
+  xy: 67, 86
+  size: 39, 28
+  orig: 39, 28
+  offset: 0, 0
+  index: -1
+megagatling_69x63
+  rotate: false
+  xy: 210, 53
+  size: 44, 41
+  orig: 44, 41
+  offset: 0, 0
+  index: -1
+megagatling_81x36
+  rotate: false
+  xy: 67, 61
+  size: 52, 23
+  orig: 52, 23
+  offset: 0, 0
+  index: -1
+megagatling_8x16
+  rotate: false
+  xy: 121, 91
+  size: 5, 10
+  orig: 5, 10
+  offset: 0, 0
+  index: -1
+megagatling_8x8
+  rotate: false
+  xy: 246, 96
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+megagatling_99x74
+  rotate: false
+  xy: 144, 53
+  size: 64, 48
+  orig: 64, 48
+  offset: 0, 0
+  index: -1
+megagatling_99x74_2
+  rotate: false
+  xy: 1, 59
+  size: 64, 48
+  orig: 64, 48
+  offset: 0, 0
+  index: -1

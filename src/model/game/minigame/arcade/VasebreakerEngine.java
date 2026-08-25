@@ -24,6 +24,7 @@ public final class VasebreakerEngine {
     private final int row;
     private double positionCol;
     private int health;
+    private final int maxHealth;
     private final int damagePerHit;
     private final boolean isGargantuar;
 
@@ -33,6 +34,7 @@ public final class VasebreakerEngine {
       this.row = row;
       this.positionCol = positionCol;
       this.health = health;
+      this.maxHealth = health;
       this.damagePerHit = damagePerHit;
       this.isGargantuar = isGargantuar;
     }
@@ -49,8 +51,17 @@ public final class VasebreakerEngine {
       return (int) Math.round(positionCol);
     }
 
+    /** Unrounded, so a view can draw the walk instead of a jump once a second. */
+    public double getExactColumn() {
+      return positionCol;
+    }
+
     public int getHealth() {
       return health;
+    }
+
+    public int getMaxHealth() {
+      return maxHealth;
     }
 
     public boolean isGargantuar() {
@@ -62,7 +73,7 @@ public final class VasebreakerEngine {
     }
   }
 
-  private static final class ArcadePlant {
+  public static final class ArcadePlant {
     private final String name;
     private final int row;
     private final int col;
@@ -80,9 +91,26 @@ public final class VasebreakerEngine {
     private boolean isDead() {
       return health <= 0;
     }
+
+    public String getName() {
+      return name;
+    }
+
+    public int getRow() {
+      return row;
+    }
+
+    public int getCol() {
+      return col;
+    }
+
+    public int getHealth() {
+      return health;
+    }
   }
 
-  private static final class PendingSeed {
+  /** A seed packet on the ground, waiting to be picked up before it wilts. */
+  public static final class PendingSeed {
     private final String plantName;
     private final int row;
     private final int col;
@@ -93,6 +121,22 @@ public final class VasebreakerEngine {
       this.row = row;
       this.col = col;
       this.ticksLeft = ticksLeft;
+    }
+
+    public String getPlantName() {
+      return plantName;
+    }
+
+    public int getRow() {
+      return row;
+    }
+
+    public int getCol() {
+      return col;
+    }
+
+    public int getTicksLeft() {
+      return ticksLeft;
     }
   }
 
@@ -314,6 +358,19 @@ public final class VasebreakerEngine {
 
   public List<ArcadeZombie> getZombies() {
     return zombies;
+  }
+
+  public boolean isLost() {
+    return lost;
+  }
+
+  public List<ArcadePlant> getPlants() {
+    return plants;
+  }
+
+  /** The packets on the ground, for a view that draws them where they fell. */
+  public List<PendingSeed> getPendingSeeds() {
+    return pendingSeeds;
   }
 
   public List<String> getPendingSeedNames() {

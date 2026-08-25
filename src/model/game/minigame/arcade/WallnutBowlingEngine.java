@@ -38,12 +38,14 @@ public final class WallnutBowlingEngine {
     private final int lane;
     private int column;
     private int health;
+    private final int maxHealth;
 
     private LaneZombie(String name, int lane, int column, int health) {
       this.name = name;
       this.lane = lane;
       this.column = column;
       this.health = health;
+      this.maxHealth = health;
     }
 
     public String getName() {return name;}
@@ -57,6 +59,10 @@ public final class WallnutBowlingEngine {
 
     public int getHealth() {
       return health;
+    }
+
+    public int getMaxHealth() {
+      return maxHealth;
     }
 
     private boolean isDead() {

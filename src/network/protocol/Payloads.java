@@ -75,7 +75,24 @@ public final class Payloads {
 
   public record LeaderboardRequest(int limit) {}
 
-  public record LeaderboardEntry(String username, int score) {}
+  /**
+   * One row of the leaderboard, carrying the columns the doc asks for: the last stage and season
+   * the player cleared, how many mini-game levels they have beaten, their completed quests split
+   * into daily and non-daily, and their bonus-game record.
+   *
+   * <p>Everything but myPoint is read out of the account's stored game data, so the table is about
+   * the whole game rather than about the bonus game alone. myPoint is the account's bestScore and
+   * is null - not zero - for a player who has never submitted one, which is what keeps the column
+   * empty for them instead of ranking them last with a score they never played for.
+   */
+  public record LeaderboardEntry(
+      String username,
+      int lastSeason,
+      int lastStage,
+      int miniGameLevels,
+      int dailyQuests,
+      int otherQuests,
+      Integer myPoint) {}
 
   public record LeaderboardResponse(List<LeaderboardEntry> entries) {}
 

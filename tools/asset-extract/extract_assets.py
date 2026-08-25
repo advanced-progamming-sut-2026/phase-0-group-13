@@ -99,6 +99,59 @@ def index_folders(sprites):
 
 # --------------------------------------------------------------------------- matching
 
+# Roster name -> upstream art folder, for entries whose name does not normalise onto the
+# folder name. Selection is otherwise exact-match only, which left these entities with no
+# atlas and no clip table even though their art and their PAM are both on disk.
+#
+# Every pair below was checked three ways before being listed: the folder exists in
+# RESOURCES.json, its atlas page exists under ATLASES/, and animations.json names a PAM that
+# exists under IMAGES/. Nothing here is a guess at which art belongs to which entity -- these
+# are spelling and world-prefix differences, not substitutions.
+PLANT_ART_ALIASES = {
+    # upstream misspells it, and has kept the misspelling since 2013
+    "Kernel-pult": "kernalpult",
+    # upstream files these under the base plant plus a suffix
+    "Twin Sunflower": "sunflower_twin",
+    "Rotobaga": "rotorutabaga",
+    # upstream spelling of Iceberg Lettuce. Not "headbutter", which is Headbutter Lettuce.
+    "Iceberg Lettuce": "iceburg",
+    # upstream drops the trailing word
+    "Mega Gatling Pea": "megagatling",
+    "Phat Beet": "phatbeets",
+}
+
+# Same idea for Zombies.json. The aliases are the project's own names for zombies the upstream
+# library files under its world token ("egypt_basic" for the plain mummy), under the name of a
+# different world's identical zombie, or under a different name entirely.
+ZOMBIE_ART_ALIASES = {
+    # the plain walker and its three armoured variants all ride the one Egypt basic rig
+    "ZombieMummyDefault": "zombie_egypt_basic",
+    "ZombieMummyArmor1Default": "zombie_egypt_basic",
+    "ZombieMummyArmor2Default": "zombie_egypt_basic",
+    "ZombieMummyArmor4Default": "zombie_egypt_basic",
+    # the Knight is the Dark Ages basic walker wearing crown and shoulder armour
+    "ZombieDarkArmor3Default": "zombie_dark_basic",
+    # world prefix only
+    "ZombieRaDefault": "zombie_egypt_ra",
+    "ZombieTombRaiserDefault": "zombie_egypt_tombraiser",
+    "ZombieIceAgeDodo": "zombie_iceage_dodorider",
+    "ZombieBeachSnorkel": "zombie_beach_snorkeler",
+    "ZombieEightiesArcade": "zombie_80s_arcade",
+    # the project calls the Dark Ages spinner "Juggler"; upstream calls it the Jester
+    "ZombieDarkJugglerDefault": "zombie_dark_jester",
+    # the sun-stealing, laser-firing zombie the spec describes is upstream's crystal-skull rig:
+    # its clip list (power_up / power / power_down / attack) is that behaviour exactly
+    "ZombieDarkTurquoiseDefault": "zombie_lostcity_crystalskull",
+    "ZombieCrystalSkullDefault": "zombie_lostcity_crystalskull",
+    # the barrel pusher is a Pirate Seas zombie the project reuses in the Dark Ages
+    "ZombieDarkBarrelRollerDefault": "zombie_pirate_barrel_pusher",
+    # NOT an exact match: the library has no parasol art at any resolution -- no folder, no
+    # packet, no image id anywhere in RESOURCES.json. The spec lists the Parasol Zombie as
+    # common to every chapter, so it rides the Big Wave Beach walker to be visible and animated
+    # at all; its umbrella is not drawn. Replace this line once parasol art is sourced.
+    "ZombieParasolDefault": "zombie_beach_basic",
+}
+
 
 def build_lookup(folders, strip_prefix=None):
     """normalised folder name -> folder name, first writer wins (sorted, so stable)."""
@@ -119,7 +172,7 @@ def match_plants(plant_folders):
     resolved, unresolved = {}, []
     for plant in plants:
         name = plant["Name"]
-        folder = lookup.get(norm(name))
+        folder = lookup.get(norm(PLANT_ART_ALIASES.get(name, name)))
         if folder:
             resolved[name] = folder
         else:
@@ -156,8 +209,9 @@ def match_zombies(zombie_folders):
         if not objclass.startswith("Zombie") or not entry.get("aliases"):
             continue
         alias = entry["aliases"][0]
-        folder = next((lookup[c] for c in _zombie_candidates(alias, objclass)
-                       if c in lookup), None)
+        override = ZOMBIE_ART_ALIASES.get(alias)
+        folder = (lookup.get(norm(override)) if override else None) or next(
+            (lookup[c] for c in _zombie_candidates(alias, objclass) if c in lookup), None)
         if folder:
             resolved[alias] = folder
         else:
@@ -412,9 +466,11 @@ SEED_PACKET_PAGE = "ATLASIMAGE_ATLAS_UI_SEEDPACKETS_768_00"
 # Plant name -> region leaf on the seed-packet page. Every pair was cropped out of the page and
 # looked at against the plant it names. Unlike the per-entity PAM sheets, this atlas holds one
 # finished portrait per plant, which is what the almanac and the seed chooser draw.
-# Left out on purpose: Rotobaga, Cat-tail, Pierce-mint and catTail-mint have no packet at all,
-# and "headbutter" is Headbutter Lettuce rather than the project's Iceberg Lettuce.
+# Left out on purpose: Rotobaga, Cat-tail, Pierce-mint and catTail-mint have no packet at all.
+# Iceberg Lettuce does have one -- upstream spells it "iceburg". "headbutter" on the same page is
+# Headbutter Lettuce, a different plant, which is what the earlier pass mistook the gap for.
 SEED_PACKETS = {
+    "Iceberg Lettuce": "iceburg",
     "Sunflower": "sunflower", "Twin Sunflower": "twinsunflower", "Sun-shroom": "sunshroom",
     "Primal Sunflower": "primalsunflower", "Gold Bloom": "goldbloom", "Peashooter": "peashooter",
     "Repeater": "repeater", "Threepeater": "threepeater", "Snow Pea": "snowpea",
@@ -634,6 +690,21 @@ HUD_PIECES = {
     # The burst the King plays when he hands a passing zombie its helmet.
     "kingaura": ("ATLASIMAGE_ATLAS_ZOMBIEDARKKINGKNIGHTEFFECT_768_00", "zombie_hat_switch_effect",
                  "zombie_hat_switch_effect_545x514"),
+    # Vase Breaker's three vases. Cropped and looked at: the brown one wears a question mark,
+    # the green one a leaf and the purple one a zombie face, which is the unknown / plant /
+    # gargantuar split Phase One's board legend already prints as V? / VG / VX.
+    "vaseunknown": ("ATLASIMAGE_ATLAS_VASEBREAKERGROUP_768_00", "Vase_brown",
+                    "Vase_brown_115x150"),
+    "vaseplant": ("ATLASIMAGE_ATLAS_VASEBREAKERGROUP_768_00", "Vase_green",
+                  "Vase_green_115x150"),
+    "vasegargantuar": ("ATLASIMAGE_ATLAS_VASEBREAKERGROUP_768_00", "Vase_gargantuar",
+                       "Vase_gargantuar_115x150"),
+    # The white burst the world plays where a vase was, so a click reads as a hit.
+    "vasesmash": ("ATLASIMAGE_ATLAS_VASEBREAKERGROUP_768_00", "Vase_brown",
+                  "Vase_brown_293x263"),
+    # The five brains I, Zombie is played for.
+    "brain": ("ATLASIMAGE_ATLAS_ZOMBIETREADMILLBRAINGROUP_768_00", "power_brain_projectile",
+              "power_brain_projectile_112x82"),
 }
 
 
@@ -697,6 +768,45 @@ def extract_hud(dry_run):
     return 0
 
 
+# Rigs the arcade mini-games put on the lawn that no roster names, so the roster-driven pass
+# never reaches them. I, Zombie deploys the classic modern-day zombies rather than a chapter
+# roster, and Vase Breaker and Bowling both release the plain walker. Checked the same three
+# ways as everything else: the folder is in RESOURCES.json, its page is under ATLASES/, and
+# animations.json names a PAM that is under IMAGES/.
+MINIGAME_ZOMBIE_RIGS = {
+    "ZombieTutorialDefault": "zombie_tutorial",
+    "ZombieTutorialGargantuar": "tutorial_gargantuar",
+    "ZombieTutorialImp": "zombie_tutorial_imp",
+}
+
+
+def extract_minigame_rigs(dry_run):
+    """Writes the atlases and clip tables for the arcade mini-games' own zombies."""
+    sprites, pages = load_resources()
+    folders = index_folders(sprites).get("zombie", {})
+    out_dir = os.path.join(ASSETS, "textures", "zombies")
+    stats = collections.Counter()
+
+    section = {}
+    for entity, folder in sorted(MINIGAME_ZOMBIE_RIGS.items()):
+        if folder not in folders:
+            print("no 768 art folder called " + folder, file=sys.stderr)
+            continue
+        record = emit(norm(entity), folders[folder], out_dir, pages, dry_run, stats)
+        if record is None:
+            print("atlas page for " + folder + " is not on disk", file=sys.stderr)
+            continue
+        record["source_folder"] = "images/{}/.../{}".format(RESOLUTION, folder)
+        section[entity] = record
+
+    _, missing = emit_animations("zombies", section, load_animations(),
+                                 os.path.join(ASSETS, "animations", "zombies"), dry_run, stats)
+    for gap in missing:
+        print("no clip table for " + gap["entity"] + ": " + gap["reason"], file=sys.stderr)
+    print("minigame rigs: {} atlases, {} clip tables".format(stats["atlas"], stats["anim"]))
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true",
@@ -707,6 +817,8 @@ def main():
                         help="only extract the zombie portraits used by I, Zombie")
     parser.add_argument("--hud", action="store_true",
                         help="only compose the in-game sun/mower/grave/pea sheet")
+    parser.add_argument("--minigames", action="store_true",
+                        help="only extract the rigs the arcade mini-games put on the lawn")
     args = parser.parse_args()
     if args.seed_packets:
         return extract_seed_packets(args.dry_run)
@@ -714,6 +826,8 @@ def main():
         return extract_zombie_packets(args.dry_run)
     if args.hud:
         return extract_hud(args.dry_run)
+    if args.minigames:
+        return extract_minigame_rigs(args.dry_run)
     if not os.path.exists(RESOURCES_JSON):
         print("missing " + RESOURCES_JSON, file=sys.stderr)
         return 1

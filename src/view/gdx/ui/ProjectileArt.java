@@ -36,6 +36,9 @@ public final class ProjectileArt implements Disposable {
   private static final float CABBAGE_FILL = 0.26f;
   private static final float PEPPER_FILL = 0.28f;
   private static final float CLOUD_FILL = 0.36f;
+  private static final float KERNEL_FILL = 0.12f;
+  private static final float BUTTER_FILL = 0.20f;
+  private static final String KERNEL_PULT = "Kernel-pult";
   // The spike is stored pointing up, so this is its length once it is turned to fly flat.
   private static final float SPIKE_FILL = 0.34f;
 
@@ -69,11 +72,23 @@ public final class ProjectileArt implements Disposable {
     return switch (projectile.getEffect()) {
       case ICE -> shot("wintermelon", "wintermelon_122x83", MELON_FILL, 0f);
       case FIRE -> shot("pepperpult", "pepperpult_55x61", PEPPER_FILL, 0f);
-      // splash is what separates Melon-pult's watermelon from Cabbage-pult's cabbage
-      default -> projectile.getSplashRadius() > 0
-          ? shot("melonpult", "Melonpult_122x83", MELON_FILL, 0f)
-          : shot("cabbagepult", "cabbagepult_107x107", CABBAGE_FILL, 0f);
+      // Kernel-pult throws one of two things and the model already says which: the buttered
+      // shot is the one that stuns. Both are in its own atlas, so neither has to borrow the
+      // cabbage -- which is what they did while the only question asked here was about splash.
+      case NORMAL -> KERNEL_PULT.equals(projectile.getSourceName())
+          ? (projectile.getStunTicks() > 0
+              ? shot("kernelpult", "kernalpult_34x37", BUTTER_FILL, 0f)
+              : shot("kernelpult", "kernalpult_16x14", KERNEL_FILL, 0f))
+          : melonOrCabbage(projectile);
+      default -> melonOrCabbage(projectile);
     };
+  }
+
+  /** splash is what separates Melon-pult's watermelon from Cabbage-pult's cabbage */
+  private Shot melonOrCabbage(Projectile projectile) {
+    return projectile.getSplashRadius() > 0
+        ? shot("melonpult", "Melonpult_122x83", MELON_FILL, 0f)
+        : shot("cabbagepult", "cabbagepult_107x107", CABBAGE_FILL, 0f);
   }
 
   private Shot shot(String plant, String region, float rowFraction, float angle) {
