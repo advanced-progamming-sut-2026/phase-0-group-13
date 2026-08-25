@@ -690,6 +690,21 @@ HUD_PIECES = {
     # The burst the King plays when he hands a passing zombie its helmet.
     "kingaura": ("ATLASIMAGE_ATLAS_ZOMBIEDARKKINGKNIGHTEFFECT_768_00", "zombie_hat_switch_effect",
                  "zombie_hat_switch_effect_545x514"),
+    # Vase Breaker's three vases. Cropped and looked at: the brown one wears a question mark,
+    # the green one a leaf and the purple one a zombie face, which is the unknown / plant /
+    # gargantuar split Phase One's board legend already prints as V? / VG / VX.
+    "vaseunknown": ("ATLASIMAGE_ATLAS_VASEBREAKERGROUP_768_00", "Vase_brown",
+                    "Vase_brown_115x150"),
+    "vaseplant": ("ATLASIMAGE_ATLAS_VASEBREAKERGROUP_768_00", "Vase_green",
+                  "Vase_green_115x150"),
+    "vasegargantuar": ("ATLASIMAGE_ATLAS_VASEBREAKERGROUP_768_00", "Vase_gargantuar",
+                       "Vase_gargantuar_115x150"),
+    # The white burst the world plays where a vase was, so a click reads as a hit.
+    "vasesmash": ("ATLASIMAGE_ATLAS_VASEBREAKERGROUP_768_00", "Vase_brown",
+                  "Vase_brown_293x263"),
+    # The five brains I, Zombie is played for.
+    "brain": ("ATLASIMAGE_ATLAS_ZOMBIETREADMILLBRAINGROUP_768_00", "power_brain_projectile",
+              "power_brain_projectile_112x82"),
 }
 
 
@@ -753,6 +768,45 @@ def extract_hud(dry_run):
     return 0
 
 
+# Rigs the arcade mini-games put on the lawn that no roster names, so the roster-driven pass
+# never reaches them. I, Zombie deploys the classic modern-day zombies rather than a chapter
+# roster, and Vase Breaker and Bowling both release the plain walker. Checked the same three
+# ways as everything else: the folder is in RESOURCES.json, its page is under ATLASES/, and
+# animations.json names a PAM that is under IMAGES/.
+MINIGAME_ZOMBIE_RIGS = {
+    "ZombieTutorialDefault": "zombie_tutorial",
+    "ZombieTutorialGargantuar": "tutorial_gargantuar",
+    "ZombieTutorialImp": "zombie_tutorial_imp",
+}
+
+
+def extract_minigame_rigs(dry_run):
+    """Writes the atlases and clip tables for the arcade mini-games' own zombies."""
+    sprites, pages = load_resources()
+    folders = index_folders(sprites).get("zombie", {})
+    out_dir = os.path.join(ASSETS, "textures", "zombies")
+    stats = collections.Counter()
+
+    section = {}
+    for entity, folder in sorted(MINIGAME_ZOMBIE_RIGS.items()):
+        if folder not in folders:
+            print("no 768 art folder called " + folder, file=sys.stderr)
+            continue
+        record = emit(norm(entity), folders[folder], out_dir, pages, dry_run, stats)
+        if record is None:
+            print("atlas page for " + folder + " is not on disk", file=sys.stderr)
+            continue
+        record["source_folder"] = "images/{}/.../{}".format(RESOLUTION, folder)
+        section[entity] = record
+
+    _, missing = emit_animations("zombies", section, load_animations(),
+                                 os.path.join(ASSETS, "animations", "zombies"), dry_run, stats)
+    for gap in missing:
+        print("no clip table for " + gap["entity"] + ": " + gap["reason"], file=sys.stderr)
+    print("minigame rigs: {} atlases, {} clip tables".format(stats["atlas"], stats["anim"]))
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true",
@@ -763,6 +817,8 @@ def main():
                         help="only extract the zombie portraits used by I, Zombie")
     parser.add_argument("--hud", action="store_true",
                         help="only compose the in-game sun/mower/grave/pea sheet")
+    parser.add_argument("--minigames", action="store_true",
+                        help="only extract the rigs the arcade mini-games put on the lawn")
     args = parser.parse_args()
     if args.seed_packets:
         return extract_seed_packets(args.dry_run)
@@ -770,6 +826,8 @@ def main():
         return extract_zombie_packets(args.dry_run)
     if args.hud:
         return extract_hud(args.dry_run)
+    if args.minigames:
+        return extract_minigame_rigs(args.dry_run)
     if not os.path.exists(RESOURCES_JSON):
         print("missing " + RESOURCES_JSON, file=sys.stderr)
         return 1

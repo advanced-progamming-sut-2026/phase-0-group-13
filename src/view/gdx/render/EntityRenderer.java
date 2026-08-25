@@ -283,7 +283,7 @@ public final class EntityRenderer implements WorldRenderer {
     boolean any = false;
     for (String part : animation.partNames()) {
       String lower = part.toLowerCase();
-      String group = armourGroup(lower);
+      String group = ArmourParts.groupOf(lower);
       if (group == null) {
         continue;
       }
@@ -296,42 +296,6 @@ public final class EntityRenderer implements WorldRenderer {
     return any ? visibility : null;
   }
 
-  /** The armour keyword in a part name, in the rigs' own vocabulary, or null if it is body art. */
-  private static String armourGroup(String lowerPartName) {
-    // The rigs wrap each armour's three damage states in a group named by the armour's index
-    // rather than by what it is -- "_zombie_egypt_armor1_states" holds the cone. The wrapper has
-    // to be switched on with its contents, because hiding a parent hides everything under it.
-    // Same numbering ZombieTypeResolver reads: 1 cone, 2 bucket, 3 knight, 4 brick.
-    if (lowerPartName.contains("armor1")) {
-      return "cone";
-    }
-    if (lowerPartName.contains("armor2")) {
-      return "bucket";
-    }
-    if (lowerPartName.contains("armor3")) {
-      return "crown";
-    }
-    if (lowerPartName.contains("armor4")) {
-      return "brick";
-    }
-    if (lowerPartName.contains("cone")) {
-      return "cone";
-    }
-    if (lowerPartName.contains("bucket")) {
-      return "bucket";
-    }
-    if (lowerPartName.contains("brick")) {
-      return "brick";
-    }
-    if (lowerPartName.contains("crown")) {
-      return "crown";
-    }
-    if (lowerPartName.contains("shoulder_armor")) {
-      return "shoulder";
-    }
-    return null;
-  }
-
   /** The still-intact armour this zombie wears in that group, or null. */
   private static Armor wornArmour(List<Armor> armors, String group) {
     for (Armor armor : armors) {
@@ -339,11 +303,11 @@ public final class EntityRenderer implements WorldRenderer {
         continue;
       }
       if (group.equals(switch (armor.getType()) {
-        case CONE -> "cone";
-        case BUCKET -> "bucket";
-        case BLOCK -> "brick";
-        case HELMET -> "crown";
-        case SHOULDER_ARMOR -> "shoulder";
+        case CONE -> ArmourParts.CONE;
+        case BUCKET -> ArmourParts.BUCKET;
+        case BLOCK -> ArmourParts.BRICK;
+        case HELMET -> ArmourParts.CROWN;
+        case SHOULDER_ARMOR -> ArmourParts.SHOULDER;
         // newspaper, barrel and piano are drawn into their zombie's own body art
         default -> "";
       })) {

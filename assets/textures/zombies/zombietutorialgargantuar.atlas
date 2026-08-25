@@ -1,0 +1,530 @@
+zombietutorialgargantuargroup_768_00.png
+size: 512,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+tutorial_gargantuar_101x74
+  rotate: false
+  xy: 190, 476
+  size: 65, 48
+  orig: 65, 48
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_102x78
+  rotate: false
+  xy: 1, 464
+  size: 66, 50
+  orig: 66, 50
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_103x117
+  rotate: false
+  xy: 257, 347
+  size: 66, 75
+  orig: 66, 75
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_105x78
+  rotate: false
+  xy: 190, 424
+  size: 67, 50
+  orig: 67, 50
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_105x89
+  rotate: false
+  xy: 325, 422
+  size: 67, 57
+  orig: 67, 57
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_106x25
+  rotate: false
+  xy: 418, 138
+  size: 68, 16
+  orig: 68, 16
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_107x75
+  rotate: false
+  xy: 394, 440
+  size: 69, 48
+  orig: 69, 48
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_10x19
+  rotate: false
+  xy: 477, 118
+  size: 7, 12
+  orig: 7, 12
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_113x63
+  rotate: false
+  xy: 257, 481
+  size: 73, 41
+  orig: 73, 41
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_116x123
+  rotate: false
+  xy: 337, 296
+  size: 74, 79
+  orig: 74, 79
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_119x111
+  rotate: false
+  xy: 179, 347
+  size: 76, 71
+  orig: 76, 71
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_122x111
+  rotate: false
+  xy: 413, 296
+  size: 78, 71
+  orig: 78, 71
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_12x15
+  rotate: false
+  xy: 501, 256
+  size: 8, 10
+  orig: 8, 10
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_135x8
+  rotate: false
+  xy: 418, 156
+  size: 87, 5
+  orig: 87, 5
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_13x22
+  rotate: false
+  xy: 501, 240
+  size: 9, 14
+  orig: 9, 14
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_13x23
+  rotate: false
+  xy: 501, 223
+  size: 9, 15
+  orig: 9, 15
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_14x11
+  rotate: false
+  xy: 418, 163
+  size: 9, 7
+  orig: 9, 7
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_153x104
+  rotate: false
+  xy: 377, 69
+  size: 98, 67
+  orig: 98, 67
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_15x24
+  rotate: false
+  xy: 501, 163
+  size: 10, 16
+  orig: 10, 16
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_15x26
+  rotate: false
+  xy: 499, 42
+  size: 10, 17
+  orig: 10, 17
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_163x67
+  rotate: false
+  xy: 325, 377
+  size: 105, 43
+  orig: 105, 43
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_16x25
+  rotate: false
+  xy: 501, 205
+  size: 10, 16
+  orig: 10, 16
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_16x29
+  rotate: false
+  xy: 499, 21
+  size: 10, 19
+  orig: 10, 19
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_17x23
+  rotate: false
+  xy: 501, 188
+  size: 11, 15
+  orig: 11, 15
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_17x27
+  rotate: false
+  xy: 499, 1
+  size: 11, 18
+  orig: 11, 18
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_187x102
+  rotate: false
+  xy: 377, 1
+  size: 120, 66
+  orig: 120, 66
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_18x13
+  rotate: false
+  xy: 498, 375
+  size: 12, 9
+  orig: 12, 9
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_18x13_2
+  rotate: false
+  xy: 394, 422
+  size: 12, 9
+  orig: 12, 9
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_20x20
+  rotate: false
+  xy: 169, 249
+  size: 13, 13
+  orig: 13, 13
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_21x25
+  rotate: false
+  xy: 498, 409
+  size: 14, 16
+  orig: 14, 16
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_223x118
+  rotate: false
+  xy: 1, 188
+  size: 143, 76
+  orig: 143, 76
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_22x27
+  rotate: false
+  xy: 498, 355
+  size: 14, 18
+  orig: 14, 18
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_22x28
+  rotate: false
+  xy: 498, 389
+  size: 14, 18
+  orig: 14, 18
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_230x270
+  rotate: false
+  xy: 188, 172
+  size: 147, 173
+  orig: 147, 173
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_252x191
+  rotate: false
+  xy: 337, 172
+  size: 162, 122
+  orig: 162, 122
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_25x25
+  rotate: false
+  xy: 493, 337
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_269x95
+  rotate: false
+  xy: 1, 266
+  size: 172, 61
+  orig: 172, 61
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_274x90
+  rotate: false
+  xy: 1, 329
+  size: 176, 58
+  orig: 176, 58
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_27x27
+  rotate: false
+  xy: 493, 317
+  size: 18, 18
+  orig: 18, 18
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_288x288
+  rotate: false
+  xy: 1, 1
+  size: 185, 185
+  orig: 185, 185
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_292x264
+  rotate: false
+  xy: 188, 1
+  size: 187, 169
+  orig: 187, 169
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_30x30
+  rotate: false
+  xy: 493, 296
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_31x47
+  rotate: false
+  xy: 232, 526
+  size: 20, 30
+  orig: 20, 30
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_32x19
+  rotate: false
+  xy: 146, 249
+  size: 21, 12
+  orig: 21, 12
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_32x40
+  rotate: false
+  xy: 420, 531
+  size: 21, 26
+  orig: 21, 26
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_33x36
+  rotate: false
+  xy: 51, 532
+  size: 21, 23
+  orig: 21, 23
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_34x48
+  rotate: false
+  xy: 488, 118
+  size: 22, 31
+  orig: 22, 31
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_35x28
+  rotate: false
+  xy: 74, 532
+  size: 23, 18
+  orig: 23, 18
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_36x44
+  rotate: false
+  xy: 99, 457
+  size: 23, 28
+  orig: 23, 28
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_38x38
+  rotate: false
+  xy: 357, 525
+  size: 25, 25
+  orig: 25, 25
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_43x39
+  rotate: false
+  xy: 69, 457
+  size: 28, 25
+  orig: 28, 25
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_49x48
+  rotate: false
+  xy: 146, 216
+  size: 32, 31
+  orig: 32, 31
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_52x29
+  rotate: false
+  xy: 127, 531
+  size: 34, 19
+  orig: 34, 19
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_52x73
+  rotate: false
+  xy: 477, 69
+  size: 34, 47
+  orig: 34, 47
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_53x28
+  rotate: false
+  xy: 384, 531
+  size: 34, 18
+  orig: 34, 18
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_60x48
+  rotate: false
+  xy: 377, 138
+  size: 39, 31
+  orig: 39, 31
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_61x41
+  rotate: false
+  xy: 146, 188
+  size: 39, 26
+  orig: 39, 26
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_66x33
+  rotate: false
+  xy: 127, 389
+  size: 42, 21
+  orig: 42, 21
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_67x65
+  rotate: false
+  xy: 257, 524
+  size: 43, 42
+  orig: 43, 42
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_6x6
+  rotate: false
+  xy: 506, 61
+  size: 4, 4
+  orig: 4, 4
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_70x71
+  rotate: false
+  xy: 465, 440
+  size: 45, 46
+  orig: 45, 46
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_73x54
+  rotate: false
+  xy: 183, 526
+  size: 47, 35
+  orig: 47, 35
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_74x65
+  rotate: false
+  xy: 446, 490
+  size: 48, 42
+  orig: 48, 42
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_75x66
+  rotate: false
+  xy: 1, 516
+  size: 48, 42
+  orig: 48, 42
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_7x7
+  rotate: false
+  xy: 499, 61
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_81x83
+  rotate: false
+  xy: 259, 424
+  size: 52, 53
+  orig: 52, 53
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_82x51
+  rotate: false
+  xy: 302, 525
+  size: 53, 33
+  orig: 53, 33
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_84x60
+  rotate: false
+  xy: 127, 490
+  size: 54, 39
+  orig: 54, 39
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_84x60_2
+  rotate: false
+  xy: 390, 490
+  size: 54, 39
+  orig: 54, 39
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_87x62
+  rotate: false
+  xy: 69, 490
+  size: 56, 40
+  orig: 56, 40
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_87x65
+  rotate: false
+  xy: 332, 481
+  size: 56, 42
+  orig: 56, 42
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_92x113
+  rotate: false
+  xy: 1, 389
+  size: 59, 73
+  orig: 59, 73
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_95x106
+  rotate: false
+  xy: 127, 420
+  size: 61, 68
+  orig: 61, 68
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_98x102
+  rotate: false
+  xy: 62, 389
+  size: 63, 66
+  orig: 63, 66
+  offset: 0, 0
+  index: -1
+tutorial_gargantuar_99x108
+  rotate: false
+  xy: 432, 369
+  size: 64, 69
+  orig: 64, 69
+  offset: 0, 0
+  index: -1

@@ -1,6 +1,7 @@
 package model.game.minigame.arcade;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,13 @@ public final class IZombieEngine {
   public static final int STARTING_SUN = 150;
   public static final int RED_LINE_COLUMN = 4;
   public static final String SUN_PRODUCER = "sun-imp";
+  /**
+   * Ticks a type has to wait before it can be deployed again, one per sun of its cost, so a
+   * basic is back in five seconds and a gargantuar in thirty. Zombies had no recharge at all
+   * until now, which left the picker with nothing truthful to show for the cooldown the doc
+   * asks it to display.
+   */
+  public static final int RECHARGE_TICKS_PER_SUN = 1;
   // Cutout plants fire on the same cadence as every other plant in the game: one shot per
   // 1.5s (15 ticks at 10 ticks/second), matching the Peashooter's Action Interval in plants.json.
   public static final int PLANT_FIRE_INTERVAL = 15;
@@ -68,12 +76,14 @@ public final class IZombieEngine {
     for (ZombieSpec spec : CATALOG.values()) {
       if (!spec.producesSun) {purchasable.add(spec);}}
     return purchasable;}
-  private static final class DeployedZombie {
+  /** One of the player's zombies on the lawn. */
+  public static final class DeployedZombie {
     private final ZombieSpec spec;
     private final int row;
     private double column;
     private int health;
     private int sunTimer;
+    private boolean eating;
 
     private DeployedZombie(ZombieSpec spec, int row, double column) {
       this.spec = spec;
@@ -83,15 +93,47 @@ public final class IZombieEngine {
       this.sunTimer = 0;
     }
 
-    private boolean isDead() {
+    public boolean isDead() {
       return health <= 0;
+    }
+
+    public String getName() {
+      return spec.name;
+    }
+
+    public int getRow() {
+      return row;
+    }
+
+    /** Unrounded, so a view can draw the walk rather than a jump per cell. */
+    public double getColumn() {
+      return column;
+    }
+
+    public int getHealth() {
+      return health;
+    }
+
+    public int getMaxHealth() {
+      return spec.health;
+    }
+
+    public boolean producesSun() {
+      return spec.producesSun;
+    }
+
+    /** True while it is chewing a cutout instead of walking. */
+    public boolean isEating() {
+      return eating;
     }
   }
 
-  private static final class DefensePlant {
+  /** One of the cardboard plant cutouts defending the brains. */
+  public static final class DefensePlant {
     private final int row;
     private final int col;
     private int health;
+    private final int maxHealth;
     private final int damagePerTick;
     private final double range;
 
@@ -99,6 +141,7 @@ public final class IZombieEngine {
       this.row = row;
       this.col = col;
       this.health = health;
+      this.maxHealth = health;
       this.damagePerTick = damagePerTick;
       this.range = range;
     }
@@ -106,10 +149,27 @@ public final class IZombieEngine {
     private boolean isDead() {
       return health <= 0;
     }
+
+    public int getRow() {
+      return row;
+    }
+
+    public int getCol() {
+      return col;
+    }
+
+    public int getHealth() {
+      return health;
+    }
+
+    public int getMaxHealth() {
+      return maxHealth;
+    }
   }
 
   private final List<DeployedZombie> deployedZombies = new ArrayList<>();
   private final List<DefensePlant> defensePlants = new ArrayList<>();
+  private final Map<String, Integer> rechargeLeft = new HashMap<>();
   private final boolean[] brainAlive = new boolean[BRAINS];
   private final Random random;
   private final int level;
@@ -183,10 +243,15 @@ public final class IZombieEngine {
     if (!unlocked) {
       return "error: " + typeName + " isn't available at level " + level;
     }
+    int waiting = rechargeTicksLeft(spec.name);
+    if (waiting > 0) {
+      return String.format("error: %s is still recharging (%.1fs left)", typeName, waiting / 10.0);
+    }
     if (zombieSun < spec.cost) {
       return "error: not enough zombie-sun (need " + spec.cost + ", have " + zombieSun + ")";
     }
     zombieSun -= spec.cost;
+    rechargeLeft.put(spec.name, rechargeTicks(spec));
     deployedZombies.add(new DeployedZombie(spec, row, col));
     return "Deployed " + typeName + " at (" + (col + 1) + ", " + (row + 1) + "). Zombie-sun left: "
         + zombieSun;
@@ -194,6 +259,7 @@ public final class IZombieEngine {
   public void tick() {
     if (won || lost) {return;}
     tickCount++;
+    rechargeLeft.replaceAll((type, left) -> Math.max(0, left - 1));
     for (DeployedZombie zombie : deployedZombies) {
       if (zombie.isDead() || !zombie.spec.producesSun) {
         continue;
@@ -227,6 +293,7 @@ public final class IZombieEngine {
           break;
         }
       }
+      zombie.eating = blocker != null;
       if (blocker != null) {blocker.health -= zombie.spec.damagePerTick;
       } else {zombie.column -= zombie.spec.speed;
         if (zombie.column <= 0) {
@@ -312,8 +379,31 @@ public final class IZombieEngine {
   public boolean isWon() {
     return won;
   }
+
+  public boolean isLost() {
+    return lost;
+  }
+
   public boolean isFinished() {
     return won || lost;
+  }
+
+  /** How long this type still has to wait before it can be deployed again, in ticks. */
+  public int rechargeTicksLeft(String typeName) {
+    Integer left = rechargeLeft.get(typeName == null ? "" : typeName.toLowerCase().trim());
+    return left == null ? 0 : left;
+  }
+
+  public static int rechargeTicks(ZombieSpec spec) {
+    return spec.cost * RECHARGE_TICKS_PER_SUN;
+  }
+
+  public List<DeployedZombie> getDeployedZombies() {
+    return deployedZombies;
+  }
+
+  public List<DefensePlant> getDefensePlants() {
+    return defensePlants;
   }
 
   public int getZombieSun() {

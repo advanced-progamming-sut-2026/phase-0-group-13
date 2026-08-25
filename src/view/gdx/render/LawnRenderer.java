@@ -58,8 +58,23 @@ public final class LawnRenderer implements WorldRenderer {
     drawGrid(context, game.getBoard());
   }
 
+  /**
+   * Backdrop only, for a screen that has a lawn but no match behind it.
+   *
+   * <p>The arcade mini-games run their own engines rather than a {@link GameManager}, so they
+   * cannot go through {@link #render}, but the lawn they play on is the same lawn.
+   */
+  public void renderBackdrop(RenderContext context, String seasonKey, float delta) {
+    season = seasonKey;
+    clock += delta;
+    drawBackground(context, atlasForSeason(seasonKey));
+  }
+
   private void drawBackground(RenderContext context, GameManager game) {
-    String path = atlasFor(game);
+    drawBackground(context, atlasForSeason(seasonKey(game)));
+  }
+
+  private void drawBackground(RenderContext context, String path) {
     if (!path.equals(loadedFor)) {
       if (backgroundAtlas != null) {
         backgroundAtlas.dispose();
@@ -91,8 +106,8 @@ public final class LawnRenderer implements WorldRenderer {
     return "dark";
   }
 
-  private static String atlasFor(GameManager game) {
-    switch (seasonKey(game)) {
+  private static String atlasForSeason(String seasonKey) {
+    switch (seasonKey) {
       case "egypt": return "textures/environment/ancientegyptseason.atlas";
       case "frost": return "textures/environment/frostbitecavesseason.atlas";
       case "beach": return "textures/environment/bigwavebeachseason.atlas";
@@ -102,7 +117,11 @@ public final class LawnRenderer implements WorldRenderer {
 
   // Measured off each season's background art. Seasons we have not measured fall back to Egypt.
   public static float[] lawnBounds(GameManager game) {
-    switch (seasonKey(game)) {
+    return lawnBounds(seasonKey(game));
+  }
+
+  public static float[] lawnBounds(String seasonKey) {
+    switch (seasonKey) {
       case "frost": return new float[] {315.05f, 88.66f, 918.60f, 453.92f};
       case "beach": return new float[] {218.45f, 80.03f, 918.92f, 452.01f};
       case "dark": return new float[] {314.12f, 74.43f, 932.74f, 456.75f};
