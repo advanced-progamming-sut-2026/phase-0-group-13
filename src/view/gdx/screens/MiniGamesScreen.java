@@ -21,9 +21,8 @@ import view.gdx.ui.UiSkinProvider;
  * The mini-game half of the Travel Log, which used to be terminal-only.
  *
  * <p>The unlock and level rules are Progress's, the same ones QuestMenuController checks for
- * "play minigame". Vase Breaker, Bowling and I, Zombie each have their own board screen; Beghouled
- * is a grid of gems rather than a lawn, so it stays on the shared {@link ArcadeMiniGameScreen};
- * Zombotany is a normal stage, so {@link MiniGameLauncher} builds it and it plays on
+ * "play minigame". Vase Breaker, Bowling, I, Zombie and Beghouled each have their own board
+ * screen; Zombotany is a normal stage, so {@link MiniGameLauncher} builds it and it plays on
  * GameplayScreen.
  */
 public final class MiniGamesScreen extends MenuScreen {
@@ -109,8 +108,7 @@ public final class MiniGamesScreen extends MenuScreen {
       return;
     }
     MatchSetup.getInstance().setMiniGame(type, level);
-    // The three that have a proper board play on their own screen; Beghouled is a grid of
-    // gems with no lawn behind it, so it stays on the shared clickable grid.
+    // All four arcade mini-games play on their own board screen.
     switch (type) {
       case VASEBREAKER -> {
         go(new VasebreakerScreen(game, level));
@@ -125,7 +123,7 @@ public final class MiniGamesScreen extends MenuScreen {
         return;
       }
       case BEGHOULED -> {
-        go(new ArcadeMiniGameScreen(game, type, level));
+        go(new BeghouledScreen(game, level));
         return;
       }
       default -> { }

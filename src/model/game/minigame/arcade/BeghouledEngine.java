@@ -466,6 +466,10 @@ public final class BeghouledEngine {
           grid[zombie.row][col] = null;
           crater[zombie.row][col] = true;
           applyGravityAndRefill();
+          // A new crater can leave the board with no legal swap at all, and the player has no way
+          // to make one: only a swap resolves the board, and no swap is accepted. Same remedy the
+          // player's own moves get, or the game would sit there until a zombie ate again.
+          ensureBoardIsPlayable();
         }
         continue;
       }

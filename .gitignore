@@ -1,5 +1,10 @@
 src/data/database/session.json
 
+# The server's own account database: password hashes, emails and per-player game state, written
+# at runtime by whoever runs the server. Not something to carry in the repo, and a committed copy
+# would fight with every other machine's.
+src/data/database/server-accounts.json
+
 # The extracted asset library (resources/raw) is tracked on purpose so a clone gets the
 # complete collection. The source archive stays out: it is 362 MB, over GitHub's 100 MB
 # file limit, and resources/raw is a byte-exact copy of what is inside it.
