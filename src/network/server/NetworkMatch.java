@@ -1,5 +1,6 @@
 package network.server;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import model.enums.MatchRole;
 import model.game.minigame.arcade.IZombieMatch;
 
@@ -8,18 +9,32 @@ public final class NetworkMatch {
   private final String id;
   private final String plantsPlayer;
   private final String zombiesPlayer;
+  private final int level;
   private final IZombieMatch state;
+
+  /**
+   * Whoever flips this is the one who gets to announce the end.
+   *
+   * <p>The clock can finish a match on the same tick the loser's socket drops, and both paths want
+   * to send MATCH_ENDED. Only one of them may, or the winner is told twice and paid twice.
+   */
+  private final AtomicBoolean ended = new AtomicBoolean();
   private volatile boolean finished;
 
   public NetworkMatch(String id, String plantsPlayer, String zombiesPlayer, int level, long seed) {
     this.id = id;
     this.plantsPlayer = plantsPlayer;
     this.zombiesPlayer = zombiesPlayer;
+    this.level = level;
     this.state = new IZombieMatch(level, seed);
   }
 
   public String getId() {
     return id;
+  }
+
+  public int getLevel() {
+    return level;
   }
 
   public IZombieMatch getState() {
@@ -50,5 +65,10 @@ public final class NetworkMatch {
 
   public void markFinished() {
     this.finished = true;
+  }
+
+  /** @return true for the first caller only, which is the one that must announce it */
+  public boolean claimEnded() {
+    return ended.compareAndSet(false, true);
   }
 }

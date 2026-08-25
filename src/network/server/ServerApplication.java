@@ -1,5 +1,6 @@
 package network.server;
 
+import data.GameDataManager;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -25,11 +26,16 @@ public final class ServerApplication {
         matchmaking,
         matches,
         new LeaderboardService(accounts));
+    matches.setListener(router);
   }
 
   public void start() throws IOException {
+    // The match engine prices plants out of plants.json, so the server needs the game data even
+    // though it never opens a lawn of its own.
+    new GameDataManager();
     serverSocket = new ServerSocket(port);
     running = true;
+    matches.start();
     System.out.println("PvZ server listening on port " + port);
     System.out.println("accounts: " + accounts.size() + " (" + accounts.getFilePath() + ")");
 
@@ -51,6 +57,7 @@ public final class ServerApplication {
 
   public void stop() {
     running = false;
+    matches.shutdown();
     try {
       if (serverSocket != null) {
         serverSocket.close();
@@ -62,6 +69,8 @@ public final class ServerApplication {
 
   public static void main(String[] args) throws IOException {
     int port = args.length > 0 ? Integer.parseInt(args[0]) : DEFAULT_PORT;
-    new ServerApplication(port).start();
+    ServerApplication server = new ServerApplication(port);
+    Runtime.getRuntime().addShutdownHook(new Thread(server::stop, "server-shutdown"));
+    server.start();
   }
 }

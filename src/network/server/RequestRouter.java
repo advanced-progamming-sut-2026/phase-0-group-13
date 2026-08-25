@@ -2,11 +2,20 @@ package network.server;
 
 import model.enums.MatchRole;
 import model.game.minigame.arcade.IZombieAction;
+import model.game.minigame.arcade.IZombieMatch;
 import network.protocol.MessageType;
 import network.protocol.NetworkMessage;
 import network.protocol.Payloads;
 
-public final class RequestRouter {
+/**
+ * Turns one client message into one server action.
+ *
+ * <p>It is also {@link MatchService.Listener}: the match clock calls back here after every tick
+ * with the board it just advanced, and once more when a match is over. That is the only place
+ * MATCH_STATE_UPDATE and MATCH_ENDED come from, so a client is never told the game moved by
+ * anything other than the server that moved it.
+ */
+public final class RequestRouter implements MatchService.Listener {
 
   private final SessionManager sessions;
   private final AuthenticationService authentication;
@@ -112,6 +121,11 @@ public final class RequestRouter {
   }
 
   private void queueUp(ClientConnection connection, NetworkMessage message) {
+    if (matches.matchOf(connection.getUsername()) != null) {
+      connection.send(message.reply(MessageType.ERROR,
+          new Payloads.Ack(false, "error: you are already in a match")));
+      return;
+    }
     String opponent = matchmaking.enqueue(connection.getUsername());
     ClientConnection opponentConnection =
         opponent == null ? null : sessions.connectionOf(opponent);
@@ -147,11 +161,14 @@ public final class RequestRouter {
 
   private void inviteDecision(ClientConnection connection, NetworkMessage message) {
     Payloads.MatchInviteDecision decision = message.payloadAs(Payloads.MatchInviteDecision.class);
-    MatchmakingService.Invite invite =
-        decision == null ? null : matchmaking.consumeInvite(decision.inviteId());
+    // Consumed against the authenticated caller, not against the id alone: an id is a guessable
+    // token and accepting on somebody else's behalf would put a stranger in their match.
+    MatchmakingService.Invite invite = decision == null
+        ? null
+        : matchmaking.consumeInvite(decision.inviteId(), connection.getUsername());
     if (invite == null) {
       connection.send(message.reply(MessageType.ERROR,
-          new Payloads.Ack(false, "error: unknown invite")));
+          new Payloads.Ack(false, "error: that invite is not yours to answer")));
       return;
     }
     ClientConnection host = sessions.connectionOf(invite.from());
@@ -175,9 +192,13 @@ public final class RequestRouter {
       String zombiesPlayer) {
     NetworkMatch match = matches.create(plantsPlayer, zombiesPlayer);
     plantsConnection.send(NetworkMessage.event(MessageType.MATCH_FOUND,
-        new Payloads.MatchFound(match.getId(), zombiesPlayer, MatchRole.PLANTS)));
+        new Payloads.MatchFound(match.getId(), zombiesPlayer, MatchRole.PLANTS, match.getLevel())));
     zombiesConnection.send(NetworkMessage.event(MessageType.MATCH_FOUND,
-        new Payloads.MatchFound(match.getId(), plantsPlayer, MatchRole.ZOMBIES)));
+        new Payloads.MatchFound(match.getId(), plantsPlayer, MatchRole.ZOMBIES, match.getLevel())));
+    System.out.println("match " + match.getId() + ": " + plantsPlayer + " (plants) vs "
+        + zombiesPlayer + " (zombies)");
+    // The first board, so both screens have something to draw before the clock's first tick.
+    broadcastState(match);
   }
 
   private void gameAction(ClientConnection connection, NetworkMessage message) {
@@ -190,6 +211,11 @@ public final class RequestRouter {
     MatchRole role = match.roleOf(connection.getUsername());
     if (role == null) {
       connection.send(message.reply(MessageType.ERROR, new Payloads.Ack(false, "error: not your match")));
+      return;
+    }
+    if (match.isFinished()) {
+      connection.send(message.reply(MessageType.ERROR,
+          new Payloads.Ack(false, "error: the match is over")));
       return;
     }
 
@@ -208,13 +234,47 @@ public final class RequestRouter {
         : IZombieAction.placeZombie(action.argument(), action.row(), action.col());
   }
 
+  @Override
+  public void onTick(NetworkMatch match) {
+    broadcastState(match);
+  }
+
+  @Override
+  public void onFinished(NetworkMatch match) {
+    MatchRole winningRole = match.getState().winner();
+    String winner = winningRole == null ? null : match.playerOf(winningRole);
+    String loser = winner == null ? null : match.opponentOf(winner);
+    // The final board first, so the losing side sees what did it before the verdict lands.
+    broadcastState(match);
+    Payloads.MatchEnded ended = new Payloads.MatchEnded(match.getId(), winner, loser, winningRole,
+        reasonFor(match, winningRole));
+    sendToBoth(match, NetworkMessage.event(MessageType.MATCH_ENDED, ended));
+    System.out.println("match " + match.getId() + " ended: " + ended.reason());
+  }
+
+  private static String reasonFor(NetworkMatch match, MatchRole winningRole) {
+    if (winningRole == null) {
+      return "the match was abandoned";
+    }
+    if (winningRole == MatchRole.ZOMBIES) {
+      return "every brain was eaten";
+    }
+    return match.getState().ticksRemaining() == 0
+        ? "the plants held out for " + IZombieMatch.SURVIVAL_SECONDS + " seconds"
+        : "the zombies ran out of sun and had nothing left on the lawn";
+  }
+
   private void broadcastState(NetworkMatch match) {
-    Payloads.MatchStateUpdate update = new Payloads.MatchStateUpdate(
-        match.getId(), "brains=" + match.getState().snapshot().brainsRemaining());
+    Payloads.MatchStateUpdate update =
+        new Payloads.MatchStateUpdate(match.getId(), match.getState().snapshot());
+    sendToBoth(match, NetworkMessage.event(MessageType.MATCH_STATE_UPDATE, update));
+  }
+
+  private void sendToBoth(NetworkMatch match, NetworkMessage message) {
     for (MatchRole role : MatchRole.values()) {
       ClientConnection target = sessions.connectionOf(match.playerOf(role));
       if (target != null) {
-        target.send(NetworkMessage.event(MessageType.MATCH_STATE_UPDATE, update));
+        target.send(message);
       }
     }
   }
@@ -242,10 +302,12 @@ public final class RequestRouter {
     matchmaking.cancel(username);
     NetworkMatch match = matches.matchOf(username);
     if (match != null) {
-      ClientConnection opponent = sessions.connectionOf(match.opponentOf(username));
-      if (opponent != null) {
+      String opponentName = match.opponentOf(username);
+      ClientConnection opponent = sessions.connectionOf(opponentName);
+      if (match.claimEnded() && opponent != null) {
         opponent.send(NetworkMessage.event(MessageType.MATCH_ENDED,
-            new Payloads.MatchEnded(match.getId(), match.opponentOf(username), "opponent left")));
+            new Payloads.MatchEnded(match.getId(), opponentName, username,
+                match.roleOf(opponentName), "your opponent left the match")));
       }
       matches.end(match.getId());
     }

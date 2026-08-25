@@ -142,8 +142,10 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     header.add(new Label(title(), skin, UiSkinProvider.LABEL_BIG)).left().padRight(24f);
     status = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
     header.add(status).left().expandX();
-    header.add(barButton("Pause", this::togglePause)).width(120f).height(44f).padRight(6f);
-    header.add(barButton("Give up", this::leave)).width(140f).height(44f);
+    if (canPause()) {
+      header.add(barButton("Pause", this::togglePause)).width(120f).height(44f).padRight(6f);
+    }
+    header.add(barButton(leaveLabel(), this::leave)).width(140f).height(44f);
     root.add(header).growX().row();
 
     picker = new Table();
@@ -267,8 +269,17 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     shapes.rect(x - 2f, geometry.rowToY(ROWS - 1), 4f, geometry.getCellHeight() * ROWS);
   }
 
+  /** False for a match whose clock is somewhere else, which nothing here may stop. */
+  protected boolean canPause() {
+    return true;
+  }
+
+  protected String leaveLabel() {
+    return "Give up";
+  }
+
   private void togglePause() {
-    if (ended) {
+    if (ended || !canPause()) {
       return;
     }
     paused = !paused;
@@ -281,27 +292,36 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     }
   }
 
-  /** The clear is recorded by the same Phase One path the terminal build uses. */
   private void finish() {
     ended = true;
     paused = false;
     boolean won = engineWon();
-    User user = UserManager.getInstance().getCurrentUser();
-    if (won && user != null) {
-      MiniGameLauncher.awardClear(user, type, level);
-      try {
-        UserManager.getInstance().updateCurrentUserGameState();
-      } catch (Exception e) {
-        toast(e.getMessage() == null ? "could not save your progress" : e.getMessage());
-      }
-    }
+    recordOutcome(won);
     if (skin == null) {
       return;
     }
     Table body = new Table();
     body.add(new Label(won ? outcomeWon() : outcomeLost(), skin, UiSkinProvider.LABEL_MEDIUM));
     Popup.show(stage, skin, won ? "You win" : "You lose", body,
-        "Back to mini-games", this::leave, null, null);
+        leaveButtonLabel(), this::leave, null, null);
+  }
+
+  /** The clear is recorded by the same Phase One path the terminal build uses. */
+  protected void recordOutcome(boolean won) {
+    User user = UserManager.getInstance().getCurrentUser();
+    if (!won || user == null) {
+      return;
+    }
+    MiniGameLauncher.awardClear(user, type, level);
+    try {
+      UserManager.getInstance().updateCurrentUserGameState();
+    } catch (Exception e) {
+      toast(e.getMessage() == null ? "could not save your progress" : e.getMessage());
+    }
+  }
+
+  protected String leaveButtonLabel() {
+    return "Back to mini-games";
   }
 
   protected String outcomeWon() {
@@ -312,7 +332,7 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     return "The zombies won this one.";
   }
 
-  private void leave() {
+  protected void leave() {
     game.switchScreen(new MiniGamesScreen(game));
   }
 

@@ -7,6 +7,18 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    // همان مِیوِن‌سنترال با آدرس اصلی خودش، فقط برای گروه‌های JUnit. گریدل کش را به‌ازای
+    // هر مخزن نگه می‌دارد، پس این باعث می‌شود ماشینی که این آرتیفکت‌ها را قبلا از این آدرس
+    // گرفته، آفلاین هم پیدایشان کند. content{} لازم است تا بقیه وابستگی‌ها سراغ اینجا نروند.
+    maven {
+        url 'https://repo1.maven.org/maven2/'
+        content {
+            includeGroupByRegex "org\\.junit.*"
+            includeGroup 'org.opentest4j'
+            includeGroup 'org.apiguardian'
+            includeGroup 'org.jspecify'
+        }
+    }
     // pvz-skin و TenPatch فقط از جیت‌پک منتشر شده‌اند
     maven { url 'https://jitpack.io' }
 }
@@ -16,10 +28,11 @@ dependencies {
     implementation 'ch.qos.logback:logback-classic:1.4.7'
     implementation 'com.esotericsoftware:kryonet:2.22.0-RC1'
     implementation 'com.google.code.gson:gson:2.10.1'
-    testImplementation platform('org.junit:junit-bom:5.10.0')
+    // نسخه‌ها از BOM می‌آیند تا api/engine/launcher هم‌نسخه بمانند.
+    // launcher را گریدل ۹ خودش اضافه نمی‌کند و بدون آن تسک test اصلا بالا نمی‌آید.
+    testImplementation platform('org.junit:junit-bom:6.1.3')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'com.esotericsoftware:kryonet:2.22.0-RC1'
     implementation 'com.badlogicgames.gdx:gdx:1.12.1'
     implementation 'com.badlogicgames.gdx:gdx-platform:1.12.1:natives-desktop'
@@ -49,6 +62,13 @@ sourceSets {
         // تصاویر/فونت‌ها/... مربوط به نسخه گرافیکی؛ روی کلاس‌پث می‌رود تا Gdx.files.internal پیدایشان کند
         resources {
             srcDir 'assets'
+        }
+    }
+    // تست‌ها بیرون از src/ هستند چون srcDir اصلی خودِ src است؛
+    // اگر داخلش بودند، کامپایل main هم سعی می‌کرد آن‌ها را بسازد و JUnit روی کلاسپثش نیست.
+    test {
+        java {
+            srcDirs = ['test']
         }
     }
 }
