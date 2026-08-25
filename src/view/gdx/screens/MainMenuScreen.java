@@ -48,6 +48,12 @@ public final class MainMenuScreen extends MenuScreen {
       menu.add(button("PLAY", UiSkinProvider.BUTTON_GREEN, this::play))
           .width(420f)
           .height(96f)
+          .padBottom(12f)
+          .row();
+      menu.add(button("MULTIPLAYER", UiSkinProvider.BUTTON_PURPLE,
+              () -> go(new MultiplayerScreen(game))))
+          .width(420f)
+          .height(72f)
           .padBottom(24f)
           .row();
     } else {

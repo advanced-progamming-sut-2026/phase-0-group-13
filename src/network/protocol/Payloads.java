@@ -3,6 +3,7 @@ package network.protocol;
 import com.google.gson.JsonElement;
 import java.util.List;
 import model.enums.MatchRole;
+import model.game.minigame.arcade.IZombieMatch;
 
 public final class Payloads {
 
@@ -55,13 +56,23 @@ public final class Payloads {
 
   public record MatchInviteDecision(String inviteId, boolean accepted) {}
 
-  public record MatchFound(String matchId, String opponent, MatchRole role) {}
+  /** level and seed so a client can name the match it is in; the board itself comes in state. */
+  public record MatchFound(String matchId, String opponent, MatchRole role, int level) {}
 
-  public record MatchEnded(String matchId, String winner, String reason) {}
+  /** winner and loser are usernames; winningRole is which side of the board took it. */
+  public record MatchEnded(
+      String matchId, String winner, String loser, MatchRole winningRole, String reason) {}
 
   public record GameAction(String matchId, String action, String argument, int row, int col) {}
 
-  public record MatchStateUpdate(String matchId, String state) {}
+  /**
+   * The whole authoritative board, once per server tick.
+   *
+   * <p>It used to carry a single formatted string, which meant a client could show a brain count
+   * and nothing else and had to simulate the rest to draw it. Carrying the engine's own snapshot
+   * is what makes the server the only place the game actually runs.
+   */
+  public record MatchStateUpdate(String matchId, IZombieMatch.Snapshot state) {}
 
   public enum ReactionKind {
     TEXT,

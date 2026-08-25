@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import model.enums.MatchRole;
+import model.game.minigame.arcade.IZombieAction;
 import network.protocol.MessageType;
 import network.protocol.NetworkMessage;
 import network.protocol.Payloads;
@@ -110,11 +112,86 @@ public final class ClientSession {
     return match;
   }
 
+  /** Which side of the board this client is playing, or null when it is not in a match. */
+  public MatchRole getRole() {
+    Payloads.MatchFound current = match;
+    return current == null ? null : current.role();
+  }
+
+  /**
+   * Forgets the match without telling the server.
+   *
+   * <p>For the screen that has finished showing a verdict: MATCH_ENDED already cleared it, and
+   * this is only for the paths that leave a match some other way, such as backing out of the
+   * lobby while an invite was still in flight.
+   */
+  public void clearMatch() {
+    match = null;
+  }
+
+  /**
+   * Joins the random queue. The reply says whether it paired immediately or is waiting; the match
+   * itself arrives later as a MATCH_FOUND event either way.
+   */
+  public Payloads.Ack requestMatchmaking(String game) throws IOException {
+    return ack(client.request(MessageType.MATCHMAKING_REQUEST,
+        new Payloads.MatchmakingRequest(game)));
+  }
+
+  public Payloads.Ack cancelMatchmaking() throws IOException {
+    return ack(client.request(MessageType.MATCHMAKING_CANCEL, null));
+  }
+
+  /** Asks the server to invite a named player. The server owns "is that account online". */
+  public Payloads.Ack invite(String targetUsername) throws IOException {
+    return ack(client.request(MessageType.MATCH_INVITE,
+        new Payloads.MatchInviteRequest(targetUsername)));
+  }
+
+  public Payloads.Ack answerInvite(String inviteId, boolean accepted) throws IOException {
+    return ack(client.request(MessageType.MATCH_INVITE_DECISION,
+        new Payloads.MatchInviteDecision(inviteId, accepted)));
+  }
+
+  /**
+   * Asks the server to make a move. Nothing here decides whether it is legal - the reply is the
+   * engine's own verdict, and the board only changes when the next state update says it did.
+   *
+   * @return null when the server applied it, otherwise the refusal to show the player
+   */
+  public String sendAction(String matchId, IZombieAction action) throws IOException {
+    String kind = action.kind() == IZombieAction.Kind.PLACE_PLANT ? "place-plant" : "place-zombie";
+    Payloads.Ack reply = ack(client.request(MessageType.GAME_ACTION,
+        new Payloads.GameAction(matchId, kind, action.type(), action.row(), action.col())));
+    return reply.success() ? null : reply.message();
+  }
+
+  public Payloads.Ack sendReaction(String matchId, Payloads.ReactionKind kind, String value)
+      throws IOException {
+    return ack(client.request(MessageType.REACTION, new Payloads.Reaction(matchId, kind, value)));
+  }
+
+  /** An ERROR reply carries an Ack too, so both shapes read the same way. */
+  private static Payloads.Ack ack(NetworkMessage reply) {
+    Payloads.Ack payload = reply.payloadAs(Payloads.Ack.class);
+    if (payload == null) {
+      return new Payloads.Ack(false, "error: empty response from the server");
+    }
+    return reply.type() == MessageType.ERROR && payload.success()
+        ? new Payloads.Ack(false, payload.message())
+        : payload;
+  }
+
   /** Server pushes (events, not replies) go to every listener registered here. */
   public void onEvent(Consumer<NetworkMessage> listener) {
     if (listener != null) {
       listeners.add(listener);
     }
+  }
+
+  /** A screen that registered one must take it off again, or it keeps a disposed stage alive. */
+  public void removeEventListener(Consumer<NetworkMessage> listener) {
+    listeners.remove(listener);
   }
 
   private void onServerEvent(NetworkMessage message) {

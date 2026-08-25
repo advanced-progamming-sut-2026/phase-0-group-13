@@ -27,14 +27,12 @@ import view.gdx.ui.SeedCard;
  * {@link IZombieEngine#placeZombie}, so the red line, the price, the recharge and the level's
  * roster are all refused by the engine and reported as it words them, not re-checked here.
  *
- * <p>The lawn's defenders are the engine's cardboard cutouts. It gives them a range and a rate of
- * fire and no name, so they are drawn as the Peashooter, which is the plant that behaves that way.
- * The zombie the player deploys walks, eats and dies from its own rig.
+ * <p>The lawn's defenders are the engine's cardboard cutouts, which it names for what they do --
+ * a Peashooter's range and rate of fire -- so each one is drawn as the plant it says it is. The
+ * zombie the player deploys walks, eats and dies from its own rig.
  */
 public final class IZombieScreen extends ArcadeBoardScreen {
 
-  /** The cutouts are nameless shooters in the engine; a Peashooter is what that describes. */
-  private static final String CUTOUT_PLANT = "Peashooter";
   private static final float BRAIN_ROW_FILL = 0.42f;
   private static final Color READY = new Color(1f, 1f, 1f, 1f);
   private static final Color UNAVAILABLE = new Color(0.45f, 0.45f, 0.5f, 1f);
@@ -145,7 +143,7 @@ public final class IZombieScreen extends ArcadeBoardScreen {
       }
     }
     for (DefensePlant plant : engine.getDefensePlants()) {
-      art.drawPlant(batch, plant, CUTOUT_PLANT, plant.getCol(), plant.getRow());
+      art.drawPlant(batch, plant, plant.getName(), plant.getCol(), plant.getRow());
     }
     for (DeployedZombie zombie : engine.getDeployedZombies()) {
       if (zombie.isDead()) {

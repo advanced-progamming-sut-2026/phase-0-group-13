@@ -37,13 +37,38 @@ public final class MatchmakingService {
     return queue.size();
   }
 
+  public synchronized boolean isQueued(String username) {
+    for (String waiting : queue) {
+      if (waiting.equalsIgnoreCase(username)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public Invite invite(String from, String to) {
     Invite invite = new Invite(UUID.randomUUID().toString(), from, to);
     invites.put(invite.id(), invite);
     return invite;
   }
 
-  public Invite consumeInvite(String inviteId) {
-    return inviteId == null ? null : invites.remove(inviteId);
+  /**
+   * Takes an invite, but only for the player it was addressed to.
+   *
+   * <p>The recipient is not optional and there is no overload without it. An invite id is a
+   * plain UUID travelling over the wire, and the version of this that took the id alone let any
+   * signed-in account accept somebody else's invitation and be dropped into their match -- so the
+   * check is not a nicety, it is the only thing standing between an id and a stranger's game.
+   *
+   * @return the invite, now consumed, or null if there is no such invite or it is not this
+   *         player's to accept
+   */
+  public synchronized Invite consumeInvite(String inviteId, String recipient) {
+    Invite invite = inviteId == null ? null : invites.get(inviteId);
+    if (invite == null || recipient == null || !invite.to().equalsIgnoreCase(recipient)) {
+      return null;
+    }
+    invites.remove(inviteId);
+    return invite;
   }
 }
