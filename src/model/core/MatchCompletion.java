@@ -37,9 +37,11 @@ public final class MatchCompletion {
     if (result.isWon() && allLawnmowersUnused(match)) {
       match.registerCombatEvent(ScoreEvent.WAVE_CLEARED_NO_LOSS);
     }
+    // Read before applyScoresToUser: banking the points to the account resets the run counter to
+    // zero, so asking afterwards would send the server a nought on every single run.
+    int bonusScore = match.getScoreManager().getCurrentMatchScore();
     if (match.isBonusMatch()) {
-      System.out.println("Game Bonus finished! MyoPoints earned this run: "
-              + match.getScoreManager().getCurrentMatchScore());
+      System.out.println("Game Bonus finished! MyoPoints earned this run: " + bonusScore);
     }
 
     User user = UserManager.getInstance().getCurrentUser();
@@ -48,7 +50,7 @@ public final class MatchCompletion {
     }
     match.getScoreManager().applyScoresToUser(user);
     if (match.isBonusMatch()) {
-      submitBonusScore(match.getScoreManager().getCurrentMatchScore());
+      submitBonusScore(bonusScore);
       save();
       return;
     }

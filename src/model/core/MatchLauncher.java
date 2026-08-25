@@ -160,7 +160,9 @@ public final class MatchLauncher {
   }
 
   public static SpecialStageRule selectionRule() {
-    if (MatchSetup.getInstance().getCurrentMiniGame() != model.enums.MiniGameType.NONE) {
+    // A mini-game and the bonus run are both outside the adventure, so no stage locks their deck.
+    if (MatchSetup.getInstance().getCurrentMiniGame() != model.enums.MiniGameType.NONE
+            || MatchSetup.getInstance().isBonusRun()) {
       return null;
     }
     SpecialStageRule rule =

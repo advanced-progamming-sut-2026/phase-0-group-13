@@ -54,6 +54,13 @@ public final class MainMenuScreen extends MenuScreen {
               () -> go(new MultiplayerScreen(game))))
           .width(420f)
           .height(72f)
+          .padBottom(12f)
+          .row();
+      // The daily scored run: the only thing that fills My Point on the leaderboard.
+      menu.add(button("BONUS GAME", UiSkinProvider.BUTTON_BROWN,
+              () -> go(PlantSelectionScreen.forBonusGame(game))))
+          .width(420f)
+          .height(72f)
           .padBottom(24f)
           .row();
     } else {

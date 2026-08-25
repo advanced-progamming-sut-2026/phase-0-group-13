@@ -20,6 +20,7 @@ import model.game.minigame.TimedWarRule;
 import model.game.plant.Plant;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.game.zombie.Zombie;
+import model.core.BonusGameLauncher;
 import model.core.GameManager;
 import model.core.GameSession;
 import model.core.MatchCompletion;
@@ -69,6 +70,8 @@ public final class GameplayScreen extends BaseScreen {
   private GdxGameActions actions;
   private boolean ended;
   private boolean paused;
+  /** The run's MyoPoints, read at the whistle before the account banks (and clears) them. */
+  private int bonusScore;
   /** True while the level-start popups are up, so nobody loses the lawn while reading them. */
   private boolean intro;
   private int lastWave;
@@ -156,9 +159,14 @@ public final class GameplayScreen extends BaseScreen {
     return user == null ? 1 : Math.max(1, user.getPlantLevel(plant));
   }
 
+  /** True for the daily score run, which belongs to the main menu rather than the adventure map. */
+  private boolean isBonus() {
+    return match != null && match.isBonusMatch();
+  }
+
   private void leave() {
     GameSession.end();
-    game.switchScreen(new AdventureScreen(game));
+    game.switchScreen(isBonus() ? new MainMenuScreen(game) : new AdventureScreen(game));
   }
 
   /** Save & Exit: keep whatever the match already awarded, then back out. */
@@ -174,8 +182,13 @@ public final class GameplayScreen extends BaseScreen {
 
   /** Rebuilds the level from the same MatchSetup. */
   private void restart() {
+    boolean bonus = isBonus();
     GameSession.end();
-    MatchLauncher.launch();
+    if (bonus) {
+      BonusGameLauncher.launch();
+    } else {
+      MatchLauncher.launch();
+    }
     GameManager restarted = GameSession.getActiveGame();
     if (restarted == null) {
       leave();
@@ -232,6 +245,15 @@ public final class GameplayScreen extends BaseScreen {
 
   private String briefingText() {
     StringBuilder text = new StringBuilder();
+    if (isBonus()) {
+      // Same seed for everyone today, which is the whole point of scoring it against other players.
+      text.append("Today's Bonus Game: every player faces the same ")
+          .append(match.getTotalWaves())
+          .append(" waves.\n")
+          .append("Score as many points as you can before they reach your house.\n")
+          .append("Your best run goes to the server and shows as My Point on the leaderboard.");
+      return text.toString();
+    }
     text.append(match.getTotalWaves()).append(" waves of zombies incoming.\n");
     if (match.getBoard() != null && match.getBoard().getGameState().isSkySunDisabled()) {
       text.append("No sun will fall from the sky -- grow your own.\n");
@@ -329,6 +351,11 @@ public final class GameplayScreen extends BaseScreen {
 
   /** What this stage wants, for the rules the lawn doesn't explain on its own. */
   private String objectiveText() {
+    if (isBonus()) {
+      // The score is the objective here, so it goes where the objective line already is.
+      return "MyoPoints " + match.getScoreManager().getCurrentMatchScore()
+          + "   -   survive for as long as you can";
+    }
     SpecialStageRule rule = match.getSpecialStageRule();
     if (rule instanceof TimedWarRule timed) {
       int survived = timed.getTimeLimitTicks() - timed.remainingTicks();
@@ -413,6 +440,8 @@ public final class GameplayScreen extends BaseScreen {
       return;
     }
     ended = true;
+    // Same reason MatchCompletion reads it early: applying the run to the account zeroes it.
+    bonusScore = match.getScoreManager().getCurrentMatchScore();
     MatchCompletion.apply(match);
     paused = false;
     if (game.getUiSkin().get() == null) {
@@ -431,10 +460,16 @@ public final class GameplayScreen extends BaseScreen {
   private void showOutcome(boolean won) {
     Table body = new Table();
     body.add(new Label(won ? "Level cleared!" : "The zombies ate your brains!",
-        game.getUiSkin().get(), UiSkinProvider.LABEL_MEDIUM));
+        game.getUiSkin().get(), UiSkinProvider.LABEL_MEDIUM)).row();
+    if (isBonus()) {
+      // The run is scored either way here, so the number matters more than the verdict.
+      body.add(new Label("MyoPoints this run: " + bonusScore
+          + "\nSent to the server; the leaderboard keeps your best.",
+          game.getUiSkin().get(), UiSkinProvider.LABEL_MEDIUM)).padTop(8f).row();
+    }
     // nothing to cancel once the match is over, so leaving is the only way out
     Popup.show(hud.getStage(), game.getUiSkin().get(), won ? "You win" : "You lose", body,
-        "Back to map", this::leave, null, null);
+        isBonus() ? "Back to menu" : "Back to map", this::leave, null, null);
   }
 
   @Override

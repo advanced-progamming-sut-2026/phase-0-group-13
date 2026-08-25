@@ -33,6 +33,7 @@ import network.client.ClientSession;
 import network.protocol.MessageType;
 import network.protocol.NetworkMessage;
 import network.protocol.Payloads;
+import view.gdx.animation.AnimationLibrary;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.render.ArcadeRenderer;
 import view.gdx.ui.HudArt;
@@ -58,6 +59,8 @@ public final class NetworkIZombieScreen extends ArcadeBoardScreen {
   private static final float BRAIN_ROW_FILL = 0.42f;
   private static final float REACTION_SECONDS = 4f;
   private static final float REACTION_ICON_FILL = 0.8f;
+  /** Lanes tall. Bigger than an emoji so it reads across the board, short of overhanging the lawn. */
+  private static final float STICKER_ROW_FILL = 1.3f;
   private static final Color READY = new Color(1f, 1f, 1f, 1f);
   private static final Color UNAVAILABLE = new Color(0.45f, 0.45f, 0.5f, 1f);
   private static final Color EATEN_BRAIN = new Color(0.35f, 0.35f, 0.38f, 0.55f);
@@ -65,6 +68,23 @@ public final class NetworkIZombieScreen extends ArcadeBoardScreen {
   /** Three of each, as the doc asks. The emoji are the game's own icons; see {@link #emojiArt}. */
   private static final String[] TEXT_REACTIONS = {"Nice one!", "Is that all?", "Good game!"};
   private static final String[] EMOJI_REACTIONS = {"brain", "sun", "plantfood"};
+
+  /**
+   * The three animated stickers, as {@code label | kind | rig | clip}.
+   *
+   * <p>They are the game's own rigs rather than new art: a chomper biting, a gargantuar swinging
+   * and the jester spinning are already animated by {@link ArcadeRenderer#drawSticker}, which loops
+   * whichever clip is named here. A rig with no animation on this machine falls back to the
+   * sender's label, the same way a missing emoji icon does.
+   */
+  private static final Sticker[] STICKER_REACTIONS = {
+      new Sticker("Chomp!", AnimationLibrary.PLANTS, "chomper", "bite"),
+      new Sticker("Smash!", AnimationLibrary.ZOMBIES, "zombietutorialgargantuar", "smash_left"),
+      new Sticker("Spin!", AnimationLibrary.ZOMBIES, "zombiedarkjugglerdefault", "spin"),
+  };
+
+  /** One animated sticker: what the button says, and which rig and clip play when it lands. */
+  private record Sticker(String label, String kind, String rig, String clip) {}
 
   private final ClientSession session = ClientSession.getInstance();
   private final HudArt hudArt = new HudArt();
@@ -83,6 +103,10 @@ public final class NetworkIZombieScreen extends ArcadeBoardScreen {
   private String chosen;
   private Label reactionLabel;
   private TextureRegion reactionIcon;
+  /** The sticker currently playing on screen, or null when the reaction is text or an emoji. */
+  private Sticker reactionSticker;
+  /** Fresh per arrival, so a sticker sent twice restarts rather than resuming mid-clip. */
+  private Object reactionPlaybackKey;
   private float reactionLeft;
   private boolean outcomeRecorded;
 
@@ -217,7 +241,20 @@ public final class NetworkIZombieScreen extends ArcadeBoardScreen {
       });
       icons.add(button).size(46f).padBottom(3f).row();
     }
-    bar.add(icons).padRight(10f);
+    bar.add(icons).padRight(8f);
+
+    Table stickers = new Table();
+    for (Sticker sticker : STICKER_REACTIONS) {
+      TextButton button = new TextButton(sticker.label(), skin, UiSkinProvider.BUTTON_PURPLE);
+      button.addListener(new ClickListener() {
+        @Override
+        public void clicked(InputEvent event, float x, float y) {
+          send(Payloads.ReactionKind.STICKER, sticker.label());
+        }
+      });
+      stickers.add(button).width(110f).height(38f).padBottom(3f).row();
+    }
+    bar.add(stickers).padRight(10f);
 
     reactionLabel = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
     reactionLabel.setWrap(true);
@@ -249,11 +286,28 @@ public final class NetworkIZombieScreen extends ArcadeBoardScreen {
     reactionIcon = reaction.kind() == Payloads.ReactionKind.EMOJI
         ? emojiArt(reaction.value())
         : null;
+    reactionSticker = reaction.kind() == Payloads.ReactionKind.STICKER
+        ? stickerFor(reaction.value())
+        : null;
+    // a new key restarts the clip, so the same sticker twice in a row plays twice
+    reactionPlaybackKey = new Object();
     reactionLeft = REACTION_SECONDS;
     if (reactionLabel != null) {
+      // The picture carries an emoji, but a sticker is worth naming: it is a phrase as much as art.
+      boolean pictureSaysItAll = reactionIcon != null;
       reactionLabel.setText(reaction.fromUsername() + ": "
-          + (reactionIcon == null ? reaction.value() : ""));
+          + (pictureSaysItAll ? "" : reaction.value()));
     }
+  }
+
+  /** The sticker this label names, or null if the sender had one this build does not. */
+  private static Sticker stickerFor(String label) {
+    for (Sticker sticker : STICKER_REACTIONS) {
+      if (sticker.label().equals(label)) {
+        return sticker;
+      }
+    }
+    return null;
   }
 
   private void choose(String type) {
@@ -393,7 +447,12 @@ public final class NetworkIZombieScreen extends ArcadeBoardScreen {
     }
     if (reactionLeft > 0f) {
       reactionLeft -= delta;
-      if (reactionIcon != null) {
+      // Corner of the board, out of the lanes that matter, as the doc suggests.
+      if (reactionSticker != null) {
+        art.drawSticker(batch, reactionPlaybackKey, reactionSticker.kind(),
+            reactionSticker.rig(), reactionSticker.clip(),
+            COLUMNS - 1, ROWS - 1, STICKER_ROW_FILL);
+      } else if (reactionIcon != null) {
         art.drawProp(batch, reactionIcon, COLUMNS - 1, ROWS - 1, REACTION_ICON_FILL);
       }
     }

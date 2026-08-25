@@ -175,6 +175,44 @@ public final class ArcadeRenderer implements Disposable {
     return true;
   }
 
+  /**
+   * Plays an entity's rig loose on the board as a sticker, centred on a cell rather than standing
+   * in it.
+   *
+   * <p>The reaction stickers are the game's own rigs -- a chomper biting, a gargantuar swinging --
+   * rather than new art, so they animate for the same reason everything else does and cost nothing
+   * but a manifest lookup. Clips loop, so a sticker keeps moving for as long as it is shown.
+   *
+   * <p>Sized against the lane rather than through {@link #scaleFor}: that clamps a sprite to one
+   * cell's width so board entities cannot overlap their neighbours, which is exactly the wrong
+   * rule for something meant to sit over the board and be noticed.
+   *
+   * @param kind {@link AnimationLibrary#PLANTS} or {@link AnimationLibrary#ZOMBIES}
+   * @param rig the entity whose animation to play, e.g. {@code chomper}
+   * @param clip the wanted clip; falls back to the rig's idle when it has no such clip
+   * @param rowFill how many lanes tall the sticker should stand
+   * @return false when this rig has no animation, so the caller can show a still instead
+   */
+  public boolean drawSticker(Batch batch, Object key, String kind, String rig, String clip,
+      double col, int row, float rowFill) {
+    EntityAnimation animation = animations.find(kind, rig);
+    String playing = animation == null ? null : animation.pickClip(clip, "idle");
+    if (playing == null) {
+      return false;
+    }
+    float drawnHeight = animation.height(playing);
+    if (drawnHeight <= 0f) {
+      return false;
+    }
+    float scale = geometry.getCellHeight() * rowFill / drawnHeight;
+    animation.draw(batch, playing, playback.advance(key, playing, delta),
+        geometry.columnCentreX(col),
+        // centred on the cell, not standing on it: a sticker floats rather than occupying a tile
+        geometry.rowCentreY(row) - drawnHeight * scale / 2f,
+        scale, false);
+    return true;
+  }
+
   /** A flat prop -- a vase, a nut, a brain -- sized to a fraction of the lane and centred on it. */
   public void drawProp(Batch batch, TextureRegion region, double col, int row, float rowFraction) {
     if (region == null) {

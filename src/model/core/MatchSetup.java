@@ -16,6 +16,7 @@ public class MatchSetup {
   private int miniGameLevel;
   private int difficultyLevel = 3;
   private int maxDeckSlots = 8;
+  private boolean bonusRun;
 
   private MatchSetup() {
     selectedPlants = new ArrayList<>();
@@ -39,6 +40,25 @@ public class MatchSetup {
     this.targetChapter = targetChapter;
     this.targetLevel = 0;
     this.currentMiniGame = MiniGameType.NONE;
+    this.bonusRun = false;
+  }
+
+  /**
+   * Marks the next match as a bonus run: the daily score game, which belongs to no chapter and no
+   * mini-game, so none of the adventure's stage rules apply to it.
+   *
+   * <p>Kept here rather than worked out at launch because the deck is chosen first, and the plant
+   * selection screen has to know there is no stage locking anything out before the match exists.
+   */
+  public void setBonusRun() {
+    this.bonusRun = true;
+    this.targetChapter = null;
+    this.targetLevel = 0;
+    this.currentMiniGame = MiniGameType.NONE;
+  }
+
+  public boolean isBonusRun() {
+    return bonusRun;
   }
 
   public String getTargetChapter() {
@@ -59,6 +79,7 @@ public class MatchSetup {
     this.miniGameLevel = level;
     this.targetChapter = null;
     this.targetLevel = 0;
+    this.bonusRun = false;
   }
 
   public MiniGameType getCurrentMiniGame() {

@@ -10,6 +10,7 @@ import data.persistence.UserManager;
 import java.util.List;
 import model.Result;
 import model.account.User;
+import model.core.BonusGameLauncher;
 import model.core.GameManager;
 import model.core.GameSession;
 import model.core.MatchLauncher;
@@ -35,25 +36,44 @@ public final class PlantSelectionScreen extends MenuScreen {
   private static final int GRID_COLUMNS = 6;
 
   private final int chapter;
+  private final boolean bonus;
   private final PlantArt plantArt = new PlantArt();
   private final HudArt hudArt = new HudArt();
 
   private Table content;
 
   public PlantSelectionScreen(PvzGdxGame game, int chapter) {
+    this(game, chapter, false);
+  }
+
+  /**
+   * Deck building for the daily bonus run.
+   *
+   * <p>Same screen because the choosing is the same: the only differences are where Back goes and
+   * which launcher Start hands off to. {@link MatchSetup#setBonusRun()} has already told
+   * {@link MatchLauncher#selectionRule()} that no stage is locking plants out, so the almanac needs
+   * no special case. Egypt's backdrop stands in, the bonus run having no season of its own.
+   */
+  public static PlantSelectionScreen forBonusGame(PvzGdxGame game) {
+    MatchSetup.getInstance().setBonusRun();
+    return new PlantSelectionScreen(game, 1, true);
+  }
+
+  private PlantSelectionScreen(PvzGdxGame game, int chapter, boolean bonus) {
     super(game);
     this.chapter = chapter;
+    this.bonus = bonus;
   }
 
   @Override
   protected String title() {
-    return "Choose your plants";
+    return bonus ? "Bonus Game  -  choose your plants" : "Choose your plants";
   }
 
   @Override
   protected Screen backTarget() {
-    // Back into this chapter's level grid, not the chapter list the player already stepped past.
-    return new AdventureScreen(game, chapter);
+    // For a chapter, back into its level grid rather than the chapter list already stepped past.
+    return bonus ? new MainMenuScreen(game) : new AdventureScreen(game, chapter);
   }
 
   @Override
@@ -249,10 +269,14 @@ public final class PlantSelectionScreen extends MenuScreen {
     MatchSetup.getInstance().setBoostedPlants(user.getBoostedPlants());
     MatchSetup.getInstance().setDifficultyLevel(user.getDifficultyLevel());
 
-    MatchLauncher.launch();
+    if (bonus) {
+      BonusGameLauncher.launch();
+    } else {
+      MatchLauncher.launch();
+    }
     GameManager started = GameSession.getActiveGame();
     if (started == null) {
-      toast("could not start the level");
+      toast(bonus ? "could not start the bonus run" : "could not start the level");
       return;
     }
     go(new GameplayScreen(game, started));
