@@ -3,6 +3,7 @@ package view.gdx.render;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import model.core.GameManager;
 import model.environment.AncientEgyptSeason;
@@ -13,6 +14,7 @@ import model.game.minigame.DeadLineRule;
 import model.game.minigame.SaveOurSeedsRule;
 import model.game.minigame.SpecialStageRule;
 import model.game.plant.Plant;
+import view.gdx.ui.HudArt;
 
 /**
  * The bits of a stage that live on the lawn rather than in the HUD: the cells Save Our Seeds is
@@ -29,6 +31,7 @@ public final class StageRuleRenderer implements WorldRenderer {
   private static final float SWIRL_SPEED = 260f;
 
   private final LawnGeometry geometry;
+  private final HudArt hudArt = new HudArt();
   private final Color guardFill = new Color(0.35f, 1f, 0.45f, 0.22f);
   private final Color guardEdge = new Color(0.45f, 1f, 0.55f, 0.95f);
   private final Color deadline = new Color(1f, 0.2f, 0.18f, 0.85f);
@@ -99,6 +102,8 @@ public final class StageRuleRenderer implements WorldRenderer {
     }
     shapes.end();
 
+    // The swirl outline carries the read; the sand art sits under it for texture. On Egypt's own
+    // sandy ground the art alone is too low-contrast to say anything.
     shapes.begin(ShapeRenderer.ShapeType.Line);
     for (AncientEgyptSeason.TornadoEvent event : events) {
       float fade = fadeOf(currentTick - event.tick(), AncientEgyptSeason.TORNADO_EVENT_TICKS);
@@ -110,6 +115,43 @@ public final class StageRuleRenderer implements WorldRenderer {
       swirl(shapes, onLawn(event.toColumn()), y, 0.6f, fade);
     }
     shapes.end();
+
+    TextureRegion cloud = hudArt.find("sandcloud");
+    TextureRegion streak = hudArt.find("sandstreak");
+    if (cloud == null) {
+      return;
+    }
+
+    context.getBatch().begin();
+    for (AncientEgyptSeason.TornadoEvent event : events) {
+      float fade = fadeOf(currentTick - event.tick(), AncientEgyptSeason.TORNADO_EVENT_TICKS);
+      if (fade <= 0f) {
+        continue;
+      }
+      float y = geometry.rowCentreY(event.row());
+      float from = onLawn(event.fromColumn());
+      float to = onLawn(event.toColumn());
+      context.getBatch().setColor(sandSwirl.r, sandSwirl.g, sandSwirl.b, fade);
+      if (streak != null) {
+        float height = geometry.getCellHeight() * 0.5f;
+        float width = streak.getRegionWidth() * height / streak.getRegionHeight();
+        for (float x = Math.min(from, to); x < Math.max(from, to); x += width * 0.8f) {
+          context.getBatch().draw(streak, x, y - height / 2f, width, height);
+        }
+      }
+      drawCloud(context, cloud, from, y, 1f, fade);
+      drawCloud(context, cloud, to, y, 0.7f, fade);
+    }
+    context.getBatch().setColor(1f, 1f, 1f, 1f);
+    context.getBatch().end();
+  }
+
+  private void drawCloud(RenderContext context, TextureRegion cloud, float x, float y, float scale,
+      float fade) {
+    float height = geometry.getCellHeight() * 0.8f * scale;
+    float width = cloud.getRegionWidth() * height / cloud.getRegionHeight();
+    context.getBatch().setColor(sandSwirl.r, sandSwirl.g, sandSwirl.b, fade);
+    context.getBatch().draw(cloud, x - width / 2f, y - height / 2f, width, height);
   }
 
   /** A zombie is picked up at the spawn column, off the right edge, so it is pulled onto the lawn. */
@@ -171,6 +213,25 @@ public final class StageRuleRenderer implements WorldRenderer {
       shapes.line(Math.max(left, x - tail), y, Math.min(left + width, x), y);
     }
     shapes.end();
+
+    TextureRegion gust = hudArt.find("snowgust");
+    if (gust == null) {
+      return;
+    }
+    float puff = geometry.getCellHeight() * 0.42f;
+    float puffWidth = gust.getRegionWidth() * puff / gust.getRegionHeight();
+    context.getBatch().begin();
+    context.getBatch().setColor(1f, 1f, 1f, fade);
+    for (int i = 0; i < 4; i++) {
+      float x = frontX + geometry.getCellWidth() * (0.55f * i - 0.3f);
+      if (x < left || x > left + width) {
+        continue;
+      }
+      float y = bottom + height * (0.2f + 0.2f * ((i + progress * 2f) % 3f));
+      context.getBatch().draw(gust, x - puffWidth / 2f, y, puffWidth, puff);
+    }
+    context.getBatch().setColor(1f, 1f, 1f, 1f);
+    context.getBatch().end();
   }
 
   /** The line the sea can never pass, and the coast strip between it and low tide. */
@@ -265,5 +326,6 @@ public final class StageRuleRenderer implements WorldRenderer {
 
   @Override
   public void dispose() {
+    hudArt.dispose();
   }
 }
