@@ -11,8 +11,11 @@ public class LootDropper {
 
   private static final double DEATH_DROP_CHANCE = 0.10;
   private static final int COIN_DROP_AMOUNT = 50;
+  private static final int MAX_PENDING_NOTICES = 8;
 
   private final List<Reward> pendingRewards = new ArrayList<>();
+  // The same lines the terminal prints, so the graphical build can show them too.
+  private final List<String> pendingNotices = new ArrayList<>();
   private final Random random;
 
   private int droppedCoins;
@@ -55,13 +58,25 @@ public class LootDropper {
     }
 
     pendingRewards.add(reward);
-    System.out.printf(
-            "A zombie dropped a %s; you have %d %s now.%n", dropName, runningTotal, unit);
+    String notice = String.format(
+            "A zombie dropped a %s; you have %d %s now.", dropName, runningTotal, unit);
+    // The terminal never drains, so the queue is capped rather than left to grow all match.
+    if (pendingNotices.size() >= MAX_PENDING_NOTICES) {
+      pendingNotices.remove(0);
+    }
+    pendingNotices.add(notice);
+    System.out.println(notice);
   }
 
   public List<Reward> drainPendingRewards() {
     List<Reward> drained = new ArrayList<>(pendingRewards);
     pendingRewards.clear();
+    return drained;
+  }
+
+  public List<String> drainPendingNotices() {
+    List<String> drained = new ArrayList<>(pendingNotices);
+    pendingNotices.clear();
     return drained;
   }
 }

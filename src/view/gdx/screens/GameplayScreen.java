@@ -26,6 +26,8 @@ import model.core.GameSession;
 import model.core.MatchCompletion;
 import model.core.MatchLauncher;
 import model.core.MatchSetup;
+import model.core.MiniGameLauncher;
+import model.enums.MiniGameType;
 import view.gdx.core.FixedStepClock;
 import view.gdx.core.GameSettings;
 import view.gdx.core.GdxConfig;
@@ -164,9 +166,20 @@ public final class GameplayScreen extends BaseScreen {
     return match != null && match.isBonusMatch();
   }
 
+  /** Zombotany is an ordinary stage, so it plays here but belongs to the mini-game menu. */
+  private boolean isMiniGame() {
+    return MatchSetup.getInstance().getCurrentMiniGame() != MiniGameType.NONE;
+  }
+
   private void leave() {
     GameSession.end();
-    game.switchScreen(isBonus() ? new MainMenuScreen(game) : new AdventureScreen(game));
+    if (isBonus()) {
+      game.switchScreen(new MainMenuScreen(game));
+    } else if (isMiniGame()) {
+      game.switchScreen(new MiniGamesScreen(game));
+    } else {
+      game.switchScreen(new AdventureScreen(game));
+    }
   }
 
   /** Save & Exit: keep whatever the match already awarded, then back out. */
@@ -183,9 +196,12 @@ public final class GameplayScreen extends BaseScreen {
   /** Rebuilds the level from the same MatchSetup. */
   private void restart() {
     boolean bonus = isBonus();
+    boolean miniGame = isMiniGame();
     GameSession.end();
     if (bonus) {
       BonusGameLauncher.launch();
+    } else if (miniGame) {
+      MiniGameLauncher.launch();
     } else {
       MatchLauncher.launch();
     }
@@ -296,6 +312,7 @@ public final class GameplayScreen extends BaseScreen {
     }
 
     watchWaves();
+    showPickups();
     updateStatus();
     hud.updateWave(match == null ? 0 : match.getCurrentWaveIndex());
     hud.updateConveyor();
@@ -326,6 +343,16 @@ public final class GameplayScreen extends BaseScreen {
     }
     // the wave count moved to the wave bar
     hud.setStatus("plant food " + match.getPlantFoodCount() + nightNote() + hint());
+  }
+
+  /** Pickups are collected for the player, so they have to be told. */
+  private void showPickups() {
+    if (match == null || match.getBoard() == null) {
+      return;
+    }
+    for (String pickup : match.getBoard().drainPendingNotices()) {
+      hud.toast(pickup);
+    }
   }
 
   /** Red banner every time the match rolls into a new wave. */
@@ -471,9 +498,14 @@ public final class GameplayScreen extends BaseScreen {
           + "\nSent to the server; the leaderboard keeps your best.",
           game.getUiSkin().get(), UiSkinProvider.LABEL_MEDIUM)).padTop(8f).row();
     }
-    // nothing to cancel once the match is over, so leaving is the only way out
-    Popup.show(hud.getStage(), game.getUiSkin().get(), won ? "You win" : "You lose", body,
-        isBonus() ? "Back to menu" : "Back to map", this::leave, null, null);
+    String leaveLabel = isBonus() ? "Back to menu" : "Back to map";
+    if (won) {
+      Popup.show(hud.getStage(), game.getUiSkin().get(), "You win", body,
+          leaveLabel, this::leave, null, null);
+      return;
+    }
+    Popup.show(hud.getStage(), game.getUiSkin().get(), "You lose", body,
+        "Retry", this::restart, leaveLabel, this::leave);
   }
 
   @Override

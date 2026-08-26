@@ -49,6 +49,24 @@ public final class RequestRouter implements MatchService.Listener {
       login(connection, message);
       return;
     }
+    // Recovery has to work for someone who cannot log in, so it sits ahead of the gate below.
+    if (message.type() == MessageType.SECURITY_QUESTION_REQUEST) {
+      connection.send(message.reply(MessageType.SECURITY_QUESTION_RESPONSE,
+          authentication.securityQuestion(
+              message.payloadAs(Payloads.SecurityQuestionRequest.class))));
+      return;
+    }
+    if (message.type() == MessageType.PASSWORD_RESET) {
+      Payloads.Ack result =
+          authentication.resetPassword(message.payloadAs(Payloads.PasswordReset.class));
+      connection.send(message.reply(
+          result.success() ? MessageType.ACK : MessageType.ERROR, result));
+      return;
+    }
+    if (message.type() == MessageType.TOKEN_LOGIN_REQUEST) {
+      tokenLogin(connection, message);
+      return;
+    }
     if (!connection.isAuthenticated()) {
       connection.send(message.reply(MessageType.ERROR, new Payloads.Ack(false, "error: log in first")));
       return;
@@ -64,6 +82,7 @@ public final class RequestRouter implements MatchService.Listener {
         matchmaking.cancel(connection.getUsername());
         connection.send(message.reply(MessageType.ACK, new Payloads.Ack(true, "left the queue")));
       }
+      case RENAME_REQUEST -> rename(connection, message);
       case MATCH_INVITE -> invite(connection, message);
       case MATCH_INVITE_DECISION -> inviteDecision(connection, message);
       case GAME_ACTION -> gameAction(connection, message);
@@ -104,7 +123,21 @@ public final class RequestRouter implements MatchService.Listener {
         authentication.login(message.payloadAs(Payloads.LoginRequest.class));
     if (response.success() && !sessions.bind(response.profile().username(), connection)) {
       connection.send(message.reply(MessageType.LOGIN_RESPONSE,
-          new Payloads.AuthResponse(false, "error: already logged in elsewhere", null)));
+          new Payloads.AuthResponse(false, "error: already logged in elsewhere", null, null)));
+      return;
+    }
+    if (response.success()) {
+      connection.setUsername(response.profile().username());
+    }
+    connection.send(message.reply(MessageType.LOGIN_RESPONSE, response));
+  }
+
+  private void tokenLogin(ClientConnection connection, NetworkMessage message) {
+    Payloads.AuthResponse response =
+        authentication.loginWithToken(message.payloadAs(Payloads.TokenLoginRequest.class));
+    if (response.success() && !sessions.bind(response.profile().username(), connection)) {
+      connection.send(message.reply(MessageType.LOGIN_RESPONSE,
+          new Payloads.AuthResponse(false, "error: already logged in elsewhere", null, null)));
       return;
     }
     if (response.success()) {
@@ -115,9 +148,31 @@ public final class RequestRouter implements MatchService.Listener {
 
   private void logout(ClientConnection connection, NetworkMessage message) {
     matchmaking.cancel(connection.getUsername());
+    authentication.clearToken(connection.getUsername());
     sessions.unbind(connection);
     connection.setUsername(null);
     connection.send(message.reply(MessageType.ACK, new Payloads.Ack(true, "logged out")));
+  }
+
+  /** Refused mid-match: the match holds both players by name. */
+  private void rename(ClientConnection connection, NetworkMessage message) {
+    Payloads.RenameRequest request = message.payloadAs(Payloads.RenameRequest.class);
+    String current = connection.getUsername();
+    if (matches.matchOf(current) != null) {
+      connection.send(message.reply(MessageType.ERROR,
+          new Payloads.Ack(false, "error: you cannot change your username during a match")));
+      return;
+    }
+    Payloads.Ack result =
+        authentication.rename(current, request == null ? null : request.newUsername());
+    if (!result.success()) {
+      connection.send(message.reply(MessageType.ERROR, result));
+      return;
+    }
+    matchmaking.cancel(current);
+    sessions.rebind(current, request.newUsername(), connection);
+    connection.setUsername(request.newUsername());
+    connection.send(message.reply(MessageType.RENAME_RESPONSE, result));
   }
 
   private void queueUp(ClientConnection connection, NetworkMessage message) {
