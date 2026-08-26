@@ -24,11 +24,25 @@ public class FrostbiteCavesSeason extends Season {
   // داک: اگر گیاه آتشین در یکی از ۸ خانهٔ اطراف باشد، یخ با نرخ ۶۰ جان بر ثانیه آب می‌شود
   private static final int FIRE_MELT_PER_TICK = 6;
 
+  /** How long a gust stays on the record, for anything drawing it. */
+  public static final int WIND_EVENT_TICKS = 28;
+
   private final Random random = new Random();
   private int lastWindTick = -1;
+  private int windRow = -1;
+  private int windTick = -1;
 
   public FrostbiteCavesSeason() {
     this.name = "Frostbite Caves";
+  }
+
+  /** -1 until the first gust. */
+  public int getWindRow() {
+    return windRow;
+  }
+
+  public int getWindTick() {
+    return windTick;
   }
 
   @Override
@@ -115,6 +129,8 @@ public class FrostbiteCavesSeason extends Season {
     lastWindTick = currentTick;
 
     int targetRow = random.nextInt(Math.max(1, board.getRows()));
+    windRow = targetRow;
+    windTick = currentTick;
     System.out.printf("A freezing wind sweeps through row %d!%n", targetRow + 1);
     for (Plant plant : board.getPlants()) {
       if (plant.getRow() == targetRow

@@ -1,5 +1,6 @@
 package model.environment;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -18,12 +19,31 @@ public class AncientEgyptSeason extends Season {
   private static final int MIN_TORNADO_JUMP = 1;
   private static final int MAX_TORNADO_JUMP = 4;
 
+  /** How long a tornado stays on the record, for anything drawing it. */
+  public static final int TORNADO_EVENT_TICKS = 22;
+  private static final int MAX_REMEMBERED_TORNADOES = 24;
+
+  public record TornadoEvent(int row, double fromColumn, double toColumn, int tick) {}
+
   private final Random random = new Random();
   private final Set<Zombie> tornadoChecked =
           Collections.newSetFromMap(new IdentityHashMap<Zombie, Boolean>());
+  private final List<TornadoEvent> tornadoes = new ArrayList<>();
 
   public AncientEgyptSeason() {
     this.name = "Ancient Egypt";
+  }
+
+  public List<TornadoEvent> getRecentTornadoes() {
+    return Collections.unmodifiableList(tornadoes);
+  }
+
+  private void recordTornado(Zombie zombie, double fromColumn, int currentTick) {
+    tornadoes.removeIf(event -> currentTick - event.tick() > TORNADO_EVENT_TICKS);
+    if (tornadoes.size() >= MAX_REMEMBERED_TORNADOES) {
+      tornadoes.remove(0);
+    }
+    tornadoes.add(new TornadoEvent(zombie.getRow(), fromColumn, zombie.getX(), currentTick));
   }
 
   private static final int TORNADO_MIN_COLUMNS = 1;
@@ -41,7 +61,9 @@ public class AncientEgyptSeason extends Season {
         continue;
       }
       int jump = MIN_TORNADO_JUMP + random.nextInt(MAX_TORNADO_JUMP - MIN_TORNADO_JUMP + 1);
+      double from = zombie.getX();
       zombie.setX(Math.max(0, zombie.getX() - jump));
+      recordTornado(zombie, from, currentTick);
       System.out.printf(
               "A tornado dropped %s %d column(s) further into the lawn, in lane %d!%n",
               zombie.getName(), jump, zombie.getRow() + 1);
@@ -69,7 +91,9 @@ public class AncientEgyptSeason extends Season {
         continue;
       }
       int jump = TORNADO_MIN_COLUMNS + random.nextInt(TORNADO_MAX_COLUMNS - TORNADO_MIN_COLUMNS + 1);
+      double from = zombie.getX();
       zombie.setX(Math.max(0, zombie.getX() - jump));
+      recordTornado(zombie, from, currentTick);
       moved++;
     }
     if (moved > 0) {

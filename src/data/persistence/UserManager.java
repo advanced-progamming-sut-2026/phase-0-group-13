@@ -18,9 +18,9 @@ import network.protocol.Payloads;
  * player's data all go through {@link ClientSession}, and nothing here decides who exists or
  * whether a password is right.
  *
- * <p>The local file is still written, but only as a mirror. Nothing in register, login or profile
- * retrieval reads it any more; it is there so the parts of Phase 1 that still walk the local list
- * (the offline leaderboard, password recovery) keep working until they are moved across too.
+ * <p>The local file is still written, but only as a mirror. Nothing in register, login, password
+ * recovery or profile retrieval reads it any more; it is there so the parts of Phase 1 that still
+ * walk the local list (the offline leaderboard) keep working until they are moved across too.
  *
  * <p>The method signatures are unchanged on purpose, so the typed controllers and the LibGDX
  * screens call exactly what they called before.
@@ -28,16 +28,20 @@ import network.protocol.Payloads;
 public class UserManager {
   private static final Gson GSON = new Gson();
 
+  private record SavedSession(String username, String token) {}
+
   private static UserManager instance;
   private final List<User> users;
   private final JsonSerializer jsonSerializer;
   private final String usersFilePath;
   private User currentUser;
-  private User recoveryUser;
   private User pendingUser;
   // The server hashes the password itself, so the plain one has to survive until the account is
   // actually committed in setSecurityQuestionForLatestUser. It never leaves this object.
   private String pendingPassword;
+  // The answer is only held so the reset call can send it again; the server decides if it is right.
+  private String recoveryUsername;
+  private String recoveryAnswer;
   private boolean isStayLoggedIn = false;
 
   private UserManager() {
@@ -106,9 +110,10 @@ public class UserManager {
     cacheLocally(user);
 
     this.isStayLoggedIn = stayLoggedIn;
-    if (stayLoggedIn) {
-      saveSessionToDisk(username);
+    if (stayLoggedIn && session.getAuthToken() != null) {
+      saveSessionToDisk(user.getUsername(), session.getAuthToken());
     } else {
+      this.isStayLoggedIn = false;
       clearSessionFromDisk();
     }
   }
@@ -131,9 +136,10 @@ public class UserManager {
       }
     }
     // An account the server holds no document for yet. It only knows the username and nickname,
-    // so the rest starts at the Phase 1 defaults and is pushed straight back up.
-    return new User(profile.username(), AuthService.hashPassword(password), "",
-        profile.nickname(), "");
+    // so the rest starts at the Phase 1 defaults and is pushed straight back up. A token login
+    // has no password to hash.
+    return new User(profile.username(), password == null ? "" : AuthService.hashPassword(password),
+        "", profile.nickname(), "");
   }
 
   /** Everything about the signed-in player, in the shape the server stores. */
@@ -142,6 +148,8 @@ public class UserManager {
         user.getNickname(),
         user.getEmail(),
         user.getPasswordHash(),
+        user.getSecurityQuestionNumber(),
+        user.getSecurityAnswer(),
         user.getCoins(),
         user.getDiamonds(),
         GSON.toJsonTree(user));
@@ -218,57 +226,84 @@ public class UserManager {
     this.pendingPassword = null;
   }
 
+  /** Step one of recovery: the server owns the lookup, the email match and the question. */
   public String initiatePasswordRecovery(String username, String email) throws Exception {
-    User foundUser = null;
-    for (User u : users) {
-      if (u.getUsername().equals(username)) {
-        foundUser = u;
-        break;
-      }
+    ClientSession session = requireSession();
+    Payloads.SecurityQuestionResponse response;
+    try {
+      response = session.requestSecurityQuestion(username, email);
+    } catch (IOException e) {
+      throw new Exception("error: could not reach the game server (" + e.getMessage() + ")");
+    }
+    if (!response.success()) {
+      this.recoveryUsername = null;
+      this.recoveryAnswer = null;
+      throw new Exception(response.message());
     }
 
-    if (foundUser == null) {
-      throw new Exception("error: username not found");
-    }
-
-    if (!foundUser.getEmail().equals(email)) {
-      throw new Exception("error: email does not match");
-    }
-
-    this.recoveryUser = foundUser;
+    this.recoveryUsername = username;
+    this.recoveryAnswer = null;
 
     model.enums.SecurityQuestion question =
-            model.enums.SecurityQuestion.fromNumber(foundUser.getSecurityQuestionNumber());
+            model.enums.SecurityQuestion.fromNumber(response.questionNumber());
     String questionText = question != null ? question.getText() : "(question unavailable)";
 
     return "Your security question is: " + questionText;
   }
 
+  /** Step two. The server holds the answer, so it is the only thing that can check it. */
   public void verifyRecoveryAnswer(String answer) throws Exception {
-    if (this.recoveryUser == null) {
+    if (this.recoveryUsername == null) {
       throw new Exception("error: no password recovery session initiated");
     }
-
-    if (!this.recoveryUser.getSecurityAnswer().equals(answer)) {
-      this.recoveryUser = null;
-      throw new Exception("error: incorrect security answer");
+    ClientSession session = requireSession();
+    Payloads.Ack response;
+    try {
+      response = session.resetPassword(this.recoveryUsername, answer, null);
+    } catch (IOException e) {
+      throw new Exception("error: could not reach the game server (" + e.getMessage() + ")");
     }
-    System.out.println("Answer verified successfully for user: " + recoveryUser.getUsername());
+    if (!response.success()) {
+      this.recoveryUsername = null;
+      this.recoveryAnswer = null;
+      throw new Exception(response.message());
+    }
+    this.recoveryAnswer = answer;
+    System.out.println("Answer verified successfully for user: " + this.recoveryUsername);
   }
 
+  /** Step three. The new hash is written on the server; the local mirror is never the authority. */
   public void resetPasswordAfterRecovery(String newPassword) throws Exception {
-    if (this.recoveryUser == null) {
+    if (this.recoveryUsername == null || this.recoveryAnswer == null) {
       throw new Exception("error: no active recovery session. Please answer the security question first.");
     }
 
     Result passCheck = AuthService.checkPassword(newPassword);
     if (!passCheck.success()) throw new Exception(passCheck.message());
 
-    this.recoveryUser.setPasswordHash(AuthService.hashPassword(newPassword));
+    ClientSession session = requireSession();
+    Payloads.Ack response;
+    try {
+      response = session.resetPassword(this.recoveryUsername, this.recoveryAnswer, newPassword);
+    } catch (IOException e) {
+      throw new Exception("error: could not reach the game server (" + e.getMessage() + ")");
+    }
+    if (!response.success()) {
+      throw new Exception(response.message());
+    }
+
+    String username = this.recoveryUsername;
+    // Keep the mirror in step so a stale hash cannot be read back by anything still using it.
+    for (User cached : users) {
+      if (cached.getUsername().equalsIgnoreCase(username)) {
+        cached.setPasswordHash(AuthService.hashPassword(newPassword));
+      }
+    }
     saveUsersToJSON();
 
-    System.out.println("Password reset successfully for user: " + this.recoveryUser.getUsername());
-    this.recoveryUser = null;
+    System.out.println("Password reset successfully for user: " + username);
+    this.recoveryUsername = null;
+    this.recoveryAnswer = null;
   }
 
   public void logout() {
@@ -286,8 +321,8 @@ public class UserManager {
     return path != null ? path.toString() : "data/database/session.json";
   }
 
-  private void saveSessionToDisk(String username) {
-    jsonSerializer.writeToFile(getSessionFilePath(), username);
+  private void saveSessionToDisk(String username, String token) {
+    jsonSerializer.writeToFile(getSessionFilePath(), new SavedSession(username, token));
   }
 
   private void clearSessionFromDisk() {
@@ -298,16 +333,41 @@ public class UserManager {
   }
 
   /**
-   * Always false now that the server authenticates.
-   *
-   * <p>The saved session only holds a username, and LOGIN_REQUEST needs the password the server
-   * hashes itself, so there is nothing here to sign in with. Restoring the locally cached account
-   * instead would put the authority back on this machine, which is exactly what Phase 3 moves
-   * away from, so the stale file is dropped and the player signs in against the server.
+   * Signs back in with the token the last "stay logged in" login saved. The server still
+   * authenticates; a token it no longer recognises is dropped and the player signs in normally.
    */
   public boolean restoreSession() {
-    clearSessionFromDisk();
-    return false;
+    // Called from both GameDataManager and the front end's start-up, so it must be safe to ask
+    // twice: the second call must not go back to the server and must not drop the file.
+    if (this.currentUser != null) {
+      return this.isStayLoggedIn;
+    }
+    SavedSession saved =
+            jsonSerializer.readFromFile(getSessionFilePath(), SavedSession.class);
+    if (saved == null || saved.username() == null || saved.token() == null) {
+      clearSessionFromDisk();
+      return false;
+    }
+
+    ClientSession session = ClientSession.getInstance();
+    if (!session.connect()) {
+      // The server is down, not the token's fault; keep it for the next start-up.
+      return false;
+    }
+    try {
+      Payloads.AuthResponse response = session.loginWithToken(saved.username(), saved.token());
+      if (!response.success()) {
+        clearSessionFromDisk();
+        return false;
+      }
+      this.currentUser = userFromProfile(response.profile(), null);
+      seedQuests(this.currentUser);
+      cacheLocally(this.currentUser);
+      this.isStayLoggedIn = true;
+      return true;
+    } catch (IOException e) {
+      return false;
+    }
   }
 
   private void seedQuests(User user) {
@@ -337,6 +397,7 @@ public class UserManager {
     return this.users;
   }
 
+  /** Renames on the server first: a rename it refuses never reaches the player's own copy. */
   public void changeUsername(String newUsername) throws Exception {
     if (this.currentUser == null) throw new Exception("error: no user is currently logged in");
     Result usernameCheck = AuthService.checkUsername(newUsername);
@@ -344,14 +405,26 @@ public class UserManager {
     if (this.currentUser.getUsername().equals(newUsername)) {
       throw new Exception("error: new username is the same as the current one");
     }
-    for (User u : users) {
-      if (u.getUsername().equals(newUsername))
-        throw new Exception("error: username already exists");
+
+    String oldUsername = this.currentUser.getUsername();
+    ClientSession session = requireSession();
+    Payloads.Ack response;
+    try {
+      response = session.rename(newUsername);
+    } catch (IOException e) {
+      throw new Exception("error: could not reach the game server (" + e.getMessage() + ")");
     }
-    // Not pushed: the server keys accounts by username and the protocol has no rename request,
-    // so a rename only lives on this machine and the server's name wins at the next sign-in.
+    if (!response.success()) {
+      throw new Exception(response.message());
+    }
+
     this.currentUser.setUsername(newUsername);
-    saveUsersToJSON();
+    users.removeIf(existing -> existing.getUsername().equalsIgnoreCase(oldUsername));
+    pushCurrentUser();
+    cacheLocally(this.currentUser);
+    if (this.isStayLoggedIn && session.getAuthToken() != null) {
+      saveSessionToDisk(newUsername, session.getAuthToken());
+    }
   }
 
   public void changeNickname(String newNickname) throws Exception {

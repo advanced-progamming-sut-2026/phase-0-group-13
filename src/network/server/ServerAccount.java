@@ -10,6 +10,10 @@ public class ServerAccount {
   private String nickname;
   private String email;
   private String gender;
+  private String securityQuestionNumber;
+  private String securityAnswer;
+  // Cleared on logout and on a password reset, so neither leaves a usable credential behind.
+  private String sessionToken;
   private int coins;
   private int diamonds;
   private Integer bestScore;
@@ -31,6 +35,34 @@ public class ServerAccount {
 
   public String getUsername() {
     return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public String getSecurityQuestionNumber() {
+    return securityQuestionNumber;
+  }
+
+  public void setSecurityQuestionNumber(String securityQuestionNumber) {
+    this.securityQuestionNumber = securityQuestionNumber;
+  }
+
+  public String getSecurityAnswer() {
+    return securityAnswer;
+  }
+
+  public void setSecurityAnswer(String securityAnswer) {
+    this.securityAnswer = securityAnswer;
+  }
+
+  public String getSessionToken() {
+    return sessionToken;
+  }
+
+  public void setSessionToken(String sessionToken) {
+    this.sessionToken = sessionToken;
   }
 
   public String getPasswordHash() {

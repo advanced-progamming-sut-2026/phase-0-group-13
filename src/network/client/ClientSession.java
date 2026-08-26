@@ -47,6 +47,7 @@ public final class ClientSession {
   private volatile Payloads.Profile profile;
   private volatile Payloads.MatchFound match;
   private volatile String lastError;
+  private volatile String authToken;
   private boolean listenerAttached;
 
   private ClientSession() {}
@@ -209,23 +210,67 @@ public final class ClientSession {
   public Payloads.AuthResponse register(Payloads.RegisterRequest request) throws IOException {
     NetworkMessage reply = client.request(MessageType.REGISTER_REQUEST, request);
     Payloads.AuthResponse response = reply.payloadAs(Payloads.AuthResponse.class);
-    return response == null
-        ? new Payloads.AuthResponse(false, "error: empty response from the server", null)
-        : response;
+    return response == null ? emptyAuthResponse() : response;
   }
 
   /** Signs in against the server and keeps the returned profile as the authoritative account. */
   public Payloads.AuthResponse login(String username, String password) throws IOException {
-    NetworkMessage reply =
-        client.request(MessageType.LOGIN_REQUEST, new Payloads.LoginRequest(username, password));
+    return accept(client.request(
+        MessageType.LOGIN_REQUEST, new Payloads.LoginRequest(username, password)));
+  }
+
+  public Payloads.AuthResponse loginWithToken(String username, String token) throws IOException {
+    return accept(client.request(
+        MessageType.TOKEN_LOGIN_REQUEST, new Payloads.TokenLoginRequest(username, token)));
+  }
+
+  private Payloads.AuthResponse accept(NetworkMessage reply) {
     Payloads.AuthResponse response = reply.payloadAs(Payloads.AuthResponse.class);
     if (response == null) {
-      return new Payloads.AuthResponse(false, "error: empty response from the server", null);
+      return emptyAuthResponse();
     }
     if (response.success()) {
       profile = response.profile();
+      authToken = response.token();
     }
     return response;
+  }
+
+  private static Payloads.AuthResponse emptyAuthResponse() {
+    return new Payloads.AuthResponse(false, "error: empty response from the server", null, null);
+  }
+
+  public String getAuthToken() {
+    return authToken;
+  }
+
+  public Payloads.SecurityQuestionResponse requestSecurityQuestion(String username, String email)
+      throws IOException {
+    NetworkMessage reply = client.request(MessageType.SECURITY_QUESTION_REQUEST,
+        new Payloads.SecurityQuestionRequest(username, email));
+    Payloads.SecurityQuestionResponse response =
+        reply.payloadAs(Payloads.SecurityQuestionResponse.class);
+    return response == null
+        ? new Payloads.SecurityQuestionResponse(
+            false, "error: empty response from the server", null)
+        : response;
+  }
+
+  /** A null newPassword only checks the answer. */
+  public Payloads.Ack resetPassword(String username, String answer, String newPassword)
+      throws IOException {
+    return ack(client.request(MessageType.PASSWORD_RESET,
+        new Payloads.PasswordReset(username, answer, newPassword)));
+  }
+
+  public Payloads.Ack rename(String newUsername) throws IOException {
+    Payloads.Ack result =
+        ack(client.request(MessageType.RENAME_REQUEST, new Payloads.RenameRequest(newUsername)));
+    if (result.success() && profile != null) {
+      profile = new Payloads.Profile(newUsername, profile.nickname(), profile.coins(),
+          profile.diamonds(), profile.bestScore(), profile.gameData());
+    }
+    return result;
   }
 
   /**
@@ -303,6 +348,7 @@ public final class ClientSession {
   public void logout() {
     profile = null;
     match = null;
+    authToken = null;
     if (!client.isConnected()) {
       return;
     }
@@ -317,6 +363,7 @@ public final class ClientSession {
   public synchronized void disconnect() {
     profile = null;
     match = null;
+    authToken = null;
     client.close();
   }
 }

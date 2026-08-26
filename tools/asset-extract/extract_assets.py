@@ -705,6 +705,12 @@ HUD_PIECES = {
     # The five brains I, Zombie is played for.
     "brain": ("ATLASIMAGE_ATLAS_ZOMBIETREADMILLBRAINGROUP_768_00", "power_brain_projectile",
               "power_brain_projectile_112x82"),
+    # Egypt's tornado and Frostbite's freezing wind. The worlds ship these as full-screen weather
+    # rigs; only the small pieces are taken, because both events are per-lane, not ambient.
+    "sandcloud": ("ATLASIMAGE_ATLAS_SANDSTORMGROUP_768_00", "sandstorm_top", "sandstorm_cloud"),
+    "sandstreak": ("ATLASIMAGE_ATLAS_SANDSTORMGROUP_768_00", "sandstorm_rear",
+                   "sandstorm_speedline_filtered"),
+    "snowgust": ("ATLASIMAGE_ATLAS_SNOWSTORMGROUP_768_00", "snowstorm_top", "snowstorm_top_86x66"),
 }
 
 
