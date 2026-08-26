@@ -76,9 +76,25 @@ public class BigWaveBeachSeason extends Season {
     }
   }
 
+  public int getMaxWaterColumn(int boardColumns) {
+    return firstWaterColumn(boardColumns, HIGH_TIDE_COLUMNS);
+  }
+
+  public int getLowTideColumn(int boardColumns) {
+    return firstWaterColumn(boardColumns, LOW_TIDE_COLUMNS);
+  }
+
+  public boolean isTideHigh() {
+    return tideHigh;
+  }
+
+  private static int firstWaterColumn(int boardColumns, int waterColumns) {
+    return Math.max(1, boardColumns - waterColumns);
+  }
+
   /** ستون‌های سمت راست را آب و بقیه را خشکی می‌کند و شمارهٔ اولین ستون آب را برمی‌گرداند. */
   private int applyWaterLine(Board board, int waterColumns) {
-    int firstWaterColumn = Math.max(1, board.getColumns() - waterColumns);
+    int firstWaterColumn = firstWaterColumn(board.getColumns(), waterColumns);
     for (int row = 0; row < board.getRows(); row++) {
       for (int col = 0; col < board.getColumns(); col++) {
         board.setWaterAt(row, col, col >= firstWaterColumn);

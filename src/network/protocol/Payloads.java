@@ -14,8 +14,20 @@ public final class Payloads {
 
   public record LoginRequest(String username, String password) {}
 
-  /** Used for both register and login. profile is null when it failed. */
-  public record AuthResponse(boolean success, String message, Profile profile) {}
+  public record TokenLoginRequest(String username, String token) {}
+
+  /** Used for both register and login. profile is null when it failed; token only on login. */
+  public record AuthResponse(boolean success, String message, Profile profile, String token) {}
+
+  public record SecurityQuestionRequest(String username, String email) {}
+
+  public record SecurityQuestionResponse(
+      boolean success, String message, String questionNumber) {}
+
+  /** A null newPassword only checks the answer, so the menus can ask in two steps. */
+  public record PasswordReset(String username, String answer, String newPassword) {}
+
+  public record RenameRequest(String newUsername) {}
 
   /**
    * The account as the server holds it.
@@ -44,6 +56,8 @@ public final class Payloads {
       String nickname,
       String email,
       String passwordHash,
+      String securityQuestionNumber,
+      String securityAnswer,
       int coins,
       int diamonds,
       JsonElement gameData) {}

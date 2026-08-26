@@ -21,8 +21,7 @@ public final class LawnRenderer implements WorldRenderer {
 
   private final LawnGeometry geometry;
   private final HudArt hudArt = new HudArt();
-  private final Color lightLane = new Color(1f, 1f, 1f, 0.10f);
-  private final Color darkLane = new Color(0f, 0f, 0f, 0.10f);
+  private final Color gridLine = new Color(1f, 0.15f, 0.15f, 0.85f);
   private final Color graveColor = new Color(0.35f, 0.32f, 0.30f, 0.92f);
   private final Color waterTile = new Color(0.16f, 0.55f, 0.72f, 0.45f);
   private final Color frozenTile = new Color(0.75f, 0.93f, 1f, 0.55f);
@@ -135,12 +134,6 @@ public final class LawnRenderer implements WorldRenderer {
     shapes.begin(ShapeRenderer.ShapeType.Filled);
     for (int row = 0; row < board.getRows(); row++) {
       for (int col = 0; col < board.getColumns(); col++) {
-        // only the cell shading is optional; water and hazards decide where you can plant
-        if (GameSettings.isGridVisible()) {
-          shapes.setColor((row + col) % 2 == 0 ? lightLane : darkLane);
-          shapes.rect(geometry.columnToX(col), geometry.rowToY(row),
-              geometry.getCellWidth() - 1f, geometry.getCellHeight() - 1f);
-        }
         // the tide decides where you can plant, so it has to be visible
         if (board.isWaterAt(row, col)) {
           shapes.setColor(waterTile);
@@ -159,7 +152,33 @@ public final class LawnRenderer implements WorldRenderer {
       }
     }
     shapes.end();
+    drawGridLines(context, board);
     drawProps(context, board);
+  }
+
+  /** The Settings grid overlay. */
+  private void drawGridLines(RenderContext context, Board board) {
+    if (!GameSettings.isGridVisible()) {
+      return;
+    }
+    float left = geometry.columnToX(0);
+    float bottom = geometry.rowToY(board.getRows() - 1);
+    float right = left + geometry.getCellWidth() * board.getColumns();
+    float top = bottom + geometry.getCellHeight() * board.getRows();
+
+    ShapeRenderer shapes = context.getShapes();
+    Gdx.gl.glEnable(GL20.GL_BLEND);
+    shapes.begin(ShapeRenderer.ShapeType.Line);
+    shapes.setColor(gridLine);
+    for (int row = 0; row <= board.getRows(); row++) {
+      float y = bottom + geometry.getCellHeight() * row;
+      shapes.line(left, y, right, y);
+    }
+    for (int col = 0; col <= board.getColumns(); col++) {
+      float x = left + geometry.getCellWidth() * col;
+      shapes.line(x, bottom, x, top);
+    }
+    shapes.end();
   }
 
   private void drawProps(RenderContext context, Board board) {

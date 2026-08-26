@@ -15,7 +15,7 @@ public final class GameSettings {
   public static final int MAX_SPEED = 3;
 
   private static int gameSpeed = MIN_SPEED;
-  private static boolean gridVisible = true;
+  private static boolean gridVisible = false;
   private static boolean debugMode = GdxConfig.DEBUG_MODE;
 
   private GameSettings() {

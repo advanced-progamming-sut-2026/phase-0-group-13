@@ -24,6 +24,8 @@ public class Board {
   private final List<Projectile> projectiles;
   private final List<Lawnmower> lawnmowers;
   private final LootDropper lootDropper;
+  private static final int MAX_PENDING_NOTICES = 8;
+  private final List<String> pendingNotices = new ArrayList<>();
   private int pendingKillCount;
   private final List<KillDetail> pendingKillDetails = new ArrayList<>();
   private int pendingPlantsLostCount;
@@ -116,9 +118,9 @@ public class Board {
       gameState.addSun(50);
       System.out.printf("The grave at (%d, %d) held 50 sun!%n", col + 1, row + 1);
     } else if (gameState.addPlantFood()) {
-      System.out.printf(
-              "The grave at (%d, %d) held a plant food; you have %d plant foods now.%n",
-              col + 1, row + 1, gameState.getPlantFoodCount());
+      notify(String.format(
+              "The grave at (%d, %d) held a plant food; you have %d plant foods now.",
+              col + 1, row + 1, gameState.getPlantFoodCount()));
     }
   }
 
@@ -222,9 +224,9 @@ public class Board {
       if (zombie.isDead() && zombie.isShiny() && !zombie.hasDroppedPlantFood()) {
         zombie.markPlantFoodDropped();
         if (gameState.addPlantFood()) {
-          System.out.printf(
-                  "The glowing zombie dropped a plant food; you have %d plant foods now.%n",
-                  gameState.getPlantFoodCount());
+          notify(String.format(
+                  "The glowing zombie dropped a plant food; you have %d plant foods now.",
+                  gameState.getPlantFoodCount()));
         }
       }
     }
@@ -257,6 +259,21 @@ public class Board {
   }
   public List<Reward> drainPendingRewards() {
     return lootDropper.drainPendingRewards();
+  }
+  private void notify(String message) {
+    // The terminal never drains, so the queue is capped rather than left to grow all match.
+    if (pendingNotices.size() >= MAX_PENDING_NOTICES) {
+      pendingNotices.remove(0);
+    }
+    pendingNotices.add(message);
+    System.out.println(message);
+  }
+  /** Loot and plant-food messages since the last call. */
+  public List<String> drainPendingNotices() {
+    List<String> drained = new ArrayList<>(pendingNotices);
+    pendingNotices.clear();
+    drained.addAll(lootDropper.drainPendingNotices());
+    return drained;
   }
   public int drainPendingKillCount() {
     int count = pendingKillCount;

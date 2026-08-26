@@ -24,6 +24,7 @@ import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
 import view.gdx.ui.SeedCard;
 import view.gdx.ui.UiSkinProvider;
+import view.gdx.ui.ZombieArt;
 
 
 /**
@@ -43,6 +44,7 @@ public final class CollectionScreen extends MenuScreen {
       new com.badlogic.gdx.graphics.Color(1f, 1f, 1f, 0.6f);
 
   private final PlantArt plantArt = new PlantArt();
+  private final ZombieArt zombieArt = new ZombieArt();
   private final HudArt hudArt = new HudArt();
   private final CollectionMenuController collection = new CollectionMenuController();
   private Table content;
@@ -239,9 +241,11 @@ public final class CollectionScreen extends MenuScreen {
 
   private SeedCard zombieCard(User user, ZombieTemplate template) {
     boolean seen = hasSeen(user, template);
+    // SeedCard draws its own placeholder when the art is null, which is what an unseen zombie gets.
     // no withCost: a zombie has no sun price
     SeedCard card = new SeedCard(skin, SeedCard.Size.FULL, template.getName(),
-            seen ? template.getName() : "???", null, hudArt, this::select);
+            seen ? template.getName() : "???", seen ? zombieArt.find(template.getName()) : null,
+            hudArt, this::select);
     card.setStatus(seen ? "seen" : "not encountered");
     card.setEnabled(seen);
     card.setSelected(seen && template.getName().equals(selected));
@@ -375,7 +379,8 @@ public final class CollectionScreen extends MenuScreen {
 
   /** Sprite for this entity, or a short "no art" note when PlantArt has none. */
   private void addSprite(Table details, String section, String name, String dir) {
-    TextureRegion region = "plants".equals(section) ? plantArt.find(name) : null;
+    TextureRegion region =
+        "plants".equals(section) ? plantArt.find(name) : zombieArt.find(name);
 
     if (region == null) {
       details.add(new Label("no verified artwork", skin, "secondary")).left().padBottom(10f).row();
@@ -404,6 +409,7 @@ public final class CollectionScreen extends MenuScreen {
   public void dispose() {
     super.dispose();
     plantArt.dispose();
+    zombieArt.dispose();
     hudArt.dispose();
   }
 }
