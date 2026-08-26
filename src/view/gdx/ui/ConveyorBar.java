@@ -63,7 +63,7 @@ public final class ConveyorBar extends Table implements Disposable {
       card.setStatus(available ? "free" : "queued");
       card.setSelected(available);
       card.setTint(available ? READY : WAITING);
-      add(card).width(96f).height(110f);
+      add(card).width(SeedBar.CARD_WIDTH).height(SeedBar.CARD_HEIGHT);
     }
   }
 

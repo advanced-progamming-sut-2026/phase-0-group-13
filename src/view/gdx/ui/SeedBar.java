@@ -22,6 +22,11 @@ import model.game.plant.PlantParts.PlantTemplate;
  */
 public final class SeedBar extends Table implements Disposable {
 
+  /** Named, not just a literal on the add() call below, so HudStage can size its own row against
+   * it -- the tools beside this bar must never end up taller than the cards they sit next to. */
+  public static final float CARD_WIDTH = 96f;
+  public static final float CARD_HEIGHT = 110f;
+
   private static final Color READY = new Color(1f, 1f, 1f, 1f);
   private static final Color RECHARGING = new Color(0.34f, 0.34f, 0.40f, 1f);
   private static final Color BROKE = new Color(0.85f, 0.75f, 0.45f, 1f);
@@ -40,7 +45,7 @@ public final class SeedBar extends Table implements Disposable {
       card.setBoosted(isBoosted(template.name));
       this.templates.add(template);
       cards.add(card);
-      add(card).width(96f).height(110f);
+      add(card).width(CARD_WIDTH).height(CARD_HEIGHT);
     }
   }
 

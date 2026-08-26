@@ -41,6 +41,19 @@ public final class HudStage implements Disposable {
   private static final Color TOOL_ARMED = new Color(1f, 1f, 1f, 1f);
   private static final Color TOOL_IDLE = new Color(0.62f, 0.62f, 0.66f, 1f);
 
+  /**
+   * The tools sit beside the seed bar in the same row (see buildSeedBar/buildConveyorBar), so this
+   * row's height becomes that whole row's height -- three of these stacked (162px) used to stand
+   * taller than a seed card (110px, see SeedBar.CARD_HEIGHT) and push the lawn's top row down
+   * underneath the HUD. One row of three fixes that: 48 + this pad on both sides comes to 54px,
+   * comfortably under a card.
+   */
+  private static final float TOOL_BUTTON_WIDTH = 112f;
+  // Package-private, not private: HudToolsRowHeightTest checks these against SeedBar.CARD_HEIGHT
+  // without needing a live Scene2D layout to do it.
+  static final float TOOL_BUTTON_HEIGHT = 48f;
+  static final float TOOL_BUTTON_PAD = 3f;
+
   private final Stage stage;
   private final HudArt hudArt = new HudArt();
 
@@ -192,7 +205,7 @@ public final class HudStage implements Disposable {
       onPick.accept(plant);
     });
     seedBar.add(seeds).left();
-    seedBar.add(toolsColumn(skin, onShovel, onPlantFood, onPause)).left().padLeft(10f).top();
+    seedBar.add(toolsRow(skin, onShovel, onPlantFood, onPause)).left().padLeft(10f).top();
   }
 
   /** Conveyor Belt stages have no seed bank to draw: the belt is the bar. */
@@ -207,7 +220,7 @@ public final class HudStage implements Disposable {
       onPick.accept(plant);
     });
     seedBar.add(conveyor).left();
-    seedBar.add(toolsColumn(skin, onShovel, onPlantFood, onPause)).left().padLeft(10f).top();
+    seedBar.add(toolsRow(skin, onShovel, onPlantFood, onPause)).left().padLeft(10f).top();
   }
 
   public void updateConveyor() {
@@ -231,14 +244,18 @@ public final class HudStage implements Disposable {
     }
   }
 
-  private Table toolsColumn(Skin skin, Runnable onShovel, Runnable onPlantFood, Runnable onPause) {
+  /**
+   * Shovel/Food/Pause side by side rather than stacked -- see the class-level comment on
+   * TOOL_BUTTON_HEIGHT for why a stack was the wrong shape here.
+   */
+  private Table toolsRow(Skin skin, Runnable onShovel, Runnable onPlantFood, Runnable onPause) {
     Table tools = new Table();
-    tools.defaults().pad(3f).width(112f).height(48f);
+    tools.defaults().pad(TOOL_BUTTON_PAD).width(TOOL_BUTTON_WIDTH).height(TOOL_BUTTON_HEIGHT);
     shovelButton = toolButton(skin, "Shovel", onShovel);
     plantFoodButton = toolButton(skin, "Food 0", onPlantFood);
-    tools.add(shovelButton).row();
-    tools.add(plantFoodButton).row();
-    tools.add(toolButton(skin, "Pause", onPause)).row();
+    tools.add(shovelButton);
+    tools.add(plantFoodButton);
+    tools.add(toolButton(skin, "Pause", onPause));
     return tools;
   }
 
