@@ -135,6 +135,21 @@ public final class GameplayInputHandler extends InputAdapter {
     hoverColumn = geometry.xToColumn(scratch.x);
   }
 
+  /**
+   * Picks up a sun the pointer is resting on or sweeping across.
+   *
+   * <p>The doc collects suns by moving over them rather than by clicking, so this is called every
+   * frame from the screen rather than only when the mouse moves: a sun that lands under a still
+   * pointer should be taken too. Separate from {@link #updateHover} so that stays a pure
+   * where-is-the-mouse question, since the drag and move handlers call it as well.
+   */
+  public void collectSunUnderPointer() {
+    if (paused || !isHoveringLawn()) {
+      return;
+    }
+    actions.collectSunByHover(hoverRow, hoverColumn);
+  }
+
   @Override
   public boolean mouseMoved(int screenX, int screenY) {
     updateHover(screenX, screenY);

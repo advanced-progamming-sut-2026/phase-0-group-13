@@ -119,6 +119,18 @@ public class Plant {
     return currentTick < disabledUntilTick;
   }
 
+  /**
+   * True while a thrown octopus still has this plant clamped, which is the only thing that calls
+   * {@link #disableUntil}.
+   *
+   * <p>Separate from {@link #isDisabled} on purpose: that is also true for a cursed plant, and the
+   * two look nothing alike on the board -- a cursed plant is a sheep, a held one wears an octopus.
+   * A caller that wants to show why a plant has stopped working has to tell them apart.
+   */
+  public boolean isHeldByOctopus(int currentTick) {
+    return !cursed && currentTick < disabledUntilTick;
+  }
+
   public void freeze(int currentTick, int durationTicks) {
     this.frozenUntilTick = Math.max(frozenUntilTick, currentTick + durationTicks);
     this.freezeLevel = 0;

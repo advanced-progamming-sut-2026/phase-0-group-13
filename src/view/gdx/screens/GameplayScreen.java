@@ -281,6 +281,10 @@ public final class GameplayScreen extends BaseScreen {
     float worldDelta = paused || intro ? 0f : delta;
 
     input.updateHover(Gdx.input.getX(), Gdx.input.getY());
+    if (!paused && !intro) {
+      // Suns are collected by passing the pointer over them, so this is a frame job, not a click.
+      input.collectSunUnderPointer();
+    }
 
     context().applyCamera();
     lawnRenderer.render(context(), match, worldDelta);

@@ -5,7 +5,9 @@ import data.persistence.UserManager;
 import java.util.function.Consumer;
 import model.account.User;
 import model.core.GameManager;
+import model.enums.SunType;
 import model.game.Board;
+import model.game.Sun;
 import model.game.Tile;
 import model.game.minigame.ConveyorRule;
 import model.game.minigame.SpecialStageRule;
@@ -147,6 +149,27 @@ public final class GdxGameActions implements GameActionBridge {
     // GameManager takes (col, row), this interface takes (row, column) like Board.getTile.
     // Null means no sun there, which is how the click falls through to planting.
     return match.collectSunAt(column, row) != null;
+  }
+
+  @Override
+  public boolean collectSunByHover(int row, int column) {
+    Board board = board();
+    if (board == null) {
+      return false;
+    }
+    for (Sun sun : board.getSuns()) {
+      // Same tile test SunManager.collectSunAt uses, so a sweep picks up exactly what a click on
+      // that tile would have. Asking first is the only way to know what is there before taking it.
+      if (sun.isExpired() || Math.abs(sun.getX() - column) > 0.5 || sun.getY() != row) {
+        continue;
+      }
+      if (sun.getType() == SunType.RADIOACTIVE && sun.isFalling()) {
+        // Collecting this one is an explosion, not a pickup. Leave it for a deliberate click.
+        return false;
+      }
+      return collectSunAt(row, column);
+    }
+    return false;
   }
 
   @Override

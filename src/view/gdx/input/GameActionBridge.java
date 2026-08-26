@@ -23,6 +23,16 @@ public interface GameActionBridge {
 
   boolean collectSunAt(int row, int column);
 
+  /**
+   * Collects a sun the pointer is only passing over.
+   *
+   * <p>Its own method rather than a flag on {@link #collectSunAt} because one sun must not be swept
+   * up: a radioactive one caught while it is still falling detonates and hurts the plants under it.
+   * Taking that risk is a decision worth a deliberate click, not something a mouse crossing the
+   * lawn should do on the player's behalf, so this leaves those where they are.
+   */
+  boolean collectSunByHover(int row, int column);
+
   boolean feedPlantAt(int row, int column);
 
   /** Leaves the match and goes back to whatever screen started it. */

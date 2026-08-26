@@ -60,6 +60,15 @@ public final class EntityRenderer implements WorldRenderer {
   // How far above its lane a lobbed shot rises at the top of the arc.
   private static final float LOB_ARC_HEIGHT = 0.85f;
   private static final float FREEZE_LEVELS = Plant.MAX_FREEZE_LEVEL;
+  // The octopus a beach thrower leaves on a plant. It is one prop out of that zombie's own rig --
+  // the little orange one with the eyes, checked against the atlas page before being named here.
+  private static final String OCTOPUS_RIG = "zombiebeachoctopus";
+  private static final String OCTOPUS_REGION = "zombie_beach_octopus_66x76";
+  private static final float OCTOPUS_ROW_FILL = 0.44f;
+  // Clamped over the plant's head rather than centred on the tile, and off to one side so it does
+  // not simply cover the face of whatever it caught.
+  private static final float OCTOPUS_LIFT = 0.52f;
+  private static final float OCTOPUS_NUDGE_RIGHT = 0.10f;
 
   private final LawnGeometry geometry;
   private final PlantArt plantArt = new PlantArt();
@@ -86,6 +95,8 @@ public final class EntityRenderer implements WorldRenderer {
   private float clock;
   // The match's own tick, for lining a plant's attack clip up with the shot it just fired.
   private int currentTick;
+  private TextureRegion octopus;
+  private boolean octopusChecked;
 
   public EntityRenderer(LawnGeometry geometry) {
     this.geometry = geometry;
@@ -129,6 +140,12 @@ public final class EntityRenderer implements WorldRenderer {
           : scaleFor(art, PLANT_REFERENCE_HEIGHT, PLANT_ROW_FILL);
       drawStanding(context, art, plant.getCol(), plant.getRow(), scale,
           PLANT_FOOT_INSET + idleBobFraction(plant));
+    }
+    // After the plants and in its own pass, so an octopus is never hidden under the neighbour
+    // drawn next. Animated plants take the `continue` above and would otherwise be skipped.
+    context.getBatch().setColor(Color.WHITE);
+    for (Plant plant : board.getPlants()) {
+      drawOctopusHold(context, plant);
     }
     context.getBatch().setColor(Color.WHITE);
     for (Zombie zombie : board.getZombies()) {
@@ -194,6 +211,40 @@ public final class EntityRenderer implements WorldRenderer {
     float depth = Math.min(1f, level / FREEZE_LEVELS);
     return frostStep.set(1f - 0.4f * depth, 1f - 0.18f * depth, 1f, 1f);
   }
+  /**
+   * The octopus a beach thrower left clamped to a plant.
+   *
+   * <p>A held plant simply stops acting, which on its own looks like the plant is broken rather
+   * than caught, so the thing holding it has to be on the board. Sits high on the tile and slightly
+   * right of centre, the way it lands in the original, and rides the plant's own idle bob so the
+   * two read as one object rather than a sticker over a moving plant.
+   */
+  private void drawOctopusHold(RenderContext context, Plant plant) {
+    if (!plant.isHeldByOctopus(currentTick)) {
+      return;
+    }
+    TextureRegion octopus = octopusArt();
+    if (octopus == null) {
+      return;
+    }
+    float height = geometry.getCellHeight() * OCTOPUS_ROW_FILL;
+    float width = octopus.getRegionWidth() * height / octopus.getRegionHeight();
+    float x = geometry.columnCentreX(plant.getCol()) - width / 2f
+        + geometry.getCellWidth() * OCTOPUS_NUDGE_RIGHT;
+    float y = geometry.rowToY(plant.getRow())
+        + geometry.getCellHeight() * (OCTOPUS_LIFT + idleBobFraction(plant));
+    context.getBatch().draw(octopus, x, y, width, height);
+  }
+
+  /** Looked up once: it is one region of the thrower's rig, and the miss is worth caching too. */
+  private TextureRegion octopusArt() {
+    if (!octopusChecked) {
+      octopusChecked = true;
+      octopus = zombieArt.findPart(OCTOPUS_RIG, OCTOPUS_REGION);
+    }
+    return octopus;
+  }
+
   /** Slow up/down drift, phase-shifted per tile so neighbouring plants do not bob in lockstep. */
   private float idleBobFraction(Plant plant) {
     float phase = (plant.getRow() * 3 + plant.getCol()) * 0.9f;

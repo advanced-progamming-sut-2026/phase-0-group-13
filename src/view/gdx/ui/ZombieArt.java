@@ -77,6 +77,33 @@ public final class ZombieArt implements Disposable {
     return packets;
   }
 
+  /**
+   * One region of a zombie's own rig atlas, by its upstream name.
+   *
+   * <p>{@link #find} wants a whole-body portrait, but a rig also carries the props a zombie brings
+   * with it, and some of those outlive the zombie on screen: the beach thrower's octopus stays
+   * clamped to whatever plant it landed on. Goes through the same atlas cache find() fills, so a
+   * part costs nothing once that zombie's atlas is open, and it is disposed with the rest.
+   *
+   * @return the region, or null when the zombie has no atlas or no such region in it
+   */
+  public TextureRegion findPart(String zombieName, String regionName) {
+    String key = normalise(zombieName);
+    if (key.isEmpty() || regionName == null) {
+      return null;
+    }
+    TextureAtlas atlas = loaded.get(key);
+    if (atlas == null) {
+      String path = ATLAS_DIR + key + ".atlas";
+      if (!Gdx.files.internal(path).exists()) {
+        return null;
+      }
+      atlas = new TextureAtlas(Gdx.files.internal(path));
+      loaded.put(key, atlas);
+    }
+    return atlas.findRegion(regionName);
+  }
+
   private TextureRegion pickPortrait(String key) {
     String path = ATLAS_DIR + key + ".atlas";
     if (!Gdx.files.internal(path).exists()) {
