@@ -153,7 +153,7 @@ public final class LawnRenderer implements WorldRenderer {
       for (Lawnmower mower : board.getLawnmowers()) {
         shapes.setColor(mower.isActive() ? mowerReady : mowerUsed);
         float size = geometry.getCellHeight() * 0.32f;
-        shapes.rect(geometry.columnToX(0) - size * 1.4f,
+        shapes.rect(geometry.columnCentreX(mower.getX()) - size / 2f,
             geometry.rowCentreY(mower.getRow()) - size / 2f, size, size);
       }
     }
@@ -215,7 +215,7 @@ public final class LawnRenderer implements WorldRenderer {
       float width = mowerArt.getRegionWidth() * height / mowerArt.getRegionHeight();
       for (Lawnmower mower : board.getLawnmowers()) {
         context.getBatch().setColor(1f, 1f, 1f, mower.isActive() ? 1f : 0.35f);
-        context.getBatch().draw(mowerArt, geometry.columnToX(0) - width - 6f,
+        context.getBatch().draw(mowerArt, geometry.columnCentreX(mower.getX()) - width / 2f,
             geometry.rowToY(mower.getRow()) + geometry.getCellHeight() * 0.12f, width, height);
       }
       context.getBatch().setColor(1f, 1f, 1f, 1f);

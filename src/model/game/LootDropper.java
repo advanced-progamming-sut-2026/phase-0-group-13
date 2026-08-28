@@ -12,10 +12,16 @@ public class LootDropper {
   private static final double DEATH_DROP_CHANCE = 0.10;
   private static final int COIN_DROP_AMOUNT = 50;
   private static final int MAX_PENDING_NOTICES = 8;
+  private static final int MAX_PENDING_LOOT_SPAWNS = 24;
+
+  /** Where a drop happened, so the graphical build can show something on the lawn there. */
+  public record LootSpawn(String kind, double column, int row) {}
 
   private final List<Reward> pendingRewards = new ArrayList<>();
   // The same lines the terminal prints, so the graphical build can show them too.
   private final List<String> pendingNotices = new ArrayList<>();
+  // Terminal mode never drains this; the cap keeps a long match from growing it forever.
+  private final List<LootSpawn> pendingLootSpawns = new ArrayList<>();
   private final Random random;
 
   private int droppedCoins;
@@ -66,6 +72,11 @@ public class LootDropper {
     }
     pendingNotices.add(notice);
     System.out.println(notice);
+
+    if (pendingLootSpawns.size() >= MAX_PENDING_LOOT_SPAWNS) {
+      pendingLootSpawns.remove(0);
+    }
+    pendingLootSpawns.add(new LootSpawn(dropName, zombie.getX(), zombie.getRow()));
   }
 
   public List<Reward> drainPendingRewards() {
@@ -77,6 +88,12 @@ public class LootDropper {
   public List<String> drainPendingNotices() {
     List<String> drained = new ArrayList<>(pendingNotices);
     pendingNotices.clear();
+    return drained;
+  }
+
+  public List<LootSpawn> drainPendingLootSpawns() {
+    List<LootSpawn> drained = new ArrayList<>(pendingLootSpawns);
+    pendingLootSpawns.clear();
     return drained;
   }
 }

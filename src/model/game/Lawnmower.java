@@ -45,6 +45,10 @@ public class Lawnmower {
     return row;
   }
 
+  public double getX() {
+    return x;
+  }
+
   public boolean isActive() {
     return isActive;
   }
