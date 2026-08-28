@@ -60,6 +60,7 @@ public class PvzGdxGame extends Game {
   @Override
   public void dispose() {
     Screen current = getScreen();
+    view.gdx.audio.GameAudio.getInstance().dispose();
     super.dispose();
     if (current != null) {
       current.dispose();

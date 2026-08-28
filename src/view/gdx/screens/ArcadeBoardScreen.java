@@ -20,6 +20,7 @@ import data.persistence.UserManager;
 import model.account.User;
 import model.core.MiniGameLauncher;
 import model.enums.MiniGameType;
+import view.gdx.audio.GameAudio;
 import view.gdx.core.FixedStepClock;
 import view.gdx.core.GameSettings;
 import view.gdx.core.GdxConfig;
@@ -117,8 +118,18 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
   /** A click on a lawn cell. Return a message to toast, or null to say nothing. */
   protected abstract String onCellClicked(int row, int column);
 
+  /**
+   * A key press, offered to the subclass before Escape and Space are read as leave and pause.
+   *
+   * @return true to consume it
+   */
+  protected boolean onKeyPressed(int keycode) {
+    return false;
+  }
+
   @Override
   public void show() {
+    GameAudio.getInstance().playMusic(GameAudio.Track.BATTLE);
     lawn = new LawnRenderer(geometry);
     art = new ArcadeRenderer(geometry);
     skin = game.getUiSkin().get();
@@ -388,6 +399,11 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
 
     @Override
     public boolean keyDown(int keycode) {
+      // The subclass gets first refusal: a screen that plays on the keyboard needs the keys more
+      // than the two shortcuts do, and it is the only one that knows which ones it uses.
+      if (onKeyPressed(keycode)) {
+        return true;
+      }
       if (keycode == Input.Keys.ESCAPE) {
         leave();
         return true;

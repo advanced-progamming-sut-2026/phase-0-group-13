@@ -25,6 +25,9 @@ public final class MatchService {
 
   private static final int DEFAULT_LEVEL = 1;
 
+  /** Long enough for any tick to finish, short enough that shutdown can never hang the server. */
+  private static final long SHUTDOWN_WAIT_MILLIS = 2000;
+
   /** What the router wants to know: a board moved, or a match is over. */
   public interface Listener {
     void onTick(NetworkMatch match);
@@ -63,12 +66,32 @@ public final class MatchService {
         IZombieMatch.TICK_MILLIS, TimeUnit.MILLISECONDS);
   }
 
-  public synchronized void shutdown() {
-    if (scheduler == null) {
-      return;
+  /**
+   * Stops the clock, and does not return until the tick that was in flight has finished.
+   *
+   * <p>shutdownNow() only interrupts, and a tick is not interruptible -- it is plain arithmetic
+   * over the board -- so without the wait a tick that had already started could still land after
+   * this returned, and a caller that then read the tick number got a match that was still moving.
+   *
+   * <p>The scheduler is taken out of the field before the wait so a concurrent start() is not
+   * blocked behind it, and the wait is bounded: a listener that calls shutdown from inside its
+   * own onTick would otherwise be waiting for itself.
+   */
+  public void shutdown() {
+    ScheduledExecutorService stopping;
+    synchronized (this) {
+      if (scheduler == null) {
+        return;
+      }
+      stopping = scheduler;
+      scheduler = null;
     }
-    scheduler.shutdownNow();
-    scheduler = null;
+    stopping.shutdownNow();
+    try {
+      stopping.awaitTermination(SHUTDOWN_WAIT_MILLIS, TimeUnit.MILLISECONDS);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
   }
 
   /**

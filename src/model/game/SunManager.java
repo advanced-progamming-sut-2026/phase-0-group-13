@@ -34,6 +34,9 @@ public class SunManager {
 
     double t = currentTick / 10.0;
     double secondsInterval = Math.max(6 + 0.05 * t, 12);
+    // The doc's fourth difficulty effect: the rate sun falls at goes down as difficulty goes up,
+    // which is the same thing as the gap between two suns getting longer.
+    secondsInterval *= model.core.Difficulty.skySunInterval();
     int ticksInterval = (int) (secondsInterval * 10);
 
     if (currentTick - lastSunDropTick >= ticksInterval) {

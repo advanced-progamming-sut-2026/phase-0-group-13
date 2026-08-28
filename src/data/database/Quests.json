@@ -158,5 +158,37 @@
         "Reward":"15 Gems",
         "Priority":"High",
         "Variable":null
+    },
+    {
+        "Quest Name":"Lawn Patrol",
+        "Category":"Repeatable",
+        "Completion Condition":"Defeat 25 zombies in any level",
+        "Reward":"250 Coins",
+        "Priority":"Low",
+        "Variable":"25"
+    },
+    {
+        "Quest Name":"Steady Gardener",
+        "Category":"Repeatable",
+        "Completion Condition":"Clear a stage of any chapter",
+        "Reward":"1 Plant Food",
+        "Priority":"Low",
+        "Variable":"1"
+    },
+    {
+        "Quest Name":"Arcade Regular",
+        "Category":"Repeatable",
+        "Completion Condition":"Clear any mini-game level",
+        "Reward":"2 Gems",
+        "Priority":"Low",
+        "Variable":"2"
+    },
+    {
+        "Quest Name":"Sun Shift",
+        "Category":"Repeatable",
+        "Completion Condition":"Collect sun_amount sun across your matches",
+        "Reward":"sun_amount / 100 Coins",
+        "Priority":"Low",
+        "Variable":"1500"
     }
 ]

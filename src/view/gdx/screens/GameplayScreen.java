@@ -28,6 +28,7 @@ import model.core.MatchLauncher;
 import model.core.MatchSetup;
 import model.core.MiniGameLauncher;
 import model.enums.MiniGameType;
+import view.gdx.audio.GameAudio;
 import view.gdx.core.FixedStepClock;
 import view.gdx.core.GameSettings;
 import view.gdx.core.GdxConfig;
@@ -74,6 +75,8 @@ public final class GameplayScreen extends BaseScreen {
   private boolean paused;
   /** The run's MyoPoints, read at the whistle before the account banks (and clears) them. */
   private int bonusScore;
+  /** How many zombies were chewing last frame; see listenForBites. */
+  private int zombiesEating;
   /** True while the level-start popups are up, so nobody loses the lawn while reading them. */
   private boolean intro;
   private int lastWave;
@@ -86,6 +89,7 @@ public final class GameplayScreen extends BaseScreen {
 
   @Override
   public void show() {
+    GameAudio.getInstance().playMusic(GameAudio.Track.BATTLE);
     lawnRenderer = new LawnRenderer(geometry);
     entityRenderer = new EntityRenderer(geometry);
     stageRuleRenderer = new StageRuleRenderer(geometry);
@@ -313,6 +317,7 @@ public final class GameplayScreen extends BaseScreen {
 
     watchWaves();
     showPickups();
+    listenForBites();
     updateStatus();
     hud.updateWave(match == null ? 0 : match.getCurrentWaveIndex());
     hud.updateConveyor();
@@ -353,6 +358,30 @@ public final class GameplayScreen extends BaseScreen {
     for (String pickup : match.getBoard().drainPendingNotices()) {
       hud.toast(pickup);
     }
+  }
+
+  /**
+   * Bites the player can hear.
+   *
+   * <p>Observed rather than pushed: the model has no audio channel and should not grow one, so
+   * this counts the zombies that are chewing this frame and only makes a noise when that count
+   * goes up -- a zombie that keeps eating is one bite, not one per frame. GameAudio's repeat guard
+   * then collapses a whole wave arriving at once into a single sound.
+   */
+  private void listenForBites() {
+    if (match == null || match.getBoard() == null || paused || intro) {
+      return;
+    }
+    int eating = 0;
+    for (Zombie zombie : match.getBoard().getZombies()) {
+      if (zombie != null && !zombie.isDead() && zombie.isEating()) {
+        eating++;
+      }
+    }
+    if (eating > zombiesEating) {
+      GameAudio.getInstance().play(GameAudio.Sfx.CHOMP);
+    }
+    zombiesEating = eating;
   }
 
   /** Red banner every time the match rolls into a new wave. */
@@ -489,6 +518,7 @@ public final class GameplayScreen extends BaseScreen {
   }
 
   private void showOutcome(boolean won) {
+    GameAudio.getInstance().play(won ? GameAudio.Sfx.WIN : GameAudio.Sfx.LOSE);
     Table body = new Table();
     body.add(new Label(won ? "Level cleared!" : "The zombies ate your brains!",
         game.getUiSkin().get(), UiSkinProvider.LABEL_MEDIUM)).row();

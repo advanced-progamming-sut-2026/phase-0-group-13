@@ -27,16 +27,28 @@ import java.util.Map;
  * falls back to its outline-plus-health-bar drawing -- see the "no verified portrait" branch in
  * EntityRenderer.drawShapes(). Wiring up the real per-frame animations (walk/eat/idle) from the
  * JSON files in assets/animations/zombies is separate, later work.
+ *
+ * <p>The four Zombotany zombies are the one place a plant's art is used for a zombie. They have
+ * no art of their own anywhere in the upstream package -- RESOURCES.json carries no 768 folder
+ * for them, so the extractor lists all four under "unresolved" in assets/metadata/asset-map.json
+ * and neither a packet nor a rig atlas exists. They are plant-headed zombies, so the plant they
+ * are named after is the closest real asset the project has, and every one of the four has a
+ * seed packet. See {@link #zombotanyPlant}.
  */
 public final class ZombieArt implements Disposable {
 
   private static final String ATLAS_DIR = "textures/zombies/";
   private static final String PACKETS_PATH = ATLAS_DIR + "zombiepackets.atlas";
 
+  /** The plants the four Zombotany zombies borrow their picture from, longest name first. */
+  private static final List<String> ZOMBOTANY_PLANTS =
+      List.of("peashooter", "jalapeno", "wallnut", "squash");
+
   private final Map<String, TextureAtlas> loaded = new HashMap<>();
   private final Map<String, TextureRegion> resolved = new HashMap<>();
   private Map<String, TextureRegion> packets;
   private TextureAtlas packetAtlas;
+  private PlantArt plantArt;
 
   /** Best-effort portrait for this zombie's raw name, or null if there is none usable. */
   public TextureRegion find(String zombieName) {
@@ -52,8 +64,41 @@ public final class ZombieArt implements Disposable {
     if (picked == null) {
       picked = pickPortrait(key);
     }
+    if (picked == null) {
+      String plant = zombotanyPlant(key);
+      if (plant != null) {
+        picked = plantArt().find(plant);
+      }
+    }
     resolved.put(key, picked);
     return picked;
+  }
+
+  /**
+   * The seed-packet name a Zombotany zombie borrows, or null when this is not one of the four.
+   *
+   * <p>Normalises first, so it matches the plant inside aliases like {@code
+   * ZombieZombotanyWallnutDefault}. The four names it returns are exactly the four regions
+   * {@code textures/plants/seedpackets.atlas} carries for those plants.
+   */
+  static String zombotanyPlant(String zombieName) {
+    String key = normalise(zombieName);
+    if (!key.contains("zombotany")) {
+      return null;
+    }
+    for (String plant : ZOMBOTANY_PLANTS) {
+      if (key.contains(plant)) {
+        return plant;
+      }
+    }
+    return null;
+  }
+
+  private PlantArt plantArt() {
+    if (plantArt == null) {
+      plantArt = new PlantArt();
+    }
+    return plantArt;
   }
 
   /**
@@ -146,6 +191,10 @@ public final class ZombieArt implements Disposable {
     if (packetAtlas != null) {
       packetAtlas.dispose();
       packetAtlas = null;
+    }
+    if (plantArt != null) {
+      plantArt.dispose();
+      plantArt = null;
     }
     packets = null;
   }
