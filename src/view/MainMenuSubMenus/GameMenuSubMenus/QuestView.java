@@ -14,7 +14,8 @@ public class QuestView implements BaseMenu {
   @Override
   public void check(Scanner scanner) {
     System.out.println(
-        "Travel Log. Use 'show quests', 'travel log page <Daily|Main|Epic Challenge>', "
+        "Travel Log. Use 'show quests', "
+            + "'travel log page <Daily|Main|Epic Challenge|Repeatable>', "
             + "'claim quest -t <title>', 'show mini-games', "
             + "'play mini-game -n <name> -l <level>', or 'menu exit'.");
 

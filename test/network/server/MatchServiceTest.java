@@ -10,6 +10,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import model.enums.MatchRole;
+import model.game.minigame.arcade.IZombieMatch;
 import org.junit.jupiter.api.Test;
 
 /** The server's clock: it runs, it isolates, it retires, and it stops. */
@@ -105,16 +106,22 @@ class MatchServiceTest {
   @Test
   void shutdownStopsTheClock() throws Exception {
     MatchService matches = new MatchService();
-    matches.setListener(listener(match -> { }, match -> { }));
+    AtomicInteger callbacks = new AtomicInteger();
+    matches.setListener(listener(match -> callbacks.incrementAndGet(), match -> { }));
     matches.start();
     NetworkMatch match = matches.create("alice", "bob");
     Thread.sleep(300);
+
     matches.shutdown();
+    // shutdown() waits for the tick that was in flight, so these two reads cannot race one.
     int stoppedAt = match.getState().getTick();
+    int callbacksAtShutdown = callbacks.get();
+    assertTrue(stoppedAt > 0, "the clock never ran, so there was nothing to stop");
 
-    Thread.sleep(400);
+    Thread.sleep(4 * IZombieMatch.TICK_MILLIS);
 
-    assertEquals(stoppedAt, match.getState().getTick());
+    assertEquals(stoppedAt, match.getState().getTick(), "the board moved after shutdown");
+    assertEquals(callbacksAtShutdown, callbacks.get(), "the listener was called after shutdown");
   }
 
   @Test

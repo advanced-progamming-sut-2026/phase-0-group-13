@@ -1,0 +1,118 @@
+package view.gdx.screens;
+
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import java.util.HashMap;
+import java.util.Map;
+import model.enums.MiniGameType;
+import model.game.minigame.arcade.IZombieEngine;
+import model.game.minigame.arcade.IZombieMatch.PlantView;
+import model.game.minigame.arcade.IZombieMatch.Snapshot;
+import model.game.minigame.arcade.IZombieMatch.ZombieView;
+import view.gdx.core.PvzGdxGame;
+import view.gdx.render.ArcadeRenderer;
+
+/**
+ * Draws a two-sided I, Zombie board from an {@link Snapshot}.
+ *
+ * <p>{@code IZombieMatch.snapshot()} is everything needed to draw the board, and it reads the same
+ * whether the match is being stepped by the server or by this process, so the networked screen and
+ * the couch-play screen paint from it identically. Only where the snapshot comes from differs, and
+ * that is the one thing {@link #currentSnapshot()} leaves to the subclass.
+ */
+public abstract class SnapshotIZombieScreen extends ArcadeBoardScreen {
+
+  protected static final float BRAIN_ROW_FILL = 0.42f;
+  protected static final Color READY = new Color(1f, 1f, 1f, 1f);
+  protected static final Color UNAVAILABLE = new Color(0.45f, 0.45f, 0.5f, 1f);
+  private static final Color EATEN_BRAIN = new Color(0.35f, 0.35f, 0.38f, 0.55f);
+
+  private final Map<Integer, Object> animationKeys = new HashMap<>();
+
+  protected SnapshotIZombieScreen(PvzGdxGame game, MiniGameType type, int level) {
+    super(game, type, level);
+  }
+
+  /** The board as it stands now, or null before there is one to draw. */
+  protected abstract Snapshot currentSnapshot();
+
+  @Override
+  protected String seasonKey() {
+    return "dark";
+  }
+
+  @Override
+  protected void drawWorld(float delta) {
+    Snapshot state = currentSnapshot();
+    if (state == null) {
+      return;
+    }
+    Batch batch = context().getBatch();
+    for (int row = 0; row < ROWS && row < state.brains().length; row++) {
+      if (state.brains()[row]) {
+        art.drawBesideLane(batch, art.icon("brain"), row, BRAIN_ROW_FILL, LANE_PROP_GAP);
+      }
+    }
+    for (PlantView plant : state.plants()) {
+      art.drawPlant(batch, keyFor(plant.id()), plant.name(), plant.col(), plant.row());
+    }
+    for (ZombieView zombie : state.zombies()) {
+      art.drawZombie(batch, keyFor(zombie.id()), zombie.type(),
+          Math.max(0.0, zombie.column()), zombie.row(), zombie.eating());
+    }
+  }
+
+  /**
+   * A stable object per entity id.
+   *
+   * <p>Playback is keyed by identity and a snapshot is fresh records every tick, so without one of
+   * these a walking zombie would restart its walk on every frame it was drawn in.
+   */
+  protected final Object keyFor(int entityId) {
+    return animationKeys.computeIfAbsent(entityId, id -> new Object());
+  }
+
+  @Override
+  protected void drawOverlays(ShapeRenderer shapes) {
+    drawRedLine(shapes, IZombieEngine.RED_LINE_COLUMN, true);
+    Snapshot state = currentSnapshot();
+    if (state == null) {
+      return;
+    }
+    for (int row = 0; row < ROWS && row < state.brains().length; row++) {
+      if (!state.brains()[row]) {
+        shapes.setColor(EATEN_BRAIN);
+        shapes.rect(geometry.columnToX(0) - LANE_PROP_GAP - 28f,
+            geometry.rowCentreY(row) - 5f, 26f, 10f);
+      }
+    }
+    for (PlantView plant : state.plants()) {
+      art.healthBar(shapes, plant.col(), plant.row(),
+          plant.health() / (float) plant.maxHealth(), 0.8f);
+    }
+    for (ZombieView zombie : state.zombies()) {
+      art.healthBar(shapes, Math.max(0.0, zombie.column()), zombie.row(),
+          zombie.health() / (float) zombie.maxHealth(), 0.86f);
+    }
+  }
+
+  @Override
+  protected void drawOutlines(ShapeRenderer shapes) {
+    Snapshot state = currentSnapshot();
+    if (state == null) {
+      return;
+    }
+    for (ZombieView zombie : state.zombies()) {
+      if (ArcadeRenderer.lookOf(zombie.type()) == null) {
+        art.outline(shapes, Math.max(0.0, zombie.column()), zombie.row());
+      }
+    }
+  }
+
+  /** mm:ss from a tick countdown, for the status line both screens show. */
+  protected static String clock(int ticksRemaining) {
+    int seconds = ticksRemaining / IZombieEngine.TICKS_PER_SECOND;
+    return String.format("%d:%02d", seconds / 60, seconds % 60);
+  }
+}

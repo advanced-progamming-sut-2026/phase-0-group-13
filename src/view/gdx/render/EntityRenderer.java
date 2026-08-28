@@ -41,6 +41,9 @@ public final class EntityRenderer implements WorldRenderer {
   // zombie-sized sprite: it stands about two and a half lanes high and is allowed to be wide.
   private static final float ZOMBOSS_ROW_FILL = 2.4f;
   private static final float ZOMBIE_FOOT_INSET = 0.08f;
+
+  /** Columns from the house at which a zombie starts showing the warning tint. */
+  private static final double NEAR_HOUSE_COLUMN = 1.2;
   private static final float PLANT_FOOT_INSET = 0.14f;
   // The stand-in for the entities that still have no rig: a tiny bob on the footInset fraction.
   private static final float PLANT_IDLE_SPEED = 2.2f;
@@ -91,6 +94,12 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color radioactiveSun = new Color(0.6f, 1f, 0.45f, 1f);
   // Reflected shots belong to the zombie now, so they must not read as one of your peas.
   private final Color reflectedPea = new Color(1f, 0.42f, 0.3f, 1f);
+  /** The doc's polish list: a flash on damage, a warning tint near the house, a landing burst. */
+  private final HitEffects hits = new HitEffects();
+  private final Color tinted = new Color();
+  private final Color hitFlash = new Color(1f, 0.94f, 0.86f, 1f);
+  private final Color nearHouse = new Color(1f, 0.55f, 0.5f, 1f);
+  private final Color burstColor = new Color(1f, 0.92f, 0.55f, 1f);
   // King's aura pulse and the Juggler's spin both read this; it only ticks in render().
   private float clock;
   // The match's own tick, for lining a plant's attack clip up with the shot it just fired.
@@ -114,8 +123,11 @@ public final class EntityRenderer implements WorldRenderer {
     Board board = game.getBoard();
     currentTick = game.getCurrentTick();
     clock += delta;
+    hits.advance(delta);
+    observeForEffects(board);
     drawSprites(context, board, delta);
     drawShapes(context, board);
+    hits.endFrame(geometry.getColumns());
     playback.endFrame();
   }
 
@@ -126,7 +138,7 @@ public final class EntityRenderer implements WorldRenderer {
       // A Wizard's curse turns the plant into a harmless sheep until the wizard dies, so the
       // board has to show a sheep, not a plant that has quietly stopped shooting.
       boolean cursed = plant.isCursed() && sheep != null;
-      context.getBatch().setColor(plantTint(plant));
+      context.getBatch().setColor(flashed(plantTint(plant), plant));
       if (!cursed && drawPlantAnimation(context, plant, delta)) {
         continue;
       }
@@ -153,7 +165,7 @@ public final class EntityRenderer implements WorldRenderer {
         continue;
       }
       drawKingAura(context, zombie);
-      context.getBatch().setColor(zombieTint(zombie));
+      context.getBatch().setColor(flashed(zombieTint(zombie), zombie));
       if (drawZombieAnimation(context, zombie, delta)) {
         continue;
       }
@@ -196,7 +208,49 @@ public final class EntityRenderer implements WorldRenderer {
     if (zombie.getActiveEffects().containsKey(StatusEffect.CHILLED)) {
       return chilledTint;
     }
-    return zombie.isHypnotized() ? hypnoTint : Color.WHITE;
+    if (zombie.isHypnotized()) {
+      return hypnoTint;
+    }
+    // The doc asks for a reddish warning on a zombie close to the house, which is the last thing
+    // a player notices in time to do something about it.
+    return zombie.getX() <= NEAR_HOUSE_COLUMN ? nearHouse : Color.WHITE;
+  }
+
+  /**
+   * Hands this frame's board to the effect tracker before anything is drawn.
+   *
+   * <p>Separate from the drawing passes because a plant with no art is still an entity that can be
+   * hit: doing this where the sprites are drawn would skip exactly those.
+   */
+  private void observeForEffects(Board board) {
+    for (Plant plant : board.getPlants()) {
+      if (!plant.isDead()) {
+        hits.observe(plant, plant.getCurrentHealth());
+      }
+    }
+    for (Zombie zombie : board.getZombies()) {
+      if (!zombie.isDead()) {
+        hits.observe(zombie, zombie.getCurrentHealth());
+      }
+    }
+    for (Projectile projectile : board.getProjectiles()) {
+      hits.observeProjectile(projectile, projectile.getXCoordinate(),
+          Math.round(projectile.getYCoordinate()));
+    }
+  }
+
+  /**
+   * Blends a base tint towards the flash colour.
+   *
+   * <p>Returns the base untouched when there is nothing to flash, so the common case still hands
+   * back the shared constant rather than a fresh colour every entity every frame.
+   */
+  private Color flashed(Color base, Object entity) {
+    float strength = hits.flashStrength(entity);
+    if (strength <= 0f) {
+      return base;
+    }
+    return tinted.set(base).lerp(hitFlash, strength);
   }
 
   /** The three freeze levels a plant goes through, then the solid block once it is encased. */
@@ -573,6 +627,7 @@ public final class EntityRenderer implements WorldRenderer {
         healthBar(shapes, zombie);
       }
     }
+    drawHitBursts(shapes);
     shapes.end();
 
     // A zombie with no verified portrait gets an outline rather than someone elses art.
@@ -598,6 +653,24 @@ public final class EntityRenderer implements WorldRenderer {
           geometry.getCellWidth() * 0.44f, geometry.getCellHeight() * 0.56f);
     }
     shapes.end();
+  }
+
+  /**
+   * The small burst where a projectile landed.
+   *
+   * <p>Shapes rather than art: assets/metadata/asset-map.json resolved no effect art at all, so
+   * there is no impact sprite in the library to use, and a ring that grows and fades reads as a
+   * hit without pretending to be something it is not.
+   */
+  private void drawHitBursts(ShapeRenderer shapes) {
+    for (HitEffects.Burst burst : hits.getBursts()) {
+      burstColor.a = burst.alpha() * 0.75f;
+      shapes.setColor(burstColor);
+      shapes.circle(geometry.columnCentreX(burst.column()),
+          geometry.rowCentreY(burst.row()),
+          geometry.getCellHeight() * burst.radiusFraction());
+    }
+    burstColor.a = 1f;
   }
 
   /** Whether anything at all is drawn for this plant: its own rig, or failing that its packet. */

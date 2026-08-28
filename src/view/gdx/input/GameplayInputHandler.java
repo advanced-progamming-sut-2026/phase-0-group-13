@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
 import java.util.List;
+import view.gdx.audio.GameAudio;
 import view.gdx.render.LawnGeometry;
 import view.gdx.render.RenderContext;
 
@@ -147,7 +148,9 @@ public final class GameplayInputHandler extends InputAdapter {
     if (paused || !isHoveringLawn()) {
       return;
     }
-    actions.collectSunByHover(hoverRow, hoverColumn);
+    if (actions.collectSunByHover(hoverRow, hoverColumn)) {
+      GameAudio.getInstance().play(GameAudio.Sfx.SUN);
+    }
   }
 
   @Override
@@ -177,22 +180,26 @@ public final class GameplayInputHandler extends InputAdapter {
 
     // a sun on the tile always wins, it is what the player meant
     if (actions.collectSunAt(row, column)) {
+      GameAudio.getInstance().play(GameAudio.Sfx.SUN);
       return true;
     }
     switch (tool) {
       case SEED:
         if (actions.plantAt(row, column, selectedPlantType)) {
+          GameAudio.getInstance().play(GameAudio.Sfx.PLANT);
           // packet is on cooldown now, staying armed would only produce refusals
           clearTool();
         }
         return true;
       case SHOVEL:
         if (actions.pluckAt(row, column)) {
+          GameAudio.getInstance().play(GameAudio.Sfx.PLANT);
           clearTool();
         }
         return true;
       case PLANT_FOOD:
         if (actions.feedPlantAt(row, column)) {
+          GameAudio.getInstance().play(GameAudio.Sfx.EXPLODE);
           clearTool();
         }
         return true;

@@ -2,8 +2,10 @@ package model.account;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import model.Result;
@@ -387,12 +389,30 @@ public class User {
       }
     }
     if (!quests.isEmpty() && !broken) {
+      // The list is sound, so the player's progress on it stays; only quests added to
+      // Quests.json since this account was seeded are appended. Without this an existing save
+      // never sees a newly added category at all -- its travel-log page would be empty for
+      // everyone but a brand new account.
+      addMissingQuests(templates);
       return;
     }
 
     quests.clear();
     for (Quest template : templates) {
       quests.add(new Quest(template));
+    }
+  }
+
+  /** Appends templates this account has no quest for, matched by title. */
+  private void addMissingQuests(List<Quest> templates) {
+    Set<String> owned = new HashSet<>();
+    for (Quest quest : quests) {
+      owned.add(quest.getTitle());
+    }
+    for (Quest template : templates) {
+      if (template != null && template.getTitle() != null && owned.add(template.getTitle())) {
+        quests.add(new Quest(template));
+      }
     }
   }
 

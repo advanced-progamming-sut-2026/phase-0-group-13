@@ -3,7 +3,7 @@ package model.game.zombie.factory;
 import data.repository.ZombieRepository;
 import java.util.List;
 import java.util.Random;
-import model.core.MatchSetup;
+import model.core.Difficulty;
 import model.enums.ZombieType;
 import model.game.zombie.Zombie;
 import model.game.zombie.ZombieParts.Armor;
@@ -30,14 +30,13 @@ public class ZombieFactory {
     }
 
     ZombieType type = ZombieTypeResolver.resolve(template);
-    double difficultyMultiplier = difficultyStatMultiplier();
-    ZombieAction behavior = determineBehavior(template, type, difficultyMultiplier);
+    ZombieAction behavior = determineBehavior(template, type, Difficulty.zombieDamage());
 
-    int scaledHp = (int) Math.round(resolveBaseHp(template, type) * difficultyMultiplier);
+    int scaledHp = (int) Math.round(resolveBaseHp(template, type) * Difficulty.zombieHealth());
     Zombie zombie = new Zombie(
             template.getName(),
             Math.max(1, scaledHp),
-            template.getBaseSpeed() / TICKS_PER_SECOND,
+            template.getBaseSpeed() * Difficulty.zombieSpeed() / TICKS_PER_SECOND,
             row, startX, behavior
     );
 
@@ -45,11 +44,6 @@ public class ZombieFactory {
     applyLootDrops(zombie);
 
     return zombie;
-  }
-
-  private double difficultyStatMultiplier() {
-    int difficultyLevel = MatchSetup.getInstance().getDifficultyLevel();
-    return Math.max(0.25, 1.0 + (difficultyLevel - 3) * 0.15);
   }
 
   private int resolveBaseHp(ZombieTemplate template, ZombieType type) {

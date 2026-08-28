@@ -68,6 +68,14 @@ public final class MiniGamesScreen extends MenuScreen {
     }
 
     content.add(panel).growX().row();
+    if (progress.isMiniGameUnlocked("i_zombie")) {
+      // Two people on one keyboard and mouse, so it is not a level of I, Zombie to be cleared -
+      // it banks nothing and sits on its own rather than in that game's 1/2/3 row.
+      content.add(new Label("Couch play: I, Zombie for two on this machine "
+          + "(P1 mouse, P2 keyboard)", skin, UiSkinProvider.LABEL_MEDIUM)).padTop(10f).row();
+      content.add(button("Couch play", UiSkinProvider.BUTTON_GREEN,
+          () -> go(new CouchIZombieScreen(game, 1)))).width(260f).padTop(4f).row();
+    }
     content.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget())))
         .width(220f)
         .padTop(8f);

@@ -4,7 +4,7 @@ import data.GameDataManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import model.core.MatchSetup;
+import model.core.Difficulty;
 import model.game.zombie.ZombieParts.ZombieTemplate;
 
 public class WaveGenerator {
@@ -63,13 +63,15 @@ public class WaveGenerator {
     return waves;
   }
 
-  // MatchSetup.getDifficultyLevel() معمولا ۱ تا ۵ هست (پیش‌فرض ۳ = متوسط)؛ هر پله فاصله از ۳، ۱۵٪
-  // رو بودجه‌ی موج اثر میذاره. levelNumber هم خودش رو تصاعد بین موج‌ها اثر داره.
+  /**
+   * How the wave budget grows with the level number.
+   *
+   * <p>Difficulty is deliberately not in here any more. The doc puts it on the *cost* of a zombie
+   * rather than on the budget -- see {@link #resolveWaveCost} -- and having it in both places
+   * applied it twice.
+   */
   private static double levelDifficultyMultiplier(int levelNumber) {
-    int difficultyLevel = MatchSetup.getInstance().getDifficultyLevel();
-    double difficultyFactor = 1.0 + (difficultyLevel - 3) * 0.15;
-    double levelFactor = 1.0 + Math.max(0, levelNumber - 1) * 0.05;
-    return Math.max(0.25, difficultyFactor) * levelFactor;
+    return 1.0 + Math.max(0, levelNumber - 1) * 0.05;
   }
 
   // به‌جای انتخاب تعداد ثابت زامبی، یه بودجه (waveCost) داریم و تا وقتی بودجه تموم نشده زامبی رندوم
@@ -108,6 +110,14 @@ public class WaveGenerator {
       return FALLBACK_ZOMBIE_COST;
     }
     int cost = template.getWavePointCost();
-    return cost > 0 ? cost : FALLBACK_ZOMBIE_COST;
+    return scaledCost(cost > 0 ? cost : FALLBACK_ZOMBIE_COST);
+  }
+
+  /**
+   * The doc's "the wave cost of zombies goes down" as difficulty goes up: the same budget then
+   * buys more of them. Never below 1, or a wave would fill to MAX_ZOMBIES_PER_WAVE for free.
+   */
+  private static int scaledCost(int cost) {
+    return Math.max(1, (int) Math.round(cost * Difficulty.waveCost()));
   }
 }

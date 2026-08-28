@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import view.gdx.audio.GameAudio;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.CurrencyHud;
 import view.gdx.ui.DebugPanel;
@@ -63,6 +64,14 @@ public abstract class MenuScreen extends BaseScreen {
     return this;
   }
 
+  /**
+   * The background track this screen plays. Menus share one, so only a screen that wants
+   * something else overrides it; asking for the track already playing leaves it running.
+   */
+  protected GameAudio.Track musicTrack() {
+    return GameAudio.Track.MENU;
+  }
+
   /** Shown top left. */
   protected abstract String title();
 
@@ -80,6 +89,7 @@ public abstract class MenuScreen extends BaseScreen {
 
   @Override
   public void show() {
+    GameAudio.getInstance().playMusic(musicTrack());
     stage = new Stage(new ScreenViewport());
     skin = game.getUiSkin().get();
     Gdx.input.setInputProcessor(stage);
@@ -181,6 +191,7 @@ public abstract class MenuScreen extends BaseScreen {
         new ClickListener() {
           @Override
           public void clicked(InputEvent event, float x, float y) {
+            GameAudio.getInstance().play(GameAudio.Sfx.CLICK);
             action.run();
           }
         });

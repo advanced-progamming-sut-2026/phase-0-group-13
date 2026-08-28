@@ -1,10 +1,8 @@
 package view.gdx.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -15,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -26,9 +23,7 @@ import model.game.minigame.arcade.IZombieEngine;
 import model.game.minigame.arcade.IZombieEngine.PlantSpec;
 import model.game.minigame.arcade.IZombieEngine.ZombieSpec;
 import model.game.minigame.arcade.IZombieMatch;
-import model.game.minigame.arcade.IZombieMatch.PlantView;
 import model.game.minigame.arcade.IZombieMatch.Snapshot;
-import model.game.minigame.arcade.IZombieMatch.ZombieView;
 import network.client.ClientSession;
 import network.protocol.MessageType;
 import network.protocol.NetworkMessage;
@@ -54,16 +49,12 @@ import view.gdx.ui.UiSkinProvider;
  * priced in sun, and neither is shown the other's controls. Both see the same board, the same
  * brains, the same clock and the same verdict, because all of it arrives from the same place.
  */
-public final class NetworkIZombieScreen extends ArcadeBoardScreen {
+public final class NetworkIZombieScreen extends SnapshotIZombieScreen {
 
-  private static final float BRAIN_ROW_FILL = 0.42f;
   private static final float REACTION_SECONDS = 4f;
   private static final float REACTION_ICON_FILL = 0.8f;
   /** Lanes tall. Bigger than an emoji so it reads across the board, short of overhanging the lawn. */
   private static final float STICKER_ROW_FILL = 1.3f;
-  private static final Color READY = new Color(1f, 1f, 1f, 1f);
-  private static final Color UNAVAILABLE = new Color(0.45f, 0.45f, 0.5f, 1f);
-  private static final Color EATEN_BRAIN = new Color(0.35f, 0.35f, 0.38f, 0.55f);
 
   /** Three of each, as the doc asks. The emoji are the game's own icons; see {@link #emojiArt}. */
   private static final String[] TEXT_REACTIONS = {"Nice one!", "Is that all?", "Good game!"};
@@ -94,7 +85,6 @@ public final class NetworkIZombieScreen extends ArcadeBoardScreen {
   private final List<String> keys = new ArrayList<>();
   private final List<Integer> costs = new ArrayList<>();
   private final List<Boolean> drawable = new ArrayList<>();
-  private final Map<Integer, Object> animationKeys = new HashMap<>();
   private final Consumer<NetworkMessage> serverEvents = this::onServerEvent;
 
   private volatile Snapshot snapshot;
@@ -142,11 +132,6 @@ public final class NetworkIZombieScreen extends ArcadeBoardScreen {
   }
 
   @Override
-  protected String seasonKey() {
-    return "dark";
-  }
-
-  @Override
   protected String title() {
     return "I, Zombie  -  vs " + match.opponent();
   }
@@ -162,13 +147,8 @@ public final class NetworkIZombieScreen extends ArcadeBoardScreen {
         : "sun " + state.plantSun();
     return "you are the " + (role == MatchRole.ZOMBIES ? "zombies" : "plants") + "   -   " + purse
         + "   -   brains " + state.brainsRemaining() + "/" + IZombieEngine.BRAINS
-        + "   -   " + clock(state.ticksRemaining())
+        + "   -   " + clock(state.ticksRemaining()) + " left"
         + (chosen == null ? "   -   pick something to place" : "   -   placing " + chosen);
-  }
-
-  private static String clock(int ticksRemaining) {
-    int seconds = ticksRemaining / IZombieEngine.TICKS_PER_SECOND;
-    return String.format("%d:%02d left", seconds / 60, seconds % 60);
   }
 
   @Override
@@ -427,24 +407,15 @@ public final class NetworkIZombieScreen extends ArcadeBoardScreen {
   }
 
   @Override
+  protected Snapshot currentSnapshot() {
+    return snapshot;
+  }
+
+  /** The board first, then whatever reaction is still on screen over the top of it. */
+  @Override
   protected void drawWorld(float delta) {
-    Snapshot state = snapshot;
-    if (state == null) {
-      return;
-    }
+    super.drawWorld(delta);
     Batch batch = context().getBatch();
-    for (int row = 0; row < ROWS && row < state.brains().length; row++) {
-      if (state.brains()[row]) {
-        art.drawBesideLane(batch, art.icon("brain"), row, BRAIN_ROW_FILL, LANE_PROP_GAP);
-      }
-    }
-    for (PlantView plant : state.plants()) {
-      art.drawPlant(batch, keyFor(plant.id()), plant.name(), plant.col(), plant.row());
-    }
-    for (ZombieView zombie : state.zombies()) {
-      art.drawZombie(batch, keyFor(zombie.id()), zombie.type(),
-          Math.max(0.0, zombie.column()), zombie.row(), zombie.eating());
-    }
     if (reactionLeft > 0f) {
       reactionLeft -= delta;
       // Corner of the board, out of the lanes that matter, as the doc suggests.
@@ -454,53 +425,6 @@ public final class NetworkIZombieScreen extends ArcadeBoardScreen {
             COLUMNS - 1, ROWS - 1, STICKER_ROW_FILL);
       } else if (reactionIcon != null) {
         art.drawProp(batch, reactionIcon, COLUMNS - 1, ROWS - 1, REACTION_ICON_FILL);
-      }
-    }
-  }
-
-  /**
-   * A stable object per entity id.
-   *
-   * <p>Playback is keyed by identity and the server sends fresh record instances every tick, so
-   * without one of these a walking zombie would restart its walk on every frame it was drawn in.
-   */
-  private Object keyFor(int entityId) {
-    return animationKeys.computeIfAbsent(entityId, id -> new Object());
-  }
-
-  @Override
-  protected void drawOverlays(ShapeRenderer shapes) {
-    drawRedLine(shapes, IZombieEngine.RED_LINE_COLUMN, true);
-    Snapshot state = snapshot;
-    if (state == null) {
-      return;
-    }
-    for (int row = 0; row < ROWS && row < state.brains().length; row++) {
-      if (!state.brains()[row]) {
-        shapes.setColor(EATEN_BRAIN);
-        shapes.rect(geometry.columnToX(0) - LANE_PROP_GAP - 28f,
-            geometry.rowCentreY(row) - 5f, 26f, 10f);
-      }
-    }
-    for (PlantView plant : state.plants()) {
-      art.healthBar(shapes, plant.col(), plant.row(),
-          plant.health() / (float) plant.maxHealth(), 0.8f);
-    }
-    for (ZombieView zombie : state.zombies()) {
-      art.healthBar(shapes, Math.max(0.0, zombie.column()), zombie.row(),
-          zombie.health() / (float) zombie.maxHealth(), 0.86f);
-    }
-  }
-
-  @Override
-  protected void drawOutlines(ShapeRenderer shapes) {
-    Snapshot state = snapshot;
-    if (state == null) {
-      return;
-    }
-    for (ZombieView zombie : state.zombies()) {
-      if (ArcadeRenderer.lookOf(zombie.type()) == null) {
-        art.outline(shapes, Math.max(0.0, zombie.column()), zombie.row());
       }
     }
   }
