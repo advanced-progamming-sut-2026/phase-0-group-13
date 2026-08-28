@@ -36,14 +36,48 @@ public final class UiSkinProvider implements Disposable {
   public static final String LABEL_BIG = "big";
 
   public static final String LABEL_MEDIUM = "medium";
+  /** Outlined variants, for type that sits on artwork rather than on a panel. */
+  public static final String LABEL_BIG_OUTLINE = "big_outline";
+  public static final String LABEL_MEDIUM_OUTLINE = "medium_outline";
   public static final String BUTTON_GREEN = "green";
   public static final String BUTTON_BROWN = "brown";
   public static final String BUTTON_PURPLE = "purple";
+  /** The flat inner surface: a well inside a frame, or a plain backing on its own. */
   public static final String PANEL_BACKGROUND = "image_ui_dialog_asset_inner_bkgd_10";
+  /** The raised dialog frame that goes around a panel. */
+  public static final String PANEL_FRAME = "image_ui_dialog_asset_dialogborder_10";
+  /** A 1x1 white pixel, for scrims, dividers and row striping. Tint it at the call site. */
+  public static final String WHITE_PIXEL = "white_pixel";
   public static final String DIALOG_BORDER = "image_ui_dialog_asset_dialogborder_10";
   public static final String MODAL_DIM = "modal_background";
   public static final String COIN_ICON = "image_ui_generic_coin_icon_small";
   public static final String GEM_ICON = "image_ui_generic_gem_icon_small";
+  /** Dark pill behind a currency readout, so a number reads on any backdrop. */
+  public static final String COUNTER_PLATE = "image_ui_generic_counter_bg";
+  /** The store's own "limited offer" banner. */
+  public static final String PROMO_RIBBON = "image_ui_cards_store_promo_ribbon";
+  /** The almanac's own pages: green for the plant side, purple for the zombie side. */
+  public static final String ALMANAC_PLANT_CARD = "image_ui_cards_almanac_plant_card";
+  public static final String ALMANAC_ZOMBIE_CARD = "image_ui_cards_almanac_zombie_card";
+
+  /**
+   * The Travel Log's own quest panels.
+   *
+   * <p>A pair of surfaces -- plain cream, and cream under a blue header for an epic challenge --
+   * plus a green outline frame that goes over either one once the quest is done. The frames have
+   * hollow centres, so they layer rather than replace.
+   */
+  public static final String QUEST_PANEL = "image_ui_quests_travel_log_panel_default";
+  public static final String QUEST_PANEL_EPIC = "image_ui_quests_travel_log_panel_epic";
+  public static final String QUEST_PANEL_DONE = "image_ui_quests_travel_log_panel_complete";
+  public static final String QUEST_PANEL_EPIC_DONE =
+      "image_ui_quests_travel_log_panel_epic_complete";
+  /** The Travel Log's own currency icons; chunkier than the tiny generic pair. */
+  public static final String QUEST_COIN_ICON = "image_ui_quests_coin_icon";
+  public static final String QUEST_GEM_ICON = "image_ui_quests_gem_icon";
+  /** Padlocks, for anything the player has not earned yet. */
+  public static final String LOCK_ICON = "image_ui_lock_small";
+  public static final String LOCK_ICON_GOLD = "image_ui_lock_small_gold";
 
   private Skin skin;
   private boolean loadFailed;

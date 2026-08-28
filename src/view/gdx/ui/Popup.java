@@ -117,7 +117,11 @@ public final class Popup {
 
   private static Table panel(Skin skin, String title, Actor body) {
     Table panel = new Table();
-    panel.setBackground(skin.getDrawable(UiSkinProvider.DIALOG_BORDER));
+    // Fill under the frame. The border drawable is a frame with a hole in the middle, so on its
+    // own the lawn showed through every dialog and the text sat on moving zombies.
+    panel.setBackground(new LayeredDrawable(
+        skin.getDrawable(UiSkinProvider.PANEL_BACKGROUND),
+        skin.getDrawable(UiSkinProvider.DIALOG_BORDER)));
     panel.pad(34f);
     panel.defaults().pad(6f);
     panel.add(new Label(title, skin, UiSkinProvider.LABEL_BIG)).padBottom(16f).row();

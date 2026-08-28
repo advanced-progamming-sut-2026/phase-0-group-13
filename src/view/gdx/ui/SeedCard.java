@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import java.util.function.Consumer;
@@ -42,6 +43,8 @@ public final class SeedCard extends Table {
 
   private boolean selected;
   private boolean enabled = true;
+  /** The almanac card art this card rests on, or null for the plain panel. */
+  private String cardArt;
 
   // Size is pinned at build time. The selected background is a nine-patch with a 159x158 minimum,
   // so without this a card would grow when picked and squash its own rows.
@@ -168,6 +171,43 @@ public final class SeedCard extends Table {
     boostLabel.setText(boosted ? "BOOST" : "");
   }
 
+  /**
+   * Puts the game's own padlock in the card's corner.
+   *
+   * <p>A locked entry was only a dimmer card, which is easy to miss in a grid where several
+   * plants are pale anyway. The padlock says it outright, and is small enough to sit over the
+   * artwork without hiding which plant it is.
+   */
+  public SeedCard withLock() {
+    if (compact) {
+      return this;
+    }
+    Image lock = new Image(skin.getDrawable(UiSkinProvider.LOCK_ICON));
+    Table corner = new Table();
+    corner.top().right().pad(7f);
+    corner.setFillParent(true);
+    corner.add(lock).size(22f, 29f);
+    addActor(corner);
+    return this;
+  }
+
+  /**
+   * Rests this card on one of the game's own almanac cards instead of the plain panel.
+   *
+   * <p>The almanac pages are a matched pair -- a green header over a cream body for plants, a
+   * purple one for zombies -- so a grid of them reads as an almanac at a glance rather than as a
+   * grid of identical panels. Only the menu-sized cards wear one; the in-match seed bank keeps the
+   * plain backing, which is what its recharge and can't-afford tints are drawn against.
+   */
+  public SeedCard withCardArt(String drawableName) {
+    if (compact || drawableName == null) {
+      return this;
+    }
+    this.cardArt = drawableName;
+    applyBackground();
+    return this;
+  }
+
   public void setSelected(boolean selected) {
     if (this.selected == selected) {
       return;
@@ -178,8 +218,16 @@ public final class SeedCard extends Table {
       nameLabel.setColor(selected ? PICKED_NAME : Color.WHITE);
       return;
     }
-    setBackground(skin.getDrawable(
-        selected ? UiSkinProvider.DIALOG_BORDER : UiSkinProvider.PANEL_BACKGROUND));
+    applyBackground();
+  }
+
+  /** Card art underneath, selection frame over the top of it when picked. */
+  private void applyBackground() {
+    Drawable resting = skin.getDrawable(
+        cardArt == null ? UiSkinProvider.PANEL_BACKGROUND : cardArt);
+    setBackground(selected
+        ? new LayeredDrawable(resting, skin.getDrawable(UiSkinProvider.DIALOG_BORDER))
+        : resting);
   }
 
   public boolean isSelected() {

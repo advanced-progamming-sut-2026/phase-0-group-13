@@ -3,11 +3,14 @@ package view.gdx.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -21,6 +24,7 @@ import view.gdx.audio.GameAudio;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.CurrencyHud;
 import view.gdx.ui.DebugPanel;
+import view.gdx.ui.LayeredDrawable;
 import view.gdx.ui.Toast;
 import view.gdx.ui.UiSkinProvider;
 
@@ -44,9 +48,31 @@ public abstract class MenuScreen extends BaseScreen {
   private String notice;
   private TextureAtlas backgroundAtlas;
 
-  /** Backdrop atlas under assets/, or null for none. Needs a region called "texture". */
+  /**
+   * How far the scrim darkens the backdrop.
+   *
+   * <p>The world art is busy at full strength and the text over it is the thing that matters, so
+   * every menu lays a flat dark wash between the two. Enough to make white type read anywhere on
+   * the screen, not so much that the art stops being art.
+   */
+  private static final float SCRIM_ALPHA = 0.42f;
+
+  /** How far the content slides up as it fades in, in pixels. */
+  private static final float ENTRANCE_RISE = 18f;
+
+  private static final float ENTRANCE_SECONDS = 0.18f;
+
+  private static final String DEFAULT_BACKGROUND = "textures/environment/darkagesseason.atlas";
+
+  /**
+   * Backdrop atlas under assets/, or null for none. Needs a region called "texture".
+   *
+   * <p>Defaults to a real backdrop rather than to nothing: half the menus never overrode this and
+   * were drawing their panels straight onto the window's clear colour, which read as an unfinished
+   * screen next to the ones that did.
+   */
   protected String backgroundAtlasPath() {
-    return null;
+    return DEFAULT_BACKGROUND;
   }
 
   protected MenuScreen(PvzGdxGame game) {
@@ -107,7 +133,8 @@ public abstract class MenuScreen extends BaseScreen {
     stage.addActor(root);
 
     Table header = new Table();
-    header.add(new Label(title(), skin, UiSkinProvider.LABEL_BIG)).left().expandX();
+    // Outlined, because the title sits directly on the backdrop with no plate behind it.
+    header.add(new Label(title(), skin, UiSkinProvider.LABEL_BIG_OUTLINE)).left().expandX();
     header.add(new CurrencyHud(skin)).right();
     root.add(header).growX().padBottom(20f).row();
 
@@ -115,6 +142,8 @@ public abstract class MenuScreen extends BaseScreen {
     content.defaults().pad(6f);
     root.add(content).grow().row();
     buildContent(content);
+
+    playEntrance(root);
 
     if (DebugPanel.isEnabled()) {
       // Floats over the corner instead of taking a row - it can be toggled on any screen now,
@@ -162,15 +191,62 @@ public abstract class MenuScreen extends BaseScreen {
     background.setFillParent(true);
     background.setScaling(Scaling.fill);
     stage.addActor(background);
+    addScrim();
   }
 
-  /** A panel-backed table, for the screens that hold a form. */
+  /** The wash between the backdrop and the content. Its own actor, so it covers the whole stage. */
+  private void addScrim() {
+    Image scrim = new Image(skin.newDrawable(UiSkinProvider.WHITE_PIXEL,
+        new Color(0f, 0f, 0f, SCRIM_ALPHA)));
+    scrim.setFillParent(true);
+    stage.addActor(scrim);
+  }
+
+  /**
+   * Fades the screen in and lets it settle upwards.
+   *
+   * <p>Short enough not to be in the way of someone clicking straight through a menu -- the table
+   * is already laid out and hit-testable while it plays, only its colour and offset move.
+   */
+  private static void playEntrance(Table root) {
+    root.getColor().a = 0f;
+    root.setTransform(false);
+    root.addAction(Actions.parallel(
+        Actions.fadeIn(ENTRANCE_SECONDS, Interpolation.fade),
+        Actions.sequence(
+            Actions.moveBy(0f, -ENTRANCE_RISE),
+            Actions.moveBy(0f, ENTRANCE_RISE, ENTRANCE_SECONDS, Interpolation.pow2Out))));
+  }
+
+  /**
+   * A framed panel, for the screens that hold a form or a list.
+   *
+   * <p>Two layers rather than one: the dialog border is the raised frame and carries its own fill,
+   * which is what gives a panel an edge to sit on instead of looking like a flat cream rectangle
+   * pasted over the art. Padding matches the frame's own insets so nothing lands on the border.
+   */
   protected Table panel() {
     Table panel = new Table();
-    panel.setBackground(skin.getDrawable(UiSkinProvider.PANEL_BACKGROUND));
-    panel.pad(28f);
+    panel.setBackground(new LayeredDrawable(
+        skin.getDrawable(UiSkinProvider.PANEL_BACKGROUND),
+        skin.getDrawable(UiSkinProvider.PANEL_FRAME)));
+    panel.pad(30f, 34f, 34f, 34f);
     panel.defaults().pad(6f);
     return panel;
+  }
+
+  /**
+   * The recessed surface that goes inside a {@link #panel}, for lists and scroll areas.
+   *
+   * <p>Flatter and lighter than the frame around it, so a list of rows reads as content sitting in
+   * a well rather than as a second panel floating on the first.
+   */
+  protected Table well() {
+    Table well = new Table();
+    well.setBackground(skin.getDrawable(UiSkinProvider.PANEL_BACKGROUND));
+    well.pad(14f);
+    well.defaults().pad(4f);
+    return well;
   }
 
   /** Adds a "label: [input]" row and gives back the input. */

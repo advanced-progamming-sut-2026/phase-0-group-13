@@ -57,17 +57,17 @@ public final class SettingsScreen extends MenuScreen {
     difficulty.setItems(LEVELS);
     difficulty.setSelected(String.valueOf(user.getDifficultyLevel()));
     panel.add(new Label("Difficulty", skin, UiSkinProvider.LABEL_MEDIUM)).right().padRight(14f);
-    panel.add(difficulty).width(200f).height(52f).row();
+    panel.add(difficulty).width(200f).height(46f).row();
 
     SelectBox<String> speed = new SelectBox<>(skin);
     speed.setItems(SPEEDS);
     speed.setSelected(String.valueOf(GameSettings.getGameSpeed()));
     panel.add(new Label("Game speed", skin, UiSkinProvider.LABEL_MEDIUM)).right().padRight(14f);
-    panel.add(speed).width(200f).height(52f).row();
+    panel.add(speed).width(200f).height(46f).row();
 
     panel.add(new Label("Music", skin, UiSkinProvider.LABEL_MEDIUM)).right().padRight(14f);
     panel.add(volumeSlider(GameSettings.getMusicVolume(), GameSettings::setMusicVolume))
-        .width(200f).height(52f).row();
+        .width(200f).height(46f).row();
 
     panel.add(new Label("Sound effects", skin, UiSkinProvider.LABEL_MEDIUM))
         .right().padRight(14f);
@@ -75,33 +75,31 @@ public final class SettingsScreen extends MenuScreen {
       GameSettings.setSfxVolume(volume);
       // Played on release so the player hears the level they just chose.
       GameAudio.getInstance().play(GameAudio.Sfx.CLICK);
-    })).width(200f).height(52f).row();
+    })).width(200f).height(46f).row();
 
     panel.add(new Label("Mute", skin, UiSkinProvider.LABEL_MEDIUM)).right().padRight(14f);
     panel.add(toggle(GameSettings.isMuted(), () -> {
       GameSettings.setMuted(!GameSettings.isMuted());
       GameAudio.getInstance().refreshVolumes();
-    })).width(200f).height(52f).row();
+    })).width(200f).height(46f).row();
 
     panel.add(new Label("Grid overlay", skin, UiSkinProvider.LABEL_MEDIUM)).right().padRight(14f);
     panel.add(toggle(GameSettings.isGridVisible(),
         () -> GameSettings.setGridVisible(!GameSettings.isGridVisible())))
-        .width(200f).height(52f).row();
+        .width(200f).height(46f).row();
 
     panel.add(new Label("Debug mode", skin, UiSkinProvider.LABEL_MEDIUM)).right().padRight(14f);
     panel.add(toggle(GameSettings.isDebugMode(),
         () -> GameSettings.setDebugMode(!GameSettings.isDebugMode())))
-        .width(200f).height(52f).row();
+        .width(200f).height(46f).row();
 
-    panel.add(button("Apply", UiSkinProvider.BUTTON_GREEN, () -> apply(user, difficulty, speed)))
-        .colspan(2)
-        .width(260f)
-        .padTop(14f)
-        .row();
-    panel.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget())))
-        .colspan(2)
-        .width(260f)
-        .row();
+    // Side by side rather than stacked: eight rows of settings plus two full-width buttons is
+    // taller than the window, which pushed the panel off the bottom and clipped the header.
+    Table actions = new Table();
+    actions.defaults().pad(6f).width(200f).height(56f);
+    actions.add(button("Apply", UiSkinProvider.BUTTON_GREEN, () -> apply(user, difficulty, speed)));
+    actions.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget())));
+    panel.add(actions).colspan(2).padTop(10f).row();
     content.add(panel);
   }
 
