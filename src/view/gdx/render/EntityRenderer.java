@@ -42,6 +42,17 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float ZOMBOSS_ROW_FILL = 2.4f;
   private static final float ZOMBIE_FOOT_INSET = 0.08f;
 
+  /**
+   * How far a zombie may spill sideways, in tiles. Wider than a tile on purpose: a gargantuar
+   * overlapping the columns either side of it is how the game reads, and clamping to one tile is
+   * what was flattening the roster.
+   */
+  private static final float ZOMBIE_WIDTH_LIMIT_CELLS = 1.45f;
+  /** And how tall, in lanes -- past this it starts covering the lanes above and below. */
+  private static final float ZOMBIE_HEIGHT_LIMIT_LANES = 1.7f;
+  /** The plant seed-packet set the four Zombotany zombies borrow from is drawn much smaller. */
+  private static final float ZOMBOTANY_REFERENCE_HEIGHT = 62f;
+
   /** Columns from the house at which a zombie starts showing the warning tint. */
   private static final double NEAR_HOUSE_COLUMN = 1.2;
   private static final float PLANT_FOOT_INSET = 0.14f;
@@ -469,7 +480,7 @@ public final class EntityRenderer implements WorldRenderer {
     if (isBoss(zombie)) {
       return height > 0f ? geometry.getCellHeight() * ZOMBOSS_ROW_FILL / height : 0f;
     }
-    return scaleFor(animation.width(clip), ZOMBIE_ANIM_UNITS, ZOMBIE_ROW_FILL);
+    return zombieScaleFrom(animation.width(clip), height, ZOMBIE_ANIM_UNITS);
   }
 
   /** How tall the zombie is drawn, whichever way it is being drawn. */
@@ -491,9 +502,58 @@ public final class EntityRenderer implements WorldRenderer {
 
   /** Walkers share one reference height so a gargantuar stays bigger; Zomboss is its own size. */
   private float zombieScale(Zombie zombie, TextureRegion art) {
-    return isBoss(zombie)
-        ? geometry.getCellHeight() * ZOMBOSS_ROW_FILL / art.getRegionHeight()
-        : scaleFor(art, ZOMBIE_REFERENCE_HEIGHT, ZOMBIE_ROW_FILL);
+    if (isBoss(zombie)) {
+      return geometry.getCellHeight() * ZOMBOSS_ROW_FILL / art.getRegionHeight();
+    }
+    return zombieScaleFrom(art.getRegionWidth(), art.getRegionHeight(),
+        referenceHeightFor(zombie));
+  }
+
+  /**
+   * Which reference a portrait is measured against.
+   *
+   * <p>The zombie packet page is one coherent set drawn to a common scale, so measuring all of it
+   * against one reference is what keeps an imp smaller than a gargantuar. The four Zombotany
+   * zombies are the exception: they have no art of their own and borrow a *plant* seed packet,
+   * which is a different set drawn much smaller, so against the zombie reference they came out at
+   * a bit over half a lane -- smaller than an imp, for a zombie that is meant to read as an
+   * ordinary walker.
+   */
+  private static float referenceHeightFor(Zombie zombie) {
+    return ZombieArt.zombotanyPlant(zombie.getName()) != null
+        ? ZOMBOTANY_REFERENCE_HEIGHT
+        : ZOMBIE_REFERENCE_HEIGHT;
+  }
+
+  /**
+   * How big to draw a zombie, given its own art size and the reference its set is drawn to.
+   *
+   * <p>Deliberately not "every zombie the same size": the ratio of a sprite to its set's reference
+   * is the relative size the artists drew, and flattening it would make a gargantuar the size of
+   * an imp. The two limits only stop the extremes from breaking the board -- a zombie may be wider
+   * than its tile, the way a gargantuar is, but it may not be so tall that it covers the lanes
+   * either side of the one it is walking in.
+   *
+   * <p>The width limit used to be 0.95 of a tile, which is right for a plant -- a plant occupies
+   * exactly one tile -- but wrong for a zombie: it fired on almost every rig in the game and
+   * rescaled it by its aspect ratio instead of its size. That is what made the Egypt Gargantuar,
+   * the largest rig in the roster at 441x519 units, draw barely taller than a mummy, and the wide,
+   * squat Barrel Roller draw smaller than an imp.
+   */
+  private float zombieScaleFrom(float spriteWidth, float spriteHeight, float referenceHeight) {
+    if (spriteWidth <= 0f || spriteHeight <= 0f || referenceHeight <= 0f) {
+      return 0f;
+    }
+    float scale = geometry.getCellHeight() * ZOMBIE_ROW_FILL / referenceHeight;
+    float widest = geometry.getCellWidth() * ZOMBIE_WIDTH_LIMIT_CELLS;
+    if (spriteWidth * scale > widest) {
+      scale = widest / spriteWidth;
+    }
+    float tallest = geometry.getCellHeight() * ZOMBIE_HEIGHT_LIMIT_LANES;
+    if (spriteHeight * scale > tallest) {
+      scale = tallest / spriteHeight;
+    }
+    return scale;
   }
 
   private float scaleFor(TextureRegion region, float referenceHeight, float rowFill) {

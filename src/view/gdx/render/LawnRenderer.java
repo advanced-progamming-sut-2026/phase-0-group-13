@@ -23,6 +23,11 @@ public final class LawnRenderer implements WorldRenderer {
   private final HudArt hudArt = new HudArt();
   private final Color gridLine = new Color(1f, 0.15f, 0.15f, 0.85f);
   private final Color graveColor = new Color(0.35f, 0.32f, 0.30f, 0.92f);
+  /** How dark a grave gets just before it breaks. */
+  private static final float GRAVE_WEAR_FLOOR = 0.45f;
+  private final Color graveWear = new Color();
+  /** Frame-to-frame health watch, only so a grave can flash on the tick it is hit. */
+  private final HitEffects graveHits = new HitEffects();
   private final Color waterTile = new Color(0.16f, 0.55f, 0.72f, 0.45f);
   private final Color frozenTile = new Color(0.75f, 0.93f, 1f, 0.55f);
   private final Color slipTile = new Color(0.6f, 0.88f, 1f, 0.3f);
@@ -53,6 +58,7 @@ public final class LawnRenderer implements WorldRenderer {
     }
     season = seasonKey(game);
     clock += delta;
+    watchGraves(game.getBoard(), delta);
     drawBackground(context, game);
     drawGrid(context, game.getBoard());
   }
@@ -181,6 +187,23 @@ public final class LawnRenderer implements WorldRenderer {
     shapes.end();
   }
 
+  /** Feeds every standing grave's health to the flash tracker before anything is drawn. */
+  private void watchGraves(Board board, float delta) {
+    graveHits.advance(delta);
+    for (int row = 0; row < board.getRows(); row++) {
+      for (int col = 0; col < board.getColumns(); col++) {
+        if (board.getTile(row, col) == null) {
+          continue;
+        }
+        if (board.getTile(row, col).getEffect() instanceof TombStoneEffect grave
+            && grave.isActive()) {
+          graveHits.observe(grave, grave.getHealth());
+        }
+      }
+    }
+    graveHits.endFrame(board.getColumns());
+  }
+
   private void drawProps(RenderContext context, Board board) {
     TextureRegion mowerArt = hudArt.find("lawnmower");
     if (mowerArt == null && !hasGraveArt()) {
@@ -238,8 +261,23 @@ public final class LawnRenderer implements WorldRenderer {
     }
     float height = geometry.getCellHeight() * 0.82f;
     float width = art.getRegionWidth() * height / art.getRegionHeight();
+    // A grave is a destructible obstacle, so it has to look like one: it darkens and reddens as it
+    // is worn down, and flashes white on the tick it takes a hit. Without this the player has no
+    // way to tell a grave they are breaking from one they are wasting shots on.
+    context.getBatch().setColor(graveTint(grave));
     context.getBatch().draw(art, geometry.columnCentreX(col) - width / 2f,
         geometry.rowToY(row) + geometry.getCellHeight() * 0.1f, width, height);
+    context.getBatch().setColor(1f, 1f, 1f, 1f);
+  }
+
+  /** Darker and redder the closer the stone is to breaking, plus the hit flash over the top. */
+  private Color graveTint(TombStoneEffect grave) {
+    float left = Math.max(0f, Math.min(1f, grave.getHealth() / (float) grave.getMaxHealth()));
+    // 1 at full health down to GRAVE_WEAR_FLOOR when it is about to break
+    float wear = GRAVE_WEAR_FLOOR + (1f - GRAVE_WEAR_FLOOR) * left;
+    graveWear.set(wear, wear * (0.55f + 0.45f * left), wear * (0.55f + 0.45f * left), 1f);
+    float flash = graveHits.flashStrength(grave);
+    return flash <= 0f ? graveWear : graveWear.lerp(Color.WHITE, flash);
   }
 
   private boolean hasGraveArt() {

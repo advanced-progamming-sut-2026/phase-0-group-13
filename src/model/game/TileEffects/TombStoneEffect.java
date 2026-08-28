@@ -9,6 +9,7 @@ public class TombStoneEffect extends TileEffect {
   }
 
   private int health;
+  private final int maxHealth;
   private boolean blocksShots;
 
   private final boolean necromancy;
@@ -26,6 +27,7 @@ public class TombStoneEffect extends TileEffect {
   public TombStoneEffect(int health, boolean blocksShots, boolean necromancy, int necromancyIntervalTicks) {
     super("Tombstone", -1);
     this.health = health;
+    this.maxHealth = Math.max(1, health);
     this.blocksShots = blocksShots;
     this.necromancy = necromancy;
     this.necromancyIntervalTicks = necromancyIntervalTicks;
@@ -88,5 +90,10 @@ public class TombStoneEffect extends TileEffect {
 
   public int getHealth() {
     return health;
+  }
+
+  /** What it started with, so a view can show how far through it is. Never zero. */
+  public int getMaxHealth() {
+    return maxHealth;
   }
 }
