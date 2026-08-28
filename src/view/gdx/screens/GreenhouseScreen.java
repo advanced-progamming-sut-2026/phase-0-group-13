@@ -4,6 +4,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Scaling;
@@ -14,6 +15,7 @@ import model.environment.greenhouse.GreenHouse;
 import model.environment.greenhouse.Pot;
 import model.game.shop.Shop;
 import view.gdx.core.PvzGdxGame;
+import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
 import view.gdx.ui.Popup;
 import view.gdx.ui.UiSkinProvider;
@@ -36,7 +38,15 @@ public final class GreenhouseScreen extends MenuScreen {
   private static final long MILLIS_PER_HOUR = 60L * 60 * 1000;
   private static final int MARIGOLD_COINS = 500;
 
+  /** Pot cell size, and how far the plant is lifted so it clears the pot's soil line. */
+  private static final float POT_WIDTH = 116f;
+  private static final float POT_HEIGHT = 74f;
+  private static final float PLANT_LIFT = 24f;
+  /** Four rows of pots plus the header have to fit in the window without a scroll bar. */
+  private static final float POT_BUTTON_HEIGHT = 30f;
+
   private final PlantArt art = new PlantArt();
+  private final HudArt hudArt = new HudArt();
   private final Shop shop = new Shop();
   private Table content;
 
@@ -93,7 +103,7 @@ public final class GreenhouseScreen extends MenuScreen {
 
     // No panel behind the grid - each pot has its own, so they read as separate tiles.
     Table grid = new Table();
-    grid.defaults().pad(8f).width(184f).height(118f);
+    grid.defaults().pad(4f).width(POT_WIDTH + 14f).top();
     for (int row = 0; row < ROWS; row++) {
       for (int col = 0; col < COLUMNS; col++) {
         int index = row * COLUMNS + col;
@@ -104,43 +114,91 @@ public final class GreenhouseScreen extends MenuScreen {
     content.add(grid).row();
   }
 
-  /** One pot: locked, empty, growing or ready. */
+  /**
+   * One pot.
+   *
+   * <p>The doc's greenhouse is PvZ's Zen Garden, and that world's own art is what this is built
+   * from: the terracotta pot with soil in it, the gold one it becomes when what is growing is
+   * ready, the shadow that sits under it, and the padlock for a slot that has not been bought.
+   * The plant is drawn behind the pot and lifted, so it comes out of the soil rather than sitting
+   * on a card next to it -- which is what made the old grid read as twenty identical buttons.
+   */
   private Table potCard(User user, Pot pot, int index) {
+    boolean locked = pot == null || !pot.isUnlocked();
+    boolean ready = !locked && !pot.isEmpty() && pot.isFullyGrown();
+
     Table card = new Table();
-    card.setBackground(skin.getDrawable(UiSkinProvider.PANEL_BACKGROUND));
-    card.pad(8f);
-    card.defaults().pad(2f);
+    card.defaults().pad(1f);
+    card.add(potVisual(pot, locked, ready)).size(POT_WIDTH, POT_HEIGHT).row();
 
-    if (pot == null || !pot.isUnlocked()) {
-      card.add(button("Buy pot\n" + POT_PRICE + " coins", UiSkinProvider.BUTTON_BROWN,
-          () -> buyPot(user))).grow();
+    if (locked) {
+      card.add(smallButton("Buy  " + POT_PRICE, UiSkinProvider.BUTTON_BROWN,
+          () -> buyPot(user))).width(POT_WIDTH).height(POT_BUTTON_HEIGHT);
       return card;
     }
-
     if (pot.isEmpty()) {
-      TextButton plant = button("Plant seed", UiSkinProvider.BUTTON_GREEN,
-          () -> openEmptyPot(user, index));
-      plant.getLabel().setWrap(true);
-      card.add(plant).grow();
+      card.add(smallButton("Plant seed", UiSkinProvider.BUTTON_GREEN,
+          () -> openEmptyPot(user, index))).width(POT_WIDTH).height(POT_BUTTON_HEIGHT);
       return card;
     }
 
-    String seed = pot.getPlantedSeedId();
-    TextureRegion sprite = art.find(seed);
-    if (sprite != null) {
-      Image image = new Image(sprite);
-      image.setScaling(Scaling.fit);
-      card.add(image).size(70f, 40f).row();
-    }
-    card.add(new Label(seed, skin, "secondary")).row();
-
-    boolean ready = pot.isFullyGrown();
-    card.add(new Label(ready ? "READY" : remaining(pot), skin, UiSkinProvider.LABEL_MEDIUM)).row();
-    TextButton open = button(ready ? "Collect" : "Details",
+    card.add(new Label(ready ? "READY" : remaining(pot), skin, "secondary")).row();
+    card.add(smallButton(ready ? "Collect" : pot.getPlantedSeedId(),
             ready ? UiSkinProvider.BUTTON_GREEN : UiSkinProvider.BUTTON_BROWN,
-            () -> openGrowingPot(pot, index));
-    card.add(open).growX().height(34f);
+            () -> openGrowingPot(pot, index)))
+        .width(POT_WIDTH).height(POT_BUTTON_HEIGHT);
     return card;
+  }
+
+  /** A pot's action button; the label is shrunk so a plant name fits on one line. */
+  private TextButton smallButton(String text, String style, Runnable action) {
+    TextButton button = button(text, style, action);
+    button.getLabel().setFontScale(0.82f);
+    return button;
+  }
+
+  /**
+   * The pot itself: shadow, then the plant, then the pot over the top of it.
+   *
+   * <p>Order is the whole trick. The pot is drawn last so its rim covers the bottom of the plant,
+   * which is what makes the plant look planted instead of pasted on.
+   */
+  private Stack potVisual(Pot pot, boolean locked, boolean ready) {
+    Stack stack = new Stack();
+    stack.add(bottomAligned(hudArt.find("potshadow"), POT_WIDTH * 0.70f, 16f, 0f, 0.55f));
+
+    if (!locked && pot != null && !pot.isEmpty()) {
+      TextureRegion sprite = art.find(pot.getPlantedSeedId());
+      if (sprite != null) {
+        stack.add(bottomAligned(sprite, 52f, 46f, PLANT_LIFT, 1f));
+      }
+    }
+
+    // Gold once it is ready to collect, so a finished pot is visible across the whole grid.
+    TextureRegion potArt = hudArt.find(ready ? "potgold" : "pot");
+    stack.add(bottomAligned(potArt, POT_WIDTH * 0.80f, 46f, 0f, locked ? 0.5f : 1f));
+
+    if (locked) {
+      stack.add(bottomAligned(hudArt.find("potlocked"), 22f, 28f, 18f, 1f));
+    } else if (ready) {
+      stack.add(bottomAligned(hudArt.find("potwater"), 17f, 26f, 38f, 1f));
+    }
+    return stack;
+  }
+
+  /** One layer of the pot stack, sitting on the floor of the cell and optionally lifted. */
+  private Table bottomAligned(TextureRegion region, float width, float height, float lift,
+      float alpha) {
+    Table holder = new Table();
+    holder.bottom();
+    if (region == null) {
+      return holder;
+    }
+    Image image = new Image(region);
+    image.setScaling(Scaling.fit);
+    image.getColor().a = alpha;
+    holder.add(image).size(width, height).padBottom(lift);
+    return holder;
   }
 
   private void openEmptyPot(User user, int index) {
@@ -262,5 +320,6 @@ public final class GreenhouseScreen extends MenuScreen {
   public void dispose() {
     super.dispose();
     art.dispose();
+    hudArt.dispose();
   }
 }

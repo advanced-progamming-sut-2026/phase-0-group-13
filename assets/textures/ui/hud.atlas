@@ -1,5 +1,5 @@
 hud.png
-size: 2018,333
+size: 2854,333
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
@@ -10,128 +10,184 @@ brain
   orig: 72, 53
   offset: 0, 0
   index: -1
-darkgrave
+cupbronze
   rotate: false
   xy: 76, 2
+  size: 132, 267
+  orig: 132, 267
+  offset: 0, 0
+  index: -1
+cupgold
+  rotate: false
+  xy: 210, 2
+  size: 132, 267
+  orig: 132, 267
+  offset: 0, 0
+  index: -1
+cupsilver
+  rotate: false
+  xy: 344, 2
+  size: 132, 267
+  orig: 132, 267
+  offset: 0, 0
+  index: -1
+darkgrave
+  rotate: false
+  xy: 478, 2
   size: 85, 103
   orig: 85, 103
   offset: 0, 0
   index: -1
 darkgravefood
   rotate: false
-  xy: 163, 2
+  xy: 565, 2
   size: 85, 103
   orig: 85, 103
   offset: 0, 0
   index: -1
 darkgravesun
   rotate: false
-  xy: 250, 2
+  xy: 652, 2
   size: 85, 103
   orig: 85, 103
   offset: 0, 0
   index: -1
 gravestone
   rotate: false
-  xy: 337, 2
+  xy: 739, 2
   size: 76, 95
   orig: 76, 95
   offset: 0, 0
   index: -1
 kingaura
   rotate: false
-  xy: 415, 2
+  xy: 817, 2
   size: 349, 329
   orig: 349, 329
   offset: 0, 0
   index: -1
 lawnmower
   rotate: false
-  xy: 766, 2
+  xy: 1168, 2
   size: 155, 108
   orig: 155, 108
   offset: 0, 0
   index: -1
 necromancy
   rotate: false
-  xy: 923, 2
+  xy: 1325, 2
   size: 101, 101
   orig: 101, 101
   offset: 0, 0
   index: -1
 pea
   rotate: false
-  xy: 1026, 2
+  xy: 1428, 2
   size: 21, 23
   orig: 21, 23
   offset: 0, 0
   index: -1
 plantfood
   rotate: false
-  xy: 1049, 2
+  xy: 1451, 2
   size: 192, 192
   orig: 192, 192
   offset: 0, 0
   index: -1
+pot
+  rotate: false
+  xy: 1645, 2
+  size: 118, 103
+  orig: 118, 103
+  offset: 0, 0
+  index: -1
+potgold
+  rotate: false
+  xy: 1765, 2
+  size: 118, 103
+  orig: 118, 103
+  offset: 0, 0
+  index: -1
+potlocked
+  rotate: false
+  xy: 1885, 2
+  size: 42, 55
+  orig: 42, 55
+  offset: 0, 0
+  index: -1
+potshadow
+  rotate: false
+  xy: 1929, 2
+  size: 113, 68
+  orig: 113, 68
+  offset: 0, 0
+  index: -1
+potwater
+  rotate: false
+  xy: 2044, 2
+  size: 33, 52
+  orig: 33, 52
+  offset: 0, 0
+  index: -1
 sandcloud
   rotate: false
-  xy: 1243, 2
+  xy: 2079, 2
   size: 74, 53
   orig: 74, 53
   offset: 0, 0
   index: -1
 sandstreak
   rotate: false
-  xy: 1319, 2
+  xy: 2155, 2
   size: 73, 42
   orig: 73, 42
   offset: 0, 0
   index: -1
 sheep
   rotate: false
-  xy: 1394, 2
+  xy: 2230, 2
   size: 75, 94
   orig: 75, 94
   offset: 0, 0
   index: -1
 snowgust
   rotate: false
-  xy: 1471, 2
+  xy: 2307, 2
   size: 55, 42
   orig: 55, 42
   offset: 0, 0
   index: -1
 sun
   rotate: false
-  xy: 1528, 2
+  xy: 2364, 2
   size: 70, 71
   orig: 70, 71
   offset: 0, 0
   index: -1
 vasegargantuar
   rotate: false
-  xy: 1600, 2
+  xy: 2436, 2
   size: 74, 96
   orig: 74, 96
   offset: 0, 0
   index: -1
 vaseplant
   rotate: false
-  xy: 1676, 2
+  xy: 2512, 2
   size: 74, 96
   orig: 74, 96
   offset: 0, 0
   index: -1
 vasesmash
   rotate: false
-  xy: 1752, 2
+  xy: 2588, 2
   size: 188, 169
   orig: 188, 169
   offset: 0, 0
   index: -1
 vaseunknown
   rotate: false
-  xy: 1942, 2
+  xy: 2778, 2
   size: 74, 96
   orig: 74, 96
   offset: 0, 0

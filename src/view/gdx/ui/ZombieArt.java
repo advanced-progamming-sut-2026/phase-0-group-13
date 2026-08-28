@@ -81,7 +81,7 @@ public final class ZombieArt implements Disposable {
    * ZombieZombotanyWallnutDefault}. The four names it returns are exactly the four regions
    * {@code textures/plants/seedpackets.atlas} carries for those plants.
    */
-  static String zombotanyPlant(String zombieName) {
+  public static String zombotanyPlant(String zombieName) {
     String key = normalise(zombieName);
     if (!key.contains("zombotany")) {
       return null;

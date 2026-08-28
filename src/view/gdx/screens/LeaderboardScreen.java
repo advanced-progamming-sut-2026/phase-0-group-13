@@ -2,11 +2,17 @@ package view.gdx.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,6 +20,7 @@ import java.util.List;
 import network.client.ClientSession;
 import network.protocol.Payloads;
 import view.gdx.core.PvzGdxGame;
+import view.gdx.ui.HudArt;
 import view.gdx.ui.UiSkinProvider;
 
 /**
@@ -39,6 +46,29 @@ public final class LeaderboardScreen extends MenuScreen {
   /** 0 asks for every registered player, which is what the doc's table is. */
   private static final int NO_LIMIT = 0;
 
+  /**
+   * The game's own first/second/third place trophies.
+   *
+   * <p>These are the Arena's league cups, the only actual placement art in the library. They read
+   * as a ranking on sight in a way a numbered rosette does not, so the top three carry the cup
+   * instead of a number -- gold, silver and bronze say which place it is by themselves.
+   */
+  private static final String[] MEDALS = {"cupgold", "cupsilver", "cupbronze"};
+
+  /** Cup size in a row. Tall and narrow, like the art. */
+  private static final float CUP_WIDTH = 30f;
+  private static final float CUP_HEIGHT = 58f;
+
+  private static final Color ME_ROW = new Color(0.16f, 0.52f, 0.18f, 0.55f);
+  /** A warm wash behind the podium places, strongest at the top. */
+  private static final Color[] PODIUM_ROW = {
+      new Color(1f, 0.82f, 0.25f, 0.26f),
+      new Color(0.85f, 0.87f, 0.92f, 0.20f),
+      new Color(0.80f, 0.53f, 0.28f, 0.18f),
+  };
+  private static final Color STRIPE_ROW = new Color(0f, 0f, 0f, 0.07f);
+  private static final Color CLEAR_ROW = new Color(0f, 0f, 0f, 0f);
+
   private enum Column {
     RANK("#", null),
     PLAYER("Player", Comparator.comparing(Payloads.LeaderboardEntry::username,
@@ -61,6 +91,7 @@ public final class LeaderboardScreen extends MenuScreen {
     }
   }
 
+  private final HudArt hudArt = new HudArt();
   private Table board;
   private List<Payloads.LeaderboardEntry> entries;
   private String status = "Asking the server for the leaderboard...";
@@ -149,8 +180,7 @@ public final class LeaderboardScreen extends MenuScreen {
     }
     board.clear();
     if (entries == null || entries.isEmpty()) {
-      board.add(new Label(status == null ? "" : status, skin, UiSkinProvider.LABEL_MEDIUM))
-          .pad(24f);
+      board.add(emptyState()).pad(24f).growX();
       return;
     }
 
@@ -162,28 +192,101 @@ public final class LeaderboardScreen extends MenuScreen {
           String.CASE_INSENSITIVE_ORDER));
     }
 
+    Table headings = new Table();
     for (Column column : Column.values()) {
-      board.add(heading(column)).pad(6f).minWidth(column == Column.PLAYER ? 190f : 130f);
+      headings.add(heading(column)).width(widthOf(column))
+          .align(column == Column.PLAYER ? Align.left : Align.center).pad(6f);
     }
-    board.row();
+    board.add(headings).growX().row();
 
     String me = ClientSession.getInstance().getUsername();
     int rank = 1;
     for (Payloads.LeaderboardEntry entry : ranked) {
       boolean isMe = me != null && me.equalsIgnoreCase(entry.username());
-      // The player's own row is called out so they can find themselves in a long table.
-      String style = isMe ? UiSkinProvider.LABEL_MEDIUM : "secondary";
-      board.add(new Label(String.valueOf(rank++), skin, style)).pad(6f);
-      board.add(new Label(entry.username() + (isMe ? "  (you)" : ""), skin, style)).left().pad(6f);
-      board.add(new Label(progressOf(entry), skin, style)).pad(6f);
-      board.add(new Label(String.valueOf(entry.miniGameLevels()), skin, style)).pad(6f);
-      board.add(new Label(String.valueOf(entry.dailyQuests()), skin, style)).pad(6f);
-      board.add(new Label(String.valueOf(entry.otherQuests()), skin, style)).pad(6f);
-      // Blank, not zero: the doc says a player who has not played the bonus game has no My Point.
-      board.add(new Label(entry.myPoint() == null ? "-" : String.valueOf(entry.myPoint()),
-          skin, style)).pad(6f);
-      board.row();
+      board.add(row(entry, rank, isMe)).growX().padBottom(2f).row();
+      rank++;
     }
+    // Keeps a short table's rows at the top of the panel instead of centred in a sea of cream.
+    board.add().expandY().row();
+  }
+
+  /**
+   * One player's row.
+   *
+   * <p>Rows alternate a faint wash so the eye can follow a line across seven columns, and the
+   * signed-in player's row is a solid highlight rather than only a brighter font -- on a long
+   * table the old treatment was almost invisible. The top three carry the game's own place badges
+   * in the rank column, which is what makes the top of the table look like a ranking rather than
+   * like row one of a spreadsheet.
+   */
+  private Table row(Payloads.LeaderboardEntry entry, int rank, boolean isMe) {
+    Table row = new Table();
+    row.setBackground(skin.newDrawable(UiSkinProvider.WHITE_PIXEL, rowTint(rank, isMe)));
+    String style = isMe ? UiSkinProvider.LABEL_MEDIUM : "secondary";
+
+    row.add(rankCell(rank, style)).width(widthOf(Column.RANK)).pad(4f);
+    row.add(new Label(entry.username() + (isMe ? "  (you)" : ""), skin, style))
+        .width(widthOf(Column.PLAYER)).left().pad(4f);
+    cell(row, progressOf(entry), style, Column.PROGRESS);
+    cell(row, String.valueOf(entry.miniGameLevels()), style, Column.MINI_GAMES);
+    cell(row, String.valueOf(entry.dailyQuests()), style, Column.DAILY);
+    cell(row, String.valueOf(entry.otherQuests()), style, Column.OTHER);
+    // Blank, not zero: the doc says a player who has not played the bonus game has no My Point.
+    cell(row, entry.myPoint() == null ? "-" : String.valueOf(entry.myPoint()), style,
+        Column.MY_POINT);
+    return row;
+  }
+
+  private void cell(Table row, String text, String style, Column column) {
+    Label label = new Label(text, skin, style);
+    label.setAlignment(Align.center);
+    row.add(label).width(widthOf(column)).pad(4f);
+  }
+
+  /**
+   * Your own row wins over everything; then the podium wash; then the ordinary stripe.
+   *
+   * <p>Deliberately in that order: finding yourself is the thing a player does first, so it must
+   * not be outranked by being third.
+   */
+  private static Color rowTint(int rank, boolean isMe) {
+    if (isMe) {
+      return ME_ROW;
+    }
+    if (rank <= PODIUM_ROW.length) {
+      return PODIUM_ROW[rank - 1];
+    }
+    return rank % 2 == 0 ? STRIPE_ROW : CLEAR_ROW;
+  }
+
+  /** A trophy for the top three, the plain number for everyone else. */
+  private Table rankCell(int rank, String style) {
+    Table cell = new Table();
+    TextureRegion cup = rank <= MEDALS.length ? hudArt.find(MEDALS[rank - 1]) : null;
+    if (cup != null) {
+      Image trophy = new Image(cup);
+      trophy.setScaling(Scaling.fit);
+      cell.add(trophy).size(CUP_WIDTH, CUP_HEIGHT);
+      return cell;
+    }
+    cell.add(new Label(String.valueOf(rank), skin, style));
+    return cell;
+  }
+
+  /** Loading and "nobody here" are different things, so they do not look the same. */
+  private Table emptyState() {
+    Table empty = new Table();
+    boolean loading = entries == null && status != null && status.startsWith("Asking");
+    empty.add(new Label(loading ? "..." : "!", skin, UiSkinProvider.LABEL_BIG)).padBottom(8f).row();
+    Label message = new Label(status == null ? "" : status, skin, UiSkinProvider.LABEL_MEDIUM);
+    message.setAlignment(Align.center);
+    message.setWrap(true);
+    empty.add(message).width(520f).row();
+    return empty;
+  }
+
+  private static float widthOf(Column column) {
+    return column == Column.PLAYER ? 220f : 132f;
   }
 
   /** A heading that sorts on click, with an arrow showing which way it is sorted. */
@@ -220,6 +323,7 @@ public final class LeaderboardScreen extends MenuScreen {
   @Override
   public void dispose() {
     board = null;
+    hudArt.dispose();
     super.dispose();
   }
 }

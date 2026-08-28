@@ -707,6 +707,22 @@ HUD_PIECES = {
               "power_brain_projectile_112x82"),
     # Egypt's tornado and Frostbite's freezing wind. The worlds ship these as full-screen weather
     # rigs; only the small pieces are taken, because both events are per-lane, not ambient.
+    # Greenhouse. The doc's greenhouse is PvZ's Zen Garden, and that world ships the pieces for
+    # it: a terracotta pot with soil in it, the same pot in gold for a slot that has been upgraded,
+    # the shadow that sits under one, its padlock, and the droplet shown over a pot that wants
+    # watering. Cropped and looked at before being listed, same as everything else here.
+    "pot": ("ATLASIMAGE_ATLAS_ZENGARDENGROUP_768_00", "zen_garden",
+            "Growing_Plant_Slot_184x161"),
+    "potgold": ("ATLASIMAGE_ATLAS_ZENGARDENGROUP_768_00", "zen_garden",
+                "Growing_Plant_Slot_184x161_2"),
+    "potshadow": ("ATLASIMAGE_ATLAS_ZENGARDENGROUP_768_00", "zen_garden",
+                  "Growing_Plant_Slot_176x106"),
+    "potlocked": ("ATLASIMAGE_ATLAS_ZENGARDENGROUP_768_00", "zen_garden", "locked_pot_icon"),
+    "potwater": ("ATLASIMAGE_ATLAS_ZENGARDENGROUP_768_00", "zen_garden", "readytowater"),
+    # Leaderboard. The Arena's league trophies are the game's own first/second/third place art.
+    "cupgold": ("ATLASIMAGE_ATLAS_UI_LEAGUES_768_00", "leagues", "cup_gold"),
+    "cupsilver": ("ATLASIMAGE_ATLAS_UI_LEAGUES_768_00", "leagues", "cup_silver"),
+    "cupbronze": ("ATLASIMAGE_ATLAS_UI_LEAGUES_768_00", "leagues", "cup_bronze"),
     "sandcloud": ("ATLASIMAGE_ATLAS_SANDSTORMGROUP_768_00", "sandstorm_top", "sandstorm_cloud"),
     "sandstreak": ("ATLASIMAGE_ATLAS_SANDSTORMGROUP_768_00", "sandstorm_rear",
                    "sandstorm_speedline_filtered"),

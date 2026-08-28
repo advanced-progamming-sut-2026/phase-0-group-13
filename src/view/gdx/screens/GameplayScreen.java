@@ -2,13 +2,18 @@ package view.gdx.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Scaling;
 import data.GameDataManager;
 import data.persistence.UserManager;
 import java.util.ArrayList;
 import java.util.List;
 import model.account.User;
+import model.game.MatchResult;
 import model.game.minigame.BossStageRule;
 import model.game.minigame.ConveyorRule;
 import model.game.minigame.DeadLineRule;
@@ -40,7 +45,9 @@ import view.gdx.render.EntityRenderer;
 import view.gdx.render.LawnGeometry;
 import view.gdx.render.LawnRenderer;
 import view.gdx.render.StageRuleRenderer;
+import view.gdx.ui.CountUpLabel;
 import view.gdx.ui.Dialogue;
+import view.gdx.ui.HudArt;
 import view.gdx.ui.HudStage;
 import view.gdx.ui.Popup;
 import view.gdx.ui.UiSkinProvider;
@@ -69,6 +76,8 @@ public final class GameplayScreen extends BaseScreen {
   private StageRuleRenderer stageRuleRenderer;
   private CursorRenderer cursorRenderer;
   private HudStage hud;
+  /** Only for the result panel's trophy and brain; the HUD keeps its own copy. */
+  private final HudArt hudArt = new HudArt();
   private GameplayInputHandler input;
   private GdxGameActions actions;
   private boolean ended;
@@ -517,16 +526,29 @@ public final class GameplayScreen extends BaseScreen {
     showOutcome(won);
   }
 
+  /**
+   * The end-of-level panel.
+   *
+   * <p>It used to be one sentence, which told the player nothing about the run they had just
+   * played and made a win look like an error dialog. The numbers here are all ones the match
+   * already kept -- the score, the coins the result banked, how far through the waves it got --
+   * so this reads them rather than computing anything, and the rewards roll up because the reward
+   * is the point of the screen.
+   */
   private void showOutcome(boolean won) {
     GameAudio.getInstance().play(won ? GameAudio.Sfx.WIN : GameAudio.Sfx.LOSE);
+    Skin skin = game.getUiSkin().get();
     Table body = new Table();
-    body.add(new Label(won ? "Level cleared!" : "The zombies ate your brains!",
-        game.getUiSkin().get(), UiSkinProvider.LABEL_MEDIUM)).row();
+    body.defaults().pad(2f);
+
+    body.add(outcomeHeadline(skin, won)).padBottom(10f).row();
+
+    body.add(summary(skin, won)).padBottom(4f).row();
+
     if (isBonus()) {
       // The run is scored either way here, so the number matters more than the verdict.
-      body.add(new Label("MyoPoints this run: " + bonusScore
-          + "\nSent to the server; the leaderboard keeps your best.",
-          game.getUiSkin().get(), UiSkinProvider.LABEL_MEDIUM)).padTop(8f).row();
+      body.add(new Label("Sent to the server; the leaderboard keeps your best.",
+          skin, "secondary")).padTop(6f).row();
     }
     String leaveLabel = isBonus() ? "Back to menu" : "Back to map";
     if (won) {
@@ -536,6 +558,69 @@ public final class GameplayScreen extends BaseScreen {
     }
     Popup.show(hud.getStage(), game.getUiSkin().get(), "You lose", body,
         "Retry", this::restart, leaveLabel, this::leave);
+  }
+
+  /**
+   * The verdict, with the game's own art beside it.
+   *
+   * <p>A win and a loss used to differ only in their wording. The gold cup is the same trophy the
+   * leaderboard hands its top place, and the brain is the one the HUD already draws for the thing
+   * the zombies are after -- so each result carries the object it is about, and the two screens
+   * are told apart at a glance rather than by reading.
+   */
+  private Table outcomeHeadline(Skin skin, boolean won) {
+    Table headline = new Table();
+    TextureRegion mark = hudArt.find(won ? "cupgold" : "brain");
+    if (mark != null) {
+      Image image = new Image(mark);
+      image.setScaling(Scaling.fit);
+      headline.add(image).size(won ? 44f : 52f, 64f).padRight(14f);
+    }
+    headline.add(new Label(won ? "Level cleared!" : "The zombies ate your brains!",
+        skin, UiSkinProvider.LABEL_BIG_OUTLINE));
+    return headline;
+  }
+
+  /** The run, in the numbers the match already tracked. Rewards roll up; facts do not. */
+  private Table summary(Skin skin, boolean won) {
+    Table stats = new Table();
+    stats.defaults().pad(3f);
+
+    if (isBonus()) {
+      stats.add(statRow(skin, "MyoPoints this run", new CountUpLabel(bonusScore, skin,
+          UiSkinProvider.LABEL_BIG_OUTLINE), null)).row();
+      return stats;
+    }
+
+    MatchResult result = match == null ? null : match.getMatchResult();
+    int waves = match == null ? 0 : Math.min(match.getCurrentWaveIndex(), match.getTotalWaves());
+    int totalWaves = match == null ? 0 : match.getTotalWaves();
+
+    stats.add(statRow(skin, "Waves survived",
+        new Label(waves + " / " + totalWaves, skin, UiSkinProvider.LABEL_MEDIUM), null)).row();
+
+    if (result != null) {
+      stats.add(statRow(skin, "Score",
+          new CountUpLabel(result.getScore(), skin, UiSkinProvider.LABEL_MEDIUM), null)).row();
+      // Only a win banks coins, so showing a zero on a loss would just be noise.
+      if (won && result.getRewardCoins() > 0) {
+        stats.add(statRow(skin, "Coins earned",
+            new CountUpLabel(result.getRewardCoins(), skin, UiSkinProvider.LABEL_BIG_OUTLINE),
+            UiSkinProvider.COIN_ICON)).row();
+      }
+    }
+    return stats;
+  }
+
+  /** "label ....... [icon] value", so the numbers line up down the right. */
+  private Table statRow(Skin skin, String label, Label value, String icon) {
+    Table row = new Table();
+    row.add(new Label(label, skin, "secondary")).right().width(190f).padRight(14f);
+    if (icon != null) {
+      row.add(new Image(skin.getDrawable(icon))).size(28f).padRight(8f);
+    }
+    row.add(value).left().width(120f);
+    return row;
   }
 
   @Override
@@ -567,6 +652,7 @@ public final class GameplayScreen extends BaseScreen {
     if (hud != null) {
       hud.dispose();
     }
+    hudArt.dispose();
   }
 
   private static int boardRows(GameManager match) {

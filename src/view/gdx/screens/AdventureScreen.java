@@ -1,10 +1,19 @@
 package view.gdx.screens;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.Scaling;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import data.persistence.UserManager;
 import model.account.AdventureMap;
 import model.account.Progress;
@@ -30,8 +39,14 @@ import view.gdx.ui.UiSkinProvider;
  */
 public final class AdventureScreen extends MenuScreen {
 
+  /** Thumbnail size, roughly the 16:9 of the world art it is cropped from. */
+  private static final float THUMB_WIDTH = 156f;
+  private static final float THUMB_HEIGHT = 88f;
+
   private Table content;
   private int openChapter;
+  /** One atlas per chapter thumbnail, opened lazily and disposed with the screen. */
+  private final Map<Integer, TextureAtlas> worldArt = new LinkedHashMap<>();
 
   public AdventureScreen(PvzGdxGame game) {
     this(game, 0);
@@ -109,15 +124,95 @@ public final class AdventureScreen extends MenuScreen {
     }
   }
 
+  /**
+   * A slice of the chapter's own world art, as its thumbnail.
+   *
+   * <p>The repository already has each world's background -- it is what this very screen draws
+   * behind itself -- so the four rows can show the place they lead to instead of only naming it.
+   * Cropped rather than squashed: the art is a wide lawn and letterboxing it into a small box
+   * would waste most of the thumbnail, so the cell clips and the image fills it.
+   *
+   * <p>A locked world is shown dimmed rather than hidden. Seeing where you are going is the point
+   * of a world list, and a blank row would say less than a dark one.
+   */
+  private Table worldThumbnail(int stage, boolean unlocked) {
+    TextureAtlas atlas = worldArt.get(stage);
+    if (atlas == null) {
+      String path = "textures/environment/" + worldAtlas(stage);
+      if (!Gdx.files.internal(path).exists()) {
+        return null;
+      }
+      atlas = new TextureAtlas(Gdx.files.internal(path));
+      worldArt.put(stage, atlas);
+    }
+    TextureRegion region = atlas.findRegion("texture");
+    if (region == null) {
+      return null;
+    }
+    Image art = new Image(region);
+    art.setScaling(Scaling.fill);
+    if (!unlocked) {
+      art.setColor(0.42f, 0.42f, 0.48f, 1f);
+    }
+
+    Table frame = new Table();
+    frame.setClip(true);
+    frame.add(art).grow();
+    if (unlocked) {
+      return frame;
+    }
+    // The game's own padlock over the dimmed art, so "locked" is a symbol and not only a shade.
+    Stack stack = new Stack();
+    stack.add(frame);
+    Table badge = new Table();
+    badge.add(new Image(skin.getDrawable(UiSkinProvider.LOCK_ICON))).size(30f, 39f);
+    stack.add(badge);
+    Table wrapper = new Table();
+    wrapper.add(stack).grow();
+    return wrapper;
+  }
+
+  /**
+   * How far through a chapter the player is.
+   *
+   * <p>A locked chapter still shows the empty bar rather than nothing, so the four rows read as
+   * one progression instead of one row plus three blanks.
+   */
+  private Table chapterProgress(int cleared, boolean unlocked) {
+    Table holder = new Table();
+    holder.left();
+    ProgressBar bar = new ProgressBar(0f, AdventureMap.LEVELS_PER_STAGE, 1f, false, skin,
+        cleared >= AdventureMap.LEVELS_PER_STAGE ? "xp_green" : "xp_yellow");
+    bar.setValue(unlocked ? cleared : 0);
+    bar.setAnimateDuration(0f);
+    if (!unlocked) {
+      bar.getColor().a = 0.45f;
+    }
+    holder.add(bar).width(320f).height(18f);
+    return holder;
+  }
+
   private Table chapterRow(User user, int stage, boolean unlocked) {
     Table row = new Table();
     row.left();
 
-    row.add(new Label(stage + ".  " + chapterName(stage), skin, UiSkinProvider.LABEL_BIG))
-        .left()
-        .expandX();
-
     int cleared = clearedLevels(user.getProgress(), stage);
+
+    Table thumb = worldThumbnail(stage, unlocked);
+    if (thumb != null) {
+      row.add(thumb).size(THUMB_WIDTH, THUMB_HEIGHT).padRight(18f);
+    }
+
+    // Name over a progress bar rather than a name and a "0 / 4" a long way apart: the whole point
+    // of a world list is how far through each world you are, and the row had a wide dead gap in
+    // the middle doing nothing.
+    Table title = new Table();
+    title.left();
+    title.add(new Label(stage + ".  " + chapterName(stage), skin, UiSkinProvider.LABEL_BIG))
+        .left().row();
+    title.add(chapterProgress(cleared, unlocked)).left().padTop(4f).row();
+    row.add(title).left().expandX();
+
     String progress = cleared + " / " + AdventureMap.LEVELS_PER_STAGE + " levels";
     row.add(new Label(unlocked ? progress : "LOCKED", skin, UiSkinProvider.LABEL_MEDIUM))
         .right()
@@ -230,6 +325,15 @@ public final class AdventureScreen extends MenuScreen {
       default -> new DarkAgesSeason();
     };
     return season.getName();
+  }
+
+  @Override
+  public void dispose() {
+    for (TextureAtlas atlas : worldArt.values()) {
+      atlas.dispose();
+    }
+    worldArt.clear();
+    super.dispose();
   }
 
   private static String worldAtlas(int stage) {

@@ -35,6 +35,11 @@ import view.gdx.ui.ZombieArt;
  */
 public final class CollectionScreen extends MenuScreen {
 
+  /** The almanac's own zombie stat icons: a shield for toughness, a runner for speed. */
+  private static final String ZOMBIE_TOUGHNESS_ICON =
+      "image_ui_almanac_zombies_zombietoughness_icon";
+  private static final String ZOMBIE_SPEED_ICON = "image_ui_almanac_zombies_zombiespeed_icon";
+
   private static final String ZOMBIE_PREFIX = "zombie_";
   private static final int COLUMNS = 4;
   private static final String ALL = "All";
@@ -236,6 +241,10 @@ public final class CollectionScreen extends MenuScreen {
       card.setTint(LOCKED_TINT);
     }
     card.setSelected(template.name.equals(selected));
+    card.withCardArt(UiSkinProvider.ALMANAC_PLANT_CARD);
+    if (!unlocked) {
+      card.withLock();
+    }
     return card;
   }
 
@@ -249,6 +258,10 @@ public final class CollectionScreen extends MenuScreen {
     card.setStatus(seen ? "seen" : "not encountered");
     card.setEnabled(seen);
     card.setSelected(seen && template.getName().equals(selected));
+    card.withCardArt(UiSkinProvider.ALMANAC_ZOMBIE_CARD);
+    if (!seen) {
+      card.withLock();
+    }
     return card;
   }
 
@@ -361,10 +374,32 @@ public final class CollectionScreen extends MenuScreen {
     addSprite(details, "zombies", template.getName(), "textures/zombies/");
 
     field(details, "type", String.valueOf(ZombieTypeResolver.resolve(template)));
-    field(details, "health", String.valueOf(template.getBaseHp()));
-    field(details, "speed", String.valueOf(template.getBaseSpeed()));
+    // Toughness and speed are the two the almanac itself calls out, and it has an icon for each.
+    details.add(statLine(template)).left().padTop(8f).row();
     field(details, "eat dps", String.valueOf(template.getEatDps()));
     field(details, "abilities", template.getStatsSummary());
+  }
+
+  /**
+   * Toughness and speed, behind the almanac's own two stat icons.
+   *
+   * <p>The shield and the runner are drawn for exactly this pair of numbers on the zombie side of
+   * the almanac, and were sitting unused in the skin while the screen printed the same two values
+   * as plain "label / value" rows.
+   */
+  private Table statLine(ZombieTemplate template) {
+    Table stats = new Table();
+    stats.left();
+    stats.add(stat(ZOMBIE_TOUGHNESS_ICON, String.valueOf(template.getBaseHp()))).padRight(26f);
+    stats.add(stat(ZOMBIE_SPEED_ICON, String.valueOf(template.getBaseSpeed())));
+    return stats;
+  }
+
+  private Table stat(String icon, String value) {
+    Table cell = new Table();
+    cell.add(new Image(skin.getDrawable(icon))).size(34f).padRight(8f);
+    cell.add(new Label(value, skin, UiSkinProvider.LABEL_MEDIUM));
+    return cell;
   }
 
   private void field(Table details, String label, String value) {
