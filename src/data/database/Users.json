@@ -20,6 +20,7 @@
       "miniGamesUnlocked": false,
       "survivalModeUnlocked": false,
       "unlockedMiniGames": [],
+      "clearedMiniGameLevels": {},
       "maxClearedStage": 0,
       "maxClearedLevel": 0
     },
@@ -322,6 +323,7 @@
         "beghouled",
         "zombotany"
       ],
+      "clearedMiniGameLevels": {},
       "maxClearedStage": 1,
       "maxClearedLevel": 4
     },
@@ -460,6 +462,1349 @@
     "lastShopRefreshTime": 0,
     "lastDailyDealPurchaseTime": 0,
     "meowPoints": 0,
+    "winStreakAtMaxDifficulty": 0
+  },
+  {
+    "gender": "male",
+    "unlockedPlants": [
+      "peashooter",
+      "sunflower",
+      "wall-nut",
+      "potato-mine",
+      "cabbage-pult",
+      "puff-shroom"
+    ],
+    "unlockedZombies": [],
+    "recentGames": [],
+    "unlockedStages": [
+      "stage_1"
+    ],
+    "progress": {
+      "currentStage": 1,
+      "currentLevel": 1,
+      "miniGamesUnlocked": false,
+      "survivalModeUnlocked": false,
+      "unlockedMiniGames": [],
+      "clearedMiniGameLevels": {},
+      "maxClearedStage": 0,
+      "maxClearedLevel": 0
+    },
+    "inventory": {
+      "items": {}
+    },
+    "greenHouse": {
+      "maxCapacity": 20,
+      "pots": [
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        }
+      ]
+    },
+    "newsBox": {
+      "readNews": [],
+      "unreadNews": []
+    },
+    "quests": [],
+    "plantLevels": {
+      "cabbagepult": 1,
+      "wallnut": 1,
+      "peashooter": 1,
+      "potatomine": 1,
+      "puffshroom": 1,
+      "sunflower": 1
+    },
+    "selectedDeck": [],
+    "boostedPlants": [],
+    "username": "arash",
+    "passwordHash": "f93711ad641e8b7c15b271e07714bbc769108fed6b76e6252a106f5e568bcc33",
+    "email": "arash@gmail.com",
+    "nickname": "arashMLG",
+    "securityQuestionNumber": "1",
+    "securityAnswer": "test",
+    "coins": 0,
+    "diamonds": 0,
+    "difficultyLevel": 3,
+    "lastShopRefreshTime": 0,
+    "lastDailyDealPurchaseTime": 0,
+    "meowPoints": 0,
+    "winStreakAtMaxDifficulty": 0
+  },
+  {
+    "gender": "male",
+    "unlockedPlants": [
+      "peashooter",
+      "sunflower",
+      "wall-nut",
+      "potato-mine",
+      "cabbage-pult",
+      "puff-shroom",
+      "twin sunflower",
+      "sun-shroom",
+      "primal sunflower",
+      "gold bloom",
+      "repeater",
+      "threepeater",
+      "snow pea",
+      "rotobaga",
+      "pea pod",
+      "split pea",
+      "citron",
+      "caulipower",
+      "electric blueberry",
+      "bowling bulb",
+      "cactus",
+      "fire peashooter",
+      "starfruit",
+      "goo peashooter",
+      "mega gatling pea",
+      "sea-shroom",
+      "fume-shroom",
+      "kernel-pult",
+      "melon-pult",
+      "winter melon",
+      "pepper-pult",
+      "primal potato mine",
+      "cherry bomb",
+      "squash",
+      "grapeshot",
+      "jalapeno",
+      "doom-shroom",
+      "tangle kelp",
+      "iceberg lettuce",
+      "bonk choy",
+      "phat beet",
+      "chomper",
+      "wasabi whip",
+      "kiwibeast",
+      "tall-nut",
+      "endurian",
+      "garlic",
+      "sweet potato",
+      "explode-o-nut",
+      "pumpkin",
+      "sun bean",
+      "torchwood",
+      "magnet-shroom",
+      "hypno-shroom",
+      "cat-tail",
+      "imitater",
+      "ice-shroom",
+      "lily pad",
+      "hot potato",
+      "grave buster",
+      "enlighten-mint",
+      "appease-mint",
+      "arma-mint",
+      "bombard-mint",
+      "enforce-mint",
+      "reinforce-mint",
+      "enchant-mint",
+      "pierce-mint",
+      "cattail-mint"
+    ],
+    "unlockedZombies": [
+      "zombie_zombieiceagehunter",
+      "zombie_zombieiceagedodo",
+      "zombie_zombiemummydefault",
+      "zombie_zombietombraiserdefault",
+      "zombie_zombieradefault",
+      "zombie_zombiemummyarmor4default",
+      "zombie_zombiedarkjugglerdefault",
+      "zombie_zombiemummyarmor1default",
+      "zombie_zombiepianodefault",
+      "zombie_zombieiceagetroglobite",
+      "zombie_zombiezombotanysquashdefault",
+      "zombie_zombiezombotanywallnutdefault",
+      "zombie_zombiezombotanypeashooterdefault",
+      "zombie_zombiedarkarmor3default",
+      "zombie_zombiezombossmechbattlezcowboy",
+      "zombie_zombiedarkbarrelrollerdefault",
+      "zombie_zombiezombossmechpirate2",
+      "zombie_zombielostcityjanedefault",
+      "zombie_zombieegyptimpdefault",
+      "zombie_zombiedarkimpdragondefault",
+      "zombie_zombiebeachsnorkel",
+      "zombie_zombiebeachfisherman",
+      "zombie_zombiedarkking"
+    ],
+    "recentGames": [],
+    "unlockedStages": [
+      "stage_1",
+      "stage_2",
+      "stage_3",
+      "stage_4"
+    ],
+    "progress": {
+      "currentStage": 1,
+      "currentLevel": 1,
+      "miniGamesUnlocked": true,
+      "survivalModeUnlocked": false,
+      "unlockedMiniGames": [
+        "vasebreaker",
+        "wallnut_bowling",
+        "i_zombie",
+        "beghouled",
+        "zombotany"
+      ],
+      "clearedMiniGameLevels": {
+        "i_zombie": 1,
+        "beghouled": 1
+      },
+      "maxClearedStage": 0,
+      "maxClearedLevel": 0
+    },
+    "inventory": {
+      "items": {
+        "seed_imitater": 440,
+        "seed_phat beet": 100
+      }
+    },
+    "greenHouse": {
+      "maxCapacity": 20,
+      "pots": [
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        }
+      ]
+    },
+    "newsBox": {
+      "readNews": [
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombotanysquashdefault",
+          "message": "New zombie discovered: zombie_zombiezombotanysquashdefault",
+          "timestamp": 1785871910293,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombotanywallnutdefault",
+          "message": "New zombie discovered: zombie_zombiezombotanywallnutdefault",
+          "timestamp": 1785871910293,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombotanypeashooterdefault",
+          "message": "New zombie discovered: zombie_zombiezombotanypeashooterdefault",
+          "timestamp": 1785871910294,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkarmor3default",
+          "message": "New zombie discovered: zombie_zombiedarkarmor3default",
+          "timestamp": 1785872370471,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombossmechbattlezcowboy",
+          "message": "New zombie discovered: zombie_zombiezombossmechbattlezcowboy",
+          "timestamp": 1785872773379,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkbarrelrollerdefault",
+          "message": "New zombie discovered: zombie_zombiedarkbarrelrollerdefault",
+          "timestamp": 1785872773381,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombossmechpirate2",
+          "message": "New zombie discovered: zombie_zombiezombossmechpirate2",
+          "timestamp": 1785872773381,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombielostcityjanedefault",
+          "message": "New zombie discovered: zombie_zombielostcityjanedefault",
+          "timestamp": 1785872789090,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieegyptimpdefault",
+          "message": "New zombie discovered: zombie_zombieegyptimpdefault",
+          "timestamp": 1785872789090,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Family Massacre",
+          "message": "New item unlocked: Family Massacre",
+          "timestamp": 1785872930623,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkimpdragondefault",
+          "message": "New zombie discovered: zombie_zombiedarkimpdragondefault",
+          "timestamp": 1785872951536,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiebeachsnorkel",
+          "message": "New zombie discovered: zombie_zombiebeachsnorkel",
+          "timestamp": 1785872951538,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiebeachfisherman",
+          "message": "New zombie discovered: zombie_zombiebeachfisherman",
+          "timestamp": 1785872951540,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkking",
+          "message": "New zombie discovered: zombie_zombiedarkking",
+          "timestamp": 1785872964694,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Pro Plant Player",
+          "message": "New item unlocked: Pro Plant Player",
+          "timestamp": 1785872964696,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "twin sunflower",
+          "message": "New plant unlocked: twin sunflower",
+          "timestamp": 1785863465823,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "sun-shroom",
+          "message": "New plant unlocked: sun-shroom",
+          "timestamp": 1785863465824,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "primal sunflower",
+          "message": "New plant unlocked: primal sunflower",
+          "timestamp": 1785863465824,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "gold bloom",
+          "message": "New plant unlocked: gold bloom",
+          "timestamp": 1785863465824,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "repeater",
+          "message": "New plant unlocked: repeater",
+          "timestamp": 1785863465824,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "threepeater",
+          "message": "New plant unlocked: threepeater",
+          "timestamp": 1785863465825,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "snow pea",
+          "message": "New plant unlocked: snow pea",
+          "timestamp": 1785863465825,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "rotobaga",
+          "message": "New plant unlocked: rotobaga",
+          "timestamp": 1785863465825,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "pea pod",
+          "message": "New plant unlocked: pea pod",
+          "timestamp": 1785863465825,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "split pea",
+          "message": "New plant unlocked: split pea",
+          "timestamp": 1785863465825,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "citron",
+          "message": "New plant unlocked: citron",
+          "timestamp": 1785863465825,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "caulipower",
+          "message": "New plant unlocked: caulipower",
+          "timestamp": 1785863465826,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "electric blueberry",
+          "message": "New plant unlocked: electric blueberry",
+          "timestamp": 1785863465826,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "bowling bulb",
+          "message": "New plant unlocked: bowling bulb",
+          "timestamp": 1785863465826,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "cactus",
+          "message": "New plant unlocked: cactus",
+          "timestamp": 1785863465826,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "fire peashooter",
+          "message": "New plant unlocked: fire peashooter",
+          "timestamp": 1785863465826,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "starfruit",
+          "message": "New plant unlocked: starfruit",
+          "timestamp": 1785863465826,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "goo peashooter",
+          "message": "New plant unlocked: goo peashooter",
+          "timestamp": 1785863465826,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "mega gatling pea",
+          "message": "New plant unlocked: mega gatling pea",
+          "timestamp": 1785863465827,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "sea-shroom",
+          "message": "New plant unlocked: sea-shroom",
+          "timestamp": 1785863465827,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "fume-shroom",
+          "message": "New plant unlocked: fume-shroom",
+          "timestamp": 1785863465827,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "kernel-pult",
+          "message": "New plant unlocked: kernel-pult",
+          "timestamp": 1785863465827,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "melon-pult",
+          "message": "New plant unlocked: melon-pult",
+          "timestamp": 1785863465827,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "winter melon",
+          "message": "New plant unlocked: winter melon",
+          "timestamp": 1785863465827,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "pepper-pult",
+          "message": "New plant unlocked: pepper-pult",
+          "timestamp": 1785863465827,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "primal potato mine",
+          "message": "New plant unlocked: primal potato mine",
+          "timestamp": 1785863465828,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "cherry bomb",
+          "message": "New plant unlocked: cherry bomb",
+          "timestamp": 1785863465828,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "squash",
+          "message": "New plant unlocked: squash",
+          "timestamp": 1785863465828,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "grapeshot",
+          "message": "New plant unlocked: grapeshot",
+          "timestamp": 1785863465828,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "jalapeno",
+          "message": "New plant unlocked: jalapeno",
+          "timestamp": 1785863465828,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "doom-shroom",
+          "message": "New plant unlocked: doom-shroom",
+          "timestamp": 1785863465828,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "tangle kelp",
+          "message": "New plant unlocked: tangle kelp",
+          "timestamp": 1785863465828,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "iceberg lettuce",
+          "message": "New plant unlocked: iceberg lettuce",
+          "timestamp": 1785863465829,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "bonk choy",
+          "message": "New plant unlocked: bonk choy",
+          "timestamp": 1785863465829,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "phat beet",
+          "message": "New plant unlocked: phat beet",
+          "timestamp": 1785863465829,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "chomper",
+          "message": "New plant unlocked: chomper",
+          "timestamp": 1785863465829,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "wasabi whip",
+          "message": "New plant unlocked: wasabi whip",
+          "timestamp": 1785863465829,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "kiwibeast",
+          "message": "New plant unlocked: kiwibeast",
+          "timestamp": 1785863465829,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "tall-nut",
+          "message": "New plant unlocked: tall-nut",
+          "timestamp": 1785863465829,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "endurian",
+          "message": "New plant unlocked: endurian",
+          "timestamp": 1785863465830,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "garlic",
+          "message": "New plant unlocked: garlic",
+          "timestamp": 1785863465830,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "sweet potato",
+          "message": "New plant unlocked: sweet potato",
+          "timestamp": 1785863465830,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "explode-o-nut",
+          "message": "New plant unlocked: explode-o-nut",
+          "timestamp": 1785863465830,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "pumpkin",
+          "message": "New plant unlocked: pumpkin",
+          "timestamp": 1785863465830,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "sun bean",
+          "message": "New plant unlocked: sun bean",
+          "timestamp": 1785863465830,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "torchwood",
+          "message": "New plant unlocked: torchwood",
+          "timestamp": 1785863465830,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "magnet-shroom",
+          "message": "New plant unlocked: magnet-shroom",
+          "timestamp": 1785863465831,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "hypno-shroom",
+          "message": "New plant unlocked: hypno-shroom",
+          "timestamp": 1785863465831,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "cat-tail",
+          "message": "New plant unlocked: cat-tail",
+          "timestamp": 1785863465831,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "imitater",
+          "message": "New plant unlocked: imitater",
+          "timestamp": 1785863465831,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "ice-shroom",
+          "message": "New plant unlocked: ice-shroom",
+          "timestamp": 1785863465831,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "lily pad",
+          "message": "New plant unlocked: lily pad",
+          "timestamp": 1785863465831,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "hot potato",
+          "message": "New plant unlocked: hot potato",
+          "timestamp": 1785863465831,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "grave buster",
+          "message": "New plant unlocked: grave buster",
+          "timestamp": 1785863465831,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "enlighten-mint",
+          "message": "New plant unlocked: enlighten-mint",
+          "timestamp": 1785863465832,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "appease-mint",
+          "message": "New plant unlocked: appease-mint",
+          "timestamp": 1785863465832,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "arma-mint",
+          "message": "New plant unlocked: arma-mint",
+          "timestamp": 1785863465832,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "bombard-mint",
+          "message": "New plant unlocked: bombard-mint",
+          "timestamp": 1785863465832,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "enforce-mint",
+          "message": "New plant unlocked: enforce-mint",
+          "timestamp": 1785863465832,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "reinforce-mint",
+          "message": "New plant unlocked: reinforce-mint",
+          "timestamp": 1785863465832,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "enchant-mint",
+          "message": "New plant unlocked: enchant-mint",
+          "timestamp": 1785863465832,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "pierce-mint",
+          "message": "New plant unlocked: pierce-mint",
+          "timestamp": 1785863465832,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "cattail-mint",
+          "message": "New plant unlocked: cattail-mint",
+          "timestamp": 1785863465832,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieiceagehunter",
+          "message": "New zombie discovered: zombie_zombieiceagehunter",
+          "timestamp": 1785864013261,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieiceagedodo",
+          "message": "New zombie discovered: zombie_zombieiceagedodo",
+          "timestamp": 1785864013261,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiemummydefault",
+          "message": "New zombie discovered: zombie_zombiemummydefault",
+          "timestamp": 1785866148223,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombietombraiserdefault",
+          "message": "New zombie discovered: zombie_zombietombraiserdefault",
+          "timestamp": 1785866148223,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieradefault",
+          "message": "New zombie discovered: zombie_zombieradefault",
+          "timestamp": 1785866148224,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiemummyarmor4default",
+          "message": "New zombie discovered: zombie_zombiemummyarmor4default",
+          "timestamp": 1785866830284,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkjugglerdefault",
+          "message": "New zombie discovered: zombie_zombiedarkjugglerdefault",
+          "timestamp": 1785868612426,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiemummyarmor1default",
+          "message": "New zombie discovered: zombie_zombiemummyarmor1default",
+          "timestamp": 1785868655852,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiepianodefault",
+          "message": "New zombie discovered: zombie_zombiepianodefault",
+          "timestamp": 1785869008397,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieiceagetroglobite",
+          "message": "New zombie discovered: zombie_zombieiceagetroglobite",
+          "timestamp": 1785869237685,
+          "isRead": true
+        }
+      ],
+      "unreadNews": []
+    },
+    "quests": [
+      {
+        "Quest Name": "Daily Sun Catcher",
+        "Category": "Daily",
+        "Completion Condition": "Collect sun_amount sun in a single day",
+        "Reward": "sun_amount / 100 Coins",
+        "Priority": "Medium",
+        "Variable": "3000-4000-5000",
+        "progressOfQuest": 250.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 3000.0
+      },
+      {
+        "Quest Name": "Chapter Hunter",
+        "Category": "Main",
+        "Completion Condition": "Defeat 50 zombies from the chapter chapter",
+        "Reward": "10 Seed Packets",
+        "Priority": "High",
+        "Variable": "Ancient Egypt",
+        "progressOfQuest": 19.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 50.0
+      },
+      {
+        "Quest Name": "Pro Plant Player",
+        "Category": "Daily",
+        "Completion Condition": "Kill ten zombies using only plant",
+        "Reward": "A random new plant",
+        "Priority": "High",
+        "Variable": "any plant that can kill",
+        "progressOfQuest": 0.0,
+        "isCompleted": true,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Only Cactus",
+        "Category": "Daily",
+        "Completion Condition": "Kill ten zombies using only the cactus",
+        "Reward": "20 Gems",
+        "Priority": "High",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Frugal Gardener",
+        "Category": "Main",
+        "Completion Condition": "Win a level without losing more than n plants",
+        "Reward": "20 Seed Packets",
+        "Priority": "High",
+        "Variable": "3",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Defense Master",
+        "Category": "Epic Challenge",
+        "Completion Condition": "Finish a level with exactly zero sun spent",
+        "Reward": "200 Gems",
+        "Priority": "Critical",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Quick Reflexes",
+        "Category": "Main",
+        "Completion Condition": "Kill 10 zombies within 30 seconds of the first wave",
+        "Reward": "500 Coins",
+        "Priority": "Medium",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Demolition Expert",
+        "Category": "Daily",
+        "Completion Condition": "Use 3 explosive plants in a single level",
+        "Reward": "100 Coins",
+        "Priority": "Low",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Symmetry",
+        "Category": "Daily",
+        "Completion Condition": "The final garden layout must be symmetric",
+        "Reward": "500 Coins",
+        "Priority": "High",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Family Massacre",
+        "Category": "Daily",
+        "Completion Condition": "Use only plants of the family_type family to kill zombies",
+        "Reward": "1000 Coins",
+        "Priority": "Medium",
+        "Variable": "Pea",
+        "progressOfQuest": 0.0,
+        "isCompleted": true,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Blossom Under Constraints",
+        "Category": "Daily",
+        "Completion Condition": "Win a level without using any plant of the family_type family",
+        "Reward": "100 Gems",
+        "Priority": "High",
+        "Variable": "Shroom",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Night or Day",
+        "Category": "Epic Challenge",
+        "Completion Condition": "Finish a daytime level with night plants (mushrooms)",
+        "Reward": "20 Gems",
+        "Priority": "High",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Win After Win",
+        "Category": "Daily",
+        "Completion Condition": "Win 5 levels in a row on the highest difficulty",
+        "Reward": "5000 Coins",
+        "Priority": "Medium",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Almost a Winner",
+        "Category": "Daily",
+        "Completion Condition": "Kill 10 zombies in the first column of a lane with no lawn mower",
+        "Reward": "300 Coins",
+        "Priority": "Medium",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "OCD Nightmare",
+        "Category": "Daily",
+        "Completion Condition": "Win a level with no symmetry in the garden (except the middle row)",
+        "Reward": "800 Coins",
+        "Priority": "Medium",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Cloudy Day",
+        "Category": "Daily",
+        "Completion Condition": "Win a level using exactly 3 sun-producing plants",
+        "Reward": "10 Gems",
+        "Priority": "High",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "One Column Less",
+        "Category": "Daily",
+        "Completion Condition": "Win a level without planting anything in column n",
+        "Reward": "10 Gems",
+        "Priority": "High",
+        "Variable": "5",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Undefended Row",
+        "Category": "Daily",
+        "Completion Condition": "Win a level without planting anything in row n",
+        "Reward": "20 Gems",
+        "Priority": "High",
+        "Variable": "3",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Undefended Cross",
+        "Category": "Daily",
+        "Completion Condition": "Win a level with both column n and row n left empty",
+        "Reward": "25 Gems",
+        "Priority": "High",
+        "Variable": "4",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Mowing Time",
+        "Category": "Daily",
+        "Completion Condition": "Destroy zombies using only the lawn mower",
+        "Reward": "15 Gems",
+        "Priority": "High",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      }
+    ],
+    "plantLevels": {
+      "cabbagepult": 1,
+      "wallnut": 1,
+      "peashooter": 1,
+      "potatomine": 1,
+      "puffshroom": 1,
+      "sunflower": 1,
+      "twinsunflower": 1,
+      "sunshroom": 1,
+      "primalsunflower": 1,
+      "goldbloom": 1,
+      "repeater": 1,
+      "threepeater": 1,
+      "snowpea": 1,
+      "rotobaga": 1,
+      "peapod": 1,
+      "splitpea": 1,
+      "citron": 1,
+      "caulipower": 1,
+      "electricblueberry": 1,
+      "bowlingbulb": 1,
+      "cactus": 1,
+      "firepeashooter": 1,
+      "starfruit": 1,
+      "goopeashooter": 1,
+      "megagatlingpea": 1,
+      "seashroom": 1,
+      "fumeshroom": 1,
+      "kernelpult": 1,
+      "melonpult": 1,
+      "wintermelon": 1,
+      "pepperpult": 1,
+      "primalpotatomine": 1,
+      "cherrybomb": 1,
+      "squash": 1,
+      "grapeshot": 1,
+      "jalapeno": 1,
+      "doomshroom": 1,
+      "tanglekelp": 1,
+      "iceberglettuce": 1,
+      "bonkchoy": 1,
+      "phatbeet": 1,
+      "chomper": 1,
+      "wasabiwhip": 1,
+      "kiwibeast": 1,
+      "tallnut": 1,
+      "endurian": 1,
+      "garlic": 1,
+      "sweetpotato": 1,
+      "explodeonut": 1,
+      "pumpkin": 1,
+      "sunbean": 1,
+      "torchwood": 1,
+      "magnetshroom": 1,
+      "hypnoshroom": 1,
+      "cattail": 1,
+      "imitater": 4,
+      "iceshroom": 1,
+      "lilypad": 1,
+      "hotpotato": 1,
+      "gravebuster": 1,
+      "enlightenmint": 1,
+      "appeasemint": 1,
+      "armamint": 1,
+      "bombardmint": 1,
+      "enforcemint": 1,
+      "reinforcemint": 1,
+      "enchantmint": 1,
+      "piercemint": 1,
+      "cattailmint": 1
+    },
+    "selectedDeck": [
+      "peashooter",
+      "sunflower",
+      "wall-nut",
+      "potato-mine",
+      "cabbage-pult",
+      "puff-shroom"
+    ],
+    "boostedPlants": [],
+    "username": "tester1",
+    "passwordHash": "2081313c458f25959e025f25742edb0bb88dda85f3bac543dc51f809c401502a",
+    "email": "tester1@example.com",
+    "nickname": "TesterNick",
+    "securityQuestionNumber": "1",
+    "securityAnswer": "BluePeter",
+    "coins": 10037299,
+    "diamonds": 10000241,
+    "difficultyLevel": 3,
+    "lastShopRefreshTime": 1785870580214,
+    "lastDailyDealPurchaseTime": 0,
+    "meowPoints": 560,
     "winStreakAtMaxDifficulty": 0
   }
 ]

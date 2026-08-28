@@ -112,38 +112,47 @@ public final class ProfileScreen extends MenuScreen {
   }
 
   private void changeUsername(TextField input) {
-    try {
-      UserManager.getInstance().changeUsername(input.getText().trim());
-      go(new ProfileScreen(game).withNotice("Username changed."));
-    } catch (Exception e) {
-      toast(e.getMessage());
-    }
+    String value = input.getText().trim();
+    runAsync(
+        () -> {
+          UserManager.getInstance().changeUsername(value);
+          return null;
+        },
+        ignored -> go(new ProfileScreen(game).withNotice("Username changed.")),
+        e -> toast(e.getMessage()));
   }
 
   private void changeNickname(TextField input) {
-    try {
-      UserManager.getInstance().changeNickname(input.getText().trim());
-      go(new ProfileScreen(game).withNotice("Nickname changed."));
-    } catch (Exception e) {
-      toast(e.getMessage());
-    }
+    String value = input.getText().trim();
+    runAsync(
+        () -> {
+          UserManager.getInstance().changeNickname(value);
+          return null;
+        },
+        ignored -> go(new ProfileScreen(game).withNotice("Nickname changed.")),
+        e -> toast(e.getMessage()));
   }
 
   private void changeEmail(TextField input) {
-    try {
-      UserManager.getInstance().changeEmail(input.getText().trim());
-      go(new ProfileScreen(game).withNotice("Email changed."));
-    } catch (Exception e) {
-      toast(e.getMessage());
-    }
+    String value = input.getText().trim();
+    runAsync(
+        () -> {
+          UserManager.getInstance().changeEmail(value);
+          return null;
+        },
+        ignored -> go(new ProfileScreen(game).withNotice("Email changed.")),
+        e -> toast(e.getMessage()));
   }
 
   private void changePassword(TextField newPassword, TextField oldPassword) {
-    try {
-      UserManager.getInstance().changePassword(newPassword.getText(), oldPassword.getText().trim());
-      go(new ProfileScreen(game).withNotice("Password changed."));
-    } catch (Exception e) {
-      toast(e.getMessage());
-    }
+    String updated = newPassword.getText();
+    String current = oldPassword.getText().trim();
+    runAsync(
+        () -> {
+          UserManager.getInstance().changePassword(updated, current);
+          return null;
+        },
+        ignored -> go(new ProfileScreen(game).withNotice("Password changed.")),
+        e -> toast(e.getMessage()));
   }
 }

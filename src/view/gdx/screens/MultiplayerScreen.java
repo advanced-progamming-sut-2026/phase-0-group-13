@@ -158,19 +158,31 @@ public final class MultiplayerScreen extends MenuScreen {
     if (message.type() == MessageType.MATCH_INVITE_EVENT) {
       Payloads.MatchInviteEvent event = message.payloadAs(Payloads.MatchInviteEvent.class);
       if (event != null) {
-        Gdx.app.postRunnable(() -> askAbout(event));
+        Gdx.app.postRunnable(() -> ifStillCurrent(() -> askAbout(event)));
       }
     } else if (message.type() == MessageType.MATCH_FOUND) {
       Payloads.MatchFound found = message.payloadAs(Payloads.MatchFound.class);
       if (found != null) {
-        Gdx.app.postRunnable(() -> enterMatch(found));
+        Gdx.app.postRunnable(() -> ifStillCurrent(() -> enterMatch(found)));
       }
     } else if (message.type() == MessageType.ACK) {
       // The only unsolicited ACK the server pushes is the host being told an invite was refused.
       Payloads.Ack ack = message.payloadAs(Payloads.Ack.class);
       if (ack != null) {
-        Gdx.app.postRunnable(() -> say(ack.message()));
+        Gdx.app.postRunnable(() -> ifStillCurrent(() -> say(ack.message())));
       }
+    }
+  }
+
+  /**
+   * The listener is removed in hide()/dispose(), but an event dispatched right before that can
+   * still have queued a postRunnable that only runs on a later frame - by which point the player
+   * may have navigated somewhere else entirely. Dropping it here instead of acting on it keeps a
+   * stale MATCH_FOUND from yanking the player out of whatever screen they are actually on.
+   */
+  private void ifStillCurrent(Runnable action) {
+    if (game.getScreen() == this) {
+      action.run();
     }
   }
 

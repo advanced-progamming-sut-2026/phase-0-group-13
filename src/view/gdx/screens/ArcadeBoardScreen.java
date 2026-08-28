@@ -324,11 +324,13 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
       return;
     }
     MiniGameLauncher.awardClear(user, type, level);
-    try {
-      UserManager.getInstance().updateCurrentUserGameState();
-    } catch (Exception e) {
-      toast(e.getMessage() == null ? "could not save your progress" : e.getMessage());
-    }
+    runAsync(
+        () -> {
+          UserManager.getInstance().updateCurrentUserGameState();
+          return null;
+        },
+        ignored -> {},
+        e -> toast(e.getMessage() == null ? "could not save your progress" : e.getMessage()));
   }
 
   protected String leaveButtonLabel() {

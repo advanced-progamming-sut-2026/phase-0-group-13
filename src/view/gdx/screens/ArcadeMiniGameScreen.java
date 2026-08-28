@@ -275,11 +275,13 @@ public final class ArcadeMiniGameScreen extends MenuScreen {
     User user = UserManager.getInstance().getCurrentUser();
     if (won && user != null) {
       MiniGameLauncher.awardClear(user, type, level);
-      try {
-        UserManager.getInstance().updateCurrentUserGameState();
-      } catch (Exception e) {
-        toast(e.getMessage());
-      }
+      runAsync(
+          () -> {
+            UserManager.getInstance().updateCurrentUserGameState();
+            return null;
+          },
+          ignored -> {},
+          e -> toast(e.getMessage()));
     }
     Table body = new Table();
     body.add(new Label(won ? "Mini-game cleared!" : "The zombies won this one.",

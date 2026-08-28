@@ -107,20 +107,22 @@ public final class SignUpScreen extends MenuScreen {
       return;
     }
 
-    try {
-      UserManager manager = UserManager.getInstance();
-      manager.registerUser(
-          username.getText().trim(),
-          password.getText(),
-          nickname.getText().trim(),
-          email.getText().trim(),
-          gender.getSelected());
-      manager.setSecurityQuestionForLatestUser(selectedQuestionNumber(), securityAnswer);
-      go(new LoginScreen(game).withNotice("Account created. You can log in now."));
-    } catch (Exception e) {
-      // Stay put with everything still filled in, so only the bad field has to be fixed.
-      toast(e.getMessage());
-    }
+    String user = username.getText().trim();
+    String pass = password.getText();
+    String nick = nickname.getText().trim();
+    String mail = email.getText().trim();
+    String genderChoice = gender.getSelected();
+    String questionNumber = selectedQuestionNumber();
+    runAsync(
+        () -> {
+          UserManager manager = UserManager.getInstance();
+          manager.registerUser(user, pass, nick, mail, genderChoice);
+          manager.setSecurityQuestionForLatestUser(questionNumber, securityAnswer);
+          return null;
+        },
+        ignored -> go(new LoginScreen(game).withNotice("Account created. You can log in now.")),
+        // Stay put with everything still filled in, so only the bad field has to be fixed.
+        e -> toast(e.getMessage()));
   }
 
   private String selectedQuestionNumber() {

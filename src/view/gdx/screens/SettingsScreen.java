@@ -141,11 +141,14 @@ public final class SettingsScreen extends MenuScreen {
   private void apply(User user, SelectBox<String> difficulty, SelectBox<String> speed) {
     GameSettings.setGameSpeed(Integer.parseInt(speed.getSelected()));
     user.setDifficultyLevel(Integer.parseInt(difficulty.getSelected()));
-    try {
-      UserManager.getInstance().updateCurrentUserGameState();
-      toast("Difficulty " + difficulty.getSelected() + ", speed x" + speed.getSelected() + ".");
-    } catch (Exception e) {
-      toast(e.getMessage());
-    }
+    String difficultyChoice = difficulty.getSelected();
+    String speedChoice = speed.getSelected();
+    runAsync(
+        () -> {
+          UserManager.getInstance().updateCurrentUserGameState();
+          return null;
+        },
+        ignored -> toast("Difficulty " + difficultyChoice + ", speed x" + speedChoice + "."),
+        e -> toast(e.getMessage()));
   }
 }

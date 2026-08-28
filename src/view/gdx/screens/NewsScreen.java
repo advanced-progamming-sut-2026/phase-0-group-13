@@ -118,10 +118,12 @@ public final class NewsScreen extends MenuScreen {
   }
 
   private void saveState() {
-    try {
-      UserManager.getInstance().updateCurrentUserGameState();
-    } catch (Exception e) {
-      toast(e.getMessage());
-    }
+    runAsync(
+        () -> {
+          UserManager.getInstance().updateCurrentUserGameState();
+          return null;
+        },
+        ignored -> {},
+        e -> toast(e.getMessage()));
   }
 }
