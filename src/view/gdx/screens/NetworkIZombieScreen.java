@@ -296,6 +296,16 @@ public final class NetworkIZombieScreen extends SnapshotIZombieScreen {
   }
 
   @Override
+  protected boolean clearSelection() {
+    if (chosen == null) {
+      return false;
+    }
+    chosen = null;
+    paintCards();
+    return true;
+  }
+
+  @Override
   protected void refreshPicker() {
     paintCards();
     if (reactionLeft <= 0f && reactionLabel != null && reactionLabel.getText().length() > 0) {

@@ -109,6 +109,8 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color healthBack = new Color(0f, 0f, 0f, 0.55f);
   private final Color healthFront = new Color(0.25f, 0.85f, 0.3f, 0.95f);
   private final Color healthLow = new Color(0.9f, 0.5f, 0.15f, 0.95f);
+  /** The armour strip: a cold grey-blue, so it never reads as more health. */
+  private final Color armourTint = new Color(0.72f, 0.78f, 0.88f, 0.95f);
   private final Color peaColor = new Color(0.55f, 0.9f, 0.3f, 1f);
   private final Color sunColor = new Color(1f, 0.85f, 0.2f, 1f);
   private final Color noArt = new Color(1f, 1f, 1f, 0.85f);
@@ -863,7 +865,15 @@ public final class EntityRenderer implements WorldRenderer {
         || plantArt.find(plant.getName()) != null;
   }
 
-  /** Sits just above the sprite, so a tall zombie does not wear its bar on its chest. */
+  /**
+   * Sits just above the sprite, so a tall zombie does not wear its bar on its chest.
+   *
+   * <p>An armoured zombie gets a second bar stacked over the first for what its cone, bucket or
+   * helmet has left. They are separate pools in the model -- {@link Zombie#takeDamage} spends the
+   * armour before the body and a piercing hit skips it -- so one blended bar would say a zombie was
+   * nearly dead while its bucket was still taking every shot. Once the armour is gone the strip
+   * goes with it, which is the same moment the rig stops drawing the headwear.
+   */
   private void healthBar(ShapeRenderer shapes, Zombie zombie) {
     float spriteHeight = zombieSpriteHeight(zombie);
     // the chapter ends when this one dies, so its bar has to be readable from across the lawn
@@ -873,13 +883,30 @@ public final class EntityRenderer implements WorldRenderer {
         + spriteHeight + 4f;
     // a tall zombie in the top lane would otherwise wear its bar up in the seed cards
     y = Math.min(y, geometry.rowToY(0) + geometry.getCellHeight() - 7f);
-    float fraction = zombie.getCurrentHealth() / (float) Math.max(1, zombie.getMaxHealth());
-    fraction = Math.max(0f, Math.min(1f, fraction));
     float thickness = isBoss(zombie) ? 11f : 5f;
+
+    float health = zombie.getCurrentHealth() / (float) Math.max(1, zombie.getMaxHealth());
+    bar(shapes, x, y, width, thickness, health,
+        health < 0.35f ? healthLow : healthFront);
+
+    int armourMax = zombie.getMaxArmorHealth();
+    if (armourMax > 0 && zombie.hasIntactArmor()) {
+      // Thinner than the health bar and directly over it: the eye reads the pair as one stack, and
+      // it is the health underneath that decides whether the zombie is nearly down.
+      float armourThickness = Math.max(3f, thickness - 2f);
+      bar(shapes, x, y + thickness + 2f, width, armourThickness,
+          zombie.getRemainingArmorHealth() / (float) armourMax, armourTint);
+    }
+  }
+
+  /** One backed bar: a dark plate, then the fill clamped to 0..1. */
+  private void bar(ShapeRenderer shapes, float x, float y, float width, float thickness,
+      float fraction, Color fill) {
+    float clamped = Math.max(0f, Math.min(1f, fraction));
     shapes.setColor(healthBack);
     shapes.rect(x - 1f, y - 1f, width + 2f, thickness + 2f);
-    shapes.setColor(fraction < 0.35f ? healthLow : healthFront);
-    shapes.rect(x, y, width * fraction, thickness);
+    shapes.setColor(fill);
+    shapes.rect(x, y, width * clamped, thickness);
   }
 
   @Override

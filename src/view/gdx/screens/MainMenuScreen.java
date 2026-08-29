@@ -1,5 +1,6 @@
 package view.gdx.screens;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -10,6 +11,7 @@ import data.persistence.UserManager;
 import model.account.User;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.HudArt;
+import view.gdx.ui.Popup;
 import view.gdx.ui.UiSkinProvider;
 
 
@@ -57,6 +59,19 @@ public final class MainMenuScreen extends MenuScreen {
   @Override
   protected String backgroundAtlasPath() {
     return "textures/environment/darkagesseason.atlas";
+  }
+
+  /**
+   * Escape closes the game, since this is the screen with nowhere further back to go.
+   *
+   * <p>Asks first. Quitting is the one thing on this screen that cannot be undone, and Escape is
+   * also the key someone presses out of habit to dismiss whatever they think is in front of them.
+   */
+  @Override
+  protected void onEscape() {
+    Popup.show(stage, skin, "Quit the game?", null,
+        new Popup.Choice("Quit", UiSkinProvider.BUTTON_BROWN, () -> Gdx.app.exit()),
+        new Popup.Choice("Keep playing", UiSkinProvider.BUTTON_GREEN, null));
   }
 
   @Override

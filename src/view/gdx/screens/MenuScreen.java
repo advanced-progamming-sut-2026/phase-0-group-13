@@ -120,6 +120,20 @@ public abstract class MenuScreen extends BaseScreen {
     return null;
   }
 
+  /**
+   * What Escape does on this screen. Goes back by default, and does nothing on a screen with
+   * nowhere to go back to.
+   *
+   * <p>Overridable because the root menu has no back and should offer to close the game instead:
+   * Escape on the first screen is how a player expects to leave one.
+   */
+  protected void onEscape() {
+    Screen back = backTarget();
+    if (back != null) {
+      go(back);
+    }
+  }
+
   @Override
   public void show() {
     GameAudio.getInstance().playMusic(musicTrack());
@@ -169,10 +183,7 @@ public abstract class MenuScreen extends BaseScreen {
             if (keycode != Input.Keys.ESCAPE) {
               return false;
             }
-            Screen back = backTarget();
-            if (back != null) {
-              go(back);
-            }
+            onEscape();
             return true;
           }
         });

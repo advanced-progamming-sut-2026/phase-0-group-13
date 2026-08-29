@@ -131,6 +131,16 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     return false;
   }
 
+  /**
+   * Puts down whatever the player is holding -- a seed, a zombie, half a swap -- so Escape can back
+   * out of a choice before it backs out of the game.
+   *
+   * @return true if something was actually being held, false if there was nothing to cancel
+   */
+  protected boolean clearSelection() {
+    return false;
+  }
+
   @Override
   public void show() {
     GameAudio.getInstance().playMusic(GameAudio.Track.BATTLE);
@@ -411,7 +421,18 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
         return true;
       }
       if (keycode == Input.Keys.ESCAPE) {
-        leave();
+        // Same ladder the main game uses: close the pause menu, else put down what is held, else
+        // pause. Leaving is the header's Give up button, not one keypress from mid-match.
+        if (paused) {
+          togglePause();
+        } else if (!clearSelection()) {
+          if (canPause()) {
+            togglePause();
+          } else {
+            // Nothing to cancel and no clock of ours to stop, so this one really is the way out.
+            leave();
+          }
+        }
         return true;
       }
       if (keycode == Input.Keys.SPACE) {

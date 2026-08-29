@@ -139,6 +139,16 @@ public final class VasebreakerScreen extends ArcadeBoardScreen {
   }
 
   @Override
+  protected boolean clearSelection() {
+    if (heldSeed == null) {
+      return false;
+    }
+    heldSeed = null;
+    rebuildPicker();
+    return true;
+  }
+
+  @Override
   protected void tickEngine() {
     engine.tick();
     // A packet the player was holding can wilt while it is held; drop it rather than let the

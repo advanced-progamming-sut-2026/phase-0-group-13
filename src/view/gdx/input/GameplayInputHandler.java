@@ -208,14 +208,23 @@ public final class GameplayInputHandler extends InputAdapter {
     }
   }
 
+  /**
+   * Escape backs out of one thing at a time, innermost first.
+   *
+   * <p>With the pause menu up it closes that; with a seed or a tool armed it puts that down; and
+   * with nothing held it pauses. It used to leave the match outright from the middle of a wave,
+   * which is a long way to fall for one keypress -- leaving is still a click away, on the pause
+   * menu's own Save &amp; Exit.
+   */
   @Override
   public boolean keyDown(int keycode) {
     if (keycode == Input.Keys.ESCAPE) {
-      // with the pause menu up, escape closes it instead of leaving
       if (paused) {
         onTogglePause.run();
+      } else if (tool != Tool.NONE) {
+        clearTool();
       } else {
-        actions.requestExit();
+        onTogglePause.run();
       }
       return true;
     }

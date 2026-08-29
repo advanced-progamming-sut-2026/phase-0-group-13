@@ -191,6 +191,16 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
     armedColumn = -1;
   }
 
+  /** Escape drops a half-finished swap: the first tile is picked but the second is not. */
+  @Override
+  protected boolean clearSelection() {
+    if (armedRow < 0) {
+      return false;
+    }
+    disarm();
+    return true;
+  }
+
   @Override
   protected void tickEngine() {
     engine.tick();

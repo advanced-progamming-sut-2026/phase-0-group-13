@@ -149,6 +149,24 @@ public final class CouchIZombieScreen extends SnapshotIZombieScreen {
     paintCards();
   }
 
+  /**
+   * Escape clears both players' picks.
+   *
+   * <p>There is only one keyboard between the two of them, so there is no way to tell which of them
+   * pressed it. Dropping both is the answer that cannot leave someone holding a card they thought
+   * they had put down; re-picking is one click or one key.
+   */
+  @Override
+  protected boolean clearSelection() {
+    if (chosenPlant == null && chosenZombie == null) {
+      return false;
+    }
+    chosenPlant = null;
+    chosenZombie = null;
+    paintCards();
+    return true;
+  }
+
   @Override
   protected void refreshPicker() {
     paintCards();
