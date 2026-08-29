@@ -160,8 +160,20 @@ public final class MultiplayerScreen extends MenuScreen {
       // The only unsolicited ACK the server pushes is the host being told an invite was refused.
       Payloads.Ack ack = message.payloadAs(Payloads.Ack.class);
       if (ack != null) {
-        Gdx.app.postRunnable(() -> say(ack.message()));
+        Gdx.app.postRunnable(() -> ifStillCurrent(() -> say(ack.message())));
       }
+    }
+  }
+
+  /**
+   * The listener is removed in hide()/dispose(), but an event dispatched right before that can
+   * still have queued a postRunnable that only runs on a later frame - by which point the player
+   * may have navigated somewhere else entirely. Dropping it here instead of acting on it keeps a
+   * stale event from touching a stage that is already gone.
+   */
+  private void ifStillCurrent(Runnable action) {
+    if (game.getScreen() == this) {
+      action.run();
     }
   }
 

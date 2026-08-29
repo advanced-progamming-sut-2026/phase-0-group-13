@@ -260,6 +260,9 @@ public class Board {
   public List<Reward> drainPendingRewards() {
     return lootDropper.drainPendingRewards();
   }
+  public List<LootDropper.LootSpawn> drainPendingLootSpawns() {
+    return lootDropper.drainPendingLootSpawns();
+  }
   private void notify(String message) {
     // The terminal never drains, so the queue is capped rather than left to grow all match.
     if (pendingNotices.size() >= MAX_PENDING_NOTICES) {

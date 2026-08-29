@@ -64,14 +64,19 @@ public final class LoginScreen extends MenuScreen {
   }
 
   private void login() {
-    try {
-      UserManager.getInstance()
-          .loginUser(username.getText().trim(), password.getText(), stayLoggedIn.isChecked());
-      go(new MainMenuScreen(game));
-    } catch (Exception e) {
-      // The screen stays exactly as it was, so the username is still there to correct.
-      password.setText("");
-      toast(e.getMessage());
-    }
+    String user = username.getText().trim();
+    String pass = password.getText();
+    boolean stay = stayLoggedIn.isChecked();
+    runAsync(
+        () -> {
+          UserManager.getInstance().loginUser(user, pass, stay);
+          return null;
+        },
+        ignored -> go(new MainMenuScreen(game)),
+        e -> {
+          // The screen stays exactly as it was, so the username is still there to correct.
+          password.setText("");
+          toast(e.getMessage());
+        });
   }
 }

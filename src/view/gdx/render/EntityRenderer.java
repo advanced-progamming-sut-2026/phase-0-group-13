@@ -3,6 +3,7 @@ package view.gdx.render;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import model.core.GameManager;
 import model.enums.StatusEffect;
 import model.enums.SunType;
 import model.game.Board;
+import model.game.LootDropper;
 import model.game.Projectile;
 import model.game.Sun;
 import model.game.plant.Plant;
@@ -23,6 +25,7 @@ import model.game.zombie.behavior.ZombossAction;
 import view.gdx.animation.AnimationLibrary;
 import view.gdx.animation.AnimationStates;
 import view.gdx.animation.EntityAnimation;
+import view.gdx.ui.CurrencyArt;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
 import view.gdx.ui.ProjectileArt;
@@ -79,6 +82,16 @@ public final class EntityRenderer implements WorldRenderer {
   private static final String OCTOPUS_RIG = "zombiebeachoctopus";
   private static final String OCTOPUS_REGION = "zombie_beach_octopus_66x76";
   private static final float OCTOPUS_ROW_FILL = 0.44f;
+
+  /** How big a lawn pickup icon is drawn, as a fraction of a cell's height. */
+  private static final float LOOT_ICON_FRACTION = 0.34f;
+  /** How far a pickup floats upward over its life, in cells. */
+  private static final float LOOT_LIFT_FRACTION = 0.7f;
+
+  /** Camera jolt added per zombie death; several dying at once stacks up to MAX_SHAKE. */
+  private static final float SHAKE_PER_DEATH = 3.4f;
+  private static final float MAX_SHAKE = 9f;
+  private static final float SHAKE_DECAY_PER_SECOND = 22f;
   // Clamped over the plant's head rather than centred on the tile, and off to one side so it does
   // not simply cover the face of whatever it caught.
   private static final float OCTOPUS_LIFT = 0.52f;
@@ -89,6 +102,7 @@ public final class EntityRenderer implements WorldRenderer {
   private final ZombieArt zombieArt = new ZombieArt();
   private final HudArt hudArt = new HudArt();
   private final ProjectileArt projectileArt = new ProjectileArt();
+  private final CurrencyArt currencyArt = new CurrencyArt();
   private final AnimationLibrary animations = new AnimationLibrary();
   private final AnimationStates playback = new AnimationStates();
   private final Color healthBack = new Color(0f, 0f, 0f, 0.55f);
@@ -111,8 +125,12 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color hitFlash = new Color(1f, 0.94f, 0.86f, 1f);
   private final Color nearHouse = new Color(1f, 0.55f, 0.5f, 1f);
   private final Color burstColor = new Color(1f, 0.92f, 0.55f, 1f);
+  private final Color dustColor = new Color(0.4f, 0.35f, 0.28f, 1f);
   // King's aura pulse and the Juggler's spin both read this; it only ticks in render().
   private float clock;
+  // How hard the world camera is currently kicking from recent zombie deaths; decays to 0.
+  private float shakeMagnitude;
+  private float shakeSeed;
   // The match's own tick, for lining a plant's attack clip up with the shot it just fired.
   private int currentTick;
   private TextureRegion octopus;
@@ -135,11 +153,46 @@ public final class EntityRenderer implements WorldRenderer {
     currentTick = game.getCurrentTick();
     clock += delta;
     hits.advance(delta);
+    spawnLootPickups(board);
     observeForEffects(board);
+    applyShake(context, delta, hits.drainFreshDeaths());
     drawSprites(context, board, delta);
     drawShapes(context, board);
     hits.endFrame(geometry.getColumns());
     playback.endFrame();
+  }
+
+  /** Turns whatever LootDropper queued this frame into pickups sitting on the lawn. */
+  private void spawnLootPickups(Board board) {
+    for (LootDropper.LootSpawn spawn : board.drainPendingLootSpawns()) {
+      hits.spawnPickup(spawn.kind(), spawn.column(), spawn.row());
+    }
+  }
+
+  /**
+   * Kicks the world camera for every zombie that just died, then decays it back to rest.
+   *
+   * <p>Always recomputed from the camera's own centre rather than a remembered "rest" position, so
+   * a screen that gets disposed mid-shake never leaves the shared camera stuck off-centre for
+   * whatever renders through it next.
+   */
+  private void applyShake(RenderContext context, float delta, int freshDeaths) {
+    if (freshDeaths > 0) {
+      shakeMagnitude = Math.min(MAX_SHAKE, shakeMagnitude + freshDeaths * SHAKE_PER_DEATH);
+    }
+    OrthographicCamera camera = context.getCamera();
+    float restX = camera.viewportWidth / 2f;
+    float restY = camera.viewportHeight / 2f;
+    if (shakeMagnitude <= 0.05f) {
+      shakeMagnitude = 0f;
+      camera.position.set(restX, restY, camera.position.z);
+      return;
+    }
+    shakeSeed += delta * 46f;
+    float dx = (float) Math.sin(shakeSeed * 12.9f) * shakeMagnitude;
+    float dy = (float) Math.cos(shakeSeed * 17.3f) * shakeMagnitude;
+    camera.position.set(restX + dx, restY + dy, camera.position.z);
+    shakeMagnitude = Math.max(0f, shakeMagnitude - SHAKE_DECAY_PER_SECOND * delta);
   }
 
   private void drawSprites(RenderContext context, Board board, float delta) {
@@ -198,7 +251,28 @@ public final class EntityRenderer implements WorldRenderer {
       }
       context.getBatch().setColor(Color.WHITE);
     }
+    for (HitEffects.LootPickup pickup : hits.getPickups()) {
+      TextureRegion art = lootIcon(pickup.kind());
+      if (art == null) {
+        continue;
+      }
+      context.getBatch().setColor(1f, 1f, 1f, pickup.alpha());
+      drawCentred(context, art, pickup.column(), pickup.row(),
+          geometry.getCellHeight() * LOOT_ICON_FRACTION,
+          geometry.getCellHeight() * LOOT_LIFT_FRACTION * pickup.progress(), 0f);
+    }
+    context.getBatch().setColor(Color.WHITE);
     context.getBatch().end();
+  }
+
+  /** The icon for one kind of lawn drop, or null if nothing to draw it with is loaded. */
+  private TextureRegion lootIcon(String kind) {
+    return switch (kind) {
+      case "coin" -> currencyArt.findCoin();
+      case "diamond" -> currencyArt.findGem();
+      case "pot" -> hudArt.find("pot");
+      default -> null;
+    };
   }
 
   /** A zombie past the mower still exists in the model; keep it on the lawn instead of off-screen.
@@ -240,6 +314,7 @@ public final class EntityRenderer implements WorldRenderer {
       }
     }
     for (Zombie zombie : board.getZombies()) {
+      hits.observeZombieState(zombie, zombie.isDead(), zombie.getX(), zombie.getRow());
       if (!zombie.isDead()) {
         hits.observe(zombie, zombie.getCurrentHealth());
       }
@@ -688,6 +763,7 @@ public final class EntityRenderer implements WorldRenderer {
       }
     }
     drawHitBursts(shapes);
+    drawDeathPuffs(shapes);
     shapes.end();
 
     // A zombie with no verified portrait gets an outline rather than someone elses art.
@@ -733,6 +809,31 @@ public final class EntityRenderer implements WorldRenderer {
     burstColor.a = 1f;
   }
 
+  /** Fixed offsets for the three dust puffs of one death, so they scatter without needing a Random. */
+  private static final float[] DEATH_PUFF_OFFSETS_X = {-0.14f, 0.16f, 0f};
+  private static final float[] DEATH_PUFF_OFFSETS_Y = {0.08f, 0.05f, 0.22f};
+
+  /**
+   * Where a zombie died: a small cluster of dust rings growing and fading, rather than the zombie
+   * simply vanishing. No dedicated death-effect art exists in the library, so this uses the same
+   * shapes-not-art approach as {@link #drawHitBursts}.
+   */
+  private void drawDeathPuffs(ShapeRenderer shapes) {
+    for (HitEffects.DeathPuff puff : hits.getDeathPuffs()) {
+      dustColor.a = puff.alpha() * 0.7f;
+      shapes.setColor(dustColor);
+      float cx = geometry.columnCentreX(onBoard(puff.column()));
+      float cy = geometry.rowCentreY(puff.row());
+      float radius = geometry.getCellHeight() * (0.14f + 0.2f * puff.progress());
+      for (int i = 0; i < DEATH_PUFF_OFFSETS_X.length; i++) {
+        shapes.circle(cx + geometry.getCellWidth() * DEATH_PUFF_OFFSETS_X[i],
+            cy + geometry.getCellHeight() * (DEATH_PUFF_OFFSETS_Y[i] + 0.3f * puff.progress()),
+            radius);
+      }
+    }
+    dustColor.a = 1f;
+  }
+
   /** Whether anything at all is drawn for this plant: its own rig, or failing that its packet. */
   private boolean hasPlantArt(Plant plant) {
     if (plant.isCursed() && hudArt.find("sheep") != null) {
@@ -768,6 +869,7 @@ public final class EntityRenderer implements WorldRenderer {
     zombieArt.dispose();
     hudArt.dispose();
     projectileArt.dispose();
+    currencyArt.dispose();
     animations.dispose();
   }
 }

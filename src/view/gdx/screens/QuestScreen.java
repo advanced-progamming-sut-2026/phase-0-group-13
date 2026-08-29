@@ -317,12 +317,13 @@ public final class QuestScreen extends MenuScreen {
       refresh();
       return;
     }
-    try {
-      UserManager.getInstance().updateCurrentUserGameState();
-      toast("Reward claimed for \"" + quest.getTitle() + "\"!");
-    } catch (Exception e) {
-      toast(e.getMessage());
-    }
+    runAsync(
+        () -> {
+          UserManager.getInstance().updateCurrentUserGameState();
+          return null;
+        },
+        ignored -> toast("Reward claimed for \"" + quest.getTitle() + "\"!"),
+        e -> toast(e.getMessage()));
     refresh();
   }
 }

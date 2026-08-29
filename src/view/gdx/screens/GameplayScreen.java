@@ -202,13 +202,17 @@ public final class GameplayScreen extends BaseScreen {
 
   /** Save & Exit: keep whatever the match already awarded, then back out. */
   private void saveAndLeave() {
-    try {
-      UserManager.getInstance().updateCurrentUserGameState();
-    } catch (Exception e) {
-      // worth saying, but must not trap the player in the match
-      hud.toast(e.getMessage() == null ? "could not save your progress" : e.getMessage());
-    }
-    leave();
+    runAsync(
+        () -> {
+          UserManager.getInstance().updateCurrentUserGameState();
+          return null;
+        },
+        ignored -> leave(),
+        e -> {
+          // worth saying, but must not trap the player in the match
+          hud.toast(e.getMessage() == null ? "could not save your progress" : e.getMessage());
+          leave();
+        });
   }
 
   /** Rebuilds the level from the same MatchSetup. */

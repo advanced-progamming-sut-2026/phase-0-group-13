@@ -110,36 +110,46 @@ public final class ForgotPasswordScreen extends MenuScreen {
   }
 
   private void identify(TextField username, TextField email) {
-    try {
-      questionText =
-          UserManager.getInstance()
-              .initiatePasswordRecovery(username.getText().trim(), email.getText().trim());
-      step = Step.ANSWER;
-      refresh();
-    } catch (Exception e) {
-      toast(e.getMessage());
-    }
+    String user = username.getText().trim();
+    String mail = email.getText().trim();
+    runAsync(
+        () -> UserManager.getInstance().initiatePasswordRecovery(user, mail),
+        question -> {
+          questionText = question;
+          step = Step.ANSWER;
+          refresh();
+        },
+        e -> toast(e.getMessage()));
   }
 
   private void verify(TextField answer) {
-    try {
-      UserManager.getInstance().verifyRecoveryAnswer(answer.getText().trim());
-      step = Step.RESET;
-      refresh();
-    } catch (Exception e) {
-      // UserManager has dropped the recovery session, so the screen has to start over too.
-      step = Step.IDENTIFY;
-      refresh();
-      toast(e.getMessage());
-    }
+    String given = answer.getText().trim();
+    runAsync(
+        () -> {
+          UserManager.getInstance().verifyRecoveryAnswer(given);
+          return null;
+        },
+        ignored -> {
+          step = Step.RESET;
+          refresh();
+        },
+        e -> {
+          // UserManager has dropped the recovery session, so the screen has to start over too.
+          step = Step.IDENTIFY;
+          refresh();
+          toast(e.getMessage());
+        });
   }
 
   private void reset(TextField newPassword) {
-    try {
-      UserManager.getInstance().resetPasswordAfterRecovery(newPassword.getText());
-      go(new LoginScreen(game).withNotice("Password reset. Log in with the new one."));
-    } catch (Exception e) {
-      toast(e.getMessage());
-    }
+    String updated = newPassword.getText();
+    runAsync(
+        () -> {
+          UserManager.getInstance().resetPasswordAfterRecovery(updated);
+          return null;
+        },
+        ignored ->
+            go(new LoginScreen(game).withNotice("Password reset. Log in with the new one.")),
+        e -> toast(e.getMessage()));
   }
 }

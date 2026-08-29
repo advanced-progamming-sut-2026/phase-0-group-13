@@ -283,11 +283,13 @@ public final class PlantSelectionScreen extends MenuScreen {
   }
 
   private void save() {
-    try {
-      UserManager.getInstance().updateCurrentUserGameState();
-    } catch (Exception e) {
-      toast(e.getMessage());
-    }
+    runAsync(
+        () -> {
+          UserManager.getInstance().updateCurrentUserGameState();
+          return null;
+        },
+        ignored -> {},
+        e -> toast(e.getMessage()));
   }
 
   /** The deck stores lowercase keys, the almanac has the real spelling. */
