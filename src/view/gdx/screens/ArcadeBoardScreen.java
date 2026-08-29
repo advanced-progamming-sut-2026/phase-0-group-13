@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import data.persistence.UserManager;
 import model.account.User;
 import model.core.MiniGameLauncher;
@@ -44,6 +44,10 @@ import view.gdx.ui.UiSkinProvider;
  * <p>Two clocks, same as {@link GameplayScreen}: {@link FixedStepClock} steps the engine and the
  * frame delta only drives animation. Pausing gives the renderers a delta of zero so the rigs
  * freeze with the simulation instead of walking on the spot.
+ *
+ * <p>The HUD shares the world's 1280x720 shape for the same reason {@link view.gdx.ui.HudStage}
+ * does: the picker strip sits directly above the board, and a viewport that does not scale with
+ * the lawn slides down over the top lane as soon as the window is not the design size.
  */
 public abstract class ArcadeBoardScreen extends BaseScreen {
 
@@ -134,7 +138,7 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     art = new ArcadeRenderer(geometry);
     skin = game.getUiSkin().get();
 
-    stage = new Stage(new ScreenViewport());
+    stage = new Stage(new FitViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
     if (skin != null) {
       buildHud();
     }

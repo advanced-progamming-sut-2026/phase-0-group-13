@@ -25,6 +25,7 @@ import model.game.zombie.behavior.ZombossAction;
 import view.gdx.animation.AnimationLibrary;
 import view.gdx.animation.AnimationStates;
 import view.gdx.animation.EntityAnimation;
+import view.gdx.core.GdxConfig;
 import view.gdx.ui.CurrencyArt;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
@@ -71,8 +72,8 @@ public final class EntityRenderer implements WorldRenderer {
   // Fractions of an armour's health at which the rig's two damaged states take over.
   private static final float ARMOUR_STAGE_1 = 0.66f;
   private static final float ARMOUR_STAGE_2 = 0.33f;
-  // How long a shooter holds its attack clip after firing. The model runs at ten ticks a
-  // second, so this is a little under half a second.
+  // Fallback hold for a rig whose attack clip the manifest gives no duration for. Normally the
+  // clip's own length is used instead; see justActed.
   private static final int PLANT_ATTACK_HOLD_TICKS = 4;
   // How far above its lane a lobbed shot rises at the top of the arc.
   private static final float LOB_ARC_HEIGHT = 0.85f;
@@ -420,20 +421,38 @@ public final class EntityRenderer implements WorldRenderer {
    * only for "idle" left it silently falling back to its seed packet.
    */
   private String plantClip(EntityAnimation animation, Plant plant) {
-    if (justActed(plant)) {
-      String attack = animation.pickClip("attack");
-      if (attack != null) {
-        return attack;
-      }
+    String attack = animation.pickClip("attack");
+    if (attack != null && justActed(plant, animation.duration(attack))) {
+      return attack;
     }
     return animation.pickClip("idle", "attack");
   }
 
-  /** True for {@link #PLANT_ATTACK_HOLD} seconds after the plant's last action tick. */
-  private boolean justActed(Plant plant) {
+  /**
+   * True while the plant's attack clip is still running.
+   *
+   * <p>Held for as long as the clip itself lasts rather than for a fixed number of ticks. Every
+   * attack used to be cut off after {@link #PLANT_ATTACK_HOLD_TICKS} and snapped back to idle
+   * part-way through the motion: a Peashooter got 39% of its second-long shot, a Cabbage-pult 24%
+   * of its throw, and a Repeater -- whose clip is one volley of two peas -- only ever played the
+   * first of them. Reading the length off the rig fixes all of them at once and needs no per-plant
+   * numbers.
+   *
+   * <p>Not capped. The clips run from a third of a second (Bonk Choy's punch) to four and a half
+   * (Hot Potato thawing), and each of those is how long that plant is genuinely busy, so the rig's
+   * own number is the answer in both directions. A plant whose attack outlasts the gap between its
+   * shots simply stays in attack, which is what it is in fact doing. The fallback is the old fixed
+   * hold, for a clip the manifest gives no duration for.
+   */
+  private boolean justActed(Plant plant, float attackSeconds) {
     int sinceAction = currentTick - plant.getLastActionTick();
-    return plant.getLastActionTick() > 0 && sinceAction >= 0
-        && sinceAction < PLANT_ATTACK_HOLD_TICKS;
+    if (plant.getLastActionTick() <= 0 || sinceAction < 0) {
+      return false;
+    }
+    int holdTicks = attackSeconds > 0f
+        ? Math.round(attackSeconds * GdxConfig.TICKS_PER_SECOND)
+        : PLANT_ATTACK_HOLD_TICKS;
+    return sinceAction < holdTicks;
   }
 
   /** Same for a zombie, which unlike a plant has to switch clips as it goes. */

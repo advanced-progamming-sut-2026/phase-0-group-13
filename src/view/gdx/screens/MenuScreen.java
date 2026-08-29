@@ -36,9 +36,11 @@ import view.gdx.ui.UiSkinProvider;
  * <p>A subclass only says what it is called and what goes in the middle. Everything a menu shares
  * with the other menus — including Escape going back — is handled here.
  *
- * <p>Own ScreenViewport rather than the shared world one, same reason HudStage has one: the world
- * is letterboxed so the lawn keeps its shape, but a menu wants one unit per real pixel so the text
- * stays sharp.
+ * <p>Own ScreenViewport rather than the world's letterboxed one, so a menu gets one unit per real
+ * pixel and its text stays sharp at any window size. The in-match HUD used to do the same and no
+ * longer can -- it has to line up with the lawn underneath it, see HudStage -- but a menu has only
+ * a backdrop under it, which is drawn to fill whatever shape the window is, so nothing here can
+ * fall out of alignment with anything.
  */
 public abstract class MenuScreen extends BaseScreen {
 

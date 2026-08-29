@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -20,15 +20,31 @@ import java.util.function.ToIntFunction;
 
 import model.core.GameManager;
 import model.game.minigame.ConveyorRule;
+import view.gdx.core.GdxConfig;
 import model.game.plant.PlantParts.PlantTemplate;
 
 /**
  * Scene2D layer for the in-match UI: sun counter, seed bar, the shovel and plant food tools, the
  * pause button and the pause menu itself.
  *
- * <p>Has its own ScreenViewport rather than sharing the world one. The world is letterboxed to a
- * fixed size so the lawn keeps its shape, but the HUD wants one unit per real pixel so the text
- * stays sharp at any window size.
+ * <p>Measured in the same 1280x720 world the lawn is drawn in, and letterboxed the same way. The
+ * menus use a ScreenViewport instead, so their text stays pixel-crisp at any window size, and this
+ * used to as well -- but a menu floats over a backdrop while this sits directly on top of the
+ * playfield, and the two viewports only agree at exactly 1280x720. Anywhere else they drift: the
+ * lawn scales with the window and the HUD does not, so on a smaller window the un-scaled card strip
+ * ran off the left edge and cut the first seed card in half, and slid down over the top lane; on a
+ * wide one the Menu button walked away from the lawn's right edge. Sharing the world's shape costs
+ * some sharpness above the design size -- the same softening the lawn art already takes -- and in
+ * exchange the HUD cannot come adrift from the board.
+ *
+ * <p>Its own FitViewport rather than the world's instance: two FitViewports of the same size map
+ * identically, and a separate one keeps the Stage from driving the camera the renderers use.
+ *
+ * <p>Height is the scarce thing here. Everything stacked above the seed bar comes off the top lane,
+ * and the gap is small: the lawn starts 177px down in Frostbite Caves and 187-189px in the other
+ * three. The stack measured 203px and covered the top lane in all four before the objective line
+ * moved to the footer; it is 174px now. Anything new added above the seed bar has to come out of
+ * that budget, so prefer the footer. HudLayoutTest holds the line.
  *
  * <p>Owns no game state. The tool buttons only report a press; what is armed lives in
  * GameplayInputHandler and comes back through {@link #updateTools}, so they cannot disagree with
@@ -76,7 +92,7 @@ public final class HudStage implements Disposable {
   private String selected;
 
   public HudStage() {
-    this.stage = new Stage(new ScreenViewport());
+    this.stage = new Stage(new FitViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
   }
 
   /** The stage itself, for putting in an InputMultiplexer. */
@@ -113,15 +129,24 @@ public final class HudStage implements Disposable {
     }
     root.add(topRow).growX().row();
 
-    // What this stage wants from the player, when it wants something unusual.
-    objective = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
-    root.add(objective).left().padLeft(4f).row();
-
     seedBar = new Table();
     root.add(seedBar).left().padTop(2f).row();
 
     extras = new Table();
     root.add(extras).left().padTop(4f).row();
+
+    // What this stage wants from the player, when it wants something unusual.
+    //
+    // Along the bottom rather than under the seed bar. Everything the HUD stacks above the lawn
+    // comes straight off the top lane -- the seed bar already reaches 203px down against a lawn
+    // that starts at 177px in Frostbite Caves -- and this is the one line of it that does not have
+    // to be next to the seeds. The strip under the board is empty in every season.
+    Table footer = new Table();
+    footer.setFillParent(true);
+    footer.bottom().left().pad(6f);
+    objective = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
+    footer.add(objective).left();
+    stage.addActor(footer);
 
     if (DebugPanel.isEnabled()) {
       // Out of the way in the corner - the HUD flows from the top and the lawn is under it.

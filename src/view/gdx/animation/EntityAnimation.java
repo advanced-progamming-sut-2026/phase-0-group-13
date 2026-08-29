@@ -123,6 +123,21 @@ public final class EntityAnimation {
     return names;
   }
 
+  /**
+   * How long one pass of a clip takes, in seconds, or 0 if this rig has no such clip.
+   *
+   * <p>For a caller that wants to hold a one-shot pose for exactly as long as it runs -- an attack,
+   * say -- rather than guessing a duration that is the same for every rig. The number is the clip's
+   * own frame span over its own frame rate, which is what {@link #draw} steps through.
+   */
+  public float duration(String clip) {
+    Clip found = clips.get(clip);
+    if (found == null || found.fps <= 0f) {
+      return 0f;
+    }
+    return (found.end - found.start + 1) / found.fps;
+  }
+
   /** Height of the drawn art in PAM units, for sizing the sprite against a lane. */
   public float height(String clip) {
     Bounds bounds = boundsOf(clip);
