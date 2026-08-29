@@ -192,7 +192,7 @@ public final class QuestScreen extends MenuScreen {
     heading.add(chip(categoryOf(quest))).padLeft(10f).left().expandX();
     card.add(heading).growX().colspan(2).padBottom(2f).row();
 
-    Label goal = new Label(quest.getCondition() == null ? "-" : quest.getCondition(),
+    Label goal = new Label(quest.getDescription() == null ? "-" : quest.getDescription(),
         skin, "secondary");
     goal.setWrap(true);
     card.add(goal).left().width(620f).colspan(2).padBottom(6f).row();

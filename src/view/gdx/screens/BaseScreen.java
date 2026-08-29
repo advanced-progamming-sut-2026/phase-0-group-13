@@ -1,6 +1,7 @@
 package view.gdx.screens;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import view.gdx.assets.GameAssets;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.render.RenderContext;
@@ -20,6 +21,14 @@ public abstract class BaseScreen implements Screen {
   /** Shared batch, shapes and camera. The game owns them, not the screen. */
   protected RenderContext context() {
     return game.getContext();
+  }
+
+  /**
+   * The Scene2D stage a session-wide popup (a match invite) can be put on, or null while this
+   * screen has none.
+   */
+  public Stage uiStage() {
+    return null;
   }
 
   @Override

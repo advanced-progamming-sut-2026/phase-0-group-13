@@ -20,7 +20,7 @@ public class User {
   public static final int MIN_DECK_SLOTS = 6;
   public static final int MAX_DECK_SLOTS = 8;
 
-  private final String gender;
+  private String gender;
 
   private final List<String> unlockedPlants;
   private final List<String> unlockedZombies;
@@ -123,18 +123,92 @@ public class User {
     String message;
     switch (type) {
       case "plant":
-        message = "New plant unlocked: " + targetId;
+        message = "New plant unlocked: " + readableName(targetId);
         break;
       case "zombie":
-        message = "New zombie discovered: " + targetId;
+        message = "New zombie discovered: " + readableName(targetId);
         break;
       case "stage":
-        message = "New stage available: " + targetId;
+        message = "New stage available: " + readableName(targetId);
         break;
       default:
         message = "New item unlocked: " + targetId;
     }
+    // targetId خام می‌ماند چون کلید lookup است؛ فقط متن خبر خواناست
     newsBox.addNews(new model.game.news.News(type, targetId, message));
+  }
+
+  /** اسم داخلی (zombie_zombiemummydefault, stage_2, repeater) را به چیزی خوانا تبدیل می‌کند. */
+  private static String readableName(String targetId) {
+    if (targetId == null || targetId.isBlank()) {
+      return "";
+    }
+    String id = targetId.trim();
+    if (id.startsWith("stage_")) {
+      String tail = id.substring("stage_".length());
+      try {
+        String environment = AdventureMap.getEnvironmentForStage(Integer.parseInt(tail));
+        if (environment != null) {
+          return "Chapter " + tail + " - " + titleCase(environment.replace('_', ' '));
+        }
+      } catch (NumberFormatException ignored) {
+        // not a numbered chapter, fall through
+      }
+      return titleCase(tail.replace('_', ' '));
+    }
+    if (id.startsWith("minigame_")) {
+      return titleCase(id.substring("minigame_".length()).replace('_', ' '));
+    }
+    if (id.startsWith("zombie_")) {
+      return titleCase(splitAlias(id.substring("zombie_".length())));
+    }
+    if (id.startsWith("plant_")) {
+      return titleCase(id.substring("plant_".length()).replace('_', ' '));
+    }
+    return titleCase(id.replace('_', ' '));
+  }
+
+  /** نام‌های upstream مثل ZombieMummyArmor1Default همه‌چسبیده‌اند و باید باز شوند. */
+  private static String splitAlias(String alias) {
+    String cleaned = alias.toLowerCase();
+    if (cleaned.startsWith("zombie")) {
+      cleaned = cleaned.substring("zombie".length());
+    }
+    if (cleaned.endsWith("default")) {
+      cleaned = cleaned.substring(0, cleaned.length() - "default".length());
+    }
+    if (cleaned.isBlank()) {
+      cleaned = alias.toLowerCase();
+    }
+    for (String word : ALIAS_WORDS) {
+      cleaned = cleaned.replace(word, " " + word + " ");
+    }
+    return cleaned.replaceAll("(\\d+)", " $1 ").replaceAll("\\s+", " ").trim();
+  }
+
+  private static final String[] ALIAS_WORDS = {
+    "gargantuar", "zombotany", "zomboss", "peashooter", "prospector", "tombraiser", "troglobite",
+    "fisherman", "snorkel", "octopus", "juggler", "jester", "wizard", "newspaper", "parasol",
+    "turquoise", "explorer", "allstar", "arcade", "barrel", "roller", "mummy", "armor", "dodo",
+    "hunter", "piano", "dragon", "skull", "crystal", "king", "imp", "mech", "dark", "egypt",
+    "beach", "iceage", "modern", "lostcity", "eighties", "wallnut", "jalapeno", "squash", "pet",
+    "tutorial"
+  };
+
+  private static String titleCase(String text) {
+    String[] words = text.trim().split("\\s+");
+    StringBuilder out = new StringBuilder();
+    for (String word : words) {
+      if (word.isEmpty()) {
+        continue;
+      }
+      if (out.length() > 0) {
+        out.append(' ');
+      }
+      out.append(Character.toUpperCase(word.charAt(0)))
+          .append(word.substring(1).toLowerCase());
+    }
+    return out.toString();
   }
 
   public void addMatchResult(MatchResult result) {
@@ -151,6 +225,7 @@ public class User {
   public String getNickname() { return nickname; }
   public void setNickname(String nickname) { this.nickname = nickname; }
   public String getGender() { return gender; }
+  public void setGender(String gender) { this.gender = gender; }
   public String getSecurityQuestionNumber() { return securityQuestionNumber; }
   public String getSecurityAnswer() { return securityAnswer; }
   public int getCoins() { return coins; }

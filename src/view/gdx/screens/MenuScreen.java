@@ -45,6 +45,11 @@ public abstract class MenuScreen extends BaseScreen {
   protected Stage stage;
   protected Skin skin;
 
+  @Override
+  public Stage uiStage() {
+    return stage;
+  }
+
   private String notice;
   private TextureAtlas backgroundAtlas;
 

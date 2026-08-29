@@ -40,6 +40,8 @@ public final class Payloads {
   public record Profile(
       String username,
       String nickname,
+      String email,
+      String gender,
       int coins,
       int diamonds,
       Integer bestScore,

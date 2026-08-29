@@ -5,6 +5,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import data.persistence.UserManager;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import model.account.User;
@@ -103,11 +106,20 @@ public final class NewsScreen extends MenuScreen {
     list.add(new Label(heading, skin, UiSkinProvider.LABEL_MEDIUM)).left().padBottom(10f).row();
     for (News news : items) {
       String tag = tagUnread && !news.isRead() ? "  [UNREAD]" : "";
-      list.add(new Label("[" + news.getType() + "] " + news.getMessage() + tag, skin))
+      list.add(new Label(
+              dateOf(news) + "  [" + news.getType() + "] " + news.getMessage() + tag, skin))
           .left()
           .row();
     }
   }
+
+  private static String dateOf(News news) {
+    return DATE_FORMAT.format(
+        Instant.ofEpochMilli(news.getTimestamp()).atZone(ZoneId.systemDefault()));
+  }
+
+  private static final DateTimeFormatter DATE_FORMAT =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
   private User requireUser() {
     User user = UserManager.getInstance().getCurrentUser();

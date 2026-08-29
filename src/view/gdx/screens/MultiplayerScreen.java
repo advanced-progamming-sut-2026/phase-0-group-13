@@ -13,7 +13,6 @@ import network.protocol.MessageType;
 import network.protocol.NetworkMessage;
 import network.protocol.Payloads;
 import view.gdx.core.PvzGdxGame;
-import view.gdx.ui.Popup;
 import view.gdx.ui.UiSkinProvider;
 
 /**
@@ -154,41 +153,16 @@ public final class MultiplayerScreen extends MenuScreen {
     }
   }
 
+  // MATCH_INVITE_EVENT and MATCH_FOUND belong to InviteWatcher now, so an invite reaches the
+  // player wherever they are and only one popup is ever raised for it.
   private void onServerEvent(NetworkMessage message) {
-    if (message.type() == MessageType.MATCH_INVITE_EVENT) {
-      Payloads.MatchInviteEvent event = message.payloadAs(Payloads.MatchInviteEvent.class);
-      if (event != null) {
-        Gdx.app.postRunnable(() -> askAbout(event));
-      }
-    } else if (message.type() == MessageType.MATCH_FOUND) {
-      Payloads.MatchFound found = message.payloadAs(Payloads.MatchFound.class);
-      if (found != null) {
-        Gdx.app.postRunnable(() -> enterMatch(found));
-      }
-    } else if (message.type() == MessageType.ACK) {
+    if (message.type() == MessageType.ACK) {
       // The only unsolicited ACK the server pushes is the host being told an invite was refused.
       Payloads.Ack ack = message.payloadAs(Payloads.Ack.class);
       if (ack != null) {
         Gdx.app.postRunnable(() -> say(ack.message()));
       }
     }
-  }
-
-  private void askAbout(Payloads.MatchInviteEvent event) {
-    if (stage == null || skin == null) {
-      return;
-    }
-    Table body = new Table();
-    body.add(new Label(event.fromUsername() + " wants to play I, Zombie.", skin,
-        UiSkinProvider.LABEL_MEDIUM));
-    Popup.show(stage, skin, "Match invite", body,
-        "Accept", () -> answer(event, true),
-        "Reject", () -> answer(event, false));
-  }
-
-  private void answer(Payloads.MatchInviteEvent event, boolean accepted) {
-    say(accepted ? "Joining " + event.fromUsername() + "..." : "Invite declined.");
-    ask(() -> session.answerInvite(event.inviteId(), accepted));
   }
 
   private void enterMatch(Payloads.MatchFound found) {

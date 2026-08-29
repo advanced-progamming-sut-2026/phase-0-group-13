@@ -48,8 +48,10 @@ public final class MatchCompletion {
     if (user == null) {
       return;
     }
-    match.getScoreManager().applyScoresToUser(user);
+    // فاز ۱: MyoPoint همان امتیاز Game Bonus است، پس فقط همان‌جا به حساب بازیکن اضافه می‌شود؛
+    // مرحله‌های عادی امتیازشان را فقط در صفحه‌ی پایان مرحله نشان می‌دهند.
     if (match.isBonusMatch()) {
+      match.getScoreManager().applyScoresToUser(user);
       submitBonusScore(bonusScore);
       save();
       return;

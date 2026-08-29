@@ -19,17 +19,18 @@ public final class Dialogue {
   private Dialogue() {
   }
 
-  /** Penny's briefing for a season. */
-  public static String stageStart(String seasonName) {
+  /** Penny's briefing for a season. She addresses whoever is signed in, not a stand-in name. */
+  public static String stageStart(String seasonName, String playerName) {
+    String player = playerName == null || playerName.isBlank() ? "Commander" : playerName.trim();
     switch (key(seasonName)) {
       case "egypt":
-        return "Ancient Egypt, User Dave. Mind the tombstones -- nothing grows on them.";
+        return "Ancient Egypt, " + player + ". Mind the tombstones -- nothing grows on them.";
       case "frost":
         return "Frostbite Caves. The ice will freeze your plants solid, so keep the lanes clear.";
       case "beach":
         return "Big Wave Beach. The tide comes in with every wave; only water plants survive it.";
       default:
-        return "The Dark Ages. No sun falls at night, User Dave -- grow your own.";
+        return "The Dark Ages. No sun falls at night, " + player + " -- grow your own.";
     }
   }
 

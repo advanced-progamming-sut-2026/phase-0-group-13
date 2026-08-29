@@ -1,12 +1,19 @@
 package model.account;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import model.Result;
 
 public class Progress {
+
+  /** فاز ۱: مینی‌گیم‌ها از همان اول از travel log در دسترسند، قفل پیشرفت ندارند. */
+  public static final List<String> ALL_MINI_GAMES =
+      Arrays.asList("vasebreaker", "wallnut_bowling", "i_zombie", "beghouled", "zombotany");
+
   private int currentStage;
   private int currentLevel;
 
@@ -34,10 +41,19 @@ public class Progress {
     this.maxClearedStage = 0;
     this.maxClearedLevel = 0;
     this.adventureCompleted = false;
-    this.miniGamesUnlocked = false;
+    this.miniGamesUnlocked = true;
     this.survivalModeUnlocked = false;
-    this.unlockedMiniGames = new HashSet<>();
+    this.unlockedMiniGames = new HashSet<>(ALL_MINI_GAMES);
     this.clearedMiniGameLevels = new HashMap<>();
+  }
+
+  /** سیوهای قدیمی با قفل مینی‌گیم ذخیره شده‌اند؛ Gson سازنده را صدا نمی‌زند، اینجا بازشان می‌کنیم. */
+  private void openMiniGames() {
+    if (unlockedMiniGames == null) {
+      unlockedMiniGames = new HashSet<>();
+    }
+    miniGamesUnlocked = true;
+    unlockedMiniGames.addAll(ALL_MINI_GAMES);
   }
 
   public static final int MINI_GAME_LEVELS = 3;
@@ -118,15 +134,7 @@ public class Progress {
     }
 
     String unlockMessage = "";
-    if (this.currentStage == 2 && this.currentLevel == 1 && !miniGamesUnlocked) {
-      this.miniGamesUnlocked = true;
-      unlockMiniGame("vasebreaker");
-      unlockMiniGame("wallnut_bowling");
-      unlockMiniGame("i_zombie");
-      unlockMiniGame("beghouled");
-      unlockMiniGame("zombotany");
-      unlockMessage = "  Mini-Games mode has been unlocked!";
-    } else if (this.currentStage == 3 && this.currentLevel == 1 && !survivalModeUnlocked) {
+    if (this.currentStage == 3 && this.currentLevel == 1 && !survivalModeUnlocked) {
       this.survivalModeUnlocked = true;
       unlockMessage = "  Survival mode has been unlocked!";
     }
@@ -140,10 +148,7 @@ public class Progress {
   }
 
   public Result unlockMiniGame(String miniGameName) {
-    if (!miniGamesUnlocked) {
-      return new Result(false, "Mini-Games mode is still locked for this account!", null);
-    }
-
+    openMiniGames();
     String gameKey = miniGameName.toLowerCase().trim();
     if (unlockedMiniGames.contains(gameKey)) {
       return new Result(false, miniGameName + " is already unlocked.", null);
@@ -175,7 +180,8 @@ public class Progress {
   }
 
   public boolean isMiniGameUnlocked(String miniGameName) {
-    return miniGamesUnlocked && unlockedMiniGames.contains(miniGameName.toLowerCase().trim());
+    openMiniGames();
+    return unlockedMiniGames.contains(miniGameName.toLowerCase().trim());
   }
 
   public int getCurrentStage() {
@@ -228,6 +234,7 @@ public class Progress {
   }
 
   public boolean isMiniGamesUnlocked() {
+    openMiniGames();
     return miniGamesUnlocked;
   }
 
@@ -236,6 +243,7 @@ public class Progress {
   }
 
   public Set<String> getUnlockedMiniGames() {
+    openMiniGames();
     return unlockedMiniGames;
   }
 

@@ -174,9 +174,10 @@ public class GameManager {
 
   public void endGame(boolean isWin) {
     running = false;
+    matchResult.setScore(scoreManager.getCurrentMatchScore());
     if (isWin) {
       matchResult.markWin();
-      matchResult.calculateRewards();
+      matchResult.calculateRewards(Math.min(currentWaveIndex, waves.size()));
       System.out.println("Dear humanz, zis is not done yet; we will come back to eat your brainz, humanz.");
     } else {
       matchResult.markLose();

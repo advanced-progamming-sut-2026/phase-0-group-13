@@ -14,6 +14,7 @@ public class PvzGdxGame extends Game {
   private GameAssets assets;
   private RenderContext context;
   private UiSkinProvider uiSkin;
+  private InviteWatcher invites;
 
   public GameAssets getAssets() {
     return assets;
@@ -41,6 +42,9 @@ public class PvzGdxGame extends Game {
     if (previous != null) {
       previous.dispose();
     }
+    if (invites != null) {
+      invites.present();
+    }
   }
 
   @Override
@@ -48,6 +52,7 @@ public class PvzGdxGame extends Game {
     assets = new GameAssets();
     context = new RenderContext();
     uiSkin = new UiSkinProvider();
+    invites = new InviteWatcher(this);
     setScreen(new LoadingScreen(this));
   }
 

@@ -179,6 +179,8 @@ public final class AuthenticationService {
     return new Payloads.Profile(
         account.getUsername(),
         account.getNickname(),
+        account.getEmail(),
+        account.getGender(),
         account.getCoins(),
         account.getDiamonds(),
         account.getBestScore(),

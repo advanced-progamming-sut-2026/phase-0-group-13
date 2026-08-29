@@ -97,6 +97,11 @@ public final class GameplayScreen extends BaseScreen {
   }
 
   @Override
+  public com.badlogic.gdx.scenes.scene2d.Stage uiStage() {
+    return hud == null ? null : hud.getStage();
+  }
+
+  @Override
   public void show() {
     GameAudio.getInstance().playMusic(GameAudio.Track.BATTLE);
     lawnRenderer = new LawnRenderer(geometry);
@@ -257,7 +262,17 @@ public final class GameplayScreen extends BaseScreen {
   /** Penny sets the scene, then the red banner says what happens next. */
   private void showStageDialogue() {
     Dialogue.show(hud.getStage(), game.getUiSkin().get(), Dialogue.PENNY,
-        Dialogue.stageStart(seasonName()), this::beginPlaying);
+        Dialogue.stageStart(seasonName(), playerName()), this::beginPlaying);
+  }
+
+  private static String playerName() {
+    User user = UserManager.getInstance().getCurrentUser();
+    if (user == null) {
+      return null;
+    }
+    return user.getNickname() == null || user.getNickname().isBlank()
+        ? user.getUsername()
+        : user.getNickname();
   }
 
   private void beginPlaying() {
