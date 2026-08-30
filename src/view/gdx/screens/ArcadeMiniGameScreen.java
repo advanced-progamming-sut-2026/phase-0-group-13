@@ -91,7 +91,7 @@ public final class ArcadeMiniGameScreen extends MenuScreen {
         final int cellColumn = col;
         TextButton cell = button(".", UiSkinProvider.BUTTON_BROWN,
             () -> click(cellRow, cellColumn));
-        cell.getLabel().setFontScale(0.8f);
+        cell.getLabel().setFontScale(UiSkinProvider.fontScale(0.8f));
         cells[row][col] = cell;
         board.add(cell);
       }

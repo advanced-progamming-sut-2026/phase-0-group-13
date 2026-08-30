@@ -49,13 +49,11 @@ public final class CurrencyArt implements Disposable {
 
   private TextureAtlas atlas() {
     if (atlas == null && !loadFailed) {
-      // classpath, not internal: the skin is copied onto the classpath by processResources and
-      // is not one of the files under assets/.
-      if (!Gdx.files.classpath(SKIN_ATLAS).exists()) {
+      if (!Gdx.files.classpath(ATLAS_PATH).exists()) {
         loadFailed = true;
         return null;
       }
-      atlas = new TextureAtlas(Gdx.files.classpath(SKIN_ATLAS));
+      atlas = new TextureAtlas(Gdx.files.classpath(ATLAS_PATH));
     }
     return atlas;
   }
