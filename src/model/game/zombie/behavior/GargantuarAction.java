@@ -7,6 +7,9 @@ import model.game.zombie.Zombie;
 import model.game.zombie.factory.ZombieFactory;
 
 public class GargantuarAction implements ZombieAction {
+  /** How long the thrown imp is drawn arcing through the air. */
+  private static final int THROW_TICKS = 8;
+
   private final int maxHealth;
   private boolean hasThrownImp;
 
@@ -27,6 +30,7 @@ public class GargantuarAction implements ZombieAction {
               factory.createZombie("ZombieEgyptImpDefault", zombie.getRow(), zombie.getX() - 2.0);
 
       if (imp != null) {
+        imp.markThrownFrom(zombie.getX(), THROW_TICKS);
         board.spawnZombie(imp);
         System.out.println("Gargantuar threw an Imp!");
       }

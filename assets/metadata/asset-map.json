@@ -901,33 +901,13 @@
       "roster": "Zombies.json"
     },
     {
-      "entity": "ZombieZombossMechCowboy",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieZombossMechCowboyProps",
-      "roster": "Zombies.json"
-    },
-    {
       "entity": "ZombieZombossMechCowboy2",
       "reason": "no 768 art folder matches the alias or the objclass ZombieZombossMechCowboyProps",
       "roster": "Zombies.json"
     },
     {
-      "entity": "ZombieZombossMechDark",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieZombossMechDarkProps",
-      "roster": "Zombies.json"
-    },
-    {
       "entity": "ZombieZombossMechDark2",
       "reason": "no 768 art folder matches the alias or the objclass ZombieZombossMechDarkProps",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieZombossMechEgypt",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieZombossMechEgyptProps",
-      "roster": "Zombies.json"
-    },
-    {
-      "entity": "ZombieZombossMechPirate",
-      "reason": "no 768 art folder matches the alias or the objclass ZombieZombossMechPirateProps",
       "roster": "Zombies.json"
     },
     {
@@ -1420,6 +1400,58 @@
       "source_folder": "images/768/.../zombie_dark_wizard",
       "source_pages": [
         "ATLASIMAGE_ATLAS_ZOMBIEDARKWIZARDGROUP_768_00"
+      ]
+    },
+    "ZombieZombossMechCowboy": {
+      "animation_data": "animations/zombies/zombiezombossmechcowboy.json",
+      "atlas": "zombiezombossmechcowboy.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombieiceagezombossgroup_768_00.png"
+      ],
+      "regions": 133,
+      "source_folder": "images/768/.../zombie_iceage_zomboss",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEICEAGEZOMBOSSGROUP_768_00"
+      ]
+    },
+    "ZombieZombossMechDark": {
+      "animation_data": "animations/zombies/zombiezombossmechdark.json",
+      "atlas": "zombiezombossmechdark.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombiedarkzombossgroup_768_00.png"
+      ],
+      "regions": 113,
+      "source_folder": "images/768/.../Zombie_Dark_Zomboss",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEDARKZOMBOSSGROUP_768_00"
+      ]
+    },
+    "ZombieZombossMechEgypt": {
+      "animation_data": "animations/zombies/zombiezombossmechegypt.json",
+      "atlas": "zombiezombossmechegypt.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombieegyptzombossgroup_768_00.png"
+      ],
+      "regions": 126,
+      "source_folder": "images/768/.../Zombie_Egypt_Zomboss",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEEGYPTZOMBOSSGROUP_768_00"
+      ]
+    },
+    "ZombieZombossMechPirate": {
+      "animation_data": "animations/zombies/zombiezombossmechpirate.json",
+      "atlas": "zombiezombossmechpirate.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "zombiebeachzombossgroup_768_00.png"
+      ],
+      "regions": 172,
+      "source_folder": "images/768/.../Zombie_beach_Zomboss",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_ZOMBIEBEACHZOMBOSSGROUP_768_00"
       ]
     }
   }

@@ -150,6 +150,15 @@ ZOMBIE_ART_ALIASES = {
     # common to every chapter, so it rides the Big Wave Beach walker to be visible and animated
     # at all; its umbrella is not drawn. Replace this line once parasol art is sourced.
     "ZombieParasolDefault": "zombie_beach_basic",
+    # The four bosses. Upstream files them by world ("beach"), the project by mech name
+    # ("Pirate"), so nothing normalised onto anything and all four were left with no rig at all.
+    # Each pairing below is the boss the spec describes, matched on its own clip list:
+    # dark has fire_attack/fire_bomb/summoning, iceage has wind_1..4 and glacier_column_1..6,
+    # beach has suction_on/loop/off and tangled_*, egypt has missile_start and rocket_launch.
+    "ZombieZombossMechEgypt": "zombie_egypt_zomboss",
+    "ZombieZombossMechPirate": "zombie_beach_zomboss",
+    "ZombieZombossMechCowboy": "zombie_iceage_zomboss",
+    "ZombieZombossMechDark": "zombie_dark_zomboss",
 }
 
 

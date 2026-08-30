@@ -1,10 +1,14 @@
 package data.repository;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import model.enums.ZombieType;
 import model.game.zombie.ZombieParts.ZombieTemplate;
+import model.game.zombie.ZombieParts.ZombieTypeResolver;
 
 
 public class ZombieRepository implements ReadOnlyRepository<Object> {
@@ -31,6 +35,33 @@ public class ZombieRepository implements ReadOnlyRepository<Object> {
   public List<ZombieTemplate> getAll() {
     return zombies;
   }
+
+  /**
+   * فهرست دانشنامه: یک کارت به‌ازای هر نوع زامبی.
+   *
+   * <p>{@link #getAll()} is the raw sheet list, which is not what an almanac wants. It carries
+   * scenery filed alongside the zombies (the arcade cabinet is a GridItem), several unused sheets
+   * that fall through to the basic walker, and four upstream variants of each Zomboss -- so the
+   * almanac showed "Basic" four times and Dr. Zomboss nine. One entry per {@link ZombieType},
+   * first sheet in file order winning, which is the same one {@code Season.templateFor} spawns.
+   */
+  public List<ZombieTemplate> getAlmanacEntries() {
+    List<ZombieTemplate> entries = new ArrayList<>();
+    Set<ZombieType> seen = EnumSet.noneOf(ZombieType.class);
+    for (ZombieTemplate template : zombies) {
+      String alias = template.getName();
+      if (alias == null || !alias.startsWith(ZOMBIE_SHEET_PREFIX)) {
+        continue;
+      }
+      if (seen.add(ZombieTypeResolver.resolve(template))) {
+        entries.add(template);
+      }
+    }
+    return entries;
+  }
+
+  /** GridItem* entries share the file with the zombies but are scenery, not zombies. */
+  private static final String ZOMBIE_SHEET_PREFIX = "Zombie";
 
   public ZombieTemplate find(String name) {
     if (name == null) {
