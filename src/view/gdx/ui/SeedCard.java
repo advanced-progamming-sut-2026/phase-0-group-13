@@ -61,7 +61,7 @@ public final class SeedCard extends Table {
     this.compact = size == Size.COMPACT;
     float artWidth = compact ? 52f : 92f;
     float artHeight = compact ? 40f : 62f;
-    float textWidth = compact ? 84f : 118f;
+    float textWidth = compact ? 96f : 118f;
 
     setBackground(skin.getDrawable(UiSkinProvider.PANEL_BACKGROUND));
     // Pad for the frame in both states, or the contents jump when a card is picked: the frame
@@ -86,7 +86,7 @@ public final class SeedCard extends Table {
     nameLabel.setWrap(true);
     nameLabel.setAlignment(Align.center);
     if (compact) {
-      nameLabel.setFontScale(0.8f);
+      nameLabel.setFontScale(UiSkinProvider.fontScale(0.8f));
     }
     add(nameLabel).width(textWidth).colspan(2).row();
 

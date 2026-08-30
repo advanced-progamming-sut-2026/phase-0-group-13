@@ -1,7 +1,7 @@
 delayload_background_dark_compressed_768_00.png
 size: 1024,2048
 format: RGBA8888
-filter: Nearest,Nearest
+filter: Linear,Linear
 repeat: none
 texture
   rotate: false

@@ -153,7 +153,7 @@ public final class GreenhouseScreen extends MenuScreen {
   /** A pot's action button; the label is shrunk so a plant name fits on one line. */
   private TextButton smallButton(String text, String style, Runnable action) {
     TextButton button = button(text, style, action);
-    button.getLabel().setFontScale(0.82f);
+    button.getLabel().setFontScale(UiSkinProvider.fontScale(0.82f));
     return button;
   }
 

@@ -4,15 +4,19 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -21,14 +25,16 @@ import java.util.function.ToIntFunction;
 import model.core.GameManager;
 import model.game.minigame.ConveyorRule;
 import model.game.plant.PlantParts.PlantTemplate;
+import view.gdx.core.GdxConfig;
 
 /**
  * Scene2D layer for the in-match UI: sun counter, seed bar, the shovel and plant food tools, the
  * pause button and the pause menu itself.
  *
- * <p>Has its own ScreenViewport rather than sharing the world one. The world is letterboxed to a
- * fixed size so the lawn keeps its shape, but the HUD wants one unit per real pixel so the text
- * stays sharp at any window size.
+ * <p>Its own FitViewport, but on the same virtual size as the world. A ScreenViewport here meant
+ * one unit per real pixel, so at 1440p the HUD kept its pixel size and shrank to half the screen
+ * while the lawn scaled up past it; matching the world's letterbox keeps the two in step and the
+ * seed bar over the lane it belongs to at any window size.
  *
  * <p>Owns no game state. The tool buttons only report a press; what is armed lives in
  * GameplayInputHandler and comes back through {@link #updateTools}, so they cannot disagree with
@@ -48,11 +54,22 @@ public final class HudStage implements Disposable {
    * underneath the HUD. One row of three fixes that: 48 + this pad on both sides comes to 54px,
    * comfortably under a card.
    */
-  private static final float TOOL_BUTTON_WIDTH = 112f;
+  private static final float TOOL_BUTTON_WIDTH = 62f;
   // Package-private, not private: HudToolsRowHeightTest checks these against SeedBar.CARD_HEIGHT
   // without needing a live Scene2D layout to do it.
-  static final float TOOL_BUTTON_HEIGHT = 48f;
+  static final float TOOL_BUTTON_HEIGHT = 62f;
   static final float TOOL_BUTTON_PAD = 3f;
+
+  /**
+   * How much of the window's height the HUD may occupy before it starts covering the top lane.
+   *
+   * <p>The lawn's top edge is where the world art puts it (see
+   * {@link view.gdx.render.SeasonBackdrop}), which on every season is a little under a quarter of
+   * the way down. Anything the HUD stacks above that has to fit in this, which is why the
+   * objective and status lines moved to the foot of the screen: they are the two pieces that grow
+   * with their text, and up here that growth lands on the lawn.
+   */
+  private static final float TOP_BLOCK_LIMIT = 190f;
 
   private final Stage stage;
   private final HudArt hudArt = new HudArt();
@@ -66,17 +83,20 @@ public final class HudStage implements Disposable {
   private WaveBar waveBar;
   private Table seedBar;
   private Table extras;
+  private Table footer;
   private SeedBar seeds;
   private ConveyorBar conveyor;
 
-  private TextButton shovelButton;
-  private TextButton plantFoodButton;
-  private TextButton startWavesButton;
+  private Button shovelButton;
+  private Button plantFoodButton;
+  private Label plantFoodCount;
+  private Button startWavesButton;
 
   private String selected;
 
   public HudStage() {
-    this.stage = new Stage(new ScreenViewport());
+    this.stage = new Stage(
+        new FitViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
   }
 
   /** The stage itself, for putting in an InputMultiplexer. */
@@ -100,28 +120,23 @@ public final class HudStage implements Disposable {
     root.top().pad(4f);
     stage.addActor(root);
 
-    // The lawn starts just below, so keep this block short.
+    // The lawn starts just below, so keep this block short. See TOP_BLOCK_LIMIT.
     Table topRow = new Table();
-    topRow.add(new CurrencyHud(skin)).left();
-    topRow.add(sunCounter(skin)).left().padLeft(22f);
+    topRow.add(counters(skin)).left();
     waveSlot = new Table();
-    topRow.add(waveSlot).left().padLeft(22f);
-    status = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
-    topRow.add(status).left().padLeft(22f).expandX();
+    topRow.add(waveSlot).left().padLeft(18f).expandX();
     if (onExit != null) {
-      topRow.add(exitButton(skin, onExit)).right().width(120f).height(46f);
+      topRow.add(exitButton(skin, onExit)).right().width(112f).height(42f);
     }
     root.add(topRow).growX().row();
-
-    // What this stage wants from the player, when it wants something unusual.
-    objective = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
-    root.add(objective).left().padLeft(4f).row();
 
     seedBar = new Table();
     root.add(seedBar).left().padTop(2f).row();
 
     extras = new Table();
     root.add(extras).left().padTop(4f).row();
+
+    buildFooter(skin);
 
     if (DebugPanel.isEnabled()) {
       // Out of the way in the corner - the HUD flows from the top and the lawn is under it.
@@ -152,6 +167,7 @@ public final class HudStage implements Disposable {
   public void setObjective(String text) {
     if (objective != null) {
       objective.setText(text == null ? "" : text);
+      refreshFooter();
     }
   }
 
@@ -160,18 +176,83 @@ public final class HudStage implements Disposable {
     Toast.showAlert(stage, skin, message);
   }
 
+  /**
+   * Coins, gems and sun on one dark plate.
+   *
+   * <p>They used to sit straight on the world art, which is sand in one chapter and ice in
+   * another, so the one row of numbers the player checks constantly had a different amount of
+   * contrast in every level and none at all over the bright patches. The plate is the original
+   * game's own -- see {@link HudPlates} -- and costs nothing: it is already in the skin atlas the
+   * HUD has loaded.
+   */
+  private Table counters(Skin skin) {
+    Table box = new Table();
+    Drawable plate = HudPlates.plate(skin);
+    if (plate != null) {
+      box.setBackground(plate);
+    }
+    box.pad(6f, 16f, 6f, 18f);
+    box.add(new CurrencyHud(skin)).left().padRight(20f);
+    box.add(sunCounter(skin)).left();
+    return box;
+  }
+
   /** Sun gets its own icon and a bigger number, it is the one figure the player watches. */
   private Table sunCounter(Skin skin) {
     Table box = new Table();
-    TextureRegion sun = hudArt.find("sun");
-    if (sun != null) {
-      Image icon = new Image(sun);
-      icon.setScaling(Scaling.fit);
-      box.add(icon).size(34f, 34f).padRight(6f);
+    // The skin's own HUD sun is drawn for a counter; the lawn's collectible is the fallback.
+    Drawable icon = HudPlates.drawable(skin, HudPlates.SUN_ICON);
+    if (icon != null) {
+      box.add(new Image(icon)).size(36f, 36f).padRight(6f);
+    } else {
+      TextureRegion sun = hudArt.find("sun");
+      if (sun != null) {
+        Image fallback = new Image(sun);
+        fallback.setScaling(Scaling.fit);
+        box.add(fallback).size(34f, 34f).padRight(6f);
+      }
     }
     sunCount = new Label("0", skin, UiSkinProvider.LABEL_BIG);
-    box.add(sunCount).left();
+    box.add(sunCount).left().minWidth(56f);
     return box;
+  }
+
+  /**
+   * The objective and status lines, moved to the foot of the window.
+   *
+   * <p>Both grow with their text, and at the top of the screen that growth pushed the seed bar
+   * down onto the lawn's first lane. Every season paints a dark decorative band along the bottom
+   * of its backdrop and nothing is ever played there, so the two lines read better and cost the
+   * board nothing.
+   */
+  private void buildFooter(Skin skin) {
+    footer = new Table();
+    Drawable plate = HudPlates.plate(skin);
+    if (plate != null) {
+      footer.setBackground(plate);
+    }
+    footer.pad(5f, 16f, 6f, 18f);
+    objective = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
+    status = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
+    footer.add(objective).left().row();
+    footer.add(status).left();
+    footer.setVisible(false);
+
+    Table anchor = new Table();
+    anchor.setFillParent(true);
+    anchor.bottom().left().pad(10f);
+    anchor.add(footer);
+    stage.addActor(anchor);
+  }
+
+  /** Hides the plate when there is nothing on it, so an empty bar never floats at the foot. */
+  private void refreshFooter() {
+    if (footer == null) {
+      return;
+    }
+    boolean anything = (objective != null && objective.getText().length() > 0)
+        || (status != null && status.getText().length() > 0);
+    footer.setVisible(anything);
   }
 
   public void setSun(int amount) {
@@ -251,15 +332,63 @@ public final class HudStage implements Disposable {
   private Table toolsRow(Skin skin, Runnable onShovel, Runnable onPlantFood, Runnable onPause) {
     Table tools = new Table();
     tools.defaults().pad(TOOL_BUTTON_PAD).width(TOOL_BUTTON_WIDTH).height(TOOL_BUTTON_HEIGHT);
-    shovelButton = toolButton(skin, "Shovel", onShovel);
-    plantFoodButton = toolButton(skin, "Food 0", onPlantFood);
+    shovelButton = iconTool(skin, HudPlates.SHOVEL, HudPlates.SHOVEL_ARMED, "Shovel", onShovel);
+    plantFoodButton = iconTool(skin, HudPlates.PLANT_FOOD, HudPlates.PLANT_FOOD_ARMED,
+        "Food 0", onPlantFood);
     tools.add(shovelButton);
-    tools.add(plantFoodButton);
-    tools.add(toolButton(skin, "Pause", onPause));
+    // The plant food count rides on its own button rather than in its label, so the icon stays
+    // an icon. Stacked, so the number sits over the leaf's bottom corner the way PvZ2 puts it.
+    plantFoodCount = new Label("0", skin, UiSkinProvider.LABEL_MEDIUM_OUTLINE);
+    Table countCorner = new Table();
+    // Tucked into the leaf's own bottom-right rather than the cell's, or the number floats off
+    // beside the icon and reads as belonging to the pause button next to it.
+    countCorner.bottom().right().pad(0f, 0f, 6f, 8f);
+    countCorner.add(plantFoodCount);
+    tools.add(new Stack(plantFoodButton, countCorner));
+    tools.add(iconTool(skin, HudPlates.PAUSE, HudPlates.PAUSE_DOWN, "Pause", onPause));
     return tools;
   }
 
-  private TextButton toolButton(Skin skin, String label, Runnable action) {
+  /**
+   * One tool button, drawn as the original game draws it.
+   *
+   * <p>The skin carries PvZ2's own shovel, plant-food and pause buttons and the HUD was using
+   * brown text buttons instead -- three words where the game has three unmistakable icons, taking
+   * nearly twice the width. The {@code _down} art is the lit variant, so an armed tool is the same
+   * button glowing rather than a tinted rectangle.
+   *
+   * <p>Falls back to the old text button whenever the skin has no such region, so a skin without
+   * the HUD set still gets a working, labelled control.
+   */
+  private Button iconTool(Skin skin, String region, String armedRegion, String label,
+      Runnable action) {
+    Drawable up = HudPlates.drawable(skin, region);
+    Drawable armed = HudPlates.drawable(skin, armedRegion);
+    Button button;
+    if (up == null) {
+      button = new TextButton(label, skin, UiSkinProvider.BUTTON_BROWN);
+    } else {
+      ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+      style.imageUp = up;
+      style.imageDown = armed == null ? up : armed;
+      style.imageChecked = style.imageDown;
+      ImageButton image = new ImageButton(style);
+      image.getImage().setScaling(Scaling.fit);
+      button = image;
+    }
+    button.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            if (action != null) {
+              action.run();
+            }
+          }
+        });
+    return button;
+  }
+
+  private Button toolButton(Skin skin, String label, Runnable action) {
     TextButton button = new TextButton(label, skin, UiSkinProvider.BUTTON_BROWN);
     button.addListener(
         new ClickListener() {
@@ -274,13 +403,21 @@ public final class HudStage implements Disposable {
   }
 
   /** Repaints the tool buttons from what the input handler has armed. */
-  public void updateTools(boolean shovelArmed, boolean plantFoodArmed, int plantFoodCount) {
+  public void updateTools(boolean shovelArmed, boolean plantFoodArmed, int foodCount) {
     if (shovelButton != null) {
+      shovelButton.setChecked(shovelArmed);
       shovelButton.setColor(shovelArmed ? TOOL_ARMED : TOOL_IDLE);
     }
     if (plantFoodButton != null) {
-      plantFoodButton.setColor(plantFoodArmed ? TOOL_ARMED : TOOL_IDLE);
-      plantFoodButton.setText("Food " + plantFoodCount);
+      plantFoodButton.setChecked(plantFoodArmed);
+      // Nothing to spend reads as a dimmed button, the same way a seed card does.
+      plantFoodButton.setColor(plantFoodArmed || foodCount > 0 ? TOOL_ARMED : TOOL_IDLE);
+      if (plantFoodButton instanceof TextButton text) {
+        text.setText("Food " + foodCount);
+      }
+    }
+    if (plantFoodCount != null) {
+      plantFoodCount.setText(String.valueOf(foodCount));
     }
   }
 
@@ -292,7 +429,8 @@ public final class HudStage implements Disposable {
 
   public void setStatus(String text) {
     if (status != null) {
-      status.setText(text);
+      status.setText(text == null ? "" : text);
+      refreshFooter();
     }
   }
 

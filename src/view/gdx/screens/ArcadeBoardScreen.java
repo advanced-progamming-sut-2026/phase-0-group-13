@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import data.persistence.UserManager;
 import model.account.User;
 import model.core.MiniGameLauncher;
@@ -134,7 +134,7 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     art = new ArcadeRenderer(geometry);
     skin = game.getUiSkin().get();
 
-    stage = new Stage(new ScreenViewport());
+    stage = new Stage(new FitViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
     if (skin != null) {
       buildHud();
     }

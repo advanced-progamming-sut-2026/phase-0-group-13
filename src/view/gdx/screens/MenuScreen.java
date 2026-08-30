@@ -19,8 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import view.gdx.audio.GameAudio;
+import view.gdx.core.GdxConfig;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.CurrencyHud;
 import view.gdx.ui.DebugPanel;
@@ -36,9 +37,10 @@ import view.gdx.ui.UiSkinProvider;
  * <p>A subclass only says what it is called and what goes in the middle. Everything a menu shares
  * with the other menus — including Escape going back — is handled here.
  *
- * <p>Own ScreenViewport rather than the shared world one, same reason HudStage has one: the world
- * is letterboxed so the lawn keeps its shape, but a menu wants one unit per real pixel so the text
- * stays sharp.
+ * <p>Own FitViewport on the world's virtual size. It used to be a ScreenViewport, one unit per
+ * real pixel, which meant a menu laid out for 1280x720 kept that pixel size on a 1440p screen and
+ * left the panel a quarter full with type too small to read. Sharing the world's letterbox keeps
+ * every menu the same relative size at any resolution.
  */
 public abstract class MenuScreen extends BaseScreen {
 
@@ -121,7 +123,7 @@ public abstract class MenuScreen extends BaseScreen {
   @Override
   public void show() {
     GameAudio.getInstance().playMusic(musicTrack());
-    stage = new Stage(new ScreenViewport());
+    stage = new Stage(new FitViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
     skin = game.getUiSkin().get();
     Gdx.input.setInputProcessor(stage);
     if (skin == null) {
