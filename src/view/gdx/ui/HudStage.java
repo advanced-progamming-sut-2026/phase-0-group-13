@@ -24,6 +24,7 @@ import java.util.function.ToIntFunction;
 
 import model.core.GameManager;
 import model.game.minigame.ConveyorRule;
+import view.gdx.core.GdxConfig;
 import model.game.plant.PlantParts.PlantTemplate;
 import view.gdx.core.GdxConfig;
 
@@ -95,8 +96,7 @@ public final class HudStage implements Disposable {
   private String selected;
 
   public HudStage() {
-    this.stage = new Stage(
-        new FitViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
+    this.stage = new Stage(new FitViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
   }
 
   /** The stage itself, for putting in an InputMultiplexer. */
@@ -136,7 +136,18 @@ public final class HudStage implements Disposable {
     extras = new Table();
     root.add(extras).left().padTop(4f).row();
 
-    buildFooter(skin);
+    // What this stage wants from the player, when it wants something unusual.
+    //
+    // Along the bottom rather than under the seed bar. Everything the HUD stacks above the lawn
+    // comes straight off the top lane -- the seed bar already reaches 203px down against a lawn
+    // that starts at 177px in Frostbite Caves -- and this is the one line of it that does not have
+    // to be next to the seeds. The strip under the board is empty in every season.
+    Table footer = new Table();
+    footer.setFillParent(true);
+    footer.bottom().left().pad(6f);
+    objective = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
+    footer.add(objective).left();
+    stage.addActor(footer);
 
     if (DebugPanel.isEnabled()) {
       // Out of the way in the corner - the HUD flows from the top and the lawn is under it.

@@ -37,10 +37,11 @@ import view.gdx.ui.UiSkinProvider;
  * <p>A subclass only says what it is called and what goes in the middle. Everything a menu shares
  * with the other menus — including Escape going back — is handled here.
  *
- * <p>Own FitViewport on the world's virtual size. It used to be a ScreenViewport, one unit per
- * real pixel, which meant a menu laid out for 1280x720 kept that pixel size on a 1440p screen and
- * left the panel a quarter full with type too small to read. Sharing the world's letterbox keeps
- * every menu the same relative size at any resolution.
+ * <p>Own ScreenViewport rather than the world's letterboxed one, so a menu gets one unit per real
+ * pixel and its text stays sharp at any window size. The in-match HUD used to do the same and no
+ * longer can -- it has to line up with the lawn underneath it, see HudStage -- but a menu has only
+ * a backdrop under it, which is drawn to fill whatever shape the window is, so nothing here can
+ * fall out of alignment with anything.
  */
 public abstract class MenuScreen extends BaseScreen {
 
@@ -120,6 +121,20 @@ public abstract class MenuScreen extends BaseScreen {
     return null;
   }
 
+  /**
+   * What Escape does on this screen. Goes back by default, and does nothing on a screen with
+   * nowhere to go back to.
+   *
+   * <p>Overridable because the root menu has no back and should offer to close the game instead:
+   * Escape on the first screen is how a player expects to leave one.
+   */
+  protected void onEscape() {
+    Screen back = backTarget();
+    if (back != null) {
+      go(back);
+    }
+  }
+
   @Override
   public void show() {
     GameAudio.getInstance().playMusic(musicTrack());
@@ -169,10 +184,7 @@ public abstract class MenuScreen extends BaseScreen {
             if (keycode != Input.Keys.ESCAPE) {
               return false;
             }
-            Screen back = backTarget();
-            if (back != null) {
-              go(back);
-            }
+            onEscape();
             return true;
           }
         });

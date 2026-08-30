@@ -122,6 +122,16 @@ public final class IZombieScreen extends ArcadeBoardScreen {
   }
 
   @Override
+  protected boolean clearSelection() {
+    if (chosen == null) {
+      return false;
+    }
+    chosen = null;
+    paintCards();
+    return true;
+  }
+
+  @Override
   protected void tickEngine() {
     engine.tick();
   }

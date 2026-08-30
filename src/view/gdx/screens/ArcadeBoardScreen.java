@@ -44,6 +44,10 @@ import view.gdx.ui.UiSkinProvider;
  * <p>Two clocks, same as {@link GameplayScreen}: {@link FixedStepClock} steps the engine and the
  * frame delta only drives animation. Pausing gives the renderers a delta of zero so the rigs
  * freeze with the simulation instead of walking on the spot.
+ *
+ * <p>The HUD shares the world's 1280x720 shape for the same reason {@link view.gdx.ui.HudStage}
+ * does: the picker strip sits directly above the board, and a viewport that does not scale with
+ * the lawn slides down over the top lane as soon as the window is not the design size.
  */
 public abstract class ArcadeBoardScreen extends BaseScreen {
 
@@ -124,6 +128,16 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
    * @return true to consume it
    */
   protected boolean onKeyPressed(int keycode) {
+    return false;
+  }
+
+  /**
+   * Puts down whatever the player is holding -- a seed, a zombie, half a swap -- so Escape can back
+   * out of a choice before it backs out of the game.
+   *
+   * @return true if something was actually being held, false if there was nothing to cancel
+   */
+  protected boolean clearSelection() {
     return false;
   }
 
@@ -407,7 +421,18 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
         return true;
       }
       if (keycode == Input.Keys.ESCAPE) {
-        leave();
+        // Same ladder the main game uses: close the pause menu, else put down what is held, else
+        // pause. Leaving is the header's Give up button, not one keypress from mid-match.
+        if (paused) {
+          togglePause();
+        } else if (!clearSelection()) {
+          if (canPause()) {
+            togglePause();
+          } else {
+            // Nothing to cancel and no clock of ours to stop, so this one really is the way out.
+            leave();
+          }
+        }
         return true;
       }
       if (keycode == Input.Keys.SPACE) {

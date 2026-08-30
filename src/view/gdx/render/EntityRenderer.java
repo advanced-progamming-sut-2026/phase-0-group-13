@@ -25,6 +25,7 @@ import model.game.zombie.behavior.ZombossAction;
 import view.gdx.animation.AnimationLibrary;
 import view.gdx.animation.AnimationStates;
 import view.gdx.animation.EntityAnimation;
+import view.gdx.core.GdxConfig;
 import view.gdx.ui.CurrencyArt;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
@@ -94,8 +95,8 @@ public final class EntityRenderer implements WorldRenderer {
   // Fractions of an armour's health at which the rig's two damaged states take over.
   private static final float ARMOUR_STAGE_1 = 0.66f;
   private static final float ARMOUR_STAGE_2 = 0.33f;
-  // How long a shooter holds its attack clip after firing. The model runs at ten ticks a
-  // second, so this is a little under half a second.
+  // Fallback hold for a rig whose attack clip the manifest gives no duration for. Normally the
+  // clip's own length is used instead; see justActed.
   private static final int PLANT_ATTACK_HOLD_TICKS = 4;
   // How far above its lane a lobbed shot rises at the top of the arc.
   private static final float LOB_ARC_HEIGHT = 0.85f;
@@ -155,6 +156,8 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color healthBack = new Color(0f, 0f, 0f, 0.55f);
   private final Color healthFront = new Color(0.25f, 0.85f, 0.3f, 0.95f);
   private final Color healthLow = new Color(0.9f, 0.5f, 0.15f, 0.95f);
+  /** The armour strip: a cold grey-blue, so it never reads as more health. */
+  private final Color armourTint = new Color(0.72f, 0.78f, 0.88f, 0.95f);
   private final Color peaColor = new Color(0.55f, 0.9f, 0.3f, 1f);
   private final Color sunColor = new Color(1f, 0.85f, 0.2f, 1f);
   private final Color noArt = new Color(1f, 1f, 1f, 0.85f);
@@ -668,20 +671,38 @@ public final class EntityRenderer implements WorldRenderer {
    * only for "idle" left it silently falling back to its seed packet.
    */
   private String plantClip(EntityAnimation animation, Plant plant) {
-    if (justActed(plant)) {
-      String attack = animation.pickClip("attack");
-      if (attack != null) {
-        return attack;
-      }
+    String attack = animation.pickClip("attack");
+    if (attack != null && justActed(plant, animation.duration(attack))) {
+      return attack;
     }
     return animation.pickClip("idle", "attack");
   }
 
-  /** True for {@link #PLANT_ATTACK_HOLD} seconds after the plant's last action tick. */
-  private boolean justActed(Plant plant) {
+  /**
+   * True while the plant's attack clip is still running.
+   *
+   * <p>Held for as long as the clip itself lasts rather than for a fixed number of ticks. Every
+   * attack used to be cut off after {@link #PLANT_ATTACK_HOLD_TICKS} and snapped back to idle
+   * part-way through the motion: a Peashooter got 39% of its second-long shot, a Cabbage-pult 24%
+   * of its throw, and a Repeater -- whose clip is one volley of two peas -- only ever played the
+   * first of them. Reading the length off the rig fixes all of them at once and needs no per-plant
+   * numbers.
+   *
+   * <p>Not capped. The clips run from a third of a second (Bonk Choy's punch) to four and a half
+   * (Hot Potato thawing), and each of those is how long that plant is genuinely busy, so the rig's
+   * own number is the answer in both directions. A plant whose attack outlasts the gap between its
+   * shots simply stays in attack, which is what it is in fact doing. The fallback is the old fixed
+   * hold, for a clip the manifest gives no duration for.
+   */
+  private boolean justActed(Plant plant, float attackSeconds) {
     int sinceAction = currentTick - plant.getLastActionTick();
-    return plant.getLastActionTick() > 0 && sinceAction >= 0
-        && sinceAction < PLANT_ATTACK_HOLD_TICKS;
+    if (plant.getLastActionTick() <= 0 || sinceAction < 0) {
+      return false;
+    }
+    int holdTicks = attackSeconds > 0f
+        ? Math.round(attackSeconds * GdxConfig.TICKS_PER_SECOND)
+        : PLANT_ATTACK_HOLD_TICKS;
+    return sinceAction < holdTicks;
   }
 
   /** Same for a zombie, which unlike a plant has to switch clips as it goes. */
@@ -1095,7 +1116,15 @@ public final class EntityRenderer implements WorldRenderer {
         || plantArt.find(plant.getName()) != null;
   }
 
-  /** Sits just above the sprite, so a tall zombie does not wear its bar on its chest. */
+  /**
+   * Sits just above the sprite, so a tall zombie does not wear its bar on its chest.
+   *
+   * <p>An armoured zombie gets a second bar stacked over the first for what its cone, bucket or
+   * helmet has left. They are separate pools in the model -- {@link Zombie#takeDamage} spends the
+   * armour before the body and a piercing hit skips it -- so one blended bar would say a zombie was
+   * nearly dead while its bucket was still taking every shot. Once the armour is gone the strip
+   * goes with it, which is the same moment the rig stops drawing the headwear.
+   */
   private void healthBar(ShapeRenderer shapes, Zombie zombie) {
     float spriteHeight = zombieSpriteHeight(zombie);
     // the chapter ends when this one dies, so its bar has to be readable from across the lawn
@@ -1105,13 +1134,30 @@ public final class EntityRenderer implements WorldRenderer {
         + spriteHeight + 4f;
     // a tall zombie in the top lane would otherwise wear its bar up in the seed cards
     y = Math.min(y, geometry.rowToY(0) + geometry.getCellHeight() - 7f);
-    float fraction = zombie.getCurrentHealth() / (float) Math.max(1, zombie.getMaxHealth());
-    fraction = Math.max(0f, Math.min(1f, fraction));
     float thickness = isBoss(zombie) ? 11f : 5f;
+
+    float health = zombie.getCurrentHealth() / (float) Math.max(1, zombie.getMaxHealth());
+    bar(shapes, x, y, width, thickness, health,
+        health < 0.35f ? healthLow : healthFront);
+
+    int armourMax = zombie.getMaxArmorHealth();
+    if (armourMax > 0 && zombie.hasIntactArmor()) {
+      // Thinner than the health bar and directly over it: the eye reads the pair as one stack, and
+      // it is the health underneath that decides whether the zombie is nearly down.
+      float armourThickness = Math.max(3f, thickness - 2f);
+      bar(shapes, x, y + thickness + 2f, width, armourThickness,
+          zombie.getRemainingArmorHealth() / (float) armourMax, armourTint);
+    }
+  }
+
+  /** One backed bar: a dark plate, then the fill clamped to 0..1. */
+  private void bar(ShapeRenderer shapes, float x, float y, float width, float thickness,
+      float fraction, Color fill) {
+    float clamped = Math.max(0f, Math.min(1f, fraction));
     shapes.setColor(healthBack);
     shapes.rect(x - 1f, y - 1f, width + 2f, thickness + 2f);
-    shapes.setColor(fraction < 0.35f ? healthLow : healthFront);
-    shapes.rect(x, y, width * fraction, thickness);
+    shapes.setColor(fill);
+    shapes.rect(x, y, width * clamped, thickness);
   }
 
   @Override
