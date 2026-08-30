@@ -262,7 +262,7 @@ public class CollectionMenuController implements BaseController {
 
   private List<ZombieTemplate> allZombies() {
     return GameDataManager.zombieRepository != null
-            ? GameDataManager.zombieRepository.getAll()
+            ? GameDataManager.zombieRepository.getAlmanacEntries()
             : null;
   }
 

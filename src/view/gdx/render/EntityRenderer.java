@@ -21,6 +21,7 @@ import model.game.zombie.Zombie;
 import model.game.zombie.ZombieParts.Armor;
 import model.game.zombie.behavior.JesterZombieAction;
 import model.game.zombie.behavior.KingAuraZombieAction;
+import model.game.zombie.behavior.ZombossAction;
 import view.gdx.animation.AnimationLibrary;
 import view.gdx.animation.AnimationStates;
 import view.gdx.animation.EntityAnimation;
@@ -89,6 +90,11 @@ public final class EntityRenderer implements WorldRenderer {
   // keeps the relative sizes the artists drew: a gargantuar stays bigger than an imp.
   private static final float PLANT_ANIM_UNITS = 90f;
   private static final float ZOMBIE_ANIM_UNITS = 150f;
+  /** The walker the plant-headed zombies borrow a body from, and how far the plant overhangs it. */
+  private static final String ZOMBOTANY_BODY = "ZombieTutorialDefault";
+  private static final float ZOMBOTANY_HEAD_FILL = 1.6f;
+  /** Peak of a thrown imp's arc, in lane heights. */
+  private static final float THROW_ARC_HEIGHT = 0.9f;
   // Chilled zombies walk at half speed, so their legs have to as well.
   private static final float CHILLED_ANIM_RATE = 0.5f;
   // Fractions of an armour's health at which the rig's two damaged states take over.
@@ -726,13 +732,56 @@ public final class EntityRenderer implements WorldRenderer {
       return false;
     }
     String clip = zombieClip(animation, zombie);
-    animation.draw(context.getBatch(), clip,
-        playback.advance(zombie, clip, delta * animationRate(zombie)),
-        geometry.columnCentreX(onBoard(zombie.getX())),
-        geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET,
-        zombieAnimationScale(zombie, animation, clip), zombie.isHypnotized(),
+    float time = playback.advance(zombie, clip, delta * animationRate(zombie));
+    float flight = zombie.flightProgress();
+    double column = flight > 0f
+        ? zombie.getX() + (zombie.getThrownFromX() - zombie.getX()) * flight
+        : zombie.getX();
+    float x = geometry.columnCentreX(onBoard(column));
+    float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
+        + throwLift(flight);
+    float scale = zombieAnimationScale(zombie, animation, clip);
+    animation.draw(context.getBatch(), clip, time, x, y, scale, zombie.isHypnotized(),
         armourVisibility(animation, zombie));
+    drawPlantHead(context, zombie, animation, clip, time, x, y, scale);
     return true;
+  }
+
+  /** How high a thrown imp rides above its lane: nothing at either end, a full arc in between. */
+  private float throwLift(float flight) {
+    if (flight <= 0f) {
+      return 0f;
+    }
+    return geometry.getCellHeight() * THROW_ARC_HEIGHT * 4f * flight * (1f - flight);
+  }
+
+  /**
+   * The plant a Zombotany wears instead of its own head.
+   *
+   * <p>The body is an ordinary walker rig, so the head has to be found per frame rather than
+   * pinned to the sprite box, or it slides off during the walk cycle. Plant art is authored
+   * facing right and the walker facing left, so the head is mirrored against the body's own flip
+   * to leave both looking the same way.
+   */
+  private void drawPlantHead(RenderContext context, Zombie zombie, EntityAnimation body,
+      String clip, float time, float x, float y, float scale) {
+    String plant = ZombieArt.zombotanyPlant(zombie.getName());
+    if (plant == null) {
+      return;
+    }
+    EntityAnimation rig = animations.find(AnimationLibrary.PLANTS, plant);
+    String idle = rig == null ? null : rig.pickClip("idle");
+    float[] head = body.topPartBox(clip, time, x, y, scale, zombie.isHypnotized());
+    if (idle == null || head == null) {
+      return;
+    }
+    float span = Math.max(head[2], head[3]) * ZOMBOTANY_HEAD_FILL;
+    float headHeight = rig.height(idle);
+    if (headHeight <= 0f) {
+      return;
+    }
+    rig.draw(context.getBatch(), idle, time, head[0], head[1] - span / 2f,
+        span / headHeight, !zombie.isHypnotized());
   }
 
   /**
@@ -806,14 +855,52 @@ public final class EntityRenderer implements WorldRenderer {
     return isStage1 ? left <= ARMOUR_STAGE_1 && left > ARMOUR_STAGE_2 : left <= ARMOUR_STAGE_2;
   }
 
-  /** Null unless this zombie has a rig with a clip worth playing. */
+  /**
+   * The rig this zombie is drawn from.
+   *
+   * <p>The four Zombotany zombies have none of their own -- no folder, no packet, no PAM anywhere
+   * upstream. They are plant-headed zombies, so they walk on the ordinary walker rig and
+   * {@link #drawPlantHead} puts the plant where its head would be.
+   */
   private EntityAnimation zombieAnimation(Zombie zombie) {
     EntityAnimation animation = animations.find(AnimationLibrary.ZOMBIES, zombie.getName());
+    if (animation == null && ZombieArt.zombotanyPlant(zombie.getName()) != null) {
+      animation = animations.find(AnimationLibrary.ZOMBIES, ZOMBOTANY_BODY);
+    }
     return animation != null && zombieClip(animation, zombie) != null ? animation : null;
   }
 
-  /** Eating while it chews a plant, walking the rest of the time. */
+  /**
+   * Zomboss drives its clip off what it is doing, not off walking and eating.
+   *
+   * <p>Each world's boss rig carries its own attack clip -- Egypt fires a missile, the Dark Ages
+   * dragon breathes fire, the mammoth slings ice, the octopus sucks -- so one candidate list
+   * covers all four and {@code pickClip} takes whichever the loaded rig actually has.
+   */
+  private static String bossClip(EntityAnimation animation, Zombie zombie) {
+    if (!(zombie.getBehavior() instanceof ZombossAction boss)) {
+      return null;
+    }
+    switch (boss.getPose()) {
+      case STUNNED:
+        return animation.pickClip("stun_loop", "stun", "stun_start");
+      case MOVING:
+        return animation.pickClip("walk_forward", "walk", "idle");
+      case ATTACKING:
+        return animation.pickClip("missile_start", "fire_attack", "suction_loop",
+            "slingshot", "rocket_launch", "idle");
+      default:
+        return animation.pickClip("idle");
+    }
+  }
+
   private static String zombieClip(EntityAnimation animation, Zombie zombie) {
+    if (zombie.isBoss()) {
+      String boss = bossClip(animation, zombie);
+      if (boss != null) {
+        return boss;
+      }
+    }
     if (zombie.isEating()) {
       String eat = animation.pickClip("eat");
       if (eat != null) {

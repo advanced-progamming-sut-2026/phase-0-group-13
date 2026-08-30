@@ -31,6 +31,12 @@ public class ZombossAction implements ZombieAction {
   /** Zomboss stands in two lanes, so plants in either of them can shoot it. */
   public static final int ROW_SPAN = 2;
 
+  /** What the boss is doing, for the renderer to pick a clip. Reporting only, drives nothing. */
+  public enum Pose { IDLE, MOVING, ATTACKING, STUNNED }
+
+  /** How long the attack pose is held after a shot, so the clip has time to read. */
+  private static final int ATTACK_POSE_TICKS = 12;
+
   /** Long enough to be a real opening; the sheet's own StunTime is 3-4 seconds. */
   private static final int STUN_TICKS = 40;
 
@@ -73,6 +79,8 @@ public class ZombossAction implements ZombieAction {
   private int suckTicksLeft;
   private int suckTopRow = -1;
   private double station = -1;
+  private Pose pose = Pose.IDLE;
+  private int attackPoseLeft;
 
   public ZombossAction(ZombieType chapter, ZombossHealth health, double eatingDamage) {
     this.chapter = chapter;
@@ -91,6 +99,10 @@ public class ZombossAction implements ZombieAction {
   /** Stunned means a free hit: it neither moves nor attacks. */
   public boolean isStunned() {
     return stunTicksLeft > 0;
+  }
+
+  public Pose getPose() {
+    return pose;
   }
 
   public int getStunTicksLeft() {
@@ -112,15 +124,18 @@ public class ZombossAction implements ZombieAction {
 
     if (stunTicksLeft > 0) {
       stunTicksLeft--;
+      pose = Pose.STUNNED;
       zombie.setEating(false);
       return;
     }
     if (suckTicksLeft > 0) {
       suckTicksLeft--;
+      pose = Pose.ATTACKING;
       dragRowsIn(zombie, board);
       return;
     }
     if (charging) {
+      pose = Pose.MOVING;
       advanceCharge(zombie, board);
       return;
     }
@@ -132,13 +147,20 @@ public class ZombossAction implements ZombieAction {
       summonMinion(zombie, board, currentTick);
     }
     if (currentTick - lastUltimateTick >= ULTIMATE_INTERVAL) {
+      attackPoseLeft = ATTACK_POSE_TICKS;
+      pose = Pose.ATTACKING;
       unleashUltimate(zombie, board, currentTick);
       return;
     }
     if (currentTick - lastAttackTick >= ATTACK_INTERVAL) {
+      attackPoseLeft = ATTACK_POSE_TICKS;
       fireAtTheLawn(zombie, board, currentTick);
     }
     crushOrHoldStation(zombie, board, currentTick);
+    if (attackPoseLeft > 0) {
+      attackPoseLeft--;
+      pose = Pose.ATTACKING;
+    }
   }
 
   private void seedTimers(int currentTick) {
@@ -231,6 +253,7 @@ public class ZombossAction implements ZombieAction {
     Plant underfoot = plantUnderneath(zombie, board, currentTick);
     if (underfoot != null) {
       zombie.setEating(true);
+      pose = Pose.ATTACKING;
       if (currentTick % 10 == 0) {
         underfoot.takeDamage((int) eatingDamage);
       }
@@ -241,9 +264,11 @@ public class ZombossAction implements ZombieAction {
     double gap = station - zombie.getX();
     if (Math.abs(gap) <= step) {
       zombie.setX(station);
+      pose = Pose.IDLE;
       return;
     }
     zombie.setX(zombie.getX() + Math.signum(gap) * step);
+    pose = Pose.MOVING;
   }
 
   private Plant plantUnderneath(Zombie zombie, Board board, int currentTick) {

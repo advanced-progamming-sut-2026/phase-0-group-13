@@ -433,7 +433,7 @@ public final class CollectionScreen extends MenuScreen {
 
   private List<ZombieTemplate> zombies() {
     return GameDataManager.zombieRepository == null
-            ? List.of() : GameDataManager.zombieRepository.getAll();
+            ? List.of() : GameDataManager.zombieRepository.getAlmanacEntries();
   }
 
   private boolean hasSeen(User user, ZombieTemplate template) {

@@ -20,6 +20,9 @@ public class Zombie {
   private double x;
   private double y;
 
+  /** Not a cell on any board, so "no frozen tile has caught this zombie yet". */
+  public static final int NO_CELL = -1;
+
   private final List<Armor> armors;
   private final ZombieAction behavior;
   private final Map<StatusEffect, Integer> activeEffects;
@@ -34,6 +37,10 @@ public class Zombie {
   private boolean submerged;
   private int rowSpan = 1;
   private boolean boss;
+  private int icedOnCell = NO_CELL;
+  private double thrownFromX;
+  private int thrownTicks;
+  private int thrownTotal;
 
   public Zombie(String name, int health, double speed, int row, double startX, ZombieAction behavior) {
     this.name = name;
@@ -57,6 +64,9 @@ public class Zombie {
 
   public void update(int currentTick, Board board) {
     if (isDead()) return;
+    if (thrownTicks > 0) {
+      thrownTicks--;
+    }
     processEffects();
     if (!activeEffects.containsKey(StatusEffect.FROZEN) && behavior != null) {
       behavior.execute(this, board, currentTick);
@@ -112,6 +122,42 @@ public class Zombie {
 
   public void applyEffect(StatusEffect effect, int durationInTicks) {
     this.activeEffects.put(effect, durationInTicks);
+  }
+
+  /**
+   * The board cell whose frozen tile last caught this zombie, or {@link #NO_CELL}.
+   *
+   * <p>A frozen tile is permanent, so without remembering this the tile would renew the freeze
+   * every tick the zombie stood on it, faster than the freeze could run down, and the zombie
+   * could never step off again.
+   */
+  public int getIcedOnCell() {
+    return icedOnCell;
+  }
+
+  public void setIcedOnCell(int cell) {
+    this.icedOnCell = cell;
+  }
+
+  /**
+   * Marks this zombie as having just been thrown from {@code fromX}, for the renderer to arc it in.
+   *
+   * <p>Reporting only: the zombie lands where it was spawned and behaves from the first tick, so
+   * nothing on the board depends on the flight.
+   */
+  public void markThrownFrom(double fromX, int ticks) {
+    this.thrownFromX = fromX;
+    this.thrownTicks = Math.max(0, ticks);
+    this.thrownTotal = this.thrownTicks;
+  }
+
+  public double getThrownFromX() {
+    return thrownFromX;
+  }
+
+  /** 1 the instant it was thrown, falling to 0 as it lands; 0 for a zombie that was not thrown. */
+  public float flightProgress() {
+    return thrownTotal <= 0 ? 0f : thrownTicks / (float) thrownTotal;
   }
 
   public void extinguishFrozenStatus() {

@@ -155,6 +155,9 @@ public class Board {
     System.out.printf("The barrel burst open at (%d, %d) and two imps tumbled out!%n",
             (int) Math.round(col) + 1, row + 1);
   }
+  /** How long one visit to a frozen tile holds a zombie. */
+  private static final int ICE_TILE_FREEZE_TICKS = 40;
+
   private void applyTileHazardsToZombies() {
     for (Zombie zombie : zombies) {
       if (zombie.isDead()) {
@@ -171,17 +174,40 @@ public class Board {
         continue;
       }
       TileEffect effect = tiles[zombie.getRow()][col].getEffect();
+      boolean onFrozenTile = false;
       if (effect instanceof IceTrailEffect ice && ice.isActive()) {
         if (ice.getSlideDirection() != 0) {
           slideZombie(zombie, ice.getSlideDirection());
         } else if (ice.isFullFreeze()) {
-          zombie.applyEffect(StatusEffect.FROZEN, 5);
+          onFrozenTile = true;
+          freezeOnIceTile(zombie, zombie.getRow() * columns + col);
         } else if (ice.isSlippery()) {
           slideZombie(zombie, ice.getLaneShift());
         } else {
           zombie.applyEffect(StatusEffect.CHILLED, 5);
         }
       }
+      if (!onFrozenTile) {
+        zombie.setIcedOnCell(Zombie.NO_CELL);
+      }
+    }
+  }
+
+  /**
+   * A frozen tile catches a zombie once per visit.
+   *
+   * <p>These tiles are permanent, so reapplying the freeze every tick renewed it faster than it
+   * could run down: the zombie could never move off the tile, and a stage whose last zombies were
+   * standing on one could neither be won nor lost. The tile is armed again as soon as the zombie
+   * is somewhere else, which is what {@code setIcedOnCell(NO_CELL)} above does.
+   */
+  private void freezeOnIceTile(Zombie zombie, int cell) {
+    if (zombie.getIcedOnCell() == cell) {
+      return;
+    }
+    zombie.setIcedOnCell(cell);
+    if (!zombie.getActiveEffects().containsKey(StatusEffect.FROZEN)) {
+      zombie.applyEffect(StatusEffect.FROZEN, ICE_TILE_FREEZE_TICKS);
     }
   }
   /**
