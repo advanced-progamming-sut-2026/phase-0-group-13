@@ -30,9 +30,9 @@ public class ZombieFactory {
     }
 
     ZombieType type = ZombieTypeResolver.resolve(template);
-    ZombieAction behavior = determineBehavior(template, type, Difficulty.zombieDamage());
-
     int scaledHp = (int) Math.round(resolveBaseHp(template, type) * Difficulty.zombieHealth());
+    ZombieAction behavior = determineBehavior(template, type, Difficulty.zombieDamage(), scaledHp);
+
     Zombie zombie = new Zombie(
             template.getName(),
             Math.max(1, scaledHp),
@@ -40,6 +40,11 @@ public class ZombieFactory {
             row, startX, behavior
     );
 
+    zombie.setDisplayName(type.getDisplayName());
+    if (isZomboss(type)) {
+      zombie.setBoss(true);
+      zombie.setRowSpan(ZombossAction.ROW_SPAN);
+    }
     applyArmorLayers(zombie, template);
     applyLootDrops(zombie);
 
@@ -61,13 +66,17 @@ public class ZombieFactory {
     if (random.nextDouble() < SHINY_CHANCE) zombie.setShiny(true);
   }
 
-  private ZombieAction determineBehavior(ZombieTemplate template, ZombieType type, double diffMultiplier) {
+  private ZombieAction determineBehavior(
+          ZombieTemplate template, ZombieType type, double diffMultiplier, int scaledHp) {
     double eatDamage = template.getEatDps() * diffMultiplier;
     return switch (type) {
       case NORMAL, CONEHEAD, BUCKETHEAD, KNIGHT, BLOCKHEAD, IMP,
            ZOMBOTANY_WALLNUT -> new StandardZombieAction(eatDamage);
+      // Segment sizes come off the sheet's own Stages, rescaled to the health it actually got.
       case ZOMBOSS_EGYPT, ZOMBOSS_PIRATE, ZOMBOSS_COWBOY, ZOMBOSS_DARK ->
-              new ZombossAction(120, 1800, eatDamage);
+              new ZombossAction(type,
+                      new ZombossHealth(template.getStageHitPoints(), Math.max(1, scaledHp)),
+                      eatDamage);
       case TURQUOISE -> new TurquoiseZombieAction(50, 10);
       case PIANIST -> new PianistZombieAction(60);
       case BARREL_ROLLER -> new BarrelRollerZombieAction(eatDamage);

@@ -88,7 +88,9 @@ public final class GdxGameActions implements GameActionBridge {
     }
     match.recordPlanting(plantType);
     // Same hand-off GamePlayController makes: the belt slot is spent, so the next click waits.
-    if (match.getSpecialStageRule() instanceof ConveyorRule belt) {
+    ConveyorRule belt = match.getSpecialStageRule() == null
+            ? null : match.getSpecialStageRule().belt();
+    if (belt != null) {
       belt.consumeReadyPlant();
     }
     return true;

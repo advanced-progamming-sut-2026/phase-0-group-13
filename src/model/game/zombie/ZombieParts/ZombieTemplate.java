@@ -97,6 +97,15 @@ public class ZombieTemplate {
     return (aliases != null && !aliases.isEmpty()) ? aliases.get(0) : null;
   }
 
+  /** The player-facing name. getName() stays the raw alias because art and saves key off it. */
+  public String getDisplayName() {
+    String alias = getName();
+    if (alias == null) {
+      return null;
+    }
+    return ZombieTypeResolver.resolve(this).getDisplayName();
+  }
+
   public int getBaseHp() {
     if (objdata != null && objdata.hitpoints != null) {
       return objdata.hitpoints;
@@ -120,6 +129,20 @@ public class ZombieTemplate {
       }
     }
     return total;
+  }
+
+  /** جان هر فاز، به ترتیب. برای زامبی‌های عادی خالی است. */
+  public List<Integer> getStageHitPoints() {
+    if (objdata == null || objdata.stages == null) {
+      return List.of();
+    }
+    List<Integer> points = new java.util.ArrayList<>();
+    for (Stage stage : objdata.stages) {
+      if (stage != null && stage.hitPoints != null) {
+        points.add(stage.hitPoints);
+      }
+    }
+    return points;
   }
 
   public double getBaseSpeed() {

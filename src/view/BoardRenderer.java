@@ -54,7 +54,7 @@ public final class BoardRenderer {
 
     System.out.println(
             "Legend: Z?=zombie   P?=plant   ~=water   +=grave (+$=50 sun, +F=plant food)"
-                    + "   *=frozen ground   ^/v=slider ice   #=barrel   .=empty tile"
+                    + "   *=frozen ground   ^/v=slider ice   !!=burning   #=barrel   .=empty tile"
                     + "   (? = first letter of the name)");
     System.out.println(
             "        Second line of every row is the current HP (zombies show body+armour)."
@@ -86,7 +86,7 @@ public final class BoardRenderer {
       }
       String ability = z.getBehavior() == null ? null : z.getBehavior().debugState(z, currentTick);
       System.out.printf("  %-34s %-10s %-11s %-14s %-10s %s%n",
-              fit(z.getName(), 20) + " (" + fit(typeOf(z), 10) + ")",
+              fit(z.getDisplayName(), 20) + " (" + fit(typeOf(z), 10) + ")",
               String.format("%.1f,%d", z.getX() + 1, z.getRow() + 1),
               z.getCurrentHealth() + "/" + z.getMaxHealth(),
               armourOf(z),
@@ -134,6 +134,9 @@ public final class BoardRenderer {
       return ice.isFullFreeze()
               ? "Frozen ground (zombies freeze here)"
               : "Slider ice: pushes zombies " + (ice.getSlideDirection() < 0 ? "up" : "down");
+    }
+    if (effect instanceof model.game.TileEffects.FireEffect) {
+      return "Burning ground (nothing can be planted while it burns)";
     }
     return effect.getName();
   }
@@ -216,7 +219,39 @@ public final class BoardRenderer {
       System.out.printf("  Plants lost: %d/%d%n",
               gm.getMatchContext().getPlantsLost(), love.getLossBudget());
     }
+    printBossHud(gm);
   }
+
+  /** داک: در مرحلهٔ باس، به‌جای نوار موج، نوار جانِ سه‌تکه نشان داده می‌شود. */
+  private static void printBossHud(GameManager gm) {
+    if (!(gm.getSpecialStageRule() instanceof model.game.minigame.BossStageRule boss)) {
+      return;
+    }
+    Zombie zomboss = boss.getBoss();
+    if (zomboss == null) {
+      System.out.println("  BOSS STAGE: Dr. Zomboss has not arrived yet.");
+      return;
+    }
+    model.game.zombie.behavior.ZombossHealth health = boss.getBossHealth();
+    StringBuilder bar = new StringBuilder();
+    for (int i = model.game.zombie.behavior.ZombossHealth.SEGMENTS - 1; i >= 0; i--) {
+      bar.append('[').append(segmentBar(health, i, zomboss.getCurrentHealth())).append(']');
+    }
+    System.out.printf("  DR. ZOMBOSS: %s  rows %d-%d%s%n", bar,
+            zomboss.getRow() + 1, zomboss.getBottomRow() + 1,
+            boss.isBossStunned() ? "   *** STUNNED ***" : "");
+  }
+
+  private static String segmentBar(
+          model.game.zombie.behavior.ZombossHealth health, int segment, int currentHealth) {
+    if (health == null) {
+      return "?????";
+    }
+    int filled = Math.round(health.fractionOf(segment, currentHealth) * BOSS_SEGMENT_CELLS);
+    return "#".repeat(filled) + "-".repeat(BOSS_SEGMENT_CELLS - filled);
+  }
+
+  private static final int BOSS_SEGMENT_CELLS = 8;
   private static void renderArcadeGrid(int rows, int cols, String header, String legend,
           java.util.function.IntFunction<String> rowLabel,
           java.util.function.BiFunction<Integer, Integer, String[]> cell) {
@@ -452,7 +487,7 @@ public final class BoardRenderer {
 
     for (Zombie z : board.getZombies()) {
       if (z.getRow() == row && Math.round(z.getX()) == col && !z.isDead()) {
-        entities.append("Z").append(initialOf(z.getName()));
+        entities.append("Z").append(initialOf(z.getDisplayName()));
         // جان بدنه + زرهِ باقی‌مانده، تا آسیب وارد شده به زره هم روی نقشه دیده شود
         int armorLeft = z.getRemainingArmorHealth();
         healths.append(z.getCurrentHealth());
@@ -512,6 +547,9 @@ public final class BoardRenderer {
         return "*";
       }
       return ice.getSlideDirection() < 0 ? "^" : "v";
+    }
+    if (effect instanceof model.game.TileEffects.FireEffect) {
+      return "!!";
     }
     return "#";
   }

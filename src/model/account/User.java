@@ -91,6 +91,14 @@ public class User {
     this.progress = new Progress();
   }
 
+  /** Debug cheat: opens every chapter on the map and every level inside them. */
+  public Result unlockAllChapters() {
+    for (int stage = 1; stage <= AdventureMap.MAX_STAGES; stage++) {
+      unlockItem("stage_" + stage);
+    }
+    return progress.unlockAllChapters();
+  }
+
   public void unlockItem(String targetId) {
     if (targetId == null || targetId.isEmpty()) {
       return;
@@ -377,6 +385,53 @@ public class User {
             true,
             plantName + " boosted! Its Plant Food effect will trigger instantly once planted.",
             key);
+  }
+
+  public static final int UPGRADE_COIN_COST = 500;
+  public static final int UPGRADE_SEED_COST = 10;
+  public static final int MAX_PLANT_LEVEL = 4;
+
+  /** Seed packets and coins for the next level; both scale with the level already held. */
+  public int upgradeSeedCost(String plantName) {
+    return UPGRADE_SEED_COST * getPlantLevel(plantName);
+  }
+
+  public int upgradeCoinCost(String plantName) {
+    return UPGRADE_COIN_COST * getPlantLevel(plantName);
+  }
+
+  public Result upgradePlant(String plantName) {
+    if (plantName == null || plantName.trim().isEmpty()) {
+      return new Result(false, "error: invalid plant name", null);
+    }
+
+    String key = plantName.toLowerCase().trim();
+    if (!hasUnlockedPlant(key)) {
+      return new Result(false, "error: you haven't unlocked " + plantName + " yet", null);
+    }
+
+    int currentLevel = getPlantLevel(key);
+    if (currentLevel >= MAX_PLANT_LEVEL) {
+      return new Result(false, "error: " + plantName + " is already at the maximum level", null);
+    }
+
+    String seedKey = "seed_" + key;
+    int seedCost = UPGRADE_SEED_COST * currentLevel;
+    int coinCost = UPGRADE_COIN_COST * currentLevel;
+
+    if (getInventory().getItemCount(seedKey) < seedCost) {
+      return new Result(false,
+              "error: not enough seed packets for " + plantName + " (need " + seedCost + ")", null);
+    }
+    if (getCoins() < coinCost) {
+      return new Result(false, "error: not enough coins (need " + coinCost + ")", null);
+    }
+
+    getInventory().consumeItem(seedKey, seedCost);
+    addCoins(-coinCost);
+    int newLevel = currentLevel + 1;
+    setPlantLevel(key, newLevel);
+    return new Result(true, plantName + " upgraded to level " + newLevel + "!", key);
   }
 
   public boolean isPlantBoosted(String plantName) {

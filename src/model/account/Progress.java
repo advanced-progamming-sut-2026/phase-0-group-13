@@ -179,6 +179,18 @@ public class Progress {
     return false;
   }
 
+  /** Debug cheat: opens every chapter and level so the whole adventure can be reached. */
+  public Result unlockAllChapters() {
+    this.currentStage = AdventureMap.MAX_STAGES;
+    this.currentLevel = AdventureMap.LEVELS_PER_STAGE;
+    this.maxClearedStage = AdventureMap.MAX_STAGES;
+    this.maxClearedLevel = AdventureMap.LEVELS_PER_STAGE;
+    this.adventureCompleted = true;
+    this.survivalModeUnlocked = true;
+    openMiniGames();
+    return new Result(true, "All chapters and levels unlocked.", null);
+  }
+
   public boolean isMiniGameUnlocked(String miniGameName) {
     openMiniGames();
     return unlockedMiniGames.contains(miniGameName.toLowerCase().trim());

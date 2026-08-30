@@ -25,6 +25,7 @@ import model.game.minigame.SaveOurSeedsRule;
 import model.game.minigame.SpecialStageRule;
 import model.game.minigame.TimedWarRule;
 import model.game.zombie.Zombie;
+import model.game.zombie.behavior.ZombossAction;
 
 /**
  * Builds a {@link GameManager} from the current {@link MatchSetup} and hands control to the
@@ -71,7 +72,7 @@ public final class MatchLauncher {
     String bossName = gameManager.getSeason() == null ? null : gameManager.getSeason().getBossZombieName();
 
     SpecialStageRule rule = levelInStage == BOSS_LEVEL_IN_STAGE && bossName != null
-            ? new BossStageRule(bossName)
+            ? new BossStageRule(bossName, deck)
             : specialRuleFor(gameManager, stage, levelInStage, deck);
     if (rule == null) {
       return;
@@ -79,7 +80,9 @@ public final class MatchLauncher {
 
     gameManager.setSpecialStageRule(rule);
     System.out.println("Special level active: " + rule.getClass().getSimpleName());
-    if (rule instanceof ConveyorRule conveyor) {
+    // Boss stages run on the belt too, so this reads the rule's belt rather than its type.
+    ConveyorRule conveyor = rule.belt();
+    if (conveyor != null) {
       gameManager.enableFreePlanting();
       gameManager.disableCooldowns();
       gameManager.getBoard().getGameState().setSkySunDisabled(true);
@@ -108,6 +111,9 @@ public final class MatchLauncher {
         gameManager.getBoard().placePlant(guarded);
         System.out.printf("PROTECT THIS: %s at (1, %d)%n", guarded.getName(), row + 1);}}}
   private static final int BOSS_LEVEL_IN_STAGE = AdventureMap.LEVELS_PER_STAGE;
+
+  /** How many ordinary waves come before Zomboss rolls on. */
+  private static final int BOSS_WARMUP_WAVES = 2;
 
   /**
    * Which level of the chapter is being played. The map screen puts the clicked level in
@@ -222,8 +228,16 @@ public final class MatchLauncher {
 
     // مرحله‌ی آخر هر فصل با یه موج اضافه که فقط زامباس توشه تموم میشه
     if (levelInStage() == BOSS_LEVEL_IN_STAGE && season.getBossZombieName() != null) {
+      // The doc replaces the wave meter with Zomboss's own health bar on these stages, so the
+      // health bar is the progress readout -- which it cannot be behind ten ordinary waves the
+      // player has no meter for. A short warm-up, then the boss.
+      if (waves.size() > BOSS_WARMUP_WAVES) {
+        waves = new ArrayList<>(waves.subList(0, BOSS_WARMUP_WAVES));
+      }
       List<Wave.SpawnEntry> spawns = new ArrayList<>();
-      spawns.add(new Wave.SpawnEntry(season.getBossZombieName(), ROWS / 2, 0, 1000));
+      // Zomboss stands in two lanes, so its top lane has to leave room for the second one.
+      int bossLane = Math.max(0, Math.min(ROWS / 2, ROWS - ZombossAction.ROW_SPAN));
+      spawns.add(new Wave.SpawnEntry(season.getBossZombieName(), bossLane, 0, 1000));
       waves.add(new Wave(waves.size() + 1, true, spawns));
     }
     return waves;

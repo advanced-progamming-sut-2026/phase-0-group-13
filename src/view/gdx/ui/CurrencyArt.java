@@ -49,11 +49,11 @@ public final class CurrencyArt implements Disposable {
 
   private TextureAtlas atlas() {
     if (atlas == null && !loadFailed) {
-      if (!Gdx.files.classpath(ATLAS_PATH).exists()) {
+      if (!Gdx.files.classpath(SKIN_ATLAS).exists()) {
         loadFailed = true;
         return null;
       }
-      atlas = new TextureAtlas(Gdx.files.classpath(ATLAS_PATH));
+      atlas = new TextureAtlas(Gdx.files.classpath(SKIN_ATLAS));
     }
     return atlas;
   }

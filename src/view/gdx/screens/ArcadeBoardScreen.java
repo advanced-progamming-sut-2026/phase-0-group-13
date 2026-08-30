@@ -28,6 +28,9 @@ import view.gdx.core.PvzGdxGame;
 import view.gdx.render.ArcadeRenderer;
 import view.gdx.render.LawnGeometry;
 import view.gdx.render.LawnRenderer;
+import view.gdx.ui.ButtonFeel;
+import view.gdx.ui.CurrencyHud;
+import view.gdx.ui.DebugPanel;
 import view.gdx.ui.Popup;
 import view.gdx.ui.Toast;
 import view.gdx.ui.UiSkinProvider;
@@ -166,7 +169,8 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     Table header = new Table();
     header.add(new Label(title(), skin, UiSkinProvider.LABEL_BIG)).left().padRight(24f);
     status = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
-    header.add(status).left().expandX();
+    header.add(status).left().expandX().padRight(16f);
+    header.add(new CurrencyHud(skin)).right().padRight(16f);
     if (canPause()) {
       header.add(barButton("Pause", this::togglePause)).width(120f).height(44f).padRight(6f);
     }
@@ -177,10 +181,19 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     picker.left();
     root.add(picker).left().padTop(4f).padLeft(6f).row();
     buildPicker(picker, skin);
+
+    if (DebugPanel.isEnabled()) {
+      Table corner = new Table();
+      corner.setFillParent(true);
+      corner.bottom().right().pad(12f);
+      corner.add(new DebugPanel(skin, this::toast));
+      stage.addActor(corner);
+    }
   }
 
   private TextButton barButton(String label, Runnable action) {
     TextButton button = new TextButton(label, skin, UiSkinProvider.BUTTON_BROWN);
+    ButtonFeel.apply(button);
     button.addListener(new ClickListener() {
       @Override
       public void clicked(InputEvent event, float x, float y) {

@@ -54,6 +54,7 @@ public final class DebugPanel extends Table {
     add(button(skin, "+" + COINS_PER_CLICK + " Coins", COINS_PER_CLICK, "coin")).padRight(8f);
     add(button(skin, "+" + DIAMONDS_PER_CLICK + " Diamonds", DIAMONDS_PER_CLICK, "diamond"));
     if (match == null) {
+      add(unlockButton(skin)).padLeft(8f);
       return;
     }
     add(matchButton(skin, "+" + SUN_PER_CLICK + " Sun",
@@ -89,6 +90,23 @@ public final class DebugPanel extends Table {
             String result = message.get();
             matchCheats.handleinput(command);
             DebugPanel.this.notify(result);
+          }
+        });
+    return button;
+  }
+
+  /** Opens the whole adventure map, so every chapter and boss is reachable without grinding. */
+  private TextButton unlockButton(Skin skin) {
+    TextButton button = new TextButton("Unlock Chapters", skin, UiSkinProvider.BUTTON_PURPLE);
+    button.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            boolean loggedIn = UserManager.getInstance().getCurrentUser() != null;
+            cheats.handleinput("menu cheat unlock-chapters");
+            DebugPanel.this.notify(loggedIn
+                ? "All chapters and levels unlocked."
+                : "error: no user logged in");
           }
         });
     return button;

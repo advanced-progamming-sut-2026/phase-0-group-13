@@ -34,6 +34,34 @@ public final class Dialogue {
     }
   }
 
+  /** What the chapter's Zomboss is called, for the health bar over the lawn. */
+  public static String zombossTitle(String seasonName) {
+    switch (key(seasonName)) {
+      case "egypt":
+        return "Dr. Zomboss   -   Robot";
+      case "frost":
+        return "Dr. Zomboss   -   Mammoth";
+      case "beach":
+        return "Dr. Zomboss   -   Octopus";
+      default:
+        return "Dr. Zomboss   -   Dragon";
+    }
+  }
+
+  /** Penny's warning on the way into a boss stage. */
+  public static String bossWarning(String seasonName) {
+    switch (key(seasonName)) {
+      case "egypt":
+        return "His robot fires missiles and charges the lanes it stands in. Keep planting.";
+      case "frost":
+        return "The mammoth freezes whole rows and whole columns. Fire plants are your friend.";
+      case "beach":
+        return "He sends octopuses for your plants and sucks two rows into his mouth. Spread out.";
+      default:
+        return "The dragon burns rows to the ground and drops imps in the flames. Stay spread out.";
+    }
+  }
+
   /** What Crazy Dave says once the season's Zomboss is down. */
   public static String afterZomboss(String seasonName) {
     switch (key(seasonName)) {
