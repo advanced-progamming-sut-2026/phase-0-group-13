@@ -12,6 +12,10 @@ public interface SpecialStageRule {
   }
 
   default boolean restrictsSelection() { return false; }
+
+  // نوار نقالهٔ این مرحله، یا null. مرحلهٔ باس هم نوار دارد، پس صداکننده‌ها به‌جای instanceof
+  // این را می‌پرسند
+  default ConveyorRule belt() { return null; }
   // پیش‌فرض: شرط باخت اضافه‌ای نداره (شرط عادی بازی خودش جدا چک میشه)
   default boolean checkLoseCondition(Board board) {
     return false;

@@ -1,5 +1,6 @@
 package model.game;
 
+import java.util.ArrayList;
 import java.util.List;
 import model.game.zombie.Zombie;
 
@@ -22,23 +23,37 @@ public class Lawnmower {
     }
   }
 
-  public void move(List<Zombie> zombies) {
-    if (isTriggered && isActive) {
-      this.x += 0.25; // سرعت حرکت چمن‌زن در هر تیک
+  /** Rolls one tick and returns whatever it ran over, so the board can credit the kills. */
+  public List<Zombie> move(List<Zombie> zombies) {
+    if (!isTriggered || !isActive) {
+      return List.of();
+    }
+    this.x += 0.25; // سرعت حرکت چمن‌زن در هر تیک
 
-      // نابود کردن زامبی‌های در مسیر خط افقی ردیف
-      for (Zombie zombie : zombies) {
-        if (zombie.getRow() == this.row && Math.abs(zombie.getX() - this.x) < 0.8) {
-          zombie.takeDamage(10000, true); // یچی میدم بده مثل بمب صدا
-        }
+    List<Zombie> crushed = new ArrayList<>();
+    // نابود کردن زامبی‌های در مسیر خط افقی ردیف
+    for (Zombie zombie : zombies) {
+      if (zombie.isBoss()) {
+        continue; // a mower rolls straight under the robot
       }
-
-      // خروج از میدان نبرد
-      if (this.x > 10.0) {
-        this.isActive = false;
-        this.isTriggered = false;
+      if (zombie.occupiesRow(this.row) && !zombie.isDead()
+              && Math.abs(zombie.getX() - this.x) < 0.8) {
+        zombie.takeDamage(10000, true); // یچی میدم بده مثل بمب صدا
+        crushed.add(zombie);
       }
     }
+
+    // خروج از میدان نبرد
+    if (this.x > 10.0) {
+      this.isActive = false;
+      this.isTriggered = false;
+    }
+    return crushed;
+  }
+
+  /** Still parked at the left, so this row is still protected. */
+  public boolean isAvailable() {
+    return isActive && !isTriggered;
   }
 
   public int getRow() {

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import model.core.GameManager;
 import model.game.Board;
 import model.game.Lawnmower;
+import model.game.TileEffects.FireEffect;
 import model.game.TileEffects.IceTrailEffect;
 import model.game.TileEffects.TileEffect;
 import model.game.TileEffects.TombStoneEffect;
@@ -34,6 +35,7 @@ public final class LawnRenderer implements WorldRenderer {
   private final Color frozenTile = new Color(0.75f, 0.93f, 1f, 0.55f);
   private final Color slipTile = new Color(0.6f, 0.88f, 1f, 0.3f);
   private final Color slipArrow = new Color(0.15f, 0.45f, 0.7f, 0.85f);
+  private final Color burningTile = new Color(0.95f, 0.42f, 0.12f, 0.5f);
   private final Color mowerReady = new Color(0.75f, 0.75f, 0.78f, 0.95f);
   private final Color mowerUsed = new Color(0.35f, 0.35f, 0.35f, 0.6f);
 
@@ -228,7 +230,7 @@ public final class LawnRenderer implements WorldRenderer {
    */
   private void watchMowers(Board board) {
     for (Lawnmower mower : board.getLawnmowers()) {
-      graveHits.observeCount(mower, mower.isActive() ? 1 : 0, MOWER_SPARK,
+      graveHits.observeCount(mower, mower.isAvailable() ? 1 : 0, MOWER_SPARK,
           mower.getX(), mower.getRow());
     }
   }
@@ -309,7 +311,7 @@ public final class LawnRenderer implements WorldRenderer {
     }
     float scale = geometry.getCellHeight() * MOWER_HEIGHT_FRACTION / reference;
     for (Lawnmower mower : board.getLawnmowers()) {
-      String clip = mower.isActive() ? idle : fired;
+      String clip = mower.isAvailable() ? idle : fired;
       context.getBatch().setColor(1f, 1f, 1f, mower.isActive() ? 1f : 0.35f);
       rig.draw(context.getBatch(), clip, playback.advance(mower, clip, frameDelta),
           geometry.columnCentreX(mower.getX()),
@@ -399,6 +401,13 @@ public final class LawnRenderer implements WorldRenderer {
     TileEffect effect = board.getTile(row, col).getEffect();
     if (effect instanceof IceTrailEffect ice && ice.isActive()) {
       drawIceTile(shapes, ice, row, col);
+      return;
+    }
+    if (effect instanceof FireEffect fire && fire.isActive()) {
+      // Nothing grows here while it burns, so it has to read as clearly as the ice does.
+      shapes.setColor(burningTile);
+      shapes.rect(geometry.columnToX(col) + 1f, geometry.rowToY(row) + 1f,
+          geometry.getCellWidth() - 2f, geometry.getCellHeight() - 2f);
       return;
     }
     if (hasGraveArt()) {

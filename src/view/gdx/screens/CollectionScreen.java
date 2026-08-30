@@ -253,7 +253,7 @@ public final class CollectionScreen extends MenuScreen {
     // SeedCard draws its own placeholder when the art is null, which is what an unseen zombie gets.
     // no withCost: a zombie has no sun price
     SeedCard card = new SeedCard(skin, SeedCard.Size.FULL, template.getName(),
-            seen ? template.getName() : "???", seen ? zombieArt.find(template.getName()) : null,
+            seen ? template.getDisplayName() : "???", seen ? zombieArt.find(template.getName()) : null,
             hudArt, this::select);
     card.setStatus(seen ? "seen" : "not encountered");
     card.setEnabled(seen);
@@ -367,7 +367,7 @@ public final class CollectionScreen extends MenuScreen {
       return;
     }
 
-    details.add(new Label(template.getName(), skin, UiSkinProvider.LABEL_BIG))
+    details.add(new Label(template.getDisplayName(), skin, UiSkinProvider.LABEL_BIG))
         .left()
         .padBottom(8f)
         .row();

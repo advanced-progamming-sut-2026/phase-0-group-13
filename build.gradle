@@ -96,6 +96,14 @@ tasks.register('runGdx', JavaExec) {
     }
 }
 
+// نسخه ترمینالی فاز ۱
+tasks.register('runTerminal', JavaExec) {
+    group = 'application'
+    description = 'Runs the Phase 1 terminal version.'
+    mainClass = 'Main'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
 // سرور فاز ۳. پورت پیش‌فرض ۷۰۷۰ است: ./gradlew runServer -Pport=7070
 tasks.register('runServer', JavaExec) {
     group = 'application'

@@ -19,9 +19,9 @@ public class CollectionMenuController implements BaseController {
 
   private static final String ZOMBIE_PREFIX = "zombie_";
   public static final int PURCHASE_COST_COINS = 2000;
-  public static final int UPGRADE_COIN_COST = 500;
-  public static final int UPGRADE_SEED_COST = 10;
-  public static final int MAX_PLANT_LEVEL = 4;
+  public static final int UPGRADE_COIN_COST = User.UPGRADE_COIN_COST;
+  public static final int UPGRADE_SEED_COST = User.UPGRADE_SEED_COST;
+  public static final int MAX_PLANT_LEVEL = User.MAX_PLANT_LEVEL;
 
   @Override
   public void initController() {}
@@ -107,7 +107,7 @@ public class CollectionMenuController implements BaseController {
     System.out.println("--- Zombies You've Seen ---");
     for (String rawName : user.getUnlockedZombies()) {
       ZombieTemplate template = findZombieTemplate(stripZombiePrefix(rawName));
-      System.out.println("  " + (template != null ? template.getName() : stripZombiePrefix(rawName)));
+      System.out.println("  " + (template != null ? template.getDisplayName() : stripZombiePrefix(rawName)));
     }
   }
 
@@ -123,7 +123,7 @@ public class CollectionMenuController implements BaseController {
     for (ZombieTemplate template : all) {
       boolean seen = user != null && user.getUnlockedZombies().contains(zombieKey(template.getName()));
       if (seen) {
-        System.out.println("  " + template.getName() + " - seen");
+        System.out.println("  " + template.getDisplayName() + " - seen");
       } else {
         System.out.println("  ??? - not yet encountered");
       }
@@ -166,7 +166,7 @@ public class CollectionMenuController implements BaseController {
       return;
     }
 
-    System.out.println("Name: " + template.getName());
+    System.out.println("Name: " + template.getDisplayName());
     System.out.println("Type: " + ZombieTypeResolver.resolve(template));
     System.out.println("Health: " + template.getBaseHp());
     System.out.println("Speed: " + template.getBaseSpeed());
@@ -178,52 +178,17 @@ public class CollectionMenuController implements BaseController {
     User user = requireUser();
     if (user == null) return;
 
-    if (!user.hasUnlockedPlant(plantName)) {
-      System.out.println("error: you haven't unlocked " + plantName + " yet");
-      return;
-    }
-
     PlantTemplate template = findPlantTemplate(plantName);
     String canonicalName =
             template != null ? template.name.toLowerCase() : plantName.toLowerCase().trim();
 
-    int currentLevel = user.getPlantLevel(canonicalName);
-    if (currentLevel >= MAX_PLANT_LEVEL) {
-      System.out.println("error: " + plantName + " is already at the maximum level");
+    Result result = user.upgradePlant(canonicalName);
+    System.out.println(result.message());
+    if (!result.success()) {
       return;
     }
-
-    String seedKey = "seed_" + canonicalName;
-    int seedCost = UPGRADE_SEED_COST * currentLevel;
-    int coinCost = UPGRADE_COIN_COST * currentLevel;
-
-    if (!hasSufficientUpgradeResources(user, plantName, seedKey, seedCost, coinCost)) {
-      return;
-    }
-
-    user.getInventory().consumeItem(seedKey, seedCost);
-    user.addCoins(-coinCost);
-
-    int newLevel = currentLevel + 1;
-    user.setPlantLevel(canonicalName, newLevel);
-
-    System.out.println(plantName + " upgraded to level " + newLevel + "!");
-    printLevelAbility(template, newLevel);
+    printLevelAbility(template, user.getPlantLevel(canonicalName));
     saveState();
-  }
-
-  private boolean hasSufficientUpgradeResources(
-          User user, String plantName, String seedKey, int seedCost, int coinCost) {
-    if (user.getInventory().getItemCount(seedKey) < seedCost) {
-      System.out.println(
-              "error: not enough seed packets for " + plantName + " (need " + seedCost + ")");
-      return false;
-    }
-    if (user.getCoins() < coinCost) {
-      System.out.println("error: not enough coins (need " + coinCost + ")");
-      return false;
-    }
-    return true;
   }
 
   private void printLevelAbility(PlantTemplate template, int level) {
@@ -308,9 +273,22 @@ public class CollectionMenuController implements BaseController {
   }
 
   private ZombieTemplate findZombieTemplate(String name) {
-    return GameDataManager.zombieRepository != null
-            ? GameDataManager.zombieRepository.find(name.trim())
-            : null;
+    if (GameDataManager.zombieRepository == null) {
+      return null;
+    }
+    String wanted = name.trim();
+    ZombieTemplate byAlias = GameDataManager.zombieRepository.find(wanted);
+    if (byAlias != null) {
+      return byAlias;
+    }
+    // players type what the almanac shows them, not the raw alias
+    for (ZombieTemplate template : GameDataManager.zombieRepository.getAll()) {
+      String display = template.getDisplayName();
+      if (display != null && display.equalsIgnoreCase(wanted)) {
+        return template;
+      }
+    }
+    return null;
   }
 
   private String zombieKey(String templateName) {

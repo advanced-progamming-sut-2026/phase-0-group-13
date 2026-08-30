@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import view.gdx.audio.GameAudio;
 import view.gdx.core.GdxConfig;
 import view.gdx.core.PvzGdxGame;
+import view.gdx.ui.ButtonFeel;
 import view.gdx.ui.CurrencyHud;
 import view.gdx.ui.DebugPanel;
 import view.gdx.ui.LayeredDrawable;
@@ -169,10 +170,11 @@ public abstract class MenuScreen extends BaseScreen {
 
     if (DebugPanel.isEnabled()) {
       // Floats over the corner instead of taking a row - it can be toggled on any screen now,
-      // and the taller ones have no spare height to give it.
+      // and the taller ones have no spare height to give it. Bottom left, because the footer
+      // buttons sit centre-right and the panel used to cover Start.
       Table corner = new Table();
       corner.setFillParent(true);
-      corner.bottom().right().pad(12f);
+      corner.bottom().left().pad(12f);
       corner.add(new DebugPanel(skin, this::toast));
       stage.addActor(corner);
     }
@@ -282,6 +284,7 @@ public abstract class MenuScreen extends BaseScreen {
 
   protected TextButton button(String text, String style, Runnable action) {
     TextButton button = new TextButton(text, skin, style);
+    ButtonFeel.apply(button);
     button.addListener(
         new ClickListener() {
           @Override

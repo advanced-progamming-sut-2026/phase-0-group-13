@@ -21,7 +21,6 @@ import model.game.zombie.Zombie;
 import model.game.zombie.ZombieParts.Armor;
 import model.game.zombie.behavior.JesterZombieAction;
 import model.game.zombie.behavior.KingAuraZombieAction;
-import model.game.zombie.behavior.ZombossAction;
 import view.gdx.animation.AnimationLibrary;
 import view.gdx.animation.AnimationStates;
 import view.gdx.animation.EntityAnimation;
@@ -239,11 +238,44 @@ public final class EntityRenderer implements WorldRenderer {
     }
     for (Zombie zombie : board.getZombies()) {
       if (!zombie.isDead()) {
-        drawShadow(context, shadow, onBoard(zombie.getX()), zombie.getRow(),
+        drawShadow(context, shadow, onBoard(zombie.getX()), footRow(zombie),
             ZOMBIE_SHADOW_WIDTH_LANES, ZOMBIE_FOOT_INSET);
       }
     }
     context.getBatch().setColor(Color.WHITE);
+  }
+
+  private void drawPlant(RenderContext context, Plant plant, TextureRegion sheep, float delta) {
+    // A Wizard's curse turns the plant into a harmless sheep until the wizard dies, so the
+    // board has to show a sheep, not a plant that has quietly stopped shooting.
+    boolean cursed = plant.isCursed() && sheep != null;
+    context.getBatch().setColor(flashed(plantTint(plant), plant));
+    if (!cursed && drawPlantAnimation(context, plant, delta)) {
+      return;
+    }
+    TextureRegion art = cursed ? sheep : plantArt.find(plant.getName());
+    if (art == null) {
+      return;
+    }
+    // the fleece is one effect frame, not a seed packet, so it is sized to the tile directly
+    float scale = cursed
+        ? geometry.getCellHeight() * PLANT_ROW_FILL / art.getRegionHeight()
+        : scaleFor(art, PLANT_REFERENCE_HEIGHT, PLANT_ROW_FILL);
+    drawStanding(context, art, plant.getCol(), plant.getRow(), scale,
+        PLANT_FOOT_INSET + idleBobFraction(plant));
+  }
+
+  private void drawZombie(RenderContext context, Zombie zombie, float delta) {
+    drawKingAura(context, zombie);
+    context.getBatch().setColor(flashed(zombieTint(zombie), zombie));
+    if (drawZombieAnimation(context, zombie, delta)) {
+      return;
+    }
+    TextureRegion art = zombieArt.find(zombie.getName());
+    if (art != null) {
+      drawStanding(context, art, onBoard(zombie.getX()), footRow(zombie),
+          zombieScale(zombie, art), ZOMBIE_FOOT_INSET, spinAngle(zombie));
+    }
   }
 
   /** One shadow, centred on the foot line the sprite above it stands on. */
@@ -294,48 +326,30 @@ public final class EntityRenderer implements WorldRenderer {
     context.getBatch().begin();
     drawGroundShadows(context, board);
     TextureRegion sheep = hudArt.find("sheep");
-    for (Plant plant : board.getPlants()) {
-      // A Wizard's curse turns the plant into a harmless sheep until the wizard dies, so the
-      // board has to show a sheep, not a plant that has quietly stopped shooting.
-      boolean cursed = plant.isCursed() && sheep != null;
-      context.getBatch().setColor(flashed(plantTint(plant), plant));
-      if (!cursed && drawPlantAnimation(context, plant, delta)) {
-        continue;
+    // Back to front: a lower row is nearer the camera, so it is drawn last and overlaps the row
+    // above it. Within a row the zombies come after the plants, so one eating a plant stands in
+    // front of it.
+    for (int row = 0; row < board.getRows(); row++) {
+      for (Plant plant : board.getPlants()) {
+        if (plant.getRow() == row) {
+          drawPlant(context, plant, sheep, delta);
+        }
       }
-      TextureRegion art = cursed ? sheep : plantArt.find(plant.getName());
-      if (art == null) {
-        continue;
+      // Its own pass over the row, so an octopus is never hidden under the neighbour drawn next.
+      context.getBatch().setColor(Color.WHITE);
+      for (Plant plant : board.getPlants()) {
+        if (plant.getRow() == row) {
+          drawOctopusHold(context, plant);
+        }
       }
-      // the fleece is one effect frame, not a seed packet, so it is sized to the tile directly
-      float scale = cursed
-          ? geometry.getCellHeight() * PLANT_ROW_FILL / art.getRegionHeight()
-          : scaleFor(art, PLANT_REFERENCE_HEIGHT, PLANT_ROW_FILL);
-      drawStanding(context, art, plant.getCol(), plant.getRow(), scale,
-          PLANT_FOOT_INSET + idleBobFraction(plant));
+      context.getBatch().setColor(Color.WHITE);
+      for (Zombie zombie : board.getZombies()) {
+        if (footRow(zombie) == row && !zombie.isDead()) {
+          drawZombie(context, zombie, delta);
+        }
+      }
+      context.getBatch().setColor(Color.WHITE);
     }
-    // After the plants and in its own pass, so an octopus is never hidden under the neighbour
-    // drawn next. Animated plants take the `continue` above and would otherwise be skipped.
-    context.getBatch().setColor(Color.WHITE);
-    for (Plant plant : board.getPlants()) {
-      drawOctopusHold(context, plant);
-    }
-    context.getBatch().setColor(Color.WHITE);
-    for (Zombie zombie : board.getZombies()) {
-      if (zombie.isDead()) {
-        continue;
-      }
-      drawKingAura(context, zombie);
-      context.getBatch().setColor(flashed(zombieTint(zombie), zombie));
-      if (drawZombieAnimation(context, zombie, delta)) {
-        continue;
-      }
-      TextureRegion art = zombieArt.find(zombie.getName());
-      if (art != null) {
-        drawStanding(context, art, onBoard(zombie.getX()), zombie.getRow(),
-            zombieScale(zombie, art), ZOMBIE_FOOT_INSET, spinAngle(zombie));
-      }
-    }
-    context.getBatch().setColor(Color.WHITE);
     drawProjectiles(context, board);
     TextureRegion sun = hudArt.find("sun");
     if (sun != null) {
@@ -516,13 +530,13 @@ public final class EntityRenderer implements WorldRenderer {
     hits.forgetCounts(entity -> entity instanceof Zombie zombie && zombie.isDead());
     seenABoard = true;
     for (Zombie zombie : board.getZombies()) {
-      hits.observeZombieState(zombie, zombie.isDead(), zombie.getX(), zombie.getRow());
+      hits.observeZombieState(zombie, zombie.isDead(), zombie.getX(), footRow(zombie));
       if (!zombie.isDead()) {
         hits.observe(zombie, zombie.getCurrentHealth());
         // Armour is a count that goes down. Nothing announces a piece breaking, so this watches
         // for it: the piece simply stopped being drawn, which on its own reads as a glitch.
         hits.observeCount(zombie, intactArmour(zombie), SPARK_ARMOUR,
-            onBoard(zombie.getX()), zombie.getRow());
+            onBoard(zombie.getX()), footRow(zombie));
       }
     }
     for (Projectile projectile : board.getProjectiles()) {
@@ -715,7 +729,7 @@ public final class EntityRenderer implements WorldRenderer {
     animation.draw(context.getBatch(), clip,
         playback.advance(zombie, clip, delta * animationRate(zombie)),
         geometry.columnCentreX(onBoard(zombie.getX())),
-        geometry.rowToY(zombie.getRow()) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET,
+        geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET,
         zombieAnimationScale(zombie, animation, clip), zombie.isHypnotized(),
         armourVisibility(animation, zombie));
     return true;
@@ -841,7 +855,17 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   private static boolean isBoss(Zombie zombie) {
-    return zombie.getBehavior() instanceof ZombossAction;
+    return zombie.isBoss();
+  }
+
+  /**
+   * The lane a zombie's feet are in.
+   *
+   * <p>Zomboss stands in two, and the sprite is drawn upwards from its foot line, so it has to
+   * stand on the lower of them for the robot to cover both lanes rather than the lane above it.
+   */
+  private static int footRow(Zombie zombie) {
+    return zombie.getBottomRow();
   }
 
   /** Walkers share one reference height so a gargantuar stays bigger; Zomboss is its own size. */
@@ -1042,7 +1066,7 @@ public final class EntityRenderer implements WorldRenderer {
       if (!zombie.isDead() && zombieArt.find(zombie.getName()) == null
           && zombieAnimation(zombie) == null) {
         shapes.rect(geometry.columnCentreX(onBoard(zombie.getX())) - geometry.getCellWidth() * 0.25f,
-            geometry.rowToY(zombie.getRow()) + geometry.getCellHeight() * 0.1f,
+            geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * 0.1f,
             geometry.getCellWidth() * 0.5f, geometry.getCellHeight() * 0.7f);
       }
     }
@@ -1130,7 +1154,7 @@ public final class EntityRenderer implements WorldRenderer {
     // the chapter ends when this one dies, so its bar has to be readable from across the lawn
     float width = geometry.getCellHeight() * (isBoss(zombie) ? 2.1f : 0.62f);
     float x = geometry.columnCentreX(onBoard(zombie.getX())) - width / 2f;
-    float y = geometry.rowToY(zombie.getRow()) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
+    float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
         + spriteHeight + 4f;
     // a tall zombie in the top lane would otherwise wear its bar up in the seed cards
     y = Math.min(y, geometry.rowToY(0) + geometry.getCellHeight() - 7f);

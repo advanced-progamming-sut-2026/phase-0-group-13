@@ -24,6 +24,7 @@ import java.util.function.ToIntFunction;
 
 import model.core.GameManager;
 import model.game.minigame.ConveyorRule;
+import model.game.zombie.behavior.ZombossHealth;
 import view.gdx.core.GdxConfig;
 import model.game.plant.PlantParts.PlantTemplate;
 import view.gdx.core.GdxConfig;
@@ -82,6 +83,7 @@ public final class HudStage implements Disposable {
 
   private Table waveSlot;
   private WaveBar waveBar;
+  private BossBar bossBar;
   private Table seedBar;
   private Table extras;
   private Table footer;
@@ -172,6 +174,23 @@ public final class HudStage implements Disposable {
   public void updateWave(int currentWaveIndex) {
     if (waveBar != null) {
       waveBar.update(currentWaveIndex);
+    }
+  }
+
+  /** داک: در مرحلهٔ باس، به‌جای نوار موج‌ها نوار جانِ سه‌تکهٔ زامباس نشان داده می‌شود. */
+  public void buildBossBar(String bossName) {
+    if (waveSlot == null || skin == null) {
+      return;
+    }
+    waveBar = null;
+    bossBar = new BossBar(skin, bossName);
+    waveSlot.clear();
+    waveSlot.add(bossBar);
+  }
+
+  public void updateBoss(ZombossHealth health, int currentHealth, boolean stunned) {
+    if (bossBar != null) {
+      bossBar.update(health, currentHealth, stunned);
     }
   }
 
@@ -274,6 +293,7 @@ public final class HudStage implements Disposable {
 
   private TextButton exitButton(Skin skin, Runnable onExit) {
     TextButton button = new TextButton("Menu", skin, UiSkinProvider.BUTTON_BROWN);
+    ButtonFeel.apply(button);
     button.addListener(
         new ClickListener() {
           @Override

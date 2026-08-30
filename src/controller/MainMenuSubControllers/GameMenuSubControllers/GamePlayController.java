@@ -204,7 +204,9 @@ public class GamePlayController implements BaseController {
         System.out.printf("%s imitates %s!%n", type, buildType);
       }
       activateBoostIfAny(plant, buildType);
-      if (gm.getSpecialStageRule() instanceof model.game.minigame.ConveyorRule c) c.consumeReadyPlant();
+      if (gm.getSpecialStageRule() != null && gm.getSpecialStageRule().belt() != null) {
+        gm.getSpecialStageRule().belt().consumeReadyPlant();
+      }
     } else {
       System.out.println("error: cannot plant there (tile occupied or not enough sun)");
     }
@@ -307,6 +309,11 @@ public class GamePlayController implements BaseController {
       System.out.println("No plants selected for this match.");
       return;
     }
+    // On a belt stage only the plant on the belt can go down, so say which one that is.
+    if (gm.getSpecialStageRule() != null && gm.getSpecialStageRule().belt() != null) {
+      String offer = gm.getSpecialStageRule().belt().peekReadyPlant();
+      System.out.println("  Conveyor belt is offering: " + (offer == null ? "nothing yet" : offer));
+    }
     for (String name : deck) {
       PlantTemplate template = GameDataManager.plantRepository.find(name);
       if (template == null) {
@@ -366,7 +373,7 @@ public class GamePlayController implements BaseController {
       return;
     }
     for (Zombie z : zombies) {
-      System.out.printf("%s (%s):%n", z.getName(), view.BoardRenderer.typeOf(z));
+      System.out.printf("%s:%n", z.getDisplayName());
       System.out.printf("  position: %.1f, %d%n", z.getX() + 1, z.getRow() + 1);
       System.out.printf("  health: %d/%d   (body damage taken: %d)%n",
               z.getCurrentHealth(), z.getMaxHealth(), z.getBodyDamageTaken());

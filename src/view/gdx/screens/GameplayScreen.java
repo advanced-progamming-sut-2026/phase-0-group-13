@@ -110,7 +110,12 @@ public final class GameplayScreen extends BaseScreen {
 
     hud = new HudStage();
     hud.build(game.getUiSkin(), this::leave, match);
-    hud.buildWaveBar(match == null ? 1 : match.getTotalWaves());
+    // A boss stage shows Zomboss's health where every other stage shows the wave meter.
+    if (bossRule() != null) {
+      hud.buildBossBar(Dialogue.zombossTitle(seasonName()));
+    } else {
+      hud.buildWaveBar(match == null ? 1 : match.getTotalWaves());
+    }
 
     // refusals go to the HUD toast, not a console the player never sees
     actions = new GdxGameActions(match, this::leave, hud::toast);
@@ -128,9 +133,20 @@ public final class GameplayScreen extends BaseScreen {
     showBriefing();
   }
 
+  /** Boss stages run on the belt too, so this asks the rule for one rather than checking its type. */
+  private ConveyorRule belt() {
+    return match == null || match.getSpecialStageRule() == null
+        ? null : match.getSpecialStageRule().belt();
+  }
+
+  private BossStageRule bossRule() {
+    return match != null && match.getSpecialStageRule() instanceof BossStageRule boss ? boss : null;
+  }
+
   /** The belt hands out its own plants, so on a conveyor stage it stands in for the seed bank. */
   private void buildBar() {
-    if (match != null && match.getSpecialStageRule() instanceof ConveyorRule belt) {
+    ConveyorRule belt = belt();
+    if (belt != null) {
       hud.buildConveyorBar(belt, input::setSelectedPlantType, input::toggleShovel,
           input::togglePlantFood, this::togglePause);
       return;
@@ -291,6 +307,19 @@ public final class GameplayScreen extends BaseScreen {
     return match == null || match.getSeason() == null ? "" : match.getSeason().getName();
   }
 
+  /** The boss's health, or nothing at all until it rolls on. */
+  private void updateBossBar() {
+    BossStageRule boss = bossRule();
+    if (boss == null) {
+      return;
+    }
+    Zombie zomboss = boss.getBoss();
+    if (zomboss == null) {
+      return;
+    }
+    hud.updateBoss(boss.getBossHealth(), zomboss.getCurrentHealth(), boss.isBossStunned());
+  }
+
   private String briefingText() {
     StringBuilder text = new StringBuilder();
     if (isBonus()) {
@@ -307,6 +336,12 @@ public final class GameplayScreen extends BaseScreen {
       text.append("No sun will fall from the sky -- grow your own.\n");
     }
     SpecialStageRule rule = match.getSpecialStageRule();
+    if (rule instanceof BossStageRule) {
+      text.append("Boss stage: the belt feeds you plants, there is no seed bank.\n")
+          .append(Dialogue.bossWarning(seasonName())).append('\n')
+          .append("Break all three of his health segments to take the chapter.");
+      return text.toString();
+    }
     if (rule != null) {
       text.append(rule.getClass().getSimpleName()).append(" is active this level.\n");
     }
@@ -348,6 +383,7 @@ public final class GameplayScreen extends BaseScreen {
     listenForBites();
     updateStatus();
     hud.updateWave(match == null ? 0 : match.getCurrentWaveIndex());
+    updateBossBar();
     hud.updateConveyor();
     hud.updateSeeds(match, input.getSelectedPlantType(), GameplayScreen::plantLevel);
     hud.updateTools(input.getTool() == GameplayInputHandler.Tool.SHOVEL,
@@ -461,6 +497,15 @@ public final class GameplayScreen extends BaseScreen {
     }
     if (rule instanceof SaveOurSeedsRule) {
       return "keep every highlighted plant alive";
+    }
+    if (rule instanceof BossStageRule boss) {
+      Zombie zomboss = boss.getBoss();
+      if (zomboss == null) {
+        return "the belt is your seed bank   -   Dr. Zomboss is on his way";
+      }
+      return "break all three of his health segments   -   "
+          + boss.getBossHealth().segmentsLeft(zomboss.getCurrentHealth()) + " left"
+          + (boss.isBossStunned() ? "   -   he is stunned, hit him now!" : "");
     }
     if (rule instanceof ConveyorRule) {
       return "plant whatever the belt gives you";

@@ -12,6 +12,7 @@ import model.game.zombie.behavior.ZombieAction;
 
 public class Zombie {
   private final String name;
+  private String displayName;
   private int currentHealth;
   private final int maxHealth;
   private final double speed;
@@ -31,6 +32,8 @@ public class Zombie {
   private boolean lootDropped;
   private boolean hypnotized;
   private boolean submerged;
+  private int rowSpan = 1;
+  private boolean boss;
 
   public Zombie(String name, int health, double speed, int row, double startX, ZombieAction behavior) {
     this.name = name;
@@ -145,8 +148,38 @@ public class Zombie {
   public double getY() { return y; }
   public int getRow() { return row; }
   public void setRow(int row) { this.row = row; }
+
+  /** How many lanes it stands in. Only Zomboss is wider than one. */
+  public int getRowSpan() { return rowSpan; }
+
+  public void setRowSpan(int rowSpan) { this.rowSpan = Math.max(1, rowSpan); }
+
+  /** آخرین ردیفی که اشغال کرده (برای زامبی معمولی همان getRow است). */
+  public int getBottomRow() { return row + rowSpan - 1; }
+
+  /**
+   * Whether a lane is one this zombie can be hit in. A Zomboss spans two, so plants in either of
+   * them can shoot it; everything else keeps the exact row match it had before.
+   */
+  public boolean occupiesRow(double lane) {
+    if (rowSpan <= 1) {
+      return row == lane;
+    }
+    return lane >= row && lane <= getBottomRow();
+  }
+
+  /** Dr. Zomboss. Mowers cannot touch it and the HUD shows its health instead of the wave meter. */
+  public boolean isBoss() { return boss; }
+
+  public void setBoss(boolean boss) { this.boss = boss; }
   public ZombieAction getBehavior() { return behavior; }
   public String getName() { return name; }
+
+  /** Player-facing name; falls back to the raw alias if nobody set one. */
+  public String getDisplayName() { return displayName == null ? name : displayName; }
+
+  public void setDisplayName(String displayName) { this.displayName = displayName; }
+
   public int getCurrentHealth() { return currentHealth; }
   public int getMaxHealth() { return maxHealth; }
   public boolean isEating() { return isEating; }

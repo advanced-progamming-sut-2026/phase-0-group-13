@@ -53,10 +53,10 @@ public final class ArcadeRenderer implements Disposable {
    * the plain walker, so all three share one rig family: {@code ZombieTutorialDefault} carries the
    * cone, the bucket and the brick on the one skeleton, exactly as the Egypt walker does.
    *
-   * <p>Three of the engine's types are missing on purpose. Pole Vaulter, Digger and Ladder are
-   * Plants vs. Zombies 1 zombies and the library this project draws from has no art for any of
-   * them -- no folder, no packet, no image id -- so they resolve to nothing and get the
-   * no-portrait outline rather than somebody else's picture.
+   * <p>Pole Vaulter, Digger and Ladder are Plants vs. Zombies 1 zombies with no art anywhere in
+   * this library -- no folder, no packet, no image id. Phase Two allows standing another asset in,
+   * so each borrows the rig whose motion reads closest: the jester tumbles like a vaulter, the
+   * tomb raiser works the ground, and the barrel roller pushes something ahead of it.
    */
   private static final Map<String, Look> LOOKS = looks();
 
@@ -72,6 +72,11 @@ public final class ArcadeRenderer implements Disposable {
     map.put("football", new Look("ZombieModernAllStarDefault", null, "football"));
     map.put("gargantuar", new Look("ZombieTutorialGargantuar", null, "gargantuar"));
     map.put("sun-imp", new Look("ZombieTutorialImp", null, "sun-imp"));
+    map.put("pole-vaulter",
+            new Look("ZombieDarkJugglerDefault", null, "ZombieDarkJugglerDefault"));
+    map.put("digger", new Look("ZombieTombRaiserDefault", null, "ZombieTombRaiserDefault"));
+    map.put("ladder",
+            new Look("ZombieDarkBarrelRollerDefault", null, "ZombieDarkBarrelRollerDefault"));
     // What Vase Breaker and Bowling call the zombie they let out.
     map.put("zombie", new Look("ZombieTutorialDefault", null, "basic"));
     return map;
