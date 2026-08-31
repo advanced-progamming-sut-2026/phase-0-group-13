@@ -17,6 +17,11 @@ public class OctopusThrowerZombieAction implements ZombieAction {
     this.eatingDamage = eatingDamage;
   }
 
+  /** The tick of its last special action, so the renderer can hold that pose. */
+  public int getLastThrowTick() {
+    return lastThrowTick;
+  }
+
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     throwOctopus(zombie, board, currentTick);

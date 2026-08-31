@@ -84,6 +84,7 @@ public final class HitEffects {
   private final List<Spark> sparks = new ArrayList<>();
   private final Map<Object, Integer> counters = new IdentityHashMap<>();
   private int freshDeaths;
+  private int freshImpacts;
 
   private final Map<Object, Integer> seenHealth = new IdentityHashMap<>();
   private final Map<Object, double[]> seenProjectiles = new IdentityHashMap<>();
@@ -203,6 +204,13 @@ public final class HitEffects {
     return count;
   }
 
+  /** Projectiles that landed on something since the last call, for the impact sound effect. */
+  public int drainFreshImpacts() {
+    int count = freshImpacts;
+    freshImpacts = 0;
+    return count;
+  }
+
   public void endFrame(int columns) {
     health.clear();
     health.putAll(seenHealth);
@@ -217,6 +225,7 @@ public final class HitEffects {
       double column = entry.getValue()[0];
       if (column >= -LAWN_MARGIN && column <= columns - 1 + LAWN_MARGIN) {
         bursts.add(new Burst(column, (int) entry.getValue()[1], 0f));
+        freshImpacts++;
       }
     }
     projectiles.clear();
@@ -255,5 +264,6 @@ public final class HitEffects {
     sparks.clear();
     counters.clear();
     freshDeaths = 0;
+    freshImpacts = 0;
   }
 }

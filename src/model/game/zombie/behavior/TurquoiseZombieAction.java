@@ -20,6 +20,11 @@ public class TurquoiseZombieAction implements ZombieAction {
     this.stealIntervalTicks = Math.max(1, stealIntervalTicks);
   }
 
+  /** The tick of its last special action, so the renderer can hold that pose. */
+  public int getLastStealTick() {
+    return lastStealTick;
+  }
+
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     Plant victim = board.getPlantAhead(zombie.getRow(), zombie.getX(), LASER_RANGE);

@@ -23,10 +23,18 @@ public class TacklerZombieAction implements ZombieAction {
     this.slowdownAfterKill = slowdownAfterKill;
   }
 
+  private int lastTackleTick = -1;
+
+  /** The tick it last hit a plant, so the renderer can play the kick/tackle clip. */
+  public int getLastTackleTick() {
+    return lastTackleTick;
+  }
+
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
     if (targetPlant != null && !targetPlant.isDead()) {
+      lastTackleTick = currentTick;
       targetPlant.takeDamage(10000);
       System.out.printf("%s tackled through %s!%n", zombie.getName(), targetPlant.getName());
       if (selfDestructs) {

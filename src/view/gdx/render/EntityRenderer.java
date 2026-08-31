@@ -23,9 +23,14 @@ import model.game.zombie.behavior.BarrelRollerZombieAction;
 import model.game.zombie.behavior.EnrageOnArmorBreakZombieAction;
 import model.game.zombie.behavior.GargantuarAction;
 import model.game.zombie.behavior.HookPullZombieAction;
+import model.game.zombie.behavior.HunterZombieAction;
 import model.game.zombie.behavior.JesterZombieAction;
 import model.game.zombie.behavior.KingAuraZombieAction;
+import model.game.zombie.behavior.OctopusThrowerZombieAction;
 import model.game.zombie.behavior.RaHealAuraZombieAction;
+import model.game.zombie.behavior.TacklerZombieAction;
+import model.game.zombie.behavior.TombRaiserZombieAction;
+import model.game.zombie.behavior.TurquoiseZombieAction;
 import model.game.zombie.behavior.ZombossAction;
 import view.gdx.animation.AnimationLibrary;
 import view.gdx.animation.AnimationStates;
@@ -120,7 +125,8 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color shieldTint = new Color(0.6f, 0.8f, 0.98f, 1f);
   private final Color icedTint = new Color(0.55f, 0.8f, 1f, 1f);
   private final Color frostStep = new Color();
-  private final Color radioactiveSun = new Color(0.6f, 1f, 0.45f, 1f);
+  /** Purple, which is the colour the doc names for a radioactive sun; it used to be green. */
+  private final Color radioactiveSun = new Color(0.78f, 0.42f, 1f, 1f);
   // Reflected shots belong to the zombie now, so they must not read as one of your peas.
   private final Color reflectedPea = new Color(1f, 0.42f, 0.3f, 1f);
   /** The doc's polish list: a flash on damage, a warning tint near the house, a landing burst. */
@@ -148,6 +154,17 @@ public final class EntityRenderer implements WorldRenderer {
 
   public LawnGeometry getGeometry() {
     return geometry;
+  }
+
+  /**
+   * Projectiles that landed since the last call, so the screen can play the impact sound.
+   *
+   * <p>The impact is worked out here rather than in the model -- {@link HitEffects} already spots
+   * a projectile that was on the lawn last frame and is not on it now, which is the same event the
+   * splat is drawn for, so the sound and the visual can never disagree.
+   */
+  public int drainImpactCount() {
+    return hits.drainFreshImpacts();
   }
 
   @Override
@@ -754,8 +771,50 @@ public final class EntityRenderer implements WorldRenderer {
         return throwing;
       }
     }
+    // The rest of the roster's signature moves. Every one of these rigs ships a clip for the
+    // thing its behaviour does -- the All-Star's kick, the Turquoise's sun-drain, the Tomb
+    // Raiser's summon, the Hunter's throw, the Octopus thrower's toss -- and none of them were
+    // ever asked for, so the ability happened with the zombie still plainly walking.
+    String ability = abilityClip(animation, zombie);
+    if (ability != null) {
+      return ability;
+    }
     // "play" is the Pianist: his rig has no walk cycle because the piano-playing loop is how he
     return animation.pickClip("walk" + suffix, "walk", "play", "idle" + suffix, "idle");
+  }
+
+  /**
+   * The clip for a zombie that has just used its own special ability, or null.
+   *
+   * <p>Each behaviour records the tick it last acted on; the pose is held for
+   * {@link #ACTION_POSE_TICKS} after that, the same way the hook and the imp throw already are.
+   */
+  private String abilityClip(EntityAnimation animation, Zombie zombie) {
+    Object behavior = zombie.getBehavior();
+    int actedAt;
+    String[] names;
+    if (behavior instanceof TacklerZombieAction tackler) {
+      actedAt = tackler.getLastTackleTick();
+      names = new String[] {"kick", "tackle"};
+    } else if (behavior instanceof TurquoiseZombieAction turquoise) {
+      actedAt = turquoise.getLastStealTick();
+      names = new String[] {"power", "power_up"};
+    } else if (behavior instanceof TombRaiserZombieAction raiser) {
+      actedAt = raiser.getLastRaiseTick();
+      names = new String[] {"power"};
+    } else if (behavior instanceof HunterZombieAction hunter) {
+      actedAt = hunter.getLastThrowTick();
+      names = new String[] {"throw"};
+    } else if (behavior instanceof OctopusThrowerZombieAction thrower) {
+      actedAt = thrower.getLastThrowTick();
+      names = new String[] {"toss"};
+    } else {
+      return null;
+    }
+    if (actedAt < 0 || currentTick - actedAt >= ACTION_POSE_TICKS) {
+      return null;
+    }
+    return animation.pickClip(names);
   }
 
   private static String propSuffix(Zombie zombie) {

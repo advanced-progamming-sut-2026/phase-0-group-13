@@ -165,7 +165,9 @@ public final class WorldCarousel extends WidgetGroup {
 
       caption = new Label(summary, skin, UiSkinProvider.LABEL_MEDIUM_OUTLINE);
       caption.setAlignment(com.badlogic.gdx.utils.Align.center);
-      add(caption).padTop(2f);
+      // The caption carries the chapter's name on its own line above the level count.
+      caption.setWrap(true);
+      add(caption).padTop(2f).growX();
     }
 
     float aspect() {

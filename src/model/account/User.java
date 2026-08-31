@@ -138,6 +138,9 @@ public class User {
       case "stage":
         message = "New stage available: " + readableName(targetId);
         break;
+      case "quest":
+        message = "Quest completed: " + targetId;
+        break;
       default:
         message = "New item unlocked: " + targetId;
     }

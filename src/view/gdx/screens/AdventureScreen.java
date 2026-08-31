@@ -107,10 +107,12 @@ public final class AdventureScreen extends MenuScreen {
 
           @Override
           public String summary(int stage) {
+            // The chapter's own name leads, so a card says which world it is and not only how far
+            // through it the player is; the doc asks for the name alongside the level count.
             if (!isUnlocked(user, stage)) {
-              return "LOCKED";
+              return chapterName(stage) + "\nLOCKED";
             }
-            return clearedLevels(user.getProgress(), stage)
+            return chapterName(stage) + "\n" + clearedLevels(user.getProgress(), stage)
                 + " / " + AdventureMap.LEVELS_PER_STAGE + " levels";
           }
         }, new WorldCarousel.Listener() {

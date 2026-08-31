@@ -95,10 +95,14 @@ public final class NewsScreen extends MenuScreen {
     list.add(new Label(heading, skin, UiSkinProvider.LABEL_MEDIUM)).left().padBottom(10f).row();
     for (News news : items) {
       String tag = tagUnread && !news.isRead() ? "  [UNREAD]" : "";
-      list.add(new Label(
-              dateOf(news) + "  [" + news.getType() + "] " + news.getMessage() + tag, skin))
+      // Headline on its own line above the body, with the date beside it: the doc asks for a
+      // title, a date and the text of each item, and the type tag alone was standing in for one.
+      list.add(new Label(news.getTitle() + "   " + dateOf(news) + tag, skin,
+              UiSkinProvider.LABEL_MEDIUM))
           .left()
+          .padTop(6f)
           .row();
+      list.add(new Label(news.getMessage(), skin)).left().row();
     }
   }
 

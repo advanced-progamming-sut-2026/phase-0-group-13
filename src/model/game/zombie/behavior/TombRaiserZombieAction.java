@@ -24,6 +24,11 @@ public class TombRaiserZombieAction implements ZombieAction {
     this.eatingDamage = eatingDamage;
   }
 
+  /** The tick of its last special action, so the renderer can hold that pose. */
+  public int getLastRaiseTick() {
+    return lastRaiseTick;
+  }
+
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     if (lastRaiseTick == -1) {

@@ -70,6 +70,7 @@ public final class GameplayScreen extends BaseScreen {
   private boolean paused;
   private int bonusScore;
   private int zombiesEating;
+  private int projectilesFlying;
   private boolean intro;
   private int lastWave;
 
@@ -127,14 +128,33 @@ public final class GameplayScreen extends BaseScreen {
   private void buildBar() {
     ConveyorRule belt = belt();
     if (belt != null) {
-      hud.buildConveyorBar(belt, input::setSelectedPlantType, input::toggleShovel,
+      hud.buildConveyorBar(belt, this::selectSeed, input::toggleShovel,
           input::togglePlantFood, this::togglePause);
       return;
     }
     List<PlantTemplate> deck = deckTemplates();
-    hud.buildSeedBar(game.getUiSkin().get(), deck, input::setSelectedPlantType,
+    hud.buildSeedBar(game.getUiSkin().get(), deck, this::selectSeed,
         input::toggleShovel, input::togglePlantFood, this::togglePause);
     input.setSeedOrder(deckNames(deck));
+  }
+
+  /**
+   * Picks a seed up, and says so when it cannot be afforded yet.
+   *
+   * <p>The card already greys itself while the sun is short, but the doc wants an actual error on
+   * the click; without one, a player clicking a dimmed card got a cursor holding a plant they were
+   * not allowed to put down and no explanation until they clicked the lawn.
+   */
+  private void selectSeed(String plantType) {
+    input.setSelectedPlantType(plantType);
+    if (plantType == null || match == null || match.isFreePlanting()) {
+      return;
+    }
+    PlantTemplate template = GameDataManager.plantRepository == null
+        ? null : GameDataManager.plantRepository.find(plantType);
+    if (template != null && match.getSunAmount() < template.cost) {
+      hud.toast("Not enough sun for " + template.name + " (needs " + template.cost + ").");
+    }
   }
 
   private void startWaves() {
@@ -347,6 +367,7 @@ public final class GameplayScreen extends BaseScreen {
     watchWaves();
     showPickups();
     listenForBites();
+    listenForShots();
     updateStatus();
     hud.updateWave(match == null ? 0 : match.getCurrentWaveIndex());
     updateBossBar();
@@ -400,6 +421,28 @@ public final class GameplayScreen extends BaseScreen {
       GameAudio.getInstance().play(GameAudio.Sfx.CHOMP);
     }
     zombiesEating = eating;
+  }
+
+  /**
+   * The shot and the hit, the two sounds the doc asks for on a projectile.
+   *
+   * <p>A shot is a projectile that was not on the board last frame; the hit comes from the
+   * renderer, which already works out that a projectile landed in order to draw the splat. Both
+   * are counted rather than tracked per projectile, since the audio layer's own repeat guard
+   * collapses a volley into one sound anyway.
+   */
+  private void listenForShots() {
+    if (match == null || match.getBoard() == null || paused || intro) {
+      return;
+    }
+    int flying = match.getBoard().getProjectiles().size();
+    if (flying > projectilesFlying) {
+      GameAudio.getInstance().play(GameAudio.Sfx.SHOOT);
+    }
+    projectilesFlying = flying;
+    if (entityRenderer != null && entityRenderer.drainImpactCount() > 0) {
+      GameAudio.getInstance().play(GameAudio.Sfx.EXPLODE);
+    }
   }
 
   private void watchWaves() {
