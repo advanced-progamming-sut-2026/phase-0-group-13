@@ -22,6 +22,11 @@ public class EnrageOnArmorBreakZombieAction implements ZombieAction {
     this.enragedBiteIntervalTicks = Math.max(1, enragedBiteIntervalTicks);
   }
 
+  /** True once the armour has broken and the bite got faster. Read-only, for the renderer. */
+  public boolean isEnraged() {
+    return enraged;
+  }
+
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     if (!enraged && !zombie.hasIntactArmor()) {

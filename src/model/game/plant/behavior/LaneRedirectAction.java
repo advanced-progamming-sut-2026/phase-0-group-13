@@ -48,6 +48,7 @@ public class LaneRedirectAction implements PlantAction {
       zombie.setRow(targetRow);
       zombie.setEating(false);
       redirects++;
+      plant.setLastActionTick(currentTick);
       System.out.printf("%s pushed %s from row %d to row %d!%n",
               plant.getName(), zombie.getName(), plant.getRow() + 1, targetRow + 1);
 

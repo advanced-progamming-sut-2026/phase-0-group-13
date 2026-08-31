@@ -19,6 +19,9 @@ public class ReflectDamageAction implements PlantAction {
       Zombie attacker = board.getZombieAt(plant.getRow(), plant.getCol());
       if (attacker != null) {
         attacker.takeDamage(damageTaken, false);
+        // The rig has an attack clip for this; without marking the tick it never plays, and
+        // Endurian looks like it is just standing there while it reflects the damage back.
+        plant.setLastActionTick(currentTick);
       }
     }
     lastObservedHealth = plant.getCurrentHealth();

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.game.zombie.behavior.ZombossHealthTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-08-31T06:57:54.605Z" hostname="MacBook-Pro-4.local" time="0.002">
+  <properties/>
+  <testcase name="everyFractionStaysBetweenZeroAndOneAcrossTheWholeFight()" classname="model.game.zombie.behavior.ZombossHealthTest" time="0.0"/>
+  <testcase name="aPartlyEatenSegmentReportsHowMuchOfItIsLeft()" classname="model.game.zombie.behavior.ZombossHealthTest" time="0.0"/>
+  <testcase name="segmentsEmptyOneAtATimeInOrder()" classname="model.game.zombie.behavior.ZombossHealthTest" time="0.0"/>
+  <testcase name="theSheetsOwnStageSizesAreKept()" classname="model.game.zombie.behavior.ZombossHealthTest" time="0.0"/>
+  <testcase name="difficultyScalingRescalesTheSegmentsInsteadOfBreakingThem()" classname="model.game.zombie.behavior.ZombossHealthTest" time="0.0"/>
+  <testcase name="theSegmentsAddUpToTheHealthTheBossActuallyHas()" classname="model.game.zombie.behavior.ZombossHealthTest" time="0.0"/>
+  <testcase name="thereAreAlwaysExactlyThreeSegments()" classname="model.game.zombie.behavior.ZombossHealthTest" time="0.0"/>
+  <testcase name="aBossWithNoStagesOnItsSheetStillGetsThreeSegments()" classname="model.game.zombie.behavior.ZombossHealthTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

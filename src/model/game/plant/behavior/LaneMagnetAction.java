@@ -49,6 +49,7 @@ public class LaneMagnetAction implements PlantAction {
       zombie.setRow(plant.getRow());
       zombie.setEating(false);
       lastPullTick = currentTick;
+      plant.setLastActionTick(currentTick);
       System.out.printf("%s magnetised %s from row %d into row %d!%n",
               plant.getName(), zombie.getName(), fromRow + 1, plant.getRow() + 1);
       if (!pullAllAndHeal) {

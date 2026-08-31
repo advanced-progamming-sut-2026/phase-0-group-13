@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.game.FrozenTileThawTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-08-31T06:57:54.488Z" hostname="MacBook-Pro-4.local" time="0.007">
+  <properties/>
+  <testcase name="theTileStillFreezesAZombieThatStepsOnIt()" classname="model.game.FrozenTileThawTest" time="0.001"/>
+  <testcase name="aFrozenZombieDoesNotMoveWhileTheFreezeLasts()" classname="model.game.FrozenTileThawTest" time="0.0"/>
+  <testcase name="aSecondFrozenTileFurtherDownTheRowCatchesItAgain()" classname="model.game.FrozenTileThawTest" time="0.0"/>
+  <testcase name="theBossIsStillImmuneToFrozenTiles()" classname="model.game.FrozenTileThawTest" time="0.0"/>
+  <testcase name="theZombieThawsAndLeavesTheTile()" classname="model.game.FrozenTileThawTest" time="0.003"/>
+  <testcase name="theFreezeRunsDownInsteadOfBeingRenewedEveryTick()" classname="model.game.FrozenTileThawTest" time="0.0"/>
+  <system-out><![CDATA[New normal sun is dropping at position (6, 3)
+Sun reached the ground at position (6, 3)
+The lawn mower in the row 3 is triggered and killed these zombies:
+- basic
+The lawn mower in the row 3 is triggered and killed these zombies:
+- basic
+Zombie of type basic is dead at (1, 3).
+New normal sun is dropping at position (2, 4)
+Sun reached the ground at position (2, 4)
+New normal sun is dropping at position (8, 5)
+Sun reached the ground at position (8, 5)
+New normal sun is dropping at position (3, 1)
+Sun reached the ground at position (3, 1)
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

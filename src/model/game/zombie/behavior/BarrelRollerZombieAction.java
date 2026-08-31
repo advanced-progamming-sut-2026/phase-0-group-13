@@ -18,6 +18,11 @@ public class BarrelRollerZombieAction implements ZombieAction {
     this.eatingDamage = eatingDamage;
   }
 
+  /** True once the barrel has burst and the imps are out. Read-only, for the renderer. */
+  public boolean isBarrelBurst() {
+    return barrelBurst;
+  }
+
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     if (!barrelBurst && !zombie.hasIntactArmor()) {

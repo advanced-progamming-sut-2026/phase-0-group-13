@@ -12,10 +12,16 @@ public class GargantuarAction implements ZombieAction {
 
   private final int maxHealth;
   private boolean hasThrownImp;
+  private int throwTick = -1;
 
   public GargantuarAction(int maxHealth) {
     this.maxHealth = maxHealth;
     this.hasThrownImp = false;
+  }
+
+  /** The tick the imp was thrown on, or -1 before that happens. For the renderer's throw pose. */
+  public int getThrowTick() {
+    return throwTick;
   }
 
   @Override
@@ -35,6 +41,7 @@ public class GargantuarAction implements ZombieAction {
         System.out.println("Gargantuar threw an Imp!");
       }
       hasThrownImp = true;
+      throwTick = currentTick;
     }
 
     Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);

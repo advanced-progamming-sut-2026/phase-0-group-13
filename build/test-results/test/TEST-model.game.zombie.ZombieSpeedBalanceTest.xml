@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="model.game.zombie.ZombieSpeedBalanceTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-08-28T21:31:44.527Z" hostname="MacBook-Pro-4.local" time="0.001">
+<testsuite name="model.game.zombie.ZombieSpeedBalanceTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-08-31T06:57:54.588Z" hostname="MacBook-Pro-4.local" time="0.002">
   <properties/>
   <testcase name="everyZombieCrossesTheLawnInASaneAmountOfTime()" classname="model.game.zombie.ZombieSpeedBalanceTest" time="0.001"/>
   <testcase name="zombieFactorysTickRateAgreesWithTheGraphicalBuildsTickRate()" classname="model.game.zombie.ZombieSpeedBalanceTest" time="0.0"/>

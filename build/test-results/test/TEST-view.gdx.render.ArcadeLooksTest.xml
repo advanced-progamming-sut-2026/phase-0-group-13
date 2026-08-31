@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="view.gdx.render.ArcadeLooksTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-08-31T06:57:57.180Z" hostname="MacBook-Pro-4.local" time="0.003">
+  <properties/>
+  <testcase name="everyLookNamesAPortraitThePacketPageHas()" classname="view.gdx.render.ArcadeLooksTest" time="0.002"/>
+  <testcase name="theThreeSubstitutesResolve()" classname="view.gdx.render.ArcadeLooksTest" time="0.0"/>
+  <testcase name="everyDeployableZombieHasALook()" classname="view.gdx.render.ArcadeLooksTest" time="0.0"/>
+  <system-out><![CDATA[A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

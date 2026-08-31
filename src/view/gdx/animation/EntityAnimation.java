@@ -70,17 +70,20 @@ public final class EntityAnimation {
    * The first of these clips this entity actually has, or null if it has none of them.
    *
    * <p>Names are not consistent across rigs: Peashooter's idle is "idle", Puff-shroom's is
-   * "idle_stage1" and Doom-shroom's is "stage1_idle". An exact name wins, then the shortest one
-   * that starts with it, then the shortest one that merely contains it, so a caller asking for
-   * "idle" gets the plain loop when there is one and the plant's own variant when there is not.
+   * "idle_stage1" and Doom-shroom's is "stage1_idle". For each name in turn, an exact match wins,
+   * then the shortest clip that starts with it; only once a candidate has neither is the next one
+   * tried. That per-candidate order matters: Caulipower's rig has an exact clip named "attack" and
+   * an "idle"-prefixed family (idle1_1, idle2_1, ...) but no clip literally named "idle" -- asking
+   * "idle" before "attack" has to make the idle variant win via its prefix match, not fall through
+   * to attack's exact one, or the plant would show as permanently attacking. A last pass over every
+   * candidate by "contains" is the least specific fallback, tried only once every candidate has
+   * failed the first two.
    */
   public String pickClip(String... preferred) {
     for (String clip : preferred) {
       if (clips.containsKey(clip)) {
         return clip;
       }
-    }
-    for (String clip : preferred) {
       String prefixed = nearest(clip, true);
       if (prefixed != null) {
         return prefixed;

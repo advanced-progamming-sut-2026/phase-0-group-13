@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.game.zombie.behavior.ZombossChapterAttacksTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-08-31T06:57:54.596Z" hostname="MacBook-Pro-4.local" time="0.009">
+  <properties/>
+  <testcase name="theBeachSuctionDragsOrdinaryZombiesTowardsTheBoss()" classname="model.game.zombie.behavior.ZombossChapterAttacksTest" time="0.001"/>
+  <testcase name="egyptsMissileDestroysPlantsAndThrowsUpGraves()" classname="model.game.zombie.behavior.ZombossChapterAttacksTest" time="0.001"/>
+  <testcase name="theMammothFreezesAColumnSolid()" classname="model.game.zombie.behavior.ZombossChapterAttacksTest" time="0.0"/>
+  <testcase name="theDragonsFireballSetsTheGroundAlight()" classname="model.game.zombie.behavior.ZombossChapterAttacksTest" time="0.001"/>
+  <testcase name="theDragonIgnitesTwoWholeRowsOppositeItself()" classname="model.game.zombie.behavior.ZombossChapterAttacksTest" time="0.0"/>
+  <testcase name="theMammothNeitherChangesRowsNorSummonsAnything()" classname="model.game.zombie.behavior.ZombossChapterAttacksTest" time="0.0"/>
+  <testcase name="everyChapterLeavesTheBossHoldingTheRightHandColumns()" classname="model.game.zombie.behavior.ZombossChapterAttacksTest" time="0.001"/>
+  <testcase name="theBeachOctopusEatsPlantsOffTheLawn()" classname="model.game.zombie.behavior.ZombossChapterAttacksTest" time="0.0"/>
+  <testcase name="egyptChargesDownItsOwnTwoRowsAndClearsThem()" classname="model.game.zombie.behavior.ZombossChapterAttacksTest" time="0.001"/>
+  <testcase name="theMammothsIceWindFreezesThePlantsInTwoRows()" classname="model.game.zombie.behavior.ZombossChapterAttacksTest" time="0.002"/>
+  <system-out><![CDATA[ZombieZombossMech dropped a Octopus into row 4!
+ZombieZombossMech stomped across into rows 1 and 2.
+ZombieZombossMech dropped a Snorkel into row 5!
+ZombieZombossMech opened his maw and started dragging rows 4 and 5 in!
+ZombieZombossMech stomped across into rows 2 and 3.
+ZombieZombossMech dropped a Snorkel into row 2!
+ZombieZombossMech fired a missile at (9, 2)!
+The blast threw up a grave at (3, 1).
+The blast threw up a grave at (5, 2).
+ZombieZombossMech fired a missile at (1, 3)!
+The blast threw up a grave at (4, 1).
+ZombieZombossMech dropped a ConeHead into row 3!
+ZombieZombossMech stomped across into rows 1 and 2.
+ZombieZombossMech fired a missile at (9, 2)!
+The blast threw up a grave at (7, 3).
+The blast threw up a grave at (7, 5).
+ZombieZombossMech fired a missile at (6, 3)!
+The blast threw up a grave at (2, 5).
+The blast threw up a grave at (7, 3).
+ZombieZombossMech dropped a ConeHead into row 1!
+ZombieZombossMech is charging down rows 1 and 2!
+ZombieZombossMech jumped back to the far side of the lawn.
+ZombieZombossMech fired a missile at (5, 5)!
+The blast threw up a grave at (4, 5).
+ZombieZombossMech stomped across into rows 2 and 3.
+ZombieZombossMech fired a missile at (6, 4)!
+The blast threw up a grave at (3, 4).
+The blast threw up a grave at (3, 3).
+ZombieZombossMech dropped a Imp into row 1!
+ZombieZombossMech fired a missile at (7, 4)!
+The blast threw up a grave at (4, 1).
+The blast threw up a grave at (3, 1).
+ZombieZombossMech fired an ice missile at (7, 5)!
+ZombieZombossMech fired an ice missile at (5, 3)!
+ZombieZombossMech fired an ice missile at (2, 2)!
+ZombieZombossMech fired an ice missile at (9, 3)!
+ZombieZombossMech sent an ice wind tearing down rows 3 and 1!
+Column 6 froze solid, zombies and all.
+ZombieZombossMech fired an ice missile at (5, 3)!
+ZombieZombossMech fired an ice missile at (7, 4)!
+ZombieZombossMech fired an ice missile at (2, 1)!
+ZombieZombossMech breathed a fireball onto (4, 2)!
+A Imp Dragon clambered out of the flames at (4, 2)!
+ZombieZombossMech breathed a fireball onto (6, 5)!
+A Imp Dragon clambered out of the flames at (6, 5)!
+ZombieZombossMech dropped a Jester into row 1!
+ZombieZombossMech stomped across into rows 3 and 4.
+ZombieZombossMech breathed a fireball onto (6, 1)!
+A Imp Dragon clambered out of the flames at (6, 1)!
+ZombieZombossMech breathed a fireball onto (3, 2)!
+A Imp Dragon clambered out of the flames at (3, 2)!
+ZombieZombossMech dropped a Imp Dragon into row 5!
+ZombieZombossMech set rows 1 and 2 ablaze!
+ZombieZombossMech breathed a fireball onto (8, 5)!
+A Imp Dragon clambered out of the flames at (8, 5)!
+ZombieZombossMech stomped across into rows 4 and 5.
+ZombieZombossMech breathed a fireball onto (7, 3)!
+A Imp Dragon clambered out of the flames at (7, 3)!
+ZombieZombossMech dropped a Jester into row 2!
+ZombieZombossMech breathed a fireball onto (8, 2)!
+A Imp Dragon clambered out of the flames at (8, 2)!
+ZombieZombossMech breathed a fireball onto (5, 1)!
+A Imp Dragon clambered out of the flames at (5, 1)!
+ZombieZombossMech breathed a fireball onto (5, 4)!
+A Imp Dragon clambered out of the flames at (5, 4)!
+ZombieZombossMech dropped a Imp Dragon into row 5!
+ZombieZombossMech stomped across into rows 3 and 4.
+ZombieZombossMech breathed a fireball onto (1, 3)!
+A Imp Dragon clambered out of the flames at (1, 3)!
+ZombieZombossMech breathed a fireball onto (5, 3)!
+A Imp Dragon clambered out of the flames at (5, 3)!
+ZombieZombossMech dropped a Jester into row 2!
+ZombieZombossMech set rows 1 and 2 ablaze!
+ZombieZombossMech breathed a fireball onto (9, 2)!
+A Imp Dragon clambered out of the flames at (9, 2)!
+ZombieZombossMech stomped across into rows 4 and 5.
+ZombieZombossMech breathed a fireball onto (7, 1)!
+A Imp Dragon clambered out of the flames at (7, 1)!
+ZombieZombossMech dropped a Jester into row 2!
+ZombieZombossMech breathed a fireball onto (3, 1)!
+A Imp Dragon clambered out of the flames at (3, 1)!
+ZombieZombossMech fired an ice missile at (6, 3)!
+ZombieZombossMech fired an ice missile at (3, 1)!
+ZombieZombossMech fired an ice missile at (1, 5)!
+ZombieZombossMech fired an ice missile at (2, 5)!
+ZombieZombossMech sent an ice wind tearing down rows 2 and 4!
+Column 3 froze solid, zombies and all.
+ZombieZombossMech fired an ice missile at (8, 1)!
+ZombieZombossMech fired an ice missile at (9, 4)!
+ZombieZombossMech fired an ice missile at (9, 1)!
+ZombieZombossMech fired a missile at (6, 2)!
+The blast threw up a grave at (3, 5).
+The blast threw up a grave at (5, 1).
+ZombieZombossMech fired a missile at (8, 2)!
+The blast threw up a grave at (3, 3).
+The blast threw up a grave at (7, 5).
+ZombieZombossMech dropped a Imp into row 1!
+ZombieZombossMech stomped across into rows 1 and 2.
+ZombieZombossMech fired a missile at (9, 1)!
+The blast threw up a grave at (2, 2).
+The blast threw up a grave at (9, 5).
+ZombieZombossMech fired a missile at (7, 5)!
+The blast threw up a grave at (6, 2).
+The blast threw up a grave at (3, 5).
+ZombieZombossMech dropped a Imp into row 1!
+ZombieZombossMech is charging down rows 1 and 2!
+ZombieZombossMech jumped back to the far side of the lawn.
+ZombieZombossMech fired a missile at (5, 5)!
+The blast threw up a grave at (7, 3).
+The blast threw up a grave at (5, 5).
+ZombieZombossMech stomped across into rows 3 and 4.
+ZombieZombossMech fired a missile at (6, 3)!
+The blast threw up a grave at (8, 5).
+The blast threw up a grave at (7, 5).
+ZombieZombossMech dropped a ConeHead into row 3!
+ZombieZombossMech fired a missile at (1, 3)!
+The blast threw up a grave at (8, 3).
+The blast threw up a grave at (1, 2).
+ZombieZombossMech breathed a fireball onto (6, 5)!
+A Imp Dragon clambered out of the flames at (6, 5)!
+ZombieZombossMech breathed a fireball onto (6, 3)!
+A Imp Dragon clambered out of the flames at (6, 3)!
+ZombieZombossMech dropped a Jester into row 5!
+ZombieZombossMech stomped across into rows 3 and 4.
+ZombieZombossMech breathed a fireball onto (9, 2)!
+A Imp Dragon clambered out of the flames at (9, 2)!
+ZombieZombossMech breathed a fireball onto (7, 3)!
+A Imp Dragon clambered out of the flames at (7, 3)!
+ZombieZombossMech dropped a Imp Dragon into row 5!
+ZombieZombossMech set rows 1 and 2 ablaze!
+ZombieZombossMech breathed a fireball onto (9, 3)!
+A Imp Dragon clambered out of the flames at (9, 3)!
+ZombieZombossMech stomped across into rows 1 and 2.
+ZombieZombossMech breathed a fireball onto (2, 4)!
+A Imp Dragon clambered out of the flames at (2, 4)!
+ZombieZombossMech dropped a Imp Dragon into row 5!
+ZombieZombossMech breathed a fireball onto (1, 3)!
+A Imp Dragon clambered out of the flames at (1, 3)!
+ZombieZombossMech fired an ice missile at (6, 2)!
+ZombieZombossMech fired an ice missile at (9, 2)!
+ZombieZombossMech fired an ice missile at (3, 3)!
+ZombieZombossMech fired an ice missile at (2, 3)!
+ZombieZombossMech sent an ice wind tearing down rows 5 and 4!
+Column 1 froze solid, zombies and all.
+ZombieZombossMech fired an ice missile at (9, 5)!
+ZombieZombossMech fired an ice missile at (5, 1)!
+ZombieZombossMech fired an ice missile at (9, 1)!
+ZombieZombossMech dropped a Octopus into row 2!
+ZombieZombossMech stomped across into rows 1 and 2.
+ZombieZombossMech dropped a Snorkel into row 2!
+ZombieZombossMech opened his maw and started dragging rows 4 and 5 in!
+ZombieZombossMech stomped across into rows 3 and 4.
+ZombieZombossMech dropped a Snorkel into row 4!
+A little octopus surfaced and ate the Peashooter at (9, 1)!
+A little octopus surfaced and ate the Peashooter at (6, 1)!
+ZombieZombossMech dropped a Octopus into row 3!
+ZombieZombossMech stomped across into rows 3 and 4.
+A little octopus surfaced and ate the Peashooter at (5, 5)!
+A little octopus surfaced and ate the Peashooter at (3, 3)!
+ZombieZombossMech dropped a Snorkel into row 5!
+ZombieZombossMech opened his maw and started dragging rows 1 and 2 in!
+A little octopus surfaced and ate the Peashooter at (2, 5)!
+ZombieZombossMech stomped across into rows 2 and 3.
+A little octopus surfaced and ate the Peashooter at (4, 4)!
+ZombieZombossMech dropped a Octopus into row 3!
+A little octopus surfaced and ate the Peashooter at (8, 5)!
+ZombieZombossMech fired a missile at (8, 4)!
+ZombieZombossMech fired a missile at (5, 1)!
+ZombieZombossMech dropped a ConeHead into row 3!
+ZombieZombossMech stomped across into rows 3 and 4.
+ZombieZombossMech fired a missile at (1, 1)!
+ZombieZombossMech fired a missile at (9, 4)!
+ZombieZombossMech dropped a ConeHead into row 2!
+ZombieZombossMech is charging down rows 3 and 4!
+ZombieZombossMech jumped back to the far side of the lawn.
+ZombieZombossMech fired a missile at (2, 2)!
+ZombieZombossMech stomped across into rows 2 and 3.
+ZombieZombossMech fired a missile at (5, 4)!
+ZombieZombossMech dropped a Imp into row 3!
+ZombieZombossMech fired a missile at (7, 1)!
+ZombieZombossMech fired an ice missile at (2, 5)!
+ZombieZombossMech fired an ice missile at (4, 3)!
+ZombieZombossMech fired an ice missile at (1, 2)!
+ZombieZombossMech fired an ice missile at (4, 5)!
+ZombieZombossMech sent an ice wind tearing down rows 1 and 4!
+Column 7 froze solid, zombies and all.
+ZombieZombossMech fired an ice missile at (3, 4)!
+ZombieZombossMech fired an ice missile at (7, 5)!
+ZombieZombossMech fired an ice missile at (3, 5)!
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

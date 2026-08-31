@@ -287,4 +287,5 @@ public class Plant {
   public double getY() { return y; }
   public int getLastActionTick() { return lastActionTick; }
   public void setLastActionTick(int tick) { this.lastActionTick = tick; }
+  public PlantAction getBehavior() { return behavior; }
 }

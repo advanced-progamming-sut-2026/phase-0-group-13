@@ -16,6 +16,11 @@ public class HookPullZombieAction implements ZombieAction {
     this.eatingDamage = eatingDamage;
   }
 
+  /** The tick of the last hook throw (hit or not), for the renderer's cast/toss pose. */
+  public int getLastHookTick() {
+    return lastHookTick;
+  }
+
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     if (lastHookTick == -1) {

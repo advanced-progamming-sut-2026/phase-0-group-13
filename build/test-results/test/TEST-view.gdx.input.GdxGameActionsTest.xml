@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="view.gdx.input.GdxGameActionsTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-08-28T21:31:47.106Z" hostname="MacBook-Pro-4.local" time="0.005">
+<testsuite name="view.gdx.input.GdxGameActionsTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-08-31T06:57:57.178Z" hostname="MacBook-Pro-4.local" time="0.002">
   <properties/>
-  <testcase name="requestExitRunsWhateverTheScreenGaveIt()" classname="view.gdx.input.GdxGameActionsTest" time="0.0"/>
-  <testcase name="feedingAPlantWithAFoodEffectActivatesItAndSpendsAPacket()" classname="view.gdx.input.GdxGameActionsTest" time="0.001"/>
-  <testcase name="feedingAPlantWithNoFoodEffectIsRefused()" classname="view.gdx.input.GdxGameActionsTest" time="0.001"/>
+  <testcase name="requestExitRunsWhateverTheScreenGaveIt()" classname="view.gdx.input.GdxGameActionsTest" time="0.001"/>
+  <testcase name="feedingAPlantWithAFoodEffectActivatesItAndSpendsAPacket()" classname="view.gdx.input.GdxGameActionsTest" time="0.0"/>
+  <testcase name="feedingAPlantWithNoFoodEffectIsRefused()" classname="view.gdx.input.GdxGameActionsTest" time="0.0"/>
   <testcase name="hoverNeverSweepsUpAStillFallingRadioactiveSun()" classname="view.gdx.input.GdxGameActionsTest" time="0.0"/>
-  <testcase name="pluckingAnEmptyTileFails()" classname="view.gdx.input.GdxGameActionsTest" time="0.0"/>
-  <testcase name="hoverDoesCollectARadioactiveSunThatHasAlreadyLanded()" classname="view.gdx.input.GdxGameActionsTest" time="0.001"/>
+  <testcase name="pluckingAnEmptyTileFails()" classname="view.gdx.input.GdxGameActionsTest" time="0.001"/>
+  <testcase name="hoverDoesCollectARadioactiveSunThatHasAlreadyLanded()" classname="view.gdx.input.GdxGameActionsTest" time="0.0"/>
   <testcase name="collectSunAtTakesAGroundedSunOnThatTile()" classname="view.gdx.input.GdxGameActionsTest" time="0.0"/>
   <testcase name="pluckRemovesThePlantOnThatTile()" classname="view.gdx.input.GdxGameActionsTest" time="0.0"/>
   <testcase name="collectSunByHoverTakesAGroundedSunTheSameAsAClick()" classname="view.gdx.input.GdxGameActionsTest" time="0.0"/>

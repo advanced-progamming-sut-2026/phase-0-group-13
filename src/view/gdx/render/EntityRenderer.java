@@ -19,8 +19,13 @@ import model.game.Sun;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 import model.game.zombie.ZombieParts.Armor;
+import model.game.zombie.behavior.BarrelRollerZombieAction;
+import model.game.zombie.behavior.EnrageOnArmorBreakZombieAction;
+import model.game.zombie.behavior.GargantuarAction;
+import model.game.zombie.behavior.HookPullZombieAction;
 import model.game.zombie.behavior.JesterZombieAction;
 import model.game.zombie.behavior.KingAuraZombieAction;
+import model.game.zombie.behavior.RaHealAuraZombieAction;
 import model.game.zombie.behavior.ZombossAction;
 import view.gdx.animation.AnimationLibrary;
 import view.gdx.animation.AnimationStates;
@@ -169,6 +174,8 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color frozenTint = new Color(0.45f, 0.7f, 1f, 1f);
   private final Color chilledTint = new Color(0.72f, 0.88f, 1f, 1f);
   private final Color hypnoTint = new Color(0.85f, 0.6f, 1f, 1f);
+  /** Parasol's umbrella is up: no dedicated art exists for it, so a cool shield tint stands in. */
+  private final Color shieldTint = new Color(0.6f, 0.8f, 0.98f, 1f);
   private final Color icedTint = new Color(0.55f, 0.8f, 1f, 1f);
   private final Color frostStep = new Color();
   private final Color radioactiveSun = new Color(0.6f, 1f, 0.45f, 1f);
@@ -273,7 +280,9 @@ public final class EntityRenderer implements WorldRenderer {
 
   private void drawZombie(RenderContext context, Zombie zombie, float delta) {
     drawKingAura(context, zombie);
-    context.getBatch().setColor(flashed(zombieTint(zombie), zombie));
+    drawHealAura(context, zombie);
+    Color tint = flashed(zombieTint(zombie), zombie);
+    context.getBatch().setColor(tint.r, tint.g, tint.b, tint.a * zombieAlpha(zombie));
     if (drawZombieAnimation(context, zombie, delta)) {
       return;
     }
@@ -282,6 +291,15 @@ public final class EntityRenderer implements WorldRenderer {
       drawStanding(context, art, onBoard(zombie.getX()), footRow(zombie),
           zombieScale(zombie, art), ZOMBIE_FOOT_INSET, spinAngle(zombie));
     }
+  }
+
+  /**
+   * Snorkel and Octopus duck under the surface between bites, immune to a direct shot while they
+   * do; there is no dedicated submerged art in the library, so this fades them instead of leaving
+   * the player unable to tell a dive from an ordinary walk.
+   */
+  private static float zombieAlpha(Zombie zombie) {
+    return zombie.isSubmerged() ? 0.55f : 1f;
   }
 
   /** One shadow, centred on the foot line the sprite above it stands on. */
@@ -511,8 +529,11 @@ public final class EntityRenderer implements WorldRenderer {
       return hypnoTint;
     }
     // The doc asks for a reddish warning on a zombie close to the house, which is the last thing
-    // a player notices in time to do something about it.
-    return zombie.getX() <= NEAR_HOUSE_COLUMN ? nearHouse : Color.WHITE;
+    // a player notices in time to do something about it, so it outranks the shield tint below.
+    if (zombie.getX() <= NEAR_HOUSE_COLUMN) {
+      return nearHouse;
+    }
+    return zombie.hasShieldBlocker() ? shieldTint : Color.WHITE;
   }
 
   /**
@@ -683,19 +704,68 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   /**
+   * The action clip a plant's own rig actually uses, for the handful whose attack is not named
+   * "attack": Chomper bites, Magnet-shroom catches, Squash jumps, Fume-shroom's release is its
+   * "special" clip. Every plant not listed here keeps asking for plain "attack", unchanged.
+   */
+  private static final Map<String, String[]> ACTION_CLIP_NAMES = Map.of(
+      "Chomper", new String[] {"bite"},
+      "Magnet-shroom", new String[] {"catch", "busy"},
+      "Squash", new String[] {"jump_down_left", "jump_down_right", "jump_up_left", "jump_up_right"},
+      "Fume-shroom", new String[] {"special"},
+      "Sun-shroom", new String[] {"special"});
+
+  /**
    * Attack for a moment after the plant acts, idle otherwise.
    *
    * <p>"idle" is asked for before "attack" so a plant that has both rests between shots, and
    * "attack" is the fallback for the handful of rigs with no idle at all: Grave Buster is authored
    * as attack / attack1 / water because chewing a grave is the only thing it ever does, and asking
    * only for "idle" left it silently falling back to its seed packet.
+   *
+   * <p>A wramp-up plant's stage never showed once it grew past the first: every stage names its
+   * clips "idle_stageN" (or a variant of it), those are all the same length, and the un-staged
+   * lookup below always kept the first one it saw. Trying the stage-qualified name first, for the
+   * plant's own stage, fixes that without touching any plant that does not grow.
    */
   private String plantClip(EntityAnimation animation, Plant plant) {
-    String attack = animation.pickClip("attack");
+    int stage = growthStage(plant);
+    String[] names = ACTION_CLIP_NAMES.getOrDefault(plant.getName(), new String[] {"attack"});
+    String attack = animation.pickClip(withStage(names, stage));
     if (attack != null && justActed(plant, animation.duration(attack))) {
       return attack;
     }
-    return animation.pickClip("idle", "attack");
+    String[] idleNames = stage > 0
+        ? new String[] {"idle_stage" + stage, "idle"}
+        : new String[] {"idle"};
+    return animation.pickClip(concat(idleNames, names));
+  }
+
+  /** The plant's current growth stage (1-based), or 0 for a plant that does not grow in stages. */
+  private static int growthStage(Plant plant) {
+    return plant.getBehavior() instanceof model.game.plant.behavior.GrowthStageAction growth
+        ? growth.getCurrentStage()
+        : 0;
+  }
+
+  /** Each name with "_stageN" appended first, when there is a stage, then the names themselves. */
+  private static String[] withStage(String[] names, int stage) {
+    return stage > 0 ? concat(stageSuffixed(names, stage), names) : names;
+  }
+
+  private static String[] stageSuffixed(String[] names, int stage) {
+    String[] out = new String[names.length];
+    for (int i = 0; i < names.length; i++) {
+      out[i] = names[i] + "_stage" + stage;
+    }
+    return out;
+  }
+
+  private static String[] concat(String[] first, String[] second) {
+    String[] out = new String[first.length + second.length];
+    System.arraycopy(first, 0, out, 0, first.length);
+    System.arraycopy(second, 0, out, first.length, second.length);
+    return out;
   }
 
   /**
@@ -894,22 +964,66 @@ public final class EntityRenderer implements WorldRenderer {
     }
   }
 
-  private static String zombieClip(EntityAnimation animation, Zombie zombie) {
+  /** How long the hook/throw poses below hold, in ticks -- long enough to read, not a full cycle. */
+  private static final int ACTION_POSE_TICKS = 8;
+
+  private String zombieClip(EntityAnimation animation, Zombie zombie) {
     if (zombie.isBoss()) {
       String boss = bossClip(animation, zombie);
       if (boss != null) {
         return boss;
       }
     }
+    String suffix = propSuffix(zombie);
     if (zombie.isEating()) {
-      String eat = animation.pickClip("eat");
+      String eat = animation.pickClip("eat" + suffix, "eat");
       if (eat != null) {
         return eat;
       }
     }
+    // The Jester spins for a stretch after catching a shot; its rig has a clip for that, unlike
+    // the shape-rotation fallback that only ever ran when this zombie had no art at all.
+    if (zombie.getBehavior() instanceof JesterZombieAction jester && jester.isSpinning()) {
+      String spin = animation.pickClip("spin_walk", "spin");
+      if (spin != null) {
+        return spin;
+      }
+    }
+    if (zombie.getBehavior() instanceof HookPullZombieAction hook
+        && currentTick - hook.getLastHookTick() < ACTION_POSE_TICKS) {
+      String cast = animation.pickClip("toss", "cast", "reel");
+      if (cast != null) {
+        return cast;
+      }
+    }
+    if (zombie.getBehavior() instanceof GargantuarAction gargantuar
+        && gargantuar.getThrowTick() >= 0
+        && currentTick - gargantuar.getThrowTick() < ACTION_POSE_TICKS) {
+      String throwing = animation.pickClip("smash_left", "fire", "cannon_fire");
+      if (throwing != null) {
+        return throwing;
+      }
+    }
     // "play" is the Pianist: his rig has no walk cycle because the piano-playing loop is how he
     // travels, so asking only for walk left him standing still while he crossed the lawn.
-    return animation.pickClip("walk", "play", "idle");
+    return animation.pickClip("walk" + suffix, "walk", "play", "idle" + suffix, "idle");
+  }
+
+  /**
+   * The prop a zombie is still carrying, appended to walk/eat/idle so the rig's own variant for
+   * "still has it" is asked for by name. Empty once the prop is gone, which is also the plain,
+   * unsuffixed clip every other zombie already asks for -- so nothing else changes.
+   */
+  private static String propSuffix(Zombie zombie) {
+    if (zombie.getBehavior() instanceof EnrageOnArmorBreakZombieAction enrage
+        && !enrage.isEnraged()) {
+      return "_newspaper";
+    }
+    if (zombie.getBehavior() instanceof BarrelRollerZombieAction barrel
+        && !barrel.isBarrelBurst()) {
+      return "2";
+    }
+    return "";
   }
 
   /** Frozen holds the pose and chilled halves it, matching what Zombie.move() actually does. */
@@ -1064,6 +1178,25 @@ public final class EntityRenderer implements WorldRenderer {
     float size = geometry.getCellHeight() * 2.9f;
     float pulse = 0.32f + 0.12f * (float) Math.sin(clock * 2.5f);
     context.getBatch().setColor(1f, 0.9f, 0.45f, pulse);
+    context.getBatch().draw(aura, geometry.columnCentreX(onBoard(zombie.getX())) - size / 2f,
+        geometry.rowCentreY(zombie.getRow()) - size / 2f, size, size);
+    context.getBatch().setColor(Color.WHITE);
+  }
+
+  /**
+   * Ra never eats a plant near it as often as it heals its neighbours, and that healing is
+   * otherwise invisible -- a wounded zombie next to him just stops looking wounded with no cue why.
+   * Same treatment as {@link #drawKingAura}, in a healing green rather than the King's gold so the
+   * two auras are not mistaken for each other.
+   */
+  private void drawHealAura(RenderContext context, Zombie zombie) {
+    TextureRegion aura = hudArt.find("kingaura");
+    if (aura == null || !(zombie.getBehavior() instanceof RaHealAuraZombieAction)) {
+      return;
+    }
+    float size = geometry.getCellHeight() * 2.4f;
+    float pulse = 0.28f + 0.12f * (float) Math.sin(clock * 2.5f);
+    context.getBatch().setColor(0.5f, 0.95f, 0.55f, pulse);
     context.getBatch().draw(aura, geometry.columnCentreX(onBoard(zombie.getX())) - size / 2f,
         geometry.rowCentreY(zombie.getRow()) - size / 2f, size, size);
     context.getBatch().setColor(Color.WHITE);
