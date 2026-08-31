@@ -19,13 +19,11 @@ public class TimedWarRule extends MiniGame implements SpecialStageRule {
   public int remainingTicks() { return Math.max(0, timeLimitTicks - elapsedTicks); }
 
   public int getTimeLimitTicks() { return timeLimitTicks; }
-  // اگه زمان تموم بشه و هنوز زامبی زنده رو نقشه باشه، باخت
   @Override
   public boolean checkLoseCondition(Board board) {
     return elapsedTicks >= timeLimitTicks && !board.getZombies().isEmpty();
   }
 
-  // اگه زمان تموم بشه و همه زامبی‌ها از بین رفته باشن، برد زودهنگام (نیازی به تموم شدن موج‌ها نیست)
   @Override
   public boolean checkWinCondition(Board board) {
     return elapsedTicks >= timeLimitTicks && board.getZombies().isEmpty();

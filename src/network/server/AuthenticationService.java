@@ -7,7 +7,6 @@ import model.Result;
 import model.core.AuthService;
 import network.protocol.Payloads;
 
-/** Reuses AuthService so the server checks the same rules as the offline game. */
 public final class AuthenticationService {
 
   private final ServerAccountStore store;
@@ -60,7 +59,6 @@ public final class AuthenticationService {
     return success("logged in", account, issueToken(account));
   }
 
-  /** The token is the whole credential; a stale one is refused like a wrong password. */
   public Payloads.AuthResponse loginWithToken(Payloads.TokenLoginRequest request) {
     if (request == null || request.token() == null) {
       return failure("error: empty request");
@@ -109,12 +107,6 @@ public final class AuthenticationService {
     return new Payloads.SecurityQuestionResponse(true, "ok", question);
   }
 
-  /**
-   * Checks the answer and, when a new password came with it, rewrites the hash.
-   *
-   * <p>The stored player document carries its own copy of the hash, so that is rewritten too, or
-   * the next login would hand back an account whose password field disagrees with it.
-   */
   public Payloads.Ack resetPassword(Payloads.PasswordReset request) {
     if (request == null) {
       return new Payloads.Ack(false, "error: empty request");
@@ -149,7 +141,6 @@ public final class AuthenticationService {
     return new Payloads.Ack(true, "password reset");
   }
 
-  /** Accounts are found by username, not keyed by it, so a rename is the field plus the copy. */
   public Payloads.Ack rename(String currentUsername, String newUsername) {
     ServerAccount account = store.find(currentUsername);
     if (account == null) {
@@ -190,9 +181,6 @@ public final class AuthenticationService {
   /**
    * Stores what the signed-in client sent for its own account and returns what is now on file.
    *
-   * <p>Username and bestScore are deliberately left alone: the username moves only through
-   * {@link #rename}, and bestScore is LeaderboardService's to move.
-   *
    * @return the stored profile, or null when there is no such account
    */
   public Payloads.Profile update(String username, Payloads.ProfileUpdate update) {
@@ -224,11 +212,6 @@ public final class AuthenticationService {
     return profileOf(account);
   }
 
-  /**
-   * The security question and answer became fields on the account only once recovery moved to the
-   * server; accounts stored before that carry them inside the player document, so both are read
-   * from the field first and from the document as a fallback.
-   */
   private static String questionNumberOf(ServerAccount account) {
     return account.getSecurityQuestionNumber() != null
         ? account.getSecurityQuestionNumber()

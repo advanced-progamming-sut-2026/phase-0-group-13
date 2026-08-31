@@ -34,18 +34,6 @@ import view.gdx.ui.Toast;
 import view.gdx.ui.UiSkinProvider;
 
 
-/**
- * Base for every Scene2D menu: the header, the currency readout, the toast and the debug panel are
- * built once here so no screen carries its own copy.
- *
- * <p>A subclass only says what it is called and what goes in the middle. Everything a menu shares
- * with the other menus — including Escape going back — is handled here.
- *
- * <p>An ExtendViewport rather than the world's letterboxed one: a menu has only a backdrop under
- * it, so it keeps the 1280x720 design area as a minimum and spreads into whatever else the window
- * has, instead of leaving bars down the sides of an ultrawide or a fullscreen monitor. The
- * in-match HUD cannot do this -- it has to line up with the lawn underneath it, see HudStage.
- */
 public abstract class MenuScreen extends BaseScreen {
 
   protected Stage stage;
@@ -61,42 +49,22 @@ public abstract class MenuScreen extends BaseScreen {
   private Texture backgroundTexture;
   private SpriteBatch backdropBatch;
 
-  /**
-   * How far the scrim darkens the backdrop.
-   *
-   * <p>The world art is busy at full strength and the text over it is the thing that matters, so
-   * every menu lays a flat dark wash between the two. Enough to make white type read anywhere on
-   * the screen, not so much that the art stops being art.
-   */
   private static final float SCRIM_ALPHA = 0.42f;
 
-  /** How far the content slides up as it fades in, in pixels. */
   private static final float ENTRANCE_RISE = 18f;
 
   private static final float ENTRANCE_SECONDS = 0.18f;
 
   private static final String DEFAULT_BACKGROUND = "textures/environment/darkagesseason.atlas";
 
-  /**
-   * Backdrop atlas under assets/, or null for none. Needs a region called "texture".
-   *
-   * <p>Defaults to a real backdrop rather than to nothing: half the menus never overrode this and
-   * were drawing their panels straight onto the window's clear colour, which read as an unfinished
-   * screen next to the ones that did.
-   */
   protected String backgroundAtlasPath() {
     return DEFAULT_BACKGROUND;
   }
 
-  /**
-   * A plain image under assets/ to use as the backdrop instead of {@link #backgroundAtlasPath()},
-   * or null to keep the atlas one. Drawn to fill the viewport at its own aspect ratio.
-   */
   protected String backgroundImagePath() {
     return null;
   }
 
-  /** Whether the dark wash goes over the backdrop. Off for a backdrop meant to be seen as it is. */
   protected boolean scrimBackground() {
     return true;
   }
@@ -105,47 +73,23 @@ public abstract class MenuScreen extends BaseScreen {
     super(game);
   }
 
-  /**
-   * Queues a message to toast as soon as this screen is shown.
-   *
-   * <p>For the cases where the thing worth reporting happens on the screen you are leaving: the
-   * old stage is disposed on the way out, so its toast would never be seen.
-   */
   public MenuScreen withNotice(String message) {
     this.notice = message;
     return this;
   }
 
-  /**
-   * The background track this screen plays. Menus share one, so only a screen that wants
-   * something else overrides it; asking for the track already playing leaves it running.
-   */
   protected GameAudio.Track musicTrack() {
     return GameAudio.Track.MENU;
   }
 
-  /** Shown top left. */
   protected abstract String title();
 
-  /** Fills the middle of the screen. Only called when there is a skin. */
   protected abstract void buildContent(Table content);
 
-  /**
-   * Where Escape and the Back button go, or null if this screen is the root.
-   *
-   * <p>Every menu overrides this, which is what stops a screen from becoming a dead end.
-   */
   protected Screen backTarget() {
     return null;
   }
 
-  /**
-   * What Escape does on this screen. Goes back by default, and does nothing on a screen with
-   * nowhere to go back to.
-   *
-   * <p>Overridable because the root menu has no back and should offer to close the game instead:
-   * Escape on the first screen is how a player expects to leave one.
-   */
   protected void onEscape() {
     Screen back = backTarget();
     if (back != null) {
@@ -160,8 +104,6 @@ public abstract class MenuScreen extends BaseScreen {
     skin = game.getUiSkin().get();
     Gdx.input.setInputProcessor(stage);
     if (skin == null) {
-      // No skin means nothing to draw, but the window should stay up rather than take the app
-      // down. UiSkinProvider has already logged why.
       return;
     }
 
@@ -173,7 +115,6 @@ public abstract class MenuScreen extends BaseScreen {
     stage.addActor(root);
 
     Table header = new Table();
-    // Outlined, because the title sits directly on the backdrop with no plate behind it.
     header.add(new Label(title(), skin, UiSkinProvider.LABEL_BIG_OUTLINE)).left().expandX();
     header.add(new CurrencyHud(skin)).right();
     root.add(header).growX().padBottom(20f).row();
@@ -186,9 +127,6 @@ public abstract class MenuScreen extends BaseScreen {
     playEntrance(root);
 
     if (DebugPanel.isEnabled()) {
-      // Floats over the corner instead of taking a row - it can be toggled on any screen now,
-      // and the taller ones have no spare height to give it. Bottom left, because the footer
-      // buttons sit centre-right and the panel used to cover Start.
       Table corner = new Table();
       corner.setFillParent(true);
       corner.bottom().left().pad(12f);
@@ -214,7 +152,6 @@ public abstract class MenuScreen extends BaseScreen {
     }
   }
 
-  /** Added before the root table so everything else draws on top. */
   private void addBackground() {
     String image = backgroundImagePath();
     if (image != null && Gdx.files.internal(image).exists()) {
@@ -239,7 +176,6 @@ public abstract class MenuScreen extends BaseScreen {
     addBackdrop(region);
   }
 
-  /** Scaling.fill keeps the art's own proportions and covers the viewport, leaving no gaps. */
   private void addBackdrop(TextureRegion region) {
     Image background = new Image(region);
     background.setFillParent(true);
@@ -250,7 +186,6 @@ public abstract class MenuScreen extends BaseScreen {
     }
   }
 
-  /** The wash between the backdrop and the content. Its own actor, so it covers the whole stage. */
   private void addScrim() {
     Image scrim = new Image(skin.newDrawable(UiSkinProvider.WHITE_PIXEL,
         new Color(0f, 0f, 0f, SCRIM_ALPHA)));
@@ -258,12 +193,6 @@ public abstract class MenuScreen extends BaseScreen {
     stage.addActor(scrim);
   }
 
-  /**
-   * Fades the screen in and lets it settle upwards.
-   *
-   * <p>Short enough not to be in the way of someone clicking straight through a menu -- the table
-   * is already laid out and hit-testable while it plays, only its colour and offset move.
-   */
   private static void playEntrance(Table root) {
     root.getColor().a = 0f;
     root.setTransform(false);
@@ -274,13 +203,6 @@ public abstract class MenuScreen extends BaseScreen {
             Actions.moveBy(0f, ENTRANCE_RISE, ENTRANCE_SECONDS, Interpolation.pow2Out))));
   }
 
-  /**
-   * A framed panel, for the screens that hold a form or a list.
-   *
-   * <p>Two layers rather than one: the dialog border is the raised frame and carries its own fill,
-   * which is what gives a panel an edge to sit on instead of looking like a flat cream rectangle
-   * pasted over the art. Padding matches the frame's own insets so nothing lands on the border.
-   */
   protected Table panel() {
     Table panel = new Table();
     panel.setBackground(new LayeredDrawable(
@@ -291,12 +213,6 @@ public abstract class MenuScreen extends BaseScreen {
     return panel;
   }
 
-  /**
-   * The recessed surface that goes inside a {@link #panel}, for lists and scroll areas.
-   *
-   * <p>Flatter and lighter than the frame around it, so a list of rows reads as content sitting in
-   * a well rather than as a second panel floating on the first.
-   */
   protected Table well() {
     Table well = new Table();
     well.setBackground(skin.getDrawable(UiSkinProvider.PANEL_BACKGROUND));
@@ -305,7 +221,6 @@ public abstract class MenuScreen extends BaseScreen {
     return well;
   }
 
-  /** Adds a "label: [input]" row and gives back the input. */
   protected TextField field(Table form, String label, boolean password) {
     TextField input = new TextField("", skin);
     if (password) {
@@ -331,12 +246,10 @@ public abstract class MenuScreen extends BaseScreen {
     return button;
   }
 
-  /** Swaps to another screen. Goes through the game so the old one gets disposed. */
   protected void go(Screen next) {
     game.switchScreen(next);
   }
 
-  /** Temporary message, see Toast. */
   protected void toast(String message) {
     Toast.show(stage, skin, message);
   }
@@ -349,7 +262,6 @@ public abstract class MenuScreen extends BaseScreen {
     stage.draw();
   }
 
-  /** The image backdrop, scaled to cover the window at its own proportions and centred. */
   private void drawFullWindowBackdrop() {
     if (backgroundTexture == null) {
       return;

@@ -281,7 +281,6 @@ public class CollectionMenuController implements BaseController {
     if (byAlias != null) {
       return byAlias;
     }
-    // players type what the almanac shows them, not the raw alias
     for (ZombieTemplate template : GameDataManager.zombieRepository.getAll()) {
       String display = template.getDisplayName();
       if (display != null && display.equalsIgnoreCase(wanted)) {

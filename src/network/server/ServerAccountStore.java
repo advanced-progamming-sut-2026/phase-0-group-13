@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/** Own file next to the existing database, so the local Users.json keeps working untouched. */
 public final class ServerAccountStore {
 
   private static final String PATH_KEY = "server-accounts";

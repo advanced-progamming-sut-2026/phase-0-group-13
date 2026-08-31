@@ -5,11 +5,6 @@ import model.game.Board;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-/**
- * زامبی اکتشافگر (مصر باستان): یک دینامیت پشت خود دارد که بعد از ۱۰ ثانیه منفجر می‌شود؛ بعد از
- * انفجار، دینامیت به انتهای سطر پرتاب می‌شود و خلاف جهت بقیه زامبی‌ها حرکت کرده و گیاهان را
- * از بین می‌برد. اگر تیر یخی به زامبی بخورد، فتیله خاموش می‌شود.
- */
 public class ProspectorZombieAction implements ZombieAction {
   private static final int BLAST_RANGE = 1;
   private static final int BLAST_DAMAGE = 1800;
@@ -41,7 +36,6 @@ public class ProspectorZombieAction implements ZombieAction {
   }
 
   private void handleFuse(Zombie zombie, Board board, int currentTick) {
-    // تیر یخی فتیله را خاموش می‌کند
     if (zombie.getActiveEffects().containsKey(StatusEffect.CHILLED)
             || zombie.getActiveEffects().containsKey(StatusEffect.FROZEN)) {
       fuseLit = false;
@@ -65,7 +59,6 @@ public class ProspectorZombieAction implements ZombieAction {
             zombie.getName(), zombie.getRow() + 1);
   }
 
-  /** دینامیت خلاف جهت زامبی‌ها (به سمت راست) حرکت می‌کند و گیاهان سر راه را نابود می‌کند. */
   private void advanceDynamite(Zombie zombie, Board board) {
     if (dynamiteX < 0 || dynamiteX >= board.getColumns()) {
       return;

@@ -6,7 +6,6 @@ import model.game.GameState;
 public interface SpecialStageRule {
   void apply(GameState gameState);
 
-  // پیش‌فرض: هیچ محدودیتی روی کاشت گیاه نیست
   default boolean isPlantAllowed(String plantName) {
     return true;
   }
@@ -14,14 +13,11 @@ public interface SpecialStageRule {
   default boolean restrictsSelection() { return false; }
 
   // نوار نقالهٔ این مرحله، یا null. مرحلهٔ باس هم نوار دارد، پس صداکننده‌ها به‌جای instanceof
-  // این را می‌پرسند
   default ConveyorRule belt() { return null; }
-  // پیش‌فرض: شرط باخت اضافه‌ای نداره (شرط عادی بازی خودش جدا چک میشه)
   default boolean checkLoseCondition(Board board) {
     return false;
   }
 
-  // پیش‌فرض: شرط برد زودهنگام اضافه‌ای نداره (برد عادی با تموم شدن موج‌ها خودش جدا چک میشه)
   default boolean checkWinCondition(Board board) {
     return false;
   }

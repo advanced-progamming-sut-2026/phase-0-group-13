@@ -1,12 +1,6 @@
 package view.gdx.assets;
 
 
-/**
- * The asset categories the runtime tree is split into.
- *
- * <p>Each constant names the subfolder it lives in, so a future loader can build a path without
- * hardcoding strings at every call site. Phase 2 infrastructure only: no loading, no caching.
- */
 public enum AssetCategory {
 
   PLANTS("plants"),

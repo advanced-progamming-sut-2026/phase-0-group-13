@@ -40,10 +40,6 @@ public class Plant {
 
   private boolean deathHookFired = false;
 
-  /**
-   * عمر محدود (Sea-shroom و Puff-shroom در plants.json «۶۰ ثانیه عمر» دارند). {@code -1} یعنی
-   * بدون محدودیت، که حالت همهٔ گیاهان دیگر است.
-   */
   private int lifespanTicks = -1;
   private int plantedTick = -1;
 
@@ -119,14 +115,6 @@ public class Plant {
     return currentTick < disabledUntilTick;
   }
 
-  /**
-   * True while a thrown octopus still has this plant clamped, which is the only thing that calls
-   * {@link #disableUntil}.
-   *
-   * <p>Separate from {@link #isDisabled} on purpose: that is also true for a cursed plant, and the
-   * two look nothing alike on the board -- a cursed plant is a sheep, a held one wears an octopus.
-   * A caller that wants to show why a plant has stopped working has to tell them apart.
-   */
   public boolean isHeldByOctopus(int currentTick) {
     return !cursed && currentTick < disabledUntilTick;
   }
@@ -137,8 +125,8 @@ public class Plant {
   }
 
   /**
-   * دو سطح اول یخ‌زدگی هیچ اثری ندارند؛ سطح سوم گیاه را داخل یخ ۶۰۰ جانی حبس می‌کند. طبق داک این
-   * یخ با تایمر آب نمی‌شود و باید با تیر گیاهان شکسته (یا با آتش ذوب) شود، پس {@code durationTicks}
+   * دو سطح اول یخ‌زدگی هیچ اثری ندارند؛ سطح سوم گیاه را داخل یخ ۶۰۰ جانی حبس می‌کند. طبق داک این یخ
+   * با تایمر آب نمی‌شود و باید با تیر گیاهان شکسته (یا با آتش ذوب) شود، پس {@code durationTicks}
    * فقط برای سازگاری با فراخوانی‌های قبلی (Hunter و پرتابه‌ها) نگه داشته شده است.
    */
   public void addFreezeExposure(int amount, int currentTick, int durationTicks) {
@@ -150,7 +138,6 @@ public class Plant {
     }
   }
 
-  /** گیاه را داخل بلوک یخ می‌کند (تا شکسته‌نشدن یخ، گیاه هیچ کاری نمی‌کند). */
   public void encaseInIce() {
     if (iceHealth > 0) return;
 
@@ -161,7 +148,6 @@ public class Plant {
             name, col + 1, row + 1, ICE_BLOCK_HEALTH);
   }
 
-  /** تیر گیاهان یخ را می‌شکند؛ آتش (تیر یا گیاه مجاور) آن را سریع‌تر آب می‌کند. */
   public void damageIce(int amount) {
     if (iceHealth <= 0 || amount <= 0) return;
 
@@ -171,7 +157,6 @@ public class Plant {
     }
   }
 
-  /** تیر/گیاه آتشین یخ را بلافاصله آب می‌کند. */
   public void meltIce() {
     damageIce(iceHealth);
   }
@@ -184,7 +169,6 @@ public class Plant {
 
   public int getFreezeLevel() { return freezeLevel; }
 
-  /** آیا این گیاه اصلا اثر «غذای گیاه» دارد؟ (گیاهان یک‌بارمصرف و نعناع‌ها ندارند) */
   public boolean hasPlantFoodEffect() {
     return plantFood != null;
   }
@@ -193,7 +177,6 @@ public class Plant {
     if (plantFood != null) {
       plantFood.activate();
     } else {
-      // طبق plants.json مینت‌ها و Imitater ذاتا اثر غذای گیاه ندارند (یک‌بارمصرف/کپی‌کننده)
       System.out.println(name + " is a single-use plant and has no Plant Food effect.");
     }
   }
@@ -209,7 +192,6 @@ public class Plant {
     this.currentHealth = Math.max(0, this.currentHealth - damage);
   }
 
-  /** عمر محدود بر حسب تیک؛ مقدار منفی یا صفر یعنی گیاه هیچ‌وقت خودبه‌خود از بین نمی‌رود. */
   public void setLifespanTicks(int lifespanTicks) {
     this.lifespanTicks = lifespanTicks;
   }
@@ -218,7 +200,6 @@ public class Plant {
     return lifespanTicks;
   }
 
-  /** اثر غذای گیاهِ Sea-shroom/Puff-shroom عمر همهٔ هم‌نوع‌هایش را از نو می‌کند. */
   public void resetLifespan(int currentTick) {
     if (lifespanTicks > 0) {
       this.plantedTick = currentTick;
@@ -248,12 +229,10 @@ public class Plant {
   public Plant getShield() { return shield; }
   public void setShield(Plant shield) { this.shield = shield; }
 
-  /** Torchwood با غذای گیاه شعله آبی می‌گیرد و تیرهای عبوری را ۳ برابر می‌کند (به جای ۲ برابر). */
   public boolean isBlueFlame() { return blueFlame; }
 
   public void setBlueFlame(boolean blueFlame) { this.blueFlame = blueFlame; }
 
-  /** غذای گیاه برای گردوها: زره دائمی اضافه می‌کند (هم سقف جان و هم جان فعلی بالا می‌رود). */
   public void grantBonusHealth(int amount) {
     if (amount > 0) {
       this.maxHealth += amount;

@@ -91,7 +91,6 @@ public class User {
     this.progress = new Progress();
   }
 
-  /** Debug cheat: opens every chapter on the map and every level inside them. */
   public Result unlockAllChapters() {
     for (int stage = 1; stage <= AdventureMap.MAX_STAGES; stage++) {
       unlockItem("stage_" + stage);
@@ -142,11 +141,9 @@ public class User {
       default:
         message = "New item unlocked: " + targetId;
     }
-    // targetId خام می‌ماند چون کلید lookup است؛ فقط متن خبر خواناست
     newsBox.addNews(new model.game.news.News(type, targetId, message));
   }
 
-  /** اسم داخلی (zombie_zombiemummydefault, stage_2, repeater) را به چیزی خوانا تبدیل می‌کند. */
   private static String readableName(String targetId) {
     if (targetId == null || targetId.isBlank()) {
       return "";
@@ -160,7 +157,6 @@ public class User {
           return "Chapter " + tail + " - " + titleCase(environment.replace('_', ' '));
         }
       } catch (NumberFormatException ignored) {
-        // not a numbered chapter, fall through
       }
       return titleCase(tail.replace('_', ' '));
     }
@@ -176,7 +172,6 @@ public class User {
     return titleCase(id.replace('_', ' '));
   }
 
-  /** نام‌های upstream مثل ZombieMummyArmor1Default همه‌چسبیده‌اند و باید باز شوند. */
   private static String splitAlias(String alias) {
     String cleaned = alias.toLowerCase();
     if (cleaned.startsWith("zombie")) {
@@ -391,7 +386,6 @@ public class User {
   public static final int UPGRADE_SEED_COST = 10;
   public static final int MAX_PLANT_LEVEL = 4;
 
-  /** Seed packets and coins for the next level; both scale with the level already held. */
   public int upgradeSeedCost(String plantName) {
     return UPGRADE_SEED_COST * getPlantLevel(plantName);
   }
@@ -519,10 +513,8 @@ public class User {
       }
     }
     if (!quests.isEmpty() && !broken) {
-      // The list is sound, so the player's progress on it stays; only quests added to
       // Quests.json since this account was seeded are appended. Without this an existing save
       // never sees a newly added category at all -- its travel-log page would be empty for
-      // everyone but a brand new account.
       addMissingQuests(templates);
       return;
     }
@@ -533,7 +525,6 @@ public class User {
     }
   }
 
-  /** Appends templates this account has no quest for, matched by title. */
   private void addMissingQuests(List<Quest> templates) {
     Set<String> owned = new HashSet<>();
     for (Quest quest : quests) {

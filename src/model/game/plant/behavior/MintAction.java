@@ -3,8 +3,6 @@ package model.game.plant.behavior;
 import model.game.Board;
 import model.game.plant.Plant;
 
-// نعناع‌ها یه‌بارمصرفن: به محض کاشته شدن به همه‌ی گیاه‌های هم‌خانواده‌ی خودشون (خانواده = همون
-// PlantCategory که تو دیتای هر نعناع ثبت شده) افکت Plant Food میدن و بعد از یه مدت کوتاه محو میشن
 public class MintAction implements PlantAction {
   private final int durationTicks;
   private int plantedTick = -1;

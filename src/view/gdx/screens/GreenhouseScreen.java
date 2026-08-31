@@ -21,28 +21,18 @@ import view.gdx.ui.Popup;
 import view.gdx.ui.UiSkinProvider;
 
 
-/**
- * Graphical Greenhouse: the 5x4 pot grid the Phase 1 menu addresses by (x, y).
- *
- * <p>Every action goes through the GreenHouse model, so a pot allows exactly what the terminal
- * menu allows. Tapping a pot opens a popup with its state and whatever action it supports right
- * now, which keeps the grid itself readable.
- */
 public final class GreenhouseScreen extends MenuScreen {
 
   private static final int COLUMNS = 5;
   private static final int ROWS = 4;
-  /** Same price the shop's pot_1 item charges. */
   private static final String POT_ITEM = "pot_1";
   private static final int POT_PRICE = 2000;
   private static final long MILLIS_PER_HOUR = 60L * 60 * 1000;
   private static final int MARIGOLD_COINS = 500;
 
-  /** Pot cell size, and how far the plant is lifted so it clears the pot's soil line. */
   private static final float POT_WIDTH = 116f;
   private static final float POT_HEIGHT = 74f;
   private static final float PLANT_LIFT = 24f;
-  /** Four rows of pots plus the header have to fit in the window without a scroll bar. */
   private static final float POT_BUTTON_HEIGHT = 30f;
 
   private final PlantArt art = new PlantArt();
@@ -101,7 +91,6 @@ public final class GreenhouseScreen extends MenuScreen {
         .height(62f);
     content.add(header).padBottom(10f).row();
 
-    // No panel behind the grid - each pot has its own, so they read as separate tiles.
     Table grid = new Table();
     grid.defaults().pad(4f).width(POT_WIDTH + 14f).top();
     for (int row = 0; row < ROWS; row++) {
@@ -114,15 +103,6 @@ public final class GreenhouseScreen extends MenuScreen {
     content.add(grid).row();
   }
 
-  /**
-   * One pot.
-   *
-   * <p>The doc's greenhouse is PvZ's Zen Garden, and that world's own art is what this is built
-   * from: the terracotta pot with soil in it, the gold one it becomes when what is growing is
-   * ready, the shadow that sits under it, and the padlock for a slot that has not been bought.
-   * The plant is drawn behind the pot and lifted, so it comes out of the soil rather than sitting
-   * on a card next to it -- which is what made the old grid read as twenty identical buttons.
-   */
   private Table potCard(User user, Pot pot, int index) {
     boolean locked = pot == null || !pot.isUnlocked();
     boolean ready = !locked && !pot.isEmpty() && pot.isFullyGrown();
@@ -150,19 +130,12 @@ public final class GreenhouseScreen extends MenuScreen {
     return card;
   }
 
-  /** A pot's action button; the label is shrunk so a plant name fits on one line. */
   private TextButton smallButton(String text, String style, Runnable action) {
     TextButton button = button(text, style, action);
     button.getLabel().setFontScale(UiSkinProvider.fontScale(0.82f));
     return button;
   }
 
-  /**
-   * The pot itself: shadow, then the plant, then the pot over the top of it.
-   *
-   * <p>Order is the whole trick. The pot is drawn last so its rim covers the bottom of the plant,
-   * which is what makes the plant look planted instead of pasted on.
-   */
   private Stack potVisual(Pot pot, boolean locked, boolean ready) {
     Stack stack = new Stack();
     stack.add(bottomAligned(hudArt.find("potshadow"), POT_WIDTH * 0.70f, 16f, 0f, 0.55f));
@@ -174,7 +147,6 @@ public final class GreenhouseScreen extends MenuScreen {
       }
     }
 
-    // Gold once it is ready to collect, so a finished pot is visible across the whole grid.
     TextureRegion potArt = hudArt.find(ready ? "potgold" : "pot");
     stack.add(bottomAligned(potArt, POT_WIDTH * 0.80f, 46f, 0f, locked ? 0.5f : 1f));
 
@@ -186,7 +158,6 @@ public final class GreenhouseScreen extends MenuScreen {
     return stack;
   }
 
-  /** One layer of the pot stack, sitting on the floor of the cell and optionally lifted. */
   private Table bottomAligned(TextureRegion region, float width, float height, float lift,
       float alpha) {
     Table holder = new Table();
@@ -247,7 +218,6 @@ public final class GreenhouseScreen extends MenuScreen {
         "Grow for " + diamonds, () -> forceGrow(user, index));
   }
 
-  /** The shop owns the price and the unlock; this only reports the Result. */
   private void buyPot(User user) {
     Result result = shop.buyItem(user, POT_ITEM, 1, null);
     toast(result.message());
@@ -257,7 +227,6 @@ public final class GreenhouseScreen extends MenuScreen {
     refresh();
   }
 
-  /** Same charge the typed "grow" command makes: one diamond per hour still to run. */
   private static int diamondCost(Pot pot) {
     return (int) Math.ceil(pot.getRemainingGrowTime() / (double) MILLIS_PER_HOUR);
   }
@@ -280,7 +249,6 @@ public final class GreenhouseScreen extends MenuScreen {
     refresh();
   }
 
-  /** Harvesting pays out, same as the typed menu, and says what it paid. */
   private void collect(User user, int index) {
     Result result = user.getGreenHouse().collectSeed(index);
     if (!result.success()) {

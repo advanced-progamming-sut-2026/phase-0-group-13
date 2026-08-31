@@ -2,7 +2,6 @@ package network.server;
 
 import com.google.gson.JsonElement;
 
-/** bestScore stays null until they submit one - no fake zeros on the leaderboard. */
 public class ServerAccount {
 
   private String username;
@@ -12,14 +11,10 @@ public class ServerAccount {
   private String gender;
   private String securityQuestionNumber;
   private String securityAnswer;
-  // Cleared on logout and on a password reset, so neither leaves a usable credential behind.
   private String sessionToken;
   private int coins;
   private int diamonds;
   private Integer bestScore;
-  // The player's own document (unlocked plants, progress, inventory, greenhouse, quests, ...).
-  // Stored as raw JSON so the server keeps every field the game model has without duplicating the
-  // model here; it is written and read back verbatim.
   private JsonElement gameData;
 
   public ServerAccount() {}

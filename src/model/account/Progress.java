@@ -10,7 +10,6 @@ import model.Result;
 
 public class Progress {
 
-  /** فاز ۱: مینی‌گیم‌ها از همان اول از travel log در دسترسند، قفل پیشرفت ندارند. */
   public static final List<String> ALL_MINI_GAMES =
       Arrays.asList("vasebreaker", "wallnut_bowling", "i_zombie", "beghouled", "zombotany");
 
@@ -22,17 +21,11 @@ public class Progress {
 
   private Set<String> unlockedMiniGames;
 
-  /** بالاترین مرحله‌ای که از هر مینی‌گیم پاس شده (اسم مینی‌گیم → مرحله). */
   private Map<String, Integer> clearedMiniGameLevels;
 
   private int maxClearedStage;
   private int maxClearedLevel;
 
-  /**
-   * True once {@code MAX_STAGES}-{@code LEVELS_PER_STAGE} (4-4) has been cleared. The map has no
-   * stage 5 to move on to, so instead of walking past the end the cursor stays on the last level
-   * and this flag records that the adventure is finished.
-   */
   private boolean adventureCompleted;
 
   public Progress() {
@@ -47,7 +40,6 @@ public class Progress {
     this.clearedMiniGameLevels = new HashMap<>();
   }
 
-  /** سیوهای قدیمی با قفل مینی‌گیم ذخیره شده‌اند؛ Gson سازنده را صدا نمی‌زند، اینجا بازشان می‌کنیم. */
   private void openMiniGames() {
     if (unlockedMiniGames == null) {
       unlockedMiniGames = new HashSet<>();
@@ -58,7 +50,6 @@ public class Progress {
 
   public static final int MINI_GAME_LEVELS = 3;
 
-  /** بعد از برد در یک مینی‌گیم، بالاترین مرحلهٔ پاس‌شده را ثبت می‌کند. */
   public boolean recordMiniGameCleared(String miniGameName, int level) {
     if (miniGameName == null || level < 1) {
       return false;
@@ -75,7 +66,6 @@ public class Progress {
     return true;
   }
 
-  /** بالاترین مرحلهٔ پاس‌شدهٔ یک مینی‌گیم (۰ یعنی هنوز هیچ مرحله‌ای پاس نشده). */
   public int getClearedMiniGameLevel(String miniGameName) {
     if (clearedMiniGameLevels == null || miniGameName == null) {
       return 0;
@@ -83,7 +73,6 @@ public class Progress {
     return clearedMiniGameLevels.getOrDefault(miniGameName.toLowerCase().trim(), 0);
   }
 
-  /** مجموع مراحل پاس‌شدهٔ همهٔ مینی‌گیم‌ها (برای لیدربورد). */
   public int getTotalMiniGameLevelsCleared() {
     if (clearedMiniGameLevels == null) {
       return 0;
@@ -122,8 +111,6 @@ public class Progress {
       this.currentStage++;
       this.currentLevel = 1;
     } else {
-      // 4-4 is the last level on the map. There is no stage 5 to walk into, so the cursor stays
-      // where it is and the adventure is marked finished instead.
       this.adventureCompleted = true;
       return new Result(
           true,
@@ -167,7 +154,6 @@ public class Progress {
     }
     normalize();
 
-    // Once the map is finished every level stays open for replay.
     if (this.adventureCompleted) return true;
 
     if (stage < this.currentStage) return true;
@@ -179,7 +165,6 @@ public class Progress {
     return false;
   }
 
-  /** Debug cheat: opens every chapter and level so the whole adventure can be reached. */
   public Result unlockAllChapters() {
     this.currentStage = AdventureMap.MAX_STAGES;
     this.currentLevel = AdventureMap.LEVELS_PER_STAGE;
@@ -206,21 +191,11 @@ public class Progress {
     return currentLevel;
   }
 
-  /** True once 4-4 has been cleared: the map is finished and there is nothing left to unlock. */
   public boolean isAdventureCompleted() {
     normalize();
     return adventureCompleted;
   }
 
-  /**
-   * Pulls the cursor back inside the 4x4 map.
-   *
-   * <p>Gson builds this object field-by-field without running the constructor, so a save written
-   * by an older build -- when the map was 5 stages of 10 levels, and when clearing the last level
-   * still incremented the stage -- can arrive holding a stage or level that no longer exists.
-   * Rather than let those values reach the menus, they are clamped to the last real level and the
-   * adventure is treated as finished, which is what walking off the end of the map meant.
-   */
   private void normalize() {
     if (currentStage < 1) {
       currentStage = 1;

@@ -163,7 +163,6 @@ public class GamePlayController implements BaseController {
     }
     String type = m.group("type").trim();
     // ایمیتیتر خودش هیچ رفتاری ندارد؛ طبق داک اولین گیاه دیگر سیدبانک را کپی می‌کند تا همان کارت
-    // با یک کول‌داون کاملا مستقل، دوباره قابل کاشت باشد
     String buildType = type;
     if (type.equalsIgnoreCase("imitater")) {
       buildType = resolveImitaterTarget(type);
@@ -309,7 +308,6 @@ public class GamePlayController implements BaseController {
       System.out.println("No plants selected for this match.");
       return;
     }
-    // On a belt stage only the plant on the belt can go down, so say which one that is.
     if (gm.getSpecialStageRule() != null && gm.getSpecialStageRule().belt() != null) {
       String offer = gm.getSpecialStageRule().belt().peekReadyPlant();
       System.out.println("  Conveyor belt is offering: " + (offer == null ? "nothing yet" : offer));
@@ -392,7 +390,6 @@ public class GamePlayController implements BaseController {
     }
   }
 
-  /** لایه‌های زره را با نوع، جان باقی‌مانده و آسیب جذب‌شده چاپ می‌کند. */
   private void printArmorInfo(Zombie z) {
     System.out.println("  armor:");
     for (var armor : z.getArmors()) {
@@ -411,7 +408,6 @@ public class GamePlayController implements BaseController {
     }
   }
   private void finishMatch(GameManager gm) {
-    // پیام برد/باخت را خود GameManager.endGame چاپ می‌کند
     MatchCompletion.apply(gm);
     Menu back = GameSession.getReturnMenu();
     GameSession.end();

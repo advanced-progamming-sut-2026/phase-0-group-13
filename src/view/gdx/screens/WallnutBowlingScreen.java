@@ -16,18 +16,6 @@ import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.SeedCard;
 
-/**
- * Wall-nut Bowling: the belt hands you a nut, you drop it in a lane and it rolls.
- *
- * <p>{@link WallnutBowlingEngine} owns the belt, the rolling, the bounces and the collisions. The
- * screen never moves a nut itself: it asks the engine which nut is on which tile this tick and
- * draws it there, which is why a nut that the engine has spent stops being drawn in the same
- * frame it stops existing.
- *
- * <p>The three kinds are told apart by their own art. The bowling wall-nut is the plain nut and
- * the Explode-o-nut is the red one, both from their own seed packets; the giant is the wall-nut at
- * nearly twice the size, which is the only thing that distinguishes it in the source library too.
- */
 public final class WallnutBowlingScreen extends ArcadeBoardScreen {
 
   private static final float NUT_ROW_FILL = 0.55f;
@@ -63,7 +51,6 @@ public final class WallnutBowlingScreen extends ArcadeBoardScreen {
         + (WallnutBowlingEngine.RED_LINE_COLUMN + 1);
   }
 
-  /** The belt: all three kinds, with whatever it has just delivered lit up. */
   @Override
   protected void buildPicker(Table picker, Skin skin) {
     cards.clear();
@@ -96,7 +83,6 @@ public final class WallnutBowlingScreen extends ArcadeBoardScreen {
     }
   }
 
-  /** Which seed packet is this nut's picture. The giant has no art of its own, see the class doc. */
   private static String packetOf(NutType nut) {
     return nut == NutType.EXPLODE_O_NUT ? "Explode-o-nut" : "Wall-nut";
   }

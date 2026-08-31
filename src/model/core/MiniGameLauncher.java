@@ -50,7 +50,6 @@ public final class MiniGameLauncher {
 
     GameSession.start(gameManager, Menu.QuestMenu);
     if (type == MiniGameType.ZOMBOTANY) {
-      // زامبوتانی موتور جداگانه نداره: یه مرحله‌ی عادیه که استخر زامبی‌هاش گیاه-زامبی‌هان
       App.setCurrentMenu(Menu.GamePlayMenu);
     } else {
       App.setCurrentMenu(Menu.MiniGameMenu);

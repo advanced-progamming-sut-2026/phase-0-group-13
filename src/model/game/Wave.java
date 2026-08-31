@@ -78,8 +78,6 @@ public class Wave {
       allSpawned = true;
     }
 
-    // اسپک: موج بعدی وقتی شروع میشه که ۷۵٪ از کل جونی که این موج اسپاون کرده از بین رفته باشه (نه
-    // وقتی همه‌ش اسپاون شدن)
     if (allSpawned && totalStartingHealth > 0) {
       double remainingHealth = 0;
       for (Zombie zombie : spawnedZombies) {
@@ -90,7 +88,6 @@ public class Wave {
         completed = true;
       }
     } else if (allSpawned && spawnedZombies.isEmpty()) {
-      // هیچ زامبی‌ای واقعا اسپاون نشد (مثلا استخر خالی بود)؛ گیر نکنیم
       completed = true;
     }
   }

@@ -12,8 +12,6 @@ public class WaveGenerator {
   private static final int MAX_WAVES = 10;
   private static final int SPAWN_SPACING_SECONDS = 3;
   private static final int DEFAULT_LANES = 5;
-  // WavePointCost تو دیتای واقعی بین ۱۰۰ تا ۱۵۰۰ پخش شده (میانگین ~۴۰۰)؛ بودجه پایه رو طوری گذاشتیم
-  // که موج اول معمولا ۲ تا ۴ زامبی داشته باشه، نه فقط یکی
   private static final int DEFAULT_WAVE_COST = 500;
   private static final int FALLBACK_ZOMBIE_COST = 100;
   private static final double DIFFICULTY_GROWTH_PER_WAVE = 0.25;
@@ -46,8 +44,6 @@ public class WaveGenerator {
     for (int waveNumber = 1; waveNumber <= waveCount; waveNumber++) {
       boolean isFinalWave = waveNumber == waveCount;
 
-      // هر موج نسبت به موج قبل ۲۵٪ سخت‌تره؛ موج آخر (پرچم) استثنا: به‌جای ادامه تصاعد، ۲ برابر موج
-      // قبل از خودشه (قرارداد معمول wave های پرچم)
       if (waveNumber == 1) {
         waveDifficulty = 1.0;
       } else if (isFinalWave) {
@@ -63,19 +59,10 @@ public class WaveGenerator {
     return waves;
   }
 
-  /**
-   * How the wave budget grows with the level number.
-   *
-   * <p>Difficulty is deliberately not in here any more. The doc puts it on the *cost* of a zombie
-   * rather than on the budget -- see {@link #resolveWaveCost} -- and having it in both places
-   * applied it twice.
-   */
   private static double levelDifficultyMultiplier(int levelNumber) {
     return 1.0 + Math.max(0, levelNumber - 1) * 0.05;
   }
 
-  // به‌جای انتخاب تعداد ثابت زامبی، یه بودجه (waveCost) داریم و تا وقتی بودجه تموم نشده زامبی رندوم
-  // از استخر انتخاب میکنیم (هرکدوم WavePointCost خودشو از دیتا مصرف میکنه)
   private static Wave buildWave(
           int waveNumber, boolean isFinalWave, int budget, List<String> pool, Random random) {
     List<Wave.SpawnEntry> spawns = new ArrayList<>();
@@ -114,8 +101,8 @@ public class WaveGenerator {
   }
 
   /**
-   * The doc's "the wave cost of zombies goes down" as difficulty goes up: the same budget then
-   * buys more of them. Never below 1, or a wave would fill to MAX_ZOMBIES_PER_WAVE for free.
+   * The doc's "the wave cost of zombies goes down" as difficulty goes up: the same budget then buys
+   * more of them. Never below 1, or a wave would fill to MAX_ZOMBIES_PER_WAVE for free.
    */
   private static int scaledCost(int cost) {
     return Math.max(1, (int) Math.round(cost * Difficulty.waveCost()));

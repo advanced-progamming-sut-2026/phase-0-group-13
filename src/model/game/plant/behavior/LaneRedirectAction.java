@@ -5,10 +5,6 @@ import model.game.Board;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-/**
- * اثر گیاهان تگ moveZombies (مثل Garlic و Sweet Potato): زامبی‌ای که به گیاه می‌رسد به جای
- * خوردن آن، به یکی از ردیف‌های همسایه هدایت می‌شود.
- */
 public class LaneRedirectAction implements PlantAction {
   private static final double REACH = 0.6;
 
@@ -21,10 +17,6 @@ public class LaneRedirectAction implements PlantAction {
     this(bitesBeforeDying, false);
   }
 
-  /**
-   * laneWide برای اثر غذای گیاهِ Garlic است: دیتا می‌گوید «هر زامبیِ داخل ردیف» را بیرون می‌کند،
-   * نه فقط آن یکی که چسبیده به گیاه.
-   */
   public LaneRedirectAction(int bitesBeforeDying, boolean laneWide) {
     this.bitesBeforeDying = Math.max(1, bitesBeforeDying);
     this.laneWide = laneWide;

@@ -3,10 +3,6 @@ package model.game.plant.behavior;
 import model.game.Board;
 import model.game.plant.Plant;
 
-/**
- * اثر غذای گیاه برای Torchwood: شعله را آبی می‌کند تا تیرهای عبوری به جای ۲ برابر، ۳ برابر
- * آسیب بزنند.
- */
 public class BlueFlameAction implements PlantAction {
   private boolean applied;
 

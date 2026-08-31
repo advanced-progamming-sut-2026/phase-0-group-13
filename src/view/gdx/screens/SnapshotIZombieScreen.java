@@ -13,14 +13,6 @@ import model.game.minigame.arcade.IZombieMatch.ZombieView;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.render.ArcadeRenderer;
 
-/**
- * Draws a two-sided I, Zombie board from an {@link Snapshot}.
- *
- * <p>{@code IZombieMatch.snapshot()} is everything needed to draw the board, and it reads the same
- * whether the match is being stepped by the server or by this process, so the networked screen and
- * the couch-play screen paint from it identically. Only where the snapshot comes from differs, and
- * that is the one thing {@link #currentSnapshot()} leaves to the subclass.
- */
 public abstract class SnapshotIZombieScreen extends ArcadeBoardScreen {
 
   protected static final float BRAIN_ROW_FILL = 0.42f;
@@ -34,7 +26,6 @@ public abstract class SnapshotIZombieScreen extends ArcadeBoardScreen {
     super(game, type, level);
   }
 
-  /** The board as it stands now, or null before there is one to draw. */
   protected abstract Snapshot currentSnapshot();
 
   @Override
@@ -63,12 +54,6 @@ public abstract class SnapshotIZombieScreen extends ArcadeBoardScreen {
     }
   }
 
-  /**
-   * A stable object per entity id.
-   *
-   * <p>Playback is keyed by identity and a snapshot is fresh records every tick, so without one of
-   * these a walking zombie would restart its walk on every frame it was drawn in.
-   */
   protected final Object keyFor(int entityId) {
     return animationKeys.computeIfAbsent(entityId, id -> new Object());
   }
@@ -110,7 +95,6 @@ public abstract class SnapshotIZombieScreen extends ArcadeBoardScreen {
     }
   }
 
-  /** mm:ss from a tick countdown, for the status line both screens show. */
   protected static String clock(int ticksRemaining) {
     int seconds = ticksRemaining / IZombieEngine.TICKS_PER_SECOND;
     return String.format("%d:%02d", seconds / 60, seconds % 60);

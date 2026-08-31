@@ -17,14 +17,6 @@ import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.UiSkinProvider;
 
 
-/**
- * The mini-game half of the Travel Log, which used to be terminal-only.
- *
- * <p>The unlock and level rules are Progress's, the same ones QuestMenuController checks for
- * "play minigame". Vase Breaker, Bowling, I, Zombie and Beghouled each have their own board
- * screen; Zombotany is a normal stage, so {@link MiniGameLauncher} builds it and it plays on
- * GameplayScreen.
- */
 public final class MiniGamesScreen extends MenuScreen {
 
   private static final List<String> GAMES =
@@ -69,8 +61,6 @@ public final class MiniGamesScreen extends MenuScreen {
 
     content.add(panel).growX().row();
     if (progress.isMiniGameUnlocked("i_zombie")) {
-      // Two people on one keyboard and mouse, so it is not a level of I, Zombie to be cleared -
-      // it banks nothing and sits on its own rather than in that game's 1/2/3 row.
       content.add(new Label("Couch play: I, Zombie for two on this machine "
           + "(P1 mouse, P2 keyboard)", skin, UiSkinProvider.LABEL_MEDIUM)).padTop(10f).row();
       content.add(button("Couch play", UiSkinProvider.BUTTON_GREEN,
@@ -116,7 +106,6 @@ public final class MiniGamesScreen extends MenuScreen {
       return;
     }
     MatchSetup.getInstance().setMiniGame(type, level);
-    // All four arcade mini-games play on their own board screen.
     switch (type) {
       case VASEBREAKER -> {
         go(new VasebreakerScreen(game, level));
@@ -137,8 +126,6 @@ public final class MiniGamesScreen extends MenuScreen {
       default -> { }
     }
 
-    // Zombotany is an ordinary stage. There is no deck builder on this route, so the seed bank is
-    // everything the player owns, same as the Conveyor Belt level does on the Adventure map.
     MatchSetup.getInstance().setSelectedPlants(user.getUnlockedPlants());
     MatchSetup.getInstance().setBoostedPlants(user.getBoostedPlants());
     MatchSetup.getInstance().setDifficultyLevel(user.getDifficultyLevel());

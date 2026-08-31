@@ -51,7 +51,6 @@ public final class VasebreakerEngine {
       return (int) Math.round(positionCol);
     }
 
-    /** Unrounded, so a view can draw the walk instead of a jump once a second. */
     public double getExactColumn() {
       return positionCol;
     }
@@ -109,7 +108,6 @@ public final class VasebreakerEngine {
     }
   }
 
-  /** A seed packet on the ground, waiting to be picked up before it wilts. */
   public static final class PendingSeed {
     private final String plantName;
     private final int row;
@@ -368,7 +366,6 @@ public final class VasebreakerEngine {
     return plants;
   }
 
-  /** The packets on the ground, for a view that draws them where they fell. */
   public List<PendingSeed> getPendingSeeds() {
     return pendingSeeds;
   }

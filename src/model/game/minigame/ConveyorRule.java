@@ -17,9 +17,6 @@ public class ConveyorRule extends MiniGame implements SpecialStageRule {
     this.spawnIntervalTicks = spawnIntervalTicks;
   }
 
-  // به‌جای خرج کردن خورشید، هر spawnIntervalTicks یه گیاه جدید (به ترتیب چرخشی روی beltPlants) رو
-  // نوار نقاله آماده میشه؛ GamePlayController باید هر تیک consumeReadyPlant رو چک کنه و در صورت غیر
-  // null بودن، اون گیاه رو قابل‌کاشت رایگان به بازیکن نشون بده
   @Override
   public void apply(GameState gameState) {
     if (beltPlants.isEmpty()) {
@@ -31,7 +28,6 @@ public class ConveyorRule extends MiniGame implements SpecialStageRule {
     }
   }
   // داک: گیاه‌ها به‌صورت رندوم روی نوار می‌آیند. قبلا به ترتیب ثابت می‌چرخید، که یعنی بازیکن
-  // می‌توانست گیاه بعدی را از رو بخواند. دوبار پشت‌سرهم یک گیاه نمی‌آید مگر اینکه چاره‌ای نباشد.
   public void deliverNow() {
     if (beltPlants.isEmpty()) {
       return;
@@ -57,7 +53,6 @@ public class ConveyorRule extends MiniGame implements SpecialStageRule {
             .equals(model.account.User.normalizePlantKey(plantName));
   }
 
-  /** What the belt is offering right now, without taking it. */
   public String peekReadyPlant() {
     return readyPlant;
   }
@@ -74,7 +69,6 @@ public class ConveyorRule extends MiniGame implements SpecialStageRule {
 
   @Override
   public boolean checkWinCondition() {
-    // برد این مرحله معمولا با تموم شدن موج‌ها مشخص میشه (مثل بقیه مراحل عادی)، نه شرط مخصوص خودش
     return false;
   }
 }

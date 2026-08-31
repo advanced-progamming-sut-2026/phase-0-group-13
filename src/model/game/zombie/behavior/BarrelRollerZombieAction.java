@@ -5,9 +5,6 @@ import model.game.TileEffects.BarrelEffect;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-// Barrel Roller بشکه رو جلوی خودش هل میده: تا وقتی بشکه (لایه‌ی armor) سالمه گیاه‌های سر راه رو له
-// میکنه و شلیک‌ها به خودش نمیرسن. با شکستن بشکه دو تا imp بیرون میان و خودش مثل زامبی معمولی ادامه
-// میده. اگه قبل از شکستن بشکه بمیره، بشکه سر جاش رو زمین میمونه (onDeath)
 public class BarrelRollerZombieAction implements ZombieAction {
   private static final int LEFTOVER_BARREL_HEALTH = 400;
 
@@ -18,7 +15,6 @@ public class BarrelRollerZombieAction implements ZombieAction {
     this.eatingDamage = eatingDamage;
   }
 
-  /** True once the barrel has burst and the imps are out. Read-only, for the renderer. */
   public boolean isBarrelBurst() {
     return barrelBurst;
   }

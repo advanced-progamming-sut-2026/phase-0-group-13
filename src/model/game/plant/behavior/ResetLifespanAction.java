@@ -3,13 +3,6 @@ package model.game.plant.behavior;
 import model.game.Board;
 import model.game.plant.Plant;
 
-/**
- * اثر غذای گیاهِ Sea-shroom و Puff-shroom: طبق plants.json «یک رگبار شلیک می‌کند <b>و عمر هر
- * Sea-shroom/Puff-shroom را از نو می‌کند</b>». بخش دومش اصلا پیاده نشده بود.
- *
- * <p>رگبار را به اکشن اصلی (شوتر) واگذار می‌کند و خودش فقط عمرها را ریست می‌کند، تا از همان
- * ShootForwardAction موجود دوباره استفاده شود و منطق شلیک تکرار نشود.
- */
 public class ResetLifespanAction implements PlantAction {
 
   private final PlantAction burst;

@@ -12,7 +12,7 @@ public class DesktopLauncher {
   public static void main(String[] args) {
     Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
     config.setTitle(GdxConfig.WINDOW_TITLE);
-    config.setWindowedMode(GdxConfig.WINDOW_WIDTH, GdxConfig.WINDOW_HEIGHT);
+    config.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
     config.setForegroundFPS(GdxConfig.FOREGROUND_FPS);
     config.useVsync(GdxConfig.USE_VSYNC);
     new Lwjgl3Application(new PvzGdxGame(), config);

@@ -83,16 +83,11 @@ public class ExplodeAction implements PlantAction {
     return this;
   }
 
-  /**
-   * انفجار در کل یک ردیف به جای ناحیهٔ مربعی (مخصوص Jalapeno که در plants.json «هر زامبی در یک
-   * ردیف را می‌سوزاند» ثبت شده): نه ردیف‌های همسایه را می‌گیرد و نه در شعاع محدود می‌ماند.
-   */
   public ExplodeAction asLaneWide() {
     this.laneOnly = true;
     return this;
   }
 
-  /** Doom-shroom «یک گودال غیرقابل کاشت به جا می‌گذارد» (plants.json). */
   public ExplodeAction leavingCrater() {
     this.leavesCrater = true;
     return this;
@@ -120,7 +115,6 @@ public class ExplodeAction implements PlantAction {
     plant.takeDamage(10000);
   }
 
-  /** کل ردیف را می‌سوزاند و یخ روی همان ردیف را هم آب می‌کند (طبق «and melts ice» در دیتا). */
   private void scorchLane(Plant plant, Board board) {
     int burned = 0;
     for (Zombie zombie : board.getZombies()) {
@@ -147,7 +141,6 @@ public class ExplodeAction implements PlantAction {
     if (scatterGrapes <= 0) {
       return;
     }
-    // انگورها در جهت‌های مختلف (بالا/پایین/جلو) پرتاب می‌شوند و از دیواره‌ها کمانه می‌کنند
     int[][] directions = {{1, 0}, {1, -1}, {1, 1}, {-1, -1}, {-1, 1}, {-1, 0}};
     for (int i = 0; i < scatterGrapes; i++) {
       int[] dir = directions[i % directions.length];

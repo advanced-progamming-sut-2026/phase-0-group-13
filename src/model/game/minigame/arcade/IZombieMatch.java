@@ -7,26 +7,10 @@ import java.util.Map;
 import java.util.Random;
 import model.enums.MatchRole;
 
-/**
- * Two-sided match around {@link IZombieEngine}. The seed is explicit so the server and both
- * clients can build the same starting board.
- *
- * <p>Both players act through {@link #apply}, which is the only door into the engine: it checks
- * who is allowed to make this kind of move and then hands the move straight to the engine, whose
- * refusal is passed back word for word. No rule is decided here and none is decided again in a
- * client -- the engine owns the price, the recharge, the red line and what is already on the tile.
- *
- * <p>The match ends one of three ways: the attacker eats all five brains, the defender survives
- * {@link #SURVIVAL_SECONDS}, or the engine declares the attacker unable to act. The first to
- * happen wins, and once a winner is decided it never changes, which is what lets the same verdict
- * be delivered to two clients.
- */
 public final class IZombieMatch {
 
-  /** The rate every cadence in {@link IZombieEngine} is written in. */
   public static final int TICK_MILLIS = 1000 / IZombieEngine.TICKS_PER_SECOND;
 
-  /** How long the defending player has to hold out to win. */
   public static final int SURVIVAL_SECONDS = 120;
   public static final int SURVIVAL_TICKS = SURVIVAL_SECONDS * IZombieEngine.TICKS_PER_SECOND;
 
@@ -72,10 +56,6 @@ public final class IZombieMatch {
     decide();
   }
 
-  /**
-   * Brains first, so an attacker who eats the last one on the very tick the clock runs out still
-   * wins it. Nothing is re-decided once a winner is set.
-   */
   private void decide() {
     if (winner != null) {
       return;
@@ -103,15 +83,10 @@ public final class IZombieMatch {
     return winner != null;
   }
 
-  /** Null while the match is still running. */
   public MatchRole winner() {
     return winner;
   }
 
-  /**
-   * Everything a client needs to draw the board, so neither of them has to run a second copy of
-   * the game to fill in what the protocol left out.
-   */
   public Snapshot snapshot() {
     List<PlantView> plants = new ArrayList<>();
     for (IZombieEngine.DefensePlant plant : engine.getDefensePlants()) {
@@ -144,11 +119,6 @@ public final class IZombieMatch {
         zombieRecharge, plantRecharge);
   }
 
-  /**
-   * What a side is worth at the end of a match, so the two clients and the server all arrive at
-   * the same number from the same board: the attacker is measured in brains taken, the defender in
-   * seconds held.
-   */
   public static int scoreFor(Snapshot snapshot, MatchRole role) {
     if (snapshot == null || role == null) {
       return 0;
@@ -162,7 +132,6 @@ public final class IZombieMatch {
 
   public record PlantView(int id, String name, int row, int col, int health, int maxHealth) {}
 
-  /** Column is unrounded so a client draws the walk rather than a jump per cell. */
   public record ZombieView(
       int id,
       String type,

@@ -55,7 +55,6 @@ public class PlantFactory {
 
     double intervalSeconds =
             Math.max(0.1, baseIntervalSeconds + levelStats.getActionIntervalDeltaSeconds());
-    // "Atk Speed +N%" یعنی بازه‌ی عمل به همان نسبت کوتاه‌تر می‌شود
     intervalSeconds =
             Math.max(0.1, intervalSeconds * (1.0 - levelStats.getAttackSpeedPercent() / 100.0));
     int interval = Math.max(1, (int) Math.round(intervalSeconds * TICKS_PER_SECOND));
@@ -73,16 +72,11 @@ public class PlantFactory {
     return plant;
   }
 
-  /**
-   * دسته‌های لِوِلی که تازه اعمال می‌شوند (سرعت حمله، خورشید، پیرس، مدت یخ و ...) در چند نقطه از
-   * ساخت رفتار لازم‌اند؛ به جای پاس‌دادن به همه‌ی متدها، همان لِوِلِ در دست ساخت اینجا نگه می‌ماند.
-   */
   private PlantLevel levelStats = PlantLevel.none();
 
   private static final Pattern LIFESPAN_SECONDS =
           Pattern.compile("lifespan of (\\d+) second", Pattern.CASE_INSENSITIVE);
 
-  /** «Limited lifespan of 60 seconds» در دیتای Sea-shroom و Puff-shroom. */
   private void applyLifespan(Plant plant, PlantTemplate template, PlantLevel stats) {
     if (template.baseAbility == null) {
       return;
@@ -100,13 +94,6 @@ public class PlantFactory {
 
   private static final int IMITATER_FREE_PLANT_FOOD_LEVEL = 4;
 
-  /**
-   * Imitater در plants.json «گیاه دیگری را کپی می‌کند (تا بتوانی یک کارت را دو بار بازی کنی)».
-   * چون دستور کاشت (`plant plant -t <type> ...`) متن آزاد می‌گیرد، کافی است نامِ هدف را پشت
-   * «imitater» بنویسند؛ نیازی به دستور یا رابط جدید نیست.
-   *
-   * @return نام گیاه کپی‌شونده، یا null اگر این اسم اصلا Imitater نباشد
-   */
   private String parseImitationTarget(String name) {
     if (name == null) {
       return null;
@@ -119,10 +106,6 @@ public class PlantFactory {
     return target.isEmpty() ? null : target;
   }
 
-  /**
-   * کپی دقیقا همان گیاه هدف است (همان رفتار، همان غذای گیاه، همان جان). Lvl 4 دیتای Imitater
-   * «plant food on enterance» است، پس از آن لِوِل به بعد کپی با غذای گیاهِ فعال متولد می‌شود.
-   */
   private Plant createImitation(String targetName, int row, int col, int level) {
     Plant copy = createPlant(targetName, row, col, level);
     if (copy == null) {
@@ -245,10 +228,6 @@ public class PlantFactory {
   private static final Pattern SUN_AMOUNT =
           Pattern.compile("(\\d+)\\s*sun", Pattern.CASE_INSENSITIVE);
 
-  /**
-   * غذای گیاه برای گیاهان پشتیبان. Imitater طبق دیتا اثری ندارد (وابسته به گیاه کپی‌شده) و
-   * null برمی‌گرداند تا پیام مناسب چاپ شود.
-   */
   private PlantFood determineModifierPlantFood(PlantTemplate template) {
     String name = template.name == null ? "" : template.name.toLowerCase();
     if (name.contains("torchwood")) {
@@ -263,7 +242,6 @@ public class PlantFactory {
     return null;
   }
 
-  /** اولین عدد متن اثر غذای گیاه را برمی‌دارد (مثلا "4000 extra health" → 4000). */
   private int parseBonusHealth(String abilityText, int fallback) {
     if (abilityText == null) {
       return fallback;
@@ -304,14 +282,11 @@ public class PlantFactory {
   private PlantAction determineBehavior(
           PlantCategory category, int interval, int damage, EnumSet<PlantTag> tags,
           PlantTemplate template) {
-    // نعناع‌ها تو دیتا با دسته‌ی خانواده‌ی خودشون ثبت شدن، پس فقط از روی اسم قابل تشخیصن
     if (isMint(template.name)) {
-      // "Duration +1s" در لِوِل‌های نعناع تا حالا اعمال نمی‌شد
       return new MintAction(
               (MINT_BASE_DURATION_SECONDS + levelStats.getDurationDeltaSeconds())
                       * TICKS_PER_SECOND);
     }
-    // Bowling Bulb سه نوع پیاز با دمیج و تاخیر جدا دارد ("40/120/180"، "Cyan/Blue/Orange")
     int[] bulbDamages = parseStageValues(template.damage);
     if (bulbDamages.length == 3 && mentions(template.baseAbility, "3 kinds of bulb")) {
       return buildBowlingBulb(template, bulbDamages);
@@ -324,12 +299,10 @@ public class PlantFactory {
     return baseBehaviorFor(category, interval, power, tags, template, 0);
   }
 
-  // power برای تولیدکننده‌های خورشید یعنی مقدار خورشید و برای بقیه یعنی دمیج
   private PlantAction baseBehaviorFor(
           PlantCategory category, int interval, int power, EnumSet<PlantTag> tags,
           PlantTemplate template, int stageIndex) {
     return switch (category) {
-      // Gold Bloom در دیتا «یک‌بار خورشید می‌دهد و ناپدید می‌شود»؛ بقیه چرخه‌ای تولید می‌کنند
       case SUN_PRODUCER -> new ProduceSunAction(
               interval, power + levelStats.getSunDelta(),
               mentions(template.baseAbility, "vanishes"));
@@ -350,10 +323,6 @@ public class PlantFactory {
   private static final Pattern BUTTER_BONUS =
           Pattern.compile("butter\\s*\\+(\\d+)%", Pattern.CASE_INSENSITIVE);
 
-  /**
-   * Kernel-pult تنها لابری است که دیتا برایش دو نوع پرتابه ثبت کرده ("20/40": دانه یا کره‌ی
-   * گیج‌کننده). بقیه‌ی لابرها همان LobAction قبلی را می‌گیرند.
-   */
   private PlantAction buildLobber(int interval, int power, EnumSet<PlantTag> tags,
           PlantTemplate template) {
     int[] shotValues = parseStageValues(template.damage);
@@ -384,10 +353,6 @@ public class PlantFactory {
   private static final Pattern BULB_DELAY =
           Pattern.compile("([A-Za-z]+)\\s*:\\s*(\\d+)\\s*s", Pattern.CASE_INSENSITIVE);
 
-  /**
-   * «Fires 3 kinds of bulb that ricochet between lanes ... Delay per bulb Cyan: 2s | Blue: 5s |
-   * Orange: 10s» با دمیج "40/120/180" — هر پیاز تایمر خودش را دارد.
-   */
   private PlantAction buildBowlingBulb(PlantTemplate template, int[] damages) {
     List<String> names = new ArrayList<>();
     List<Integer> delays = new ArrayList<>();
@@ -412,10 +377,6 @@ public class PlantFactory {
 
   private static final double MAGNET_RANGE = 3.0;
 
-  /**
-   * دستهٔ Homing فقط شلیکِ ردیاب نیست: طبق plants.json کارِ Caulipower هیپنوتیزم‌کردنِ هدف است و
-   * کارِ Magnet-shroom کندنِ فلز از سر زامبی — هیچ‌کدام تیر با دمیج شلیک نمی‌کنند.
-   */
   private PlantAction determineHomingBehavior(int interval, int power, PlantTemplate template) {
     String name = template.name == null ? "" : template.name.toLowerCase();
     if (mentions(template.baseAbility, "hypnotis")) {
@@ -432,7 +393,6 @@ public class PlantFactory {
     ShootForwardAction action = new ShootForwardAction(interval, power,
             resolveProjectileEffect(tags), piercing, parseLaneSpread(template.baseAbility));
     action.setDirections(parseFiringDirections(template.baseAbility));
-    // گیاهانی مثل Bowling Bulb تیرهایشان بین ردیف‌ها کمانه می‌کند
     if (mentions(template.baseAbility, "ricochet")) {
       action.setRicochet(parseVanishSeconds(template.baseAbility) * TICKS_PER_SECOND);
     }
@@ -443,10 +403,6 @@ public class PlantFactory {
   private static final Pattern PIERCE_COUNT =
           Pattern.compile("pierces through (\\d+)", Pattern.CASE_INSENSITIVE);
 
-  /**
-   * Cactus در دیتا «از ۳ زامبی رد می‌شود» و Lvl 2 یکی اضافه می‌کند. Fume-shroom عددی ندارد، پس
-   * صفر (بی‌نهایت) برمی‌گردد و رفتار فعلی‌اش دست‌نخورده می‌ماند.
-   */
   private int parsePierceLimit(String abilityText) {
     if (abilityText == null) {
       return 0;
@@ -471,7 +427,6 @@ public class PlantFactory {
     if (name.contains("hypno")) {
       return new HypnoShroomAction();
     }
-    // افکت Torchwood و Lily Pad رو Board و GameManager اعمال میکنن، پس رفتار تیکی لازم ندارن
     return null;
   }
 
@@ -484,7 +439,6 @@ public class PlantFactory {
       return baseBehaviorFor(category, interval, power, tags, template, 0);
     }
     int[] stageStartTicks = parseStageStartTicks(template.baseAbility, stageValues.length);
-    // بونوس لِوِل روی مقدار مرحله‌ی اول حساب شده؛ همون اختلاف رو به بقیه‌ی مرحله‌ها هم میدیم
     int levelBonus = power - stageValues[0];
     PlantAction[] stages = new PlantAction[stageValues.length];
     for (int i = 0; i < stageValues.length; i++) {
@@ -515,7 +469,6 @@ public class PlantFactory {
   private static final Pattern STAGE_TIME =
           Pattern.compile("Stg\\s*(\\d+)\\s*:\\s*(\\d+)\\s*s", Pattern.CASE_INSENSITIVE);
 
-  // "To Stg2: 24s | To Stg3: 72s" یعنی مرحله‌ها از تیک 0، 240 و 720 بعد از کاشت شروع میشن
   private int[] parseStageStartTicks(String abilityText, int stageCount) {
     int[] startTicks = new int[stageCount];
     if (abilityText == null) {
@@ -535,7 +488,6 @@ public class PlantFactory {
   private static final int[][] STAR_DIRECTIONS = {{1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}};
   private static final int[][] SPLIT_DIRECTIONS = {{1, 0}, {-1, 0}, {-1, 0}};
 
-  // null یعنی همون شلیک مستقیم به جلو
   private int[][] parseFiringDirections(String abilityText) {
     if (abilityText == null) {
       return null;
@@ -555,14 +507,11 @@ public class PlantFactory {
 
   private PlantAction determineExplosiveBehavior(
           int damage, EnumSet<PlantTag> tags, PlantTemplate template) {
-    // گیاهانی که دیتا برایشان دمیج صفر و کارِ «یخ‌زدن» ثبت کرده (Iceberg Lettuce, Ice-shroom)
-    // نباید فالبکِ ۱۸۰۰ دمیج بگیرند؛ کارشان freeze است نه انفجار
     if (mentions(template.baseAbility, "freeze")) {
       boolean wholeLawn = mentions(template.baseAbility, "lawn")
               || mentions(template.baseAbility, "every zombie");
       return freezeAction(wholeLawn, true);
     }
-    // Hot Potato یخ را آب می‌کند و Grave Buster سنگ‌قبر را نابود می‌کند؛ هیچ‌کدام منفجر نمی‌شوند
     if (mentions(template.baseAbility, "melt it")) {
       return new MeltIceAction(levelStats.getRangeDelta());
     }
@@ -575,11 +524,9 @@ public class PlantFactory {
     int blastDamage = damage > 0 ? damage : 1800;
     int range = mentions(template.baseAbility, "lawn") ? 9 : (mentions(template.baseAbility, "3x3") ? 1 : 0);
 
-    // Jalapeno: «هر زامبی در یک ردیف» یعنی کل ردیف، نه ناحیهٔ ۳x۳
     if (mentions(template.baseAbility, "in one lane")) {
       return new ExplodeAction(0, blastDamage, range).asLaneWide();
     }
-    // Doom-shroom گودال غیرقابل کاشت به جا می‌گذارد
     if (mentions(template.baseAbility, "crater")) {
       return new ExplodeAction(0, blastDamage, Math.max(range, 1)).leavingCrater();
     }
@@ -590,7 +537,6 @@ public class PlantFactory {
     }
 
     ExplodeAction explode = new ExplodeAction(0, blastDamage, Math.max(range, 1));
-    // گیاهانی مثل Grapeshot بعد از انفجار، ساچمه‌های کمانه‌کننده پخش می‌کنند
     if (mentions(template.baseAbility, "ricochet")) {
       explode.withScatteringGrapes(
               GRAPE_COUNT, parseVanishSeconds(template.baseAbility) * TICKS_PER_SECOND,
@@ -601,7 +547,6 @@ public class PlantFactory {
 
   private static final int GRAVE_BUSTER_EAT_SECONDS = 3;
 
-  /** مدت یخ‌زدگی: پایه‌ی FreezeAction به‌علاوهٔ «Freeze Time +2s» لِوِل. */
   private FreezeAction freezeAction(boolean wholeLawn, boolean consumedOnUse) {
     int seconds = FreezeAction.DEFAULT_FREEZE_SECONDS + levelStats.getFreezeTimeDeltaSeconds();
     return new FreezeAction(Math.max(1, seconds) * TICKS_PER_SECOND, wholeLawn, consumedOnUse);
@@ -610,7 +555,6 @@ public class PlantFactory {
   private static final int GRAPE_COUNT = 6;
   private static final int DEFAULT_GRAPE_LIFE_SECONDS = 5;
 
-  /** از متن توانایی، «vanish after N seconds» را می‌خواند. */
   private int parseVanishSeconds(String abilityText) {
     if (abilityText == null) {
       return DEFAULT_GRAPE_LIFE_SECONDS;
@@ -639,7 +583,6 @@ public class PlantFactory {
     if (tags.contains(PlantTag.SUN)) return new SunOnHitAction(5);
     if (name != null && name.toLowerCase().contains("endurian")) return new ReflectDamageAction();
     if (tags.contains(PlantTag.MOVE_ZOMBIES)) {
-      // Sweet Potato آهنرباست و زامبی‌ها را به ردیف خودش می‌کِشد؛ Garlic برعکس، هُلشان می‌دهد
       boolean magnet = name != null && name.toLowerCase().contains("sweet potato");
       return magnet ? new LaneMagnetAction(20) : new LaneRedirectAction(3);
     }
@@ -648,8 +591,6 @@ public class PlantFactory {
 
   private PlantFood determinePlantFood(
           PlantTemplate template, PlantCategory category, int interval, int damage, EnumSet<PlantTag> tags) {
-    // plants.json برای گیاهان یک‌بارمصرف (Cherry Bomb, Jalapeno, Gold Bloom, ...) صراحتا
-    // "None (single-use plant)" ثبت کرده؛ پس نباید برایشان اثر ساختگی بسازیم
     if (isMint(template.name) || hasNoPlantFoodEffect(template.plantFoodEffect)) {
       return null;
     }
@@ -671,10 +612,6 @@ public class PlantFactory {
 
   private static final int PLANT_FOOD_TARGETS = 3;
 
-  /**
-   * دو اثر غذای گیاهِ شوترها که فقط رگبار نبودند: Fume-shroom «زامبی‌ها را عقب می‌راند» و
-   * قارچ‌های عمر-محدود «عمر همهٔ هم‌نوع‌هایشان را از نو می‌کنند».
-   */
   private PlantFood buildShooterPlantFood(PlantTemplate template, PlantCategory category,
           int interval, int damage, EnumSet<PlantTag> tags) {
     boolean piercing = category == PlantCategory.STRIKE_THROUGH;
@@ -689,7 +626,6 @@ public class PlantFactory {
     return new PlantFood(150, burst);
   }
 
-  /** اثر غذای گیاهِ Kernel-pult: «روی سر هر زامبیِ روی زمین کره می‌اندازد». */
   private PlantFood buildLobberPlantFood(PlantTemplate template, int interval, int damage,
           EnumSet<PlantTag> tags) {
     int[] shotValues = parseStageValues(template.damage);
@@ -700,11 +636,6 @@ public class PlantFactory {
             new LobAction(Math.max(1, interval / 3), damage * 2, true, resolveProjectileEffect(tags)));
   }
 
-  /**
-   * اثر غذای گیاهِ Bonk Choy / Wasabi Whip / Phat Beet / Kiwibeast در دیتا صراحتا ناحیه‌ای است
-   * ("3x3 area" / "area damage" / "every nearby zombie") ولی سازندهٔ دوآرگومانی شعاع را صفر
-   * می‌گذاشت. Chomper استثناست: دیتایش «۳ زامبی» است، نه ناحیه — پس تک‌هدف می‌ماند.
-   */
   private int plantFoodMeleeRadius(PlantTemplate template) {
     String effect = template.plantFoodEffect;
     boolean areaEffect = mentions(effect, "3x3")
@@ -713,7 +644,6 @@ public class PlantFactory {
     return areaEffect ? 1 : 0;
   }
 
-  /** Caulipower چند زامبی تصادفی را هیپنوتیزم می‌کند و Magnet-shroom چند فلز را یکجا می‌کَند. */
   private PlantFood determineHomingPlantFood(PlantTemplate template, int interval, int damage) {
     String name = template.name == null ? "" : template.name.toLowerCase();
     if (mentions(template.plantFoodEffect, "hypnotis")) {
@@ -725,10 +655,6 @@ public class PlantFactory {
     return new PlantFood(150, new HomingAction(Math.max(1, interval / 3), damage * 2));
   }
 
-  /**
-   * گردوهای تگ moveZombies اثرشان زره نیست: Garlic کل ردیف را بیرون می‌ریزد و Sweet Potato
-   * زامبی‌های نزدیک را می‌کِشد و جانش را کامل می‌کند.
-   */
   private PlantFood determineWallNutPlantFood(PlantTemplate template, EnumSet<PlantTag> tags) {
     if (tags.contains(PlantTag.MOVE_ZOMBIES)) {
       boolean magnet = template.name != null
@@ -740,7 +666,6 @@ public class PlantFactory {
     return new PlantFood(1, new FortifyAction(parseBonusHealth(template.plantFoodEffect, 4000)));
   }
 
-  /** Iceberg Lettuce با غذای گیاه کل زمین را یخ می‌زند؛ بقیه‌ی انفجاری‌ها منفجر می‌شوند. */
   private PlantFood determineExplosivePlantFood(PlantTemplate template, int damage) {
     if (mentions(template.plantFoodEffect, "freeze")) {
       return new PlantFood(1, freezeAction(true, true));

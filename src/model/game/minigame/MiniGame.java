@@ -4,7 +4,7 @@ import model.game.GameState;
 
 public abstract class MiniGame {
   protected boolean started;
-  protected int score; // معادل با MyoPoints در بازی‌های امتیازی
+  protected int score;
 
   public void start() {
     started = true;

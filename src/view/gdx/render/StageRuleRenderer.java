@@ -19,9 +19,6 @@ import view.gdx.ui.HudArt;
 /**
  * The bits of a stage that live on the lawn rather than in the HUD: the cells Save Our Seeds is
  * guarding, the line Deadline zombies must not cross, and each chapter's own markers.
- *
- * <p>Nothing here decides when an event happens or how long it lasts; the seasons record what they
- * did and this fades it out over the window they say it is worth showing for.
  */
 public final class StageRuleRenderer implements WorldRenderer {
 
@@ -74,7 +71,6 @@ public final class StageRuleRenderer implements WorldRenderer {
     }
   }
 
-  /** A swirl where the zombie was picked up, a trail to where it was dropped, an arrow on the end. */
   private void drawTornadoes(RenderContext context, AncientEgyptSeason egypt, int currentTick) {
     var events = egypt.getRecentTornadoes();
     if (events.isEmpty()) {
@@ -95,15 +91,12 @@ public final class StageRuleRenderer implements WorldRenderer {
       shapes.setColor(sandTrail.r, sandTrail.g, sandTrail.b, 0.9f * fade);
       shapes.rect(Math.min(from, to), y - TORNADO_TRAIL_HEIGHT / 2f,
           Math.abs(to - from), TORNADO_TRAIL_HEIGHT);
-      // The head points the way the zombie was carried, towards the house.
       float head = geometry.getCellWidth() * 0.22f;
       shapes.setColor(sandSwirl.r, sandSwirl.g, sandSwirl.b, fade);
       shapes.triangle(to - head, y, to, y + head * 0.55f, to, y - head * 0.55f);
     }
     shapes.end();
 
-    // The swirl outline carries the read; the sand art sits under it for texture. On Egypt's own
-    // sandy ground the art alone is too low-contrast to say anything.
     shapes.begin(ShapeRenderer.ShapeType.Line);
     for (AncientEgyptSeason.TornadoEvent event : events) {
       float fade = fadeOf(currentTick - event.tick(), AncientEgyptSeason.TORNADO_EVENT_TICKS);
@@ -154,7 +147,6 @@ public final class StageRuleRenderer implements WorldRenderer {
     context.getBatch().draw(cloud, x - width / 2f, y - height / 2f, width, height);
   }
 
-  /** A zombie is picked up at the spawn column, off the right edge, so it is pulled onto the lawn. */
   private float onLawn(double column) {
     return geometry.columnCentreX(Math.min(column, geometry.getColumns() - 1.0));
   }
@@ -170,7 +162,6 @@ public final class StageRuleRenderer implements WorldRenderer {
     }
   }
 
-  /** A band over the row the wind hit, with a front that sweeps across it once. */
   private void drawIceWind(RenderContext context, FrostbiteCavesSeason frost, GameManager game) {
     int row = frost.getWindRow();
     if (row < 0 || row >= game.getBoard().getRows()) {
@@ -192,7 +183,6 @@ public final class StageRuleRenderer implements WorldRenderer {
     Gdx.gl.glEnable(GL20.GL_BLEND);
     ShapeRenderer shapes = context.getShapes();
     shapes.begin(ShapeRenderer.ShapeType.Filled);
-    // The caves are already ice-blue, so the gust has to be near-white to read at all.
     shapes.setColor(windBand.r, windBand.g, windBand.b, 0.45f * fade);
     shapes.rect(left, bottom, width, height);
     shapes.setColor(windGust.r, windGust.g, windGust.b, 0.85f * fade);
@@ -269,7 +259,6 @@ public final class StageRuleRenderer implements WorldRenderer {
     shapes.end();
   }
 
-  /** 1 right after the event, 0 once the season stops reporting it. */
   private static float fadeOf(int age, int window) {
     if (age < 0 || age > window) {
       return 0f;
@@ -277,7 +266,6 @@ public final class StageRuleRenderer implements WorldRenderer {
     return 1f - (age / (float) window);
   }
 
-  // Pulsing, because "keep these alive" has to read differently from ordinary decoration.
   private void drawGuardedCells(RenderContext context, SaveOurSeedsRule rule) {
     if (rule.getProtectedPlants().isEmpty()) {
       return;
@@ -310,7 +298,6 @@ public final class StageRuleRenderer implements WorldRenderer {
         geometry.getCellWidth() - 2f, geometry.getCellHeight() - 2f);
   }
 
-  /** The rule loses the moment a zombie's column reaches this one, so the line sits on its edge. */
   private void drawDeadline(RenderContext context, DeadLineRule rule, GameManager game) {
     float x = geometry.columnToX(rule.getDeadlineColumn());
     float bottom = geometry.rowToY(game.getBoard().getRows() - 1);

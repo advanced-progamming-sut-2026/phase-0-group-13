@@ -7,14 +7,6 @@ import network.protocol.MessageType;
 import network.protocol.NetworkMessage;
 import network.protocol.Payloads;
 
-/**
- * Turns one client message into one server action.
- *
- * <p>It is also {@link MatchService.Listener}: the match clock calls back here after every tick
- * with the board it just advanced, and once more when a match is over. That is the only place
- * MATCH_STATE_UPDATE and MATCH_ENDED come from, so a client is never told the game moved by
- * anything other than the server that moved it.
- */
 public final class RequestRouter implements MatchService.Listener {
 
   private final SessionManager sessions;
@@ -154,7 +146,6 @@ public final class RequestRouter implements MatchService.Listener {
     connection.send(message.reply(MessageType.ACK, new Payloads.Ack(true, "logged out")));
   }
 
-  /** Refused mid-match: the match holds both players by name. */
   private void rename(ClientConnection connection, NetworkMessage message) {
     Payloads.RenameRequest request = message.payloadAs(Payloads.RenameRequest.class);
     String current = connection.getUsername();
@@ -186,7 +177,6 @@ public final class RequestRouter implements MatchService.Listener {
         opponent == null ? null : sessions.connectionOf(opponent);
     if (opponentConnection == null) {
       if (opponent != null) {
-        // the waiting player went offline, so take their spot instead of dropping out
         matchmaking.enqueue(connection.getUsername());
       }
       connection.send(message.reply(MessageType.ACK, new Payloads.Ack(true, "waiting for an opponent")));
@@ -216,8 +206,6 @@ public final class RequestRouter implements MatchService.Listener {
 
   private void inviteDecision(ClientConnection connection, NetworkMessage message) {
     Payloads.MatchInviteDecision decision = message.payloadAs(Payloads.MatchInviteDecision.class);
-    // Consumed against the authenticated caller, not against the id alone: an id is a guessable
-    // token and accepting on somebody else's behalf would put a stranger in their match.
     MatchmakingService.Invite invite = decision == null
         ? null
         : matchmaking.consumeInvite(decision.inviteId(), connection.getUsername());
@@ -239,7 +227,6 @@ public final class RequestRouter implements MatchService.Listener {
     startMatch(host, invite.from(), connection, invite.to());
   }
 
-  /** Whoever was waiting or sent the invite takes plants, the other takes zombies. */
   private void startMatch(
       ClientConnection plantsConnection,
       String plantsPlayer,
@@ -252,7 +239,6 @@ public final class RequestRouter implements MatchService.Listener {
         new Payloads.MatchFound(match.getId(), plantsPlayer, MatchRole.ZOMBIES, match.getLevel())));
     System.out.println("match " + match.getId() + ": " + plantsPlayer + " (plants) vs "
         + zombiesPlayer + " (zombies)");
-    // The first board, so both screens have something to draw before the clock's first tick.
     broadcastState(match);
   }
 
@@ -299,7 +285,6 @@ public final class RequestRouter implements MatchService.Listener {
     MatchRole winningRole = match.getState().winner();
     String winner = winningRole == null ? null : match.playerOf(winningRole);
     String loser = winner == null ? null : match.opponentOf(winner);
-    // The final board first, so the losing side sees what did it before the verdict lands.
     broadcastState(match);
     Payloads.MatchEnded ended = new Payloads.MatchEnded(match.getId(), winner, loser, winningRole,
         reasonFor(match, winningRole));

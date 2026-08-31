@@ -55,13 +55,8 @@ public final class MatchmakingService {
   /**
    * Takes an invite, but only for the player it was addressed to.
    *
-   * <p>The recipient is not optional and there is no overload without it. An invite id is a
-   * plain UUID travelling over the wire, and the version of this that took the id alone let any
-   * signed-in account accept somebody else's invitation and be dropped into their match -- so the
-   * check is not a nicety, it is the only thing standing between an id and a stranger's game.
-   *
    * @return the invite, now consumed, or null if there is no such invite or it is not this
-   *         player's to accept
+   * player's to accept
    */
   public synchronized Invite consumeInvite(String inviteId, String recipient) {
     Invite invite = inviteId == null ? null : invites.get(inviteId);

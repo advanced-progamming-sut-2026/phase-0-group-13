@@ -7,19 +7,10 @@ import model.game.zombie.Zombie;
 import model.game.zombie.behavior.ZombossAction;
 import model.game.zombie.behavior.ZombossHealth;
 
-// لِوِل ۴ هر فصل مرحله‌ی باسه. این قانون فاز باس رو مدیریت میکنه: ورود زامباس رو اعلام میکنه و
-// به‌محض کشته شدنش مرحله رو برده اعلام میکنه، حتی اگه چندتا زامبی احضارشده هنوز رو زمین مونده باشن
 public class BossStageRule implements SpecialStageRule {
   private final String bossName;
 
-  /**
-   * داک: مرحله‌های زامباس بر پایهٔ نوار نقاله‌اند.
-   *
-   * <p>Its own belt rather than a second rule, because a match carries one SpecialStageRule and
-   * the boss stage needs both halves. Everything that used to ask {@code instanceof ConveyorRule}
-   * now asks {@link SpecialStageRule#belt()}, so the belt behaves identically here and on the
-   * chapter-one conveyor level.
-   */
+  /** داک: مرحله‌های زامباس بر پایهٔ نوار نقاله‌اند. */
   private final ConveyorRule belt;
 
   private boolean bossAnnounced;
@@ -36,13 +27,7 @@ public class BossStageRule implements SpecialStageRule {
     this.belt = new ConveyorRule(beltPlants, BELT_INTERVAL_TICKS);
   }
 
-  /**
-   * Faster than the chapter-one belt's 120 ticks.
-   *
-   * <p>The belt is the only source of plants on a boss stage, and Zomboss clears whole rows at a
-   * time; at one plant every twelve seconds the player can never rebuild what an ultimate just
-   * took, which makes the fight a formality rather than a fight.
-   */
+  /** Faster than the chapter-one belt's 120 ticks. */
   private static final int BELT_INTERVAL_TICKS = 55;
 
   @Override
@@ -92,12 +77,10 @@ public class BossStageRule implements SpecialStageRule {
     return bossDefeated;
   }
 
-  /** The boss itself once it has arrived, or null before that and after it goes down. */
   public Zombie getBoss() {
     return boss != null && !boss.isDead() ? boss : null;
   }
 
-  /** Its segment bookkeeping, for the health bar and the stun readout. */
   public ZombossAction getBossAction() {
     Zombie current = getBoss();
     return current != null && current.getBehavior() instanceof ZombossAction action ? action : null;

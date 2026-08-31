@@ -7,7 +7,7 @@ public class GameState {
   private Season currentSeason;
   private int currentSun;
   private int plantFoodCount;
-  private int elapsedTime; // زمان سپری شده
+  private int elapsedTime;
   private boolean skySunDisabled;
 
   public GameState() {
@@ -21,7 +21,7 @@ public class GameState {
   public void update(Wave wave, Season season) {
     this.currentWave = wave;
     this.currentSeason = season;
-    this.elapsedTime++; // افزایش زمان بازی به اندازه ۱ تیک
+    this.elapsedTime++;
   }
 
   public void addSun(int amount) {
@@ -86,7 +86,6 @@ public class GameState {
     this.skySunDisabled = skySunDisabled;
   }
 
-  // تبدیل تیک به ثانیه
   public double getElapsedTimeInSeconds() {
     return this.elapsedTime / 10.0;
   }

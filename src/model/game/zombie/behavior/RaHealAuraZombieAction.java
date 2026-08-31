@@ -11,7 +11,6 @@ public class RaHealAuraZombieAction implements ZombieAction {
   private final double eatingDamage;
   private int lastHealTick = -1;
 
-  // به‌جای رفتار مهاجم خاص، هر healInterval تیک به زامبی‌های زخمی هم‌ردیف تو شعاع range جون برمیگردونه
   public RaHealAuraZombieAction(int healInterval, int healAmount, double range, double eatingDamage) {
     this.healInterval = healInterval;
     this.healAmount = healAmount;

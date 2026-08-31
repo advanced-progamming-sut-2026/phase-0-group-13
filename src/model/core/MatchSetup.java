@@ -43,13 +43,6 @@ public class MatchSetup {
     this.bonusRun = false;
   }
 
-  /**
-   * Marks the next match as a bonus run: the daily score game, which belongs to no chapter and no
-   * mini-game, so none of the adventure's stage rules apply to it.
-   *
-   * <p>Kept here rather than worked out at launch because the deck is chosen first, and the plant
-   * selection screen has to know there is no stage locking anything out before the match exists.
-   */
   public void setBonusRun() {
     this.bonusRun = true;
     this.targetChapter = null;
@@ -65,7 +58,6 @@ public class MatchSetup {
     return targetChapter;
   }
 
-  /** Which level of the chapter the player picked; 0 means "wherever the account is up to". */
   public void setTargetLevel(int targetLevel) {
     this.targetLevel = Math.max(0, targetLevel);
   }

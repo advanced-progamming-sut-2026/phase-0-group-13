@@ -15,28 +15,10 @@ import view.gdx.ui.Popup;
 import view.gdx.ui.UiSkinProvider;
 
 
-/**
- * The graphical main menu, matching the Phase 1 one.
- *
- * <p>Logged out it offers Login and Sign Up and greys the rest out, which is the same rule the
- * terminal build enforces by refusing the sub-menu commands with "no user logged in". Logged in it
- * is the hub the other screens come back to.
- *
- * <p>The unread badge reads the same AllNews the terminal MainMenuView prints its "[NEWS *]" from.
- * Rebuilt on every show(), so logging in or reading the news updates it without any listeners.
- */
 public final class MainMenuScreen extends MenuScreen {
 
   private final HudArt hudArt = new HudArt();
 
-  /**
-   * PvZ's own buttons for these destinations, used here as the icon on ours.
-   *
-   * <p>The greenhouse takes the Zen Garden's watering can because the doc's greenhouse is that
-   * feature; the Travel Log takes the quest log; Profile takes the edit button, which is what a
-   * profile screen is for. Leaderboard has no skin icon, so it takes the Arena's gold cup out of
-   * the HUD sheet -- the same trophy its own top row wears.
-   */
   private static final String ICON_NEWS = "image_ui_hud_tasklist_buttons_hud_task_list_normal";
   private static final String ICON_ALMANAC =
       "image_ui_hud_almanacbutton_buttons_hud_almanac_normal";
@@ -61,12 +43,6 @@ public final class MainMenuScreen extends MenuScreen {
     return "textures/environment/darkagesseason.atlas";
   }
 
-  /**
-   * Escape closes the game, since this is the screen with nowhere further back to go.
-   *
-   * <p>Asks first. Quitting is the one thing on this screen that cannot be undone, and Escape is
-   * also the key someone presses out of habit to dismiss whatever they think is in front of them.
-   */
   @Override
   protected void onEscape() {
     Popup.show(stage, skin, "Quit the game?", null,
@@ -79,9 +55,6 @@ public final class MainMenuScreen extends MenuScreen {
     User user = UserManager.getInstance().getCurrentUser();
     boolean loggedIn = user != null;
 
-    // The buttons sit on a panel rather than straight on the art: PLAY is the one thing on this
-    // screen that has to be found instantly, and a block of buttons floating on a busy lawn reads
-    // as a screenshot with controls pasted over it.
     Table menu = panel();
     menu.pad(24f, 40f, 28f, 40f);
     menu.add(new Label(greeting(user), skin, UiSkinProvider.LABEL_MEDIUM)).padBottom(18f).row();
@@ -98,7 +71,6 @@ public final class MainMenuScreen extends MenuScreen {
           .height(64f)
           .padBottom(10f)
           .row();
-      // The daily scored run: the only thing that fills My Point on the leaderboard.
       menu.add(button("BONUS GAME", UiSkinProvider.BUTTON_BROWN,
               () -> go(PlantSelectionScreen.forBonusGame(game))))
           .width(420f)
@@ -156,11 +128,6 @@ public final class MainMenuScreen extends MenuScreen {
     return unread > 0 ? "News (" + unread + ") !" : "News";
   }
 
-  /**
-   * A button that is only wired up when there's a user, because the Phase 1 sub-menus all start by
-   * rejecting a null one. A disabled Button still fires listeners we add ourselves, so the way to
-   * make it inert is to not add one.
-   */
   private TextButton gated(String text, String icon, Runnable action, boolean enabled) {
     TextButton button;
     if (!enabled) {
@@ -172,14 +139,6 @@ public final class MainMenuScreen extends MenuScreen {
     return withIcon(button, icon);
   }
 
-  /**
-   * Puts the game's own icon for a destination on the left of its button.
-   *
-   * <p>These are the buttons PvZ itself uses to reach these screens -- the almanac's book, the Zen
-   * Garden's watering can, the quest log, the settings wrench -- so the row says where each button
-   * goes before the label is read. The icon is inserted ahead of the label the TextButton already
-   * built, which is why its children are rebuilt rather than appended to.
-   */
   private TextButton withIcon(TextButton button, String icon) {
     if (icon == null || !skin.has(icon, TextureRegion.class)) {
       return button;
@@ -187,7 +146,6 @@ public final class MainMenuScreen extends MenuScreen {
     return withIcon(button, skin.getRegion(icon));
   }
 
-  /** Same, for art that lives in the HUD sheet rather than the skin. */
   private TextButton withIcon(TextButton button, TextureRegion icon) {
     if (icon == null) {
       return button;

@@ -16,7 +16,6 @@ public final class BeghouledEngine {
   private static final int MAX_CASCADE_CHAIN = 50;
   private static final int MAX_RESHUFFLE_ATTEMPTS = 50;
 
-  // پنج نوع اول از ابتدا رو زمین پخش میشن؛ بقیه فقط از راه ارتقا به دست میان
   public enum PlantKind {
     PEASHOOTER("peashooter", 'P'),
     SUNFLOWER("sunflower", 'S'),
@@ -134,8 +133,6 @@ public final class BeghouledEngine {
   private final Map<PlantKind, Upgrade> upgrades;
   private final PlantKind[] startingKinds;
   private final PlantKind[][] grid = new PlantKind[ROWS][COLS];
-  // خونه‌هایی که زامبی گیاهشون رو خورده: دیگه هیچ گیاهی اونجا قرار نمیگیره، نه با پر شدن معمولی و
-  // نه با جابه‌جا کردن گیاه‌ها
   private final boolean[][] crater = new boolean[ROWS][COLS];
   private final List<LaneZombie> zombies = new ArrayList<>();
   private final Random random;
@@ -174,7 +171,6 @@ public final class BeghouledEngine {
           grid[row][col] = crater[row][col] ? null : randomKind();
         }
       }
-      // زمین شروع نباید از اول ترکیب آماده داشته باشه، ولی باید حداقل یه حرکت معتبر داشته باشه
       if (findMatchGroups().isEmpty() && hasAnyValidMove()) {
         return;
       }
@@ -242,7 +238,6 @@ public final class BeghouledEngine {
       }
     }
 
-    // ارتقا خودش ممکنه ترکیب بسازه؛ همون‌جا حسابش میکنیم
     int cascadeSun = resolveBoard();
     checkEndConditions();
     return "Upgraded " + converted + " " + from.label + " into " + upgrade.to.label + " for "
@@ -261,8 +256,6 @@ public final class BeghouledEngine {
     return count;
   }
 
-  // هر ترکیب پاک میشه، گیاه‌های بالایی میفتن پایین و جای خالی با گیاه رندوم پر میشه. اگه همون سقوط
-  // ترکیب جدید بسازه (cascade) هر ترکیب یه خورشید بیشتر از حالت عادی میده
   private int resolveBoard() {
     int totalSun = 0;
     int chain = 0;
@@ -350,8 +343,6 @@ public final class BeghouledEngine {
     groups.add(group);
   }
 
-  // هر ستون با گودال‌ها به چند تکه تقسیم میشه و هر تکه جدا فشرده و پر میشه؛ گیاه از روی گودال رد
-  // نمیشه و گودال هیچ‌وقت پر نمیشه
   private void applyGravityAndRefill() {
     for (int col = 0; col < COLS; col++) {
       int segmentBottom = ROWS - 1;
@@ -383,7 +374,6 @@ public final class BeghouledEngine {
     }
   }
 
-  // اگه هیچ حرکت معتبری باقی نمونده باشه، کل زمین با گیاه‌های رندوم جدید ریست میشه
   private void ensureBoardIsPlayable() {
     if (hasAnyValidMove()) {
       return;
@@ -439,7 +429,6 @@ public final class BeghouledEngine {
     ticksSinceSpawn++;
     if (ticksSinceSpawn >= ticksBetweenSpawns) {
       ticksSinceSpawn = 0;
-      // موج‌ها تو این مینی‌گیم تمومی ندارن؛ شرط برد رسیدن به تعداد ترکیب‌های خواسته‌شده‌ست
       zombies.add(new LaneZombie(random.nextInt(ROWS), COLS - 1, 100 + level * 40));
     }
 
@@ -466,9 +455,6 @@ public final class BeghouledEngine {
           grid[zombie.row][col] = null;
           crater[zombie.row][col] = true;
           applyGravityAndRefill();
-          // A new crater can leave the board with no legal swap at all, and the player has no way
-          // to make one: only a swap resolves the board, and no swap is accepted. Same remedy the
-          // player's own moves get, or the game would sit there until a zombie ate again.
           ensureBoardIsPlayable();
         }
         continue;

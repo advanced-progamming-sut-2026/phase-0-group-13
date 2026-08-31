@@ -14,7 +14,6 @@ public class ExplorerZombieAction implements ZombieAction {
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     if (isTorchLit) {
-      // چک کردن گیاه در فاصله یک خانه‌ای جلوتر
       Plant targetPlant = board.getPlantAhead(zombie.getRow(), zombie.getX(), 1.0);
 
       if (targetPlant != null && !targetPlant.isDead()) {

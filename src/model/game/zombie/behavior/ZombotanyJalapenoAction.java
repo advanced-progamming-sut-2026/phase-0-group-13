@@ -4,8 +4,6 @@ import model.game.Board;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-// زامبی-جالاپینو: تا ۱۰ ثانیه بعد از ورودش به زمین مثل یه زامبی معمولی رفتار میکنه، ولی اگه تا اون
-// موقع کشته نشه کل ردیف خودش رو آتیش میزنه و خودش هم از بین میره
 public class ZombotanyJalapenoAction implements ZombieAction {
   private final int fuseTicks;
   private final double eatingDamage;

@@ -22,8 +22,6 @@ public class TombStoneEffect extends TileEffect {
     this(health, blocksShots, false, 0);
   }
 
-  // necromancy=true یعنی این سنگ‌قبر هر necromancyIntervalTicks یه زامبی از دلش زنده میکنه (تا وقتی
-  // خودش با شلیک کافی نابود بشه)
   public TombStoneEffect(int health, boolean blocksShots, boolean necromancy, int necromancyIntervalTicks) {
     super("Tombstone", -1);
     this.health = health;
@@ -81,7 +79,6 @@ public class TombStoneEffect extends TileEffect {
     this.buriedReward = buriedReward;
   }
 
-  /** جایزهٔ داخل قبر را یک‌بار تحویل می‌دهد. */
   public String claimReward() {
     String reward = buriedReward;
     buriedReward = null;

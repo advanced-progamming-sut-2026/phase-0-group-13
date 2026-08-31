@@ -7,7 +7,6 @@ import model.game.zombie.Zombie;
 import model.game.zombie.factory.ZombieFactory;
 
 public class GargantuarAction implements ZombieAction {
-  /** How long the thrown imp is drawn arcing through the air. */
   private static final int THROW_TICKS = 8;
 
   private final int maxHealth;
@@ -19,7 +18,6 @@ public class GargantuarAction implements ZombieAction {
     this.hasThrownImp = false;
   }
 
-  /** The tick the imp was thrown on, or -1 before that happens. For the renderer's throw pose. */
   public int getThrowTick() {
     return throwTick;
   }
@@ -27,11 +25,8 @@ public class GargantuarAction implements ZombieAction {
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     if (!hasThrownImp && zombie.getCurrentHealth() <= maxHealth / 2) {
-      // ایمپ و پرت میکنه گولاخه
       ZombieFactory factory = new ZombieFactory(GameDataManager.zombieRepository);
 
-      // "imp" باگ داشت: ZombieRepository.find دقیقا با alias مطابقت میخواد، و همچین اسمی وجود
-      // نداره (فقط "ZombieEgyptImpDefault" هست) - قبلا همیشه silently fail میشد
       Zombie imp =
               factory.createZombie("ZombieEgyptImpDefault", zombie.getRow(), zombie.getX() - 2.0);
 
@@ -48,7 +43,7 @@ public class GargantuarAction implements ZombieAction {
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
       if (currentTick % 15 == 0) {
-        targetPlant.takeDamage(10000); // بمیره
+        targetPlant.takeDamage(10000);
       }
     } else {
       zombie.setEating(false);

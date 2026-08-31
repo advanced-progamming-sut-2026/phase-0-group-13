@@ -29,12 +29,6 @@ import view.gdx.ui.UiSkinProvider;
 import view.gdx.ui.WorldCarousel;
 
 
-/**
- * The Adventure map: a chapter chooser, and inside a chapter the route of its levels.
- *
- * <p>Chapter and level locks come from the account (getUnlockedStages, Progress.isLevelAccessible),
- * so they match what GameMenuController enforces for the typed "enter chapter" command.
- */
 public final class AdventureScreen extends MenuScreen {
 
   private final int openChapter;
@@ -52,7 +46,6 @@ public final class AdventureScreen extends MenuScreen {
     this(game, 0);
   }
 
-  /** Opens straight into a chapter's level map, e.g. coming back from plant selection. */
   public AdventureScreen(PvzGdxGame game, int openChapter) {
     super(game);
     this.openChapter = openChapter;
@@ -78,7 +71,6 @@ public final class AdventureScreen extends MenuScreen {
     return "textures/ui/menubackground.png";
   }
 
-  /** The adventure backdrop is meant to be seen as it is, so nothing washes over it. */
   @Override
   protected boolean scrimBackground() {
     return false;
@@ -102,7 +94,6 @@ public final class AdventureScreen extends MenuScreen {
     }
   }
 
-  // ---- chapter chooser -------------------------------------------------------------------
 
   private void buildChapterChooser(Table content, User user) {
     Table footer = new Table();
@@ -164,19 +155,11 @@ public final class AdventureScreen extends MenuScreen {
       toast("Chapter " + stage + " is locked. Clear the previous chapter first.");
       return;
     }
-    // Same as the terminal's "enter chapter": a fresh seed bank for whichever level gets picked,
-    // so a deck chosen for a different chapter doesn't leak in.
     user.clearDeck();
     MatchSetup.getInstance().setTargetChapter(String.valueOf(stage));
     go(new AdventureScreen(game, stage));
   }
 
-  /**
-   * The wide selection area with an arrow at each edge.
-   *
-   * <p>The arrows go in a layer above it so they stay clickable and visible over the artwork, and
-   * the area itself is inset by their width so nothing is ever hidden underneath one.
-   */
   private Stack sideBySide(TextButton prev, com.badlogic.gdx.scenes.scene2d.Actor middle,
       TextButton next) {
     Table inset = new Table();
@@ -206,7 +189,6 @@ public final class AdventureScreen extends MenuScreen {
     };
   }
 
-  /** Left and right arrow keys drive the same selection the arrow buttons do. */
   private void arrowKeys(java.util.function.IntConsumer step) {
     stage.addListener(new InputListener() {
       @Override
@@ -224,7 +206,6 @@ public final class AdventureScreen extends MenuScreen {
     });
   }
 
-  /** Opens on the chapter the player is actually playing. */
   private static int startingChapter(User user) {
     int stage = user.getProgress().getCurrentStage();
     return stage < 1 || stage > AdventureMap.MAX_STAGES ? 1 : stage;
@@ -234,7 +215,6 @@ public final class AdventureScreen extends MenuScreen {
     return user.getUnlockedStages().contains("stage_" + stage);
   }
 
-  // ---- level map -------------------------------------------------------------------------
 
   private void buildLevelMap(Table content, User user) {
     Progress progress = user.getProgress();
@@ -299,7 +279,6 @@ public final class AdventureScreen extends MenuScreen {
     content.add(footer).padTop(4f);
   }
 
-  /** The level the map opens on: the first one not yet cleared, else the last. */
   private int firstPlayable(Progress progress) {
     int cleared = clearedLevels(progress, openChapter);
     for (int level = cleared + 1; level <= AdventureMap.LEVELS_PER_STAGE; level++) {
@@ -310,9 +289,6 @@ public final class AdventureScreen extends MenuScreen {
     return Math.max(1, Math.min(cleared, AdventureMap.LEVELS_PER_STAGE));
   }
 
-  // The chapter has to be in MatchSetup before the selection screen opens: selectionRule() reads
-  // it to work out which plants this stage locks out. The Conveyor Belt level hands out plants
-  // itself, so it skips selection and goes straight to the lawn.
   private void startLevel(int level) {
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) {
@@ -332,8 +308,6 @@ public final class AdventureScreen extends MenuScreen {
       return;
     }
 
-    // No selection screen ran, and entering the chapter cleared the deck, so the belt draws from
-    // everything the player owns rather than from an empty seed bank.
     MatchSetup.getInstance().setSelectedPlants(user.getUnlockedPlants());
     MatchSetup.getInstance().setBoostedPlants(user.getBoostedPlants());
     MatchLauncher.launch();
@@ -345,10 +319,7 @@ public final class AdventureScreen extends MenuScreen {
     go(new GameplayScreen(game, started));
   }
 
-  /** Levels of this chapter the player has already cleared. */
   private static int clearedLevels(Progress progress, int stage) {
-    // The cursor stops on 4-4 rather than running off the map, so once the adventure is finished
-    // "levels cleared" has to come from the flag or the last chapter would read 3 / 4 forever.
     if (progress.isAdventureCompleted()) {
       return AdventureMap.LEVELS_PER_STAGE;
     }
@@ -361,7 +332,6 @@ public final class AdventureScreen extends MenuScreen {
     return Math.max(0, progress.getCurrentLevel() - 1);
   }
 
-  /** Same stage-to-season mapping MatchLauncher uses. */
   private static String chapterName(int stage) {
     Season season = switch (stage) {
       case 1 -> new AncientEgyptSeason();

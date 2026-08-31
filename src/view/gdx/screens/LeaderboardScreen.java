@@ -23,44 +23,18 @@ import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.UiSkinProvider;
 
-/**
- * The leaderboard, as the doc's mandatory menu.
- *
- * <p>Every row comes from the server: the screen asks LEADERBOARD_REQUEST and draws the reply. It
- * deliberately does not read {@code UserManager.getAllUsers()} the way the terminal board does --
- * that is this machine's mirror of the accounts, and Phase Three says the table is built from
- * server-stored user data. So a player who has never signed in on this computer still appears, and
- * a local file that has drifted cannot change the standings.
- *
- * <p>The request runs on its own thread because the protocol call blocks on the socket, and
- * blocking here would freeze the render loop for as long as the server took to answer. The result
- * comes back through {@code Gdx.app.postRunnable}, which is the only safe way to touch the stage
- * from off the render thread. That gives the screen three states to show -- asking, failed, and a
- * table -- rather than a window that stops repainting.
- *
- * <p>Columns are the ones the doc lists, and clicking a heading sorts by it: first click descending
- * (the useful direction for a ranking), clicking the same heading again flips to ascending.
- */
+/** The leaderboard, as the doc's mandatory menu. */
 public final class LeaderboardScreen extends MenuScreen {
 
   /** 0 asks for every registered player, which is what the doc's table is. */
   private static final int NO_LIMIT = 0;
 
-  /**
-   * The game's own first/second/third place trophies.
-   *
-   * <p>These are the Arena's league cups, the only actual placement art in the library. They read
-   * as a ranking on sight in a way a numbered rosette does not, so the top three carry the cup
-   * instead of a number -- gold, silver and bronze say which place it is by themselves.
-   */
   private static final String[] MEDALS = {"cupgold", "cupsilver", "cupbronze"};
 
-  /** Cup size in a row. Tall and narrow, like the art. */
   private static final float CUP_WIDTH = 30f;
   private static final float CUP_HEIGHT = 58f;
 
   private static final Color ME_ROW = new Color(0.16f, 0.52f, 0.18f, 0.55f);
-  /** A warm wash behind the podium places, strongest at the top. */
   private static final Color[] PODIUM_ROW = {
       new Color(1f, 0.82f, 0.25f, 0.26f),
       new Color(0.85f, 0.87f, 0.92f, 0.20f),
@@ -130,7 +104,6 @@ public final class LeaderboardScreen extends MenuScreen {
     fetch();
   }
 
-  /** Asks the server off the render thread, then redraws once the answer is in. */
   private void fetch() {
     entries = null;
     status = "Asking the server for the leaderboard...";
@@ -143,8 +116,6 @@ public final class LeaderboardScreen extends MenuScreen {
       if (!session.isConnected() && !session.connect()) {
         problem = session.getLastError();
       } else if (!session.isAuthenticated()) {
-        // The server only answers a signed-in connection, so say that rather than letting the
-        // refusal come back looking like a leaderboard with nobody on it.
         problem = "error: log in to see the leaderboard.";
       } else {
         try {
@@ -156,7 +127,6 @@ public final class LeaderboardScreen extends MenuScreen {
       List<Payloads.LeaderboardEntry> result = fetched;
       String failure = problem;
       Gdx.app.postRunnable(() -> {
-        // The screen can be gone by now if the player pressed Back while this was in flight.
         if (board == null) {
           return;
         }
@@ -206,19 +176,9 @@ public final class LeaderboardScreen extends MenuScreen {
       board.add(row(entry, rank, isMe)).growX().padBottom(2f).row();
       rank++;
     }
-    // Keeps a short table's rows at the top of the panel instead of centred in a sea of cream.
     board.add().expandY().row();
   }
 
-  /**
-   * One player's row.
-   *
-   * <p>Rows alternate a faint wash so the eye can follow a line across seven columns, and the
-   * signed-in player's row is a solid highlight rather than only a brighter font -- on a long
-   * table the old treatment was almost invisible. The top three carry the game's own place badges
-   * in the rank column, which is what makes the top of the table look like a ranking rather than
-   * like row one of a spreadsheet.
-   */
   private Table row(Payloads.LeaderboardEntry entry, int rank, boolean isMe) {
     Table row = new Table();
     row.setBackground(skin.newDrawable(UiSkinProvider.WHITE_PIXEL, rowTint(rank, isMe)));
@@ -243,12 +203,6 @@ public final class LeaderboardScreen extends MenuScreen {
     row.add(label).width(widthOf(column)).pad(4f);
   }
 
-  /**
-   * Your own row wins over everything; then the podium wash; then the ordinary stripe.
-   *
-   * <p>Deliberately in that order: finding yourself is the thing a player does first, so it must
-   * not be outranked by being third.
-   */
   private static Color rowTint(int rank, boolean isMe) {
     if (isMe) {
       return ME_ROW;
@@ -259,7 +213,6 @@ public final class LeaderboardScreen extends MenuScreen {
     return rank % 2 == 0 ? STRIPE_ROW : CLEAR_ROW;
   }
 
-  /** A trophy for the top three, the plain number for everyone else. */
   private Table rankCell(int rank, String style) {
     Table cell = new Table();
     TextureRegion cup = rank <= MEDALS.length ? hudArt.find(MEDALS[rank - 1]) : null;
@@ -289,7 +242,6 @@ public final class LeaderboardScreen extends MenuScreen {
     return column == Column.PLAYER ? 220f : 132f;
   }
 
-  /** A heading that sorts on click, with an arrow showing which way it is sorted. */
   private Label heading(Column column) {
     String text = column.heading;
     if (column == sortedBy && column.ascending != null) {
@@ -302,8 +254,6 @@ public final class LeaderboardScreen extends MenuScreen {
     label.addListener(new ClickListener() {
       @Override
       public void clicked(InputEvent event, float x, float y) {
-        // Clicking the column it is already sorted by flips the direction; a new column starts
-        // descending, which is the way round a ranking is normally read.
         ascending = column == sortedBy && !ascending;
         sortedBy = column;
         redraw();
@@ -312,7 +262,6 @@ public final class LeaderboardScreen extends MenuScreen {
     return label;
   }
 
-  /** "Season 2 Stage 3", or a dash for an account that has not cleared a level yet. */
   private static String progressOf(Payloads.LeaderboardEntry entry) {
     if (entry.lastSeason() <= 0 || entry.lastStage() <= 0) {
       return "-";

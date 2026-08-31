@@ -5,18 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A decoded PopCap {@code .PAM} animation.
- *
- * <p>Every plant and zombie in {@code resources/raw} ships its animation as a PAM: a list of part
- * images plus sprite timelines that add, move and remove those parts frame by frame. libGDX cannot
- * read the format -- see open item 2 in docs/phase2/asset-organization.md -- so this is the reader
- * for it. The field layout follows the reference implementation in tools/pvz-libs/libPVZ-main.
- *
- * <p>Image names come through as {@code "<leaf>|<RESOURCE_ID>"} and the leaf is exactly the region
- * name the extracted atlases under {@code assets/textures} use, which is what lets a PAM be drawn
- * from them without the source library.
- */
 final class PamFile {
 
   private static final long MAGIC = 0xBAF01954L;
@@ -37,7 +25,6 @@ final class PamFile {
     this.mainSprite = mainSprite;
   }
 
-  /** Reads a PAM, or returns null if the file is missing or is not one. */
   static PamFile read(FileHandle file) {
     if (file == null || !file.exists()) {
       return null;
@@ -49,7 +36,6 @@ final class PamFile {
     }
   }
 
-  /** One part image: which atlas region to draw and the transform baked into the part itself. */
   static final class Image {
     final String leaf;
     final int[] size;
@@ -62,7 +48,6 @@ final class PamFile {
     }
   }
 
-  /** A timeline. The main sprite is the whole entity; the others are its moving sub-parts. */
   static final class Sprite {
     final String name;
     final float frameRate;
@@ -75,7 +60,6 @@ final class PamFile {
     }
   }
 
-  /** What changes on this frame. A non-null clip marks the frame a named clip starts on. */
   static final class Frame {
     final String clip;
     final boolean stop;
@@ -122,7 +106,6 @@ final class PamFile {
     }
   }
 
-  /** Little-endian binary walk over the file. */
   private static final class Reader {
 
     private static final int M_SRC_RECT = 32768;

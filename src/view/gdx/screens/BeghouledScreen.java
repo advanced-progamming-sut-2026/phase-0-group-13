@@ -17,23 +17,6 @@ import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.SeedCard;
 
-/**
- * Beghouled: the lawn as a match-three board.
- *
- * <p>{@link BeghouledEngine} owns all of it -- which plant sits where, what a swap is worth, when
- * the falling plants cascade, where the craters are and whether the target is met. This picks the
- * two tiles and draws the result.
- *
- * <p>Every plant is its own seed-packet portrait rather than the terminal build's letter, which is
- * what makes the board readable: matching is a game of spotting three alike, and three pictures
- * are far easier to spot than three copies of {@code CC}. Craters -- tiles a zombie has eaten and
- * nothing will ever grow on again -- get a gravestone, so a hole in the board reads as damage
- * rather than as a gap in the art.
- *
- * <p>A swap needs two clicks. The first arms a tile, the second either swaps with it or, when the
- * two are not neighbours, becomes the new armed tile: re-aiming is what the player meant, not an
- * error worth a toast. Clicking the armed tile again puts it down.
- */
 public final class BeghouledScreen extends ArcadeBoardScreen {
 
   private static final float PLANT_ROW_FILL = 0.72f;
@@ -48,15 +31,7 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
   private final HudArt hudArt = new HudArt();
   private final List<SeedCard> upgradeCards = new ArrayList<>();
   private final List<Upgrade> upgradeOrder = new ArrayList<>();
-  /** One per lane, so a zombie keeps its place in the walk cycle as it steps across. */
   private final Object[] zombieKeys = new Object[ROWS];
-  /**
-   * Portrait per plant kind, looked up once.
-   *
-   * <p>The whole board is redrawn every frame and every tile carries a picture, so going through
-   * the atlas by name forty-five times a frame would mean forty-five string normalisations and
-   * forty-five region scans for a set of eleven pictures that never changes.
-   */
   private final TextureRegion[] portraits = new TextureRegion[PlantKind.values().length];
   private TextureRegion craterArt;
 
@@ -73,7 +48,6 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
 
   @Override
   public void show() {
-    // After super, which is what builds the renderer the atlases hang off.
     super.show();
     for (PlantKind kind : PlantKind.values()) {
       portraits[kind.ordinal()] = art.plantPortrait(kind.label);
@@ -101,7 +75,6 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
                 + ") - click a neighbour");
   }
 
-  /** The upgrades the level offers, priced in sun. Same list the typed menu prints. */
   @Override
   protected void buildPicker(Table picker, Skin skin) {
     upgradeCards.clear();
@@ -118,7 +91,6 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
     paintUpgrades();
   }
 
-  /** Only affordability and the count on the lawn change, so the cards are repainted, not rebuilt. */
   @Override
   protected void refreshPicker() {
     paintUpgrades();
@@ -151,7 +123,6 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
 
   private void buyUpgrade(String fromLabel) {
     toast(engine.upgrade(fromLabel));
-    // An upgrade rewrites whole swathes of the board, so an armed tile may no longer mean anything.
     disarm();
     paintUpgrades();
   }
@@ -171,7 +142,6 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
       return null;
     }
     if (!isNeighbour(row, column)) {
-      // Re-aim rather than refuse: a click on a far tile is a new pick, not a failed swap.
       armedRow = row;
       armedColumn = column;
       return null;
@@ -191,7 +161,6 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
     armedColumn = -1;
   }
 
-  /** Escape drops a half-finished swap: the first tile is picked but the second is not. */
   @Override
   protected boolean clearSelection() {
     if (armedRow < 0) {
@@ -204,8 +173,6 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
   @Override
   protected void tickEngine() {
     engine.tick();
-    // A zombie can eat the very tile the player armed, which turns it into a crater. Drop the pick
-    // rather than leave a highlight on a hole the next click could not swap with anyway.
     if (armedRow >= 0 && engine.getPlantAt(armedRow, armedColumn) == null) {
       disarm();
     }
@@ -226,8 +193,6 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
         }
       }
     }
-    // The engine moves zombies a whole cell at a time and only reports them by tile, so the board
-    // is scanned rather than a list walked; there is no sub-cell position to miss.
     for (int row = 0; row < ROWS; row++) {
       for (int col = 0; col < COLUMNS; col++) {
         if (engine.getZombieHealthAt(row, col) >= 0) {
@@ -240,9 +205,6 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
 
   @Override
   protected void drawOverlays(ShapeRenderer shapes) {
-    // The filled pass runs after the sprite batch, so this washes over the gravestone rather than
-    // sitting behind it. That is the look wanted: a crater is a dead tile, and a stone in shadow
-    // reads as dead where a brightly lit one would read as another piece to match.
     shapes.setColor(CRATER_GROUND);
     for (int row = 0; row < ROWS; row++) {
       for (int col = 0; col < COLUMNS; col++) {

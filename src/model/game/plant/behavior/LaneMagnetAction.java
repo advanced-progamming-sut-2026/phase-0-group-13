@@ -4,10 +4,6 @@ import model.game.Board;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-/**
- * اثر Sweet Potato: برخلاف Garlic که زامبی را به ردیف کناری هُل می‌دهد، این گیاه مثل آهنربا
- * زامبی‌های ردیف‌های همسایه را به ردیف خودش می‌کِشد.
- */
 public class LaneMagnetAction implements PlantAction {
   private static final double PULL_RANGE = 3.0;
 
@@ -19,10 +15,6 @@ public class LaneMagnetAction implements PlantAction {
     this(pullIntervalTicks, false);
   }
 
-  /**
-   * pullAllAndHeal اثر غذای گیاهِ Sweet Potato است: دیتا می‌گوید «همهٔ زامبی‌های نزدیک را می‌کِشد
-   * و جان خودش را کامل می‌کند» — نه یکی‌یکی و بدون درمان.
-   */
   public LaneMagnetAction(int pullIntervalTicks, boolean pullAllAndHeal) {
     this.pullIntervalTicks = Math.max(1, pullIntervalTicks);
     this.pullAllAndHeal = pullAllAndHeal;
@@ -38,7 +30,6 @@ public class LaneMagnetAction implements PlantAction {
       if (zombie.isDead() || zombie.isHypnotized() || zombie.getRow() == plant.getRow()) {
         continue;
       }
-      // فقط ردیف‌های بلافاصله همسایه و زامبی‌هایی که نزدیک ستون گیاه‌اند
       if (Math.abs(zombie.getRow() - plant.getRow()) != 1
               || zombie.getX() - plant.getCol() > PULL_RANGE
               || zombie.getX() < plant.getCol()) {

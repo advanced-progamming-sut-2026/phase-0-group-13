@@ -7,8 +7,6 @@ import model.game.Board;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-// زامبی پیانیست آروم جلو میاد و پیانوش رو از روی گیاه‌های سر راه رد میکنه (واینمیسته بخوره)، و هر
-// چند ثانیه یه بار با نواختن پیانو، زامبی‌های یه ردیف تصادفی رو به یکی از ردیف‌های همسایه میبره
 public class PianistZombieAction implements ZombieAction {
   private final int tuneIntervalTicks;
   private final Random random = new Random();
@@ -33,8 +31,6 @@ public class PianistZombieAction implements ZombieAction {
   }
 
   // طبق داک: «زامبی‌ها هر چند ثانیه یک‌بار به‌صورت رندوم ردیف خود را با یکی از ردیف‌های همسایه
-  // جابه‌جا می‌کنند»؛ یعنی همهٔ زامبی‌های زمین (به‌جز خود پیانیست که مشغول نواختن است) هرکدام به یکی
-  // از ردیف‌های همسایهٔ خودشان می‌روند، نه فقط زامبی‌های یک ردیفِ تصادفی
   private void playTune(Zombie zombie, Board board, int currentTick) {
     if (lastTuneTick == -1) {
       lastTuneTick = currentTick;

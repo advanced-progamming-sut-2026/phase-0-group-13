@@ -9,14 +9,11 @@ public class HookPullZombieAction implements ZombieAction {
   private final double eatingDamage;
   private int lastHookTick = -1;
 
-  // برای زامبی‌های آبی (Fisherman/Octopus) که به‌جای خوردن مستقیم، هر hookInterval تیک با قلاب/شاخک
-  // یه گیاه رو از ردیف بالا یا پایین خودشون بیرون میکشن و نابود میکنن
   public HookPullZombieAction(int hookInterval, double eatingDamage) {
     this.hookInterval = hookInterval;
     this.eatingDamage = eatingDamage;
   }
 
-  /** The tick of the last hook throw (hit or not), for the renderer's cast/toss pose. */
   public int getLastHookTick() {
     return lastHookTick;
   }

@@ -4,10 +4,6 @@ import model.game.Board;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-/**
- * تروگلوبایت: یک بلوک یخ جلوی خودش هل می‌دهد. هر گیاه (یا زامبی هیپنوتیزم‌شده‌ای) که بلوک یخ
- * به آن برسد، درجا از بین می‌رود. اگر بلوک شکسته شود، زامبی مثل یک زامبی عادی ادامه می‌دهد.
- */
 public class IceBlockPusherZombieAction implements ZombieAction {
   private static final double BLOCK_OFFSET = 1.0;
   private static final double CRUSH_RANGE = 0.6;
@@ -41,7 +37,6 @@ public class IceBlockPusherZombieAction implements ZombieAction {
     zombie.move();
   }
 
-  /** بلوک یخ جلوی زامبی حرکت می‌کند و هر گیاهی سر راهش را له می‌کند. */
   private void pushBlock(Zombie zombie, Board board) {
     double blockX = zombie.getX() - BLOCK_OFFSET;
     for (Plant plant : board.getPlants()) {

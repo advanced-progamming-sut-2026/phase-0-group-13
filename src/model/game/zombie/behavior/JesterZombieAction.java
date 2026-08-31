@@ -28,10 +28,6 @@ public class JesterZombieAction implements ZombieAction {
     walkOrEat(zombie, board, currentTick);
   }
 
-  /**
-   * ژانگولر تا وقتی پرتابه‌ای به سمتش می‌آید می‌چرخد و در حال چرخش سریع‌تر جلو می‌رود؛
-   * وقتی مدتی پرتابه‌ای نیاید، چرخش تمام می‌شود و به سرعت عادی برمی‌گردد.
-   */
   private void updateSpin(Zombie zombie) {
     if (spinTicksLeft <= 0) {
       return;
@@ -43,7 +39,6 @@ public class JesterZombieAction implements ZombieAction {
     }
   }
 
-  /** True while the juggler is spinning, so the renderer can show it. Read-only. */
   public boolean isSpinning() {
     return spinTicksLeft > 0;
   }
@@ -57,7 +52,6 @@ public class JesterZombieAction implements ZombieAction {
   }
 
   private void reflectIncomingProjectiles(Zombie zombie, Board board) {
-    // addProjectile وسط پیمایش همون لیست، ConcurrentModificationException میداد
     List<Projectile> reflected = new ArrayList<>();
     Iterator<Projectile> iterator = board.getProjectiles().iterator();
     while (iterator.hasNext()) {
@@ -84,7 +78,6 @@ public class JesterZombieAction implements ZombieAction {
   }
   
   private Projectile buildReflectedProjectile(Projectile incoming, Zombie zombie) {
-    // تیر با همان قدرت خودش برمی‌گردد (نه با دمیج گازگرفتن زامبی)
     return new Projectile(
             Math.max(incoming.getDamage(), (int) eatingDamage),
             -0.5,

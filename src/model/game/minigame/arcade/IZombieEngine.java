@@ -21,17 +21,7 @@ public final class IZombieEngine {
   public static final int STARTING_SUN = 150;
   public static final int RED_LINE_COLUMN = 4;
   public static final String SUN_PRODUCER = "sun-imp";
-  /**
-   * Ticks a type has to wait before it can be deployed again, one per sun of its cost, so a
-   * basic is back in five seconds and a gargantuar in thirty. Zombies had no recharge at all
-   * until now, which left the picker with nothing truthful to show for the cooldown the doc
-   * asks it to display.
-   */
   public static final int RECHARGE_TICKS_PER_SUN = 1;
-  /**
-   * فاز ۱ می‌گوید نرخ تولید خورشیدِ sun-imp اولش خیلی کم است و با گذر زمان زیاد می‌شود، پس فاصلهٔ
-   * بین دو خورشید از ۲۴ ثانیه شروع می‌شود و هر ۸ تیک یک تیک کوتاه‌تر می‌شود تا کف ۲.۵ ثانیه.
-   */
   public static final int SUN_INTERVAL_START_TICKS = 240;
   public static final int SUN_INTERVAL_FLOOR_TICKS = 25;
   public static final int SUN_INTERVAL_RAMP_TICKS = 8;
@@ -40,19 +30,9 @@ public final class IZombieEngine {
   // 1.5s (15 ticks at 10 ticks/second), matching the Peashooter's Action Interval in plants.json.
   public static final int PLANT_FIRE_INTERVAL = 15;
   public static final int TICKS_PER_SECOND = 10;
-  /** What the defending player starts with, the same purse the attacker gets. */
   public static final int PLANT_STARTING_SUN = 150;
-  /** The cutouts shoot once every 1.5s for a flat amount, which is what a Peashooter is. */
   public static final String CUTOUT_PLANT = "Peashooter";
 
-  /**
-   * What the defending player may place.
-   *
-   * <p>Four plants, because these are the four whose behaviour this engine can already express: a
-   * producer, two shooters and a blocker. Anything carrying a mechanic of its own -- a slow, a
-   * splash, a one-shot detonation -- would need the engine to grow one first, and inventing it in
-   * a view or a network layer is exactly what this list exists to avoid.
-   */
   public static final List<String> PLANT_ROSTER =
       List.of("Sunflower", "Peashooter", "Repeater", "Wall-nut");
 
@@ -61,7 +41,7 @@ public final class IZombieEngine {
     public final int cost;
     public final int health;
     public final int damagePerTick;
-    public final double speed; // columns per tick
+    public final double speed;
     public final boolean producesSun;
     public final int unlockLevel;
 
@@ -77,13 +57,7 @@ public final class IZombieEngine {
     }
   }
 
-  /**
-   * A placeable plant, priced and statted from plants.json.
-   *
-   * <p>Nothing here is a number this class chose: cost, health, recharge and the shot's damage and
-   * cadence are all read out of the same catalogue the adventure game is built from, so the two
-   * sides of a match are costed against one another rather than against two different tables.
-   */
+  /** A placeable plant, priced and statted from plants.json. */
   public static final class PlantSpec {
     public final String name;
     public final int cost;
@@ -109,7 +83,6 @@ public final class IZombieEngine {
     }
   }
 
-  /** "20" is one pea; the Repeater's "20x2" is two. */
   private static final Pattern DAMAGE = Pattern.compile("(\\d+)(?:\\s*[x*]\\s*(\\d+))?");
   private static final Pattern FIRST_NUMBER = Pattern.compile("\\d+");
 
@@ -186,7 +159,6 @@ public final class IZombieEngine {
     }
   }
 
-  /** "Produces 50 sun every 24 seconds." - the amount is the ability's own first number. */
   private static int sunPerCycleOf(PlantTemplate template) {
     if (!"Sun Producer".equalsIgnoreCase(template.category)) {
       return 0;
@@ -204,7 +176,6 @@ public final class IZombieEngine {
     for (ZombieSpec spec : CATALOG.values()) {
       if (!spec.producesSun) {purchasable.add(spec);}}
     return purchasable;}
-  /** One of the player's zombies on the lawn. */
   public static final class DeployedZombie {
     private final int id;
     private final ZombieSpec spec;
@@ -223,13 +194,6 @@ public final class IZombieEngine {
       this.sunTimer = 0;
     }
 
-    /**
-     * Unique for the life of the engine.
-     *
-     * <p>A client is sent a fresh copy of the board every tick, so without this it cannot tell
-     * that the zombie in the picture is the same one it drew a moment ago -- and an animation that
-     * cannot be recognised between frames restarts on every one of them.
-     */
     public int getId() {
       return id;
     }
@@ -246,7 +210,6 @@ public final class IZombieEngine {
       return row;
     }
 
-    /** Unrounded, so a view can draw the walk rather than a jump per cell. */
     public double getColumn() {
       return column;
     }
@@ -263,13 +226,11 @@ public final class IZombieEngine {
       return spec.producesSun;
     }
 
-    /** True while it is chewing a cutout instead of walking. */
     public boolean isEating() {
       return eating;
     }
   }
 
-  /** One of the plants defending the brains: a seeded cutout, or one the defender placed. */
   public static final class DefensePlant {
     private final int id;
     private final String name;
@@ -301,12 +262,10 @@ public final class IZombieEngine {
       return health <= 0;
     }
 
-    /** Unique for the life of the engine, same reason as {@link DeployedZombie#getId()}. */
     public int getId() {
       return id;
     }
 
-    /** What it is, so a view can draw it as itself rather than as one stand-in for all of them. */
     public String getName() {
       return name;
     }
@@ -388,7 +347,6 @@ public final class IZombieEngine {
     return zombieTypesFor(level);
   }
 
-  /** The same roster without a running engine, for a client that only knows the level. */
   public static List<ZombieSpec> zombieTypesFor(int level) {
     List<ZombieSpec> all = purchasableSpecs();
     List<ZombieSpec> available = new ArrayList<>();
@@ -430,12 +388,6 @@ public final class IZombieEngine {
     return "Deployed " + typeName + " at (" + (col + 1) + ", " + (row + 1) + "). Zombie-sun left: "
         + zombieSun;
   }
-  /**
-   * The defending player's move, refused in the same words and the same order as placeZombie: the
-   * cell, the type, what is already standing there, the recharge, then the price.
-   *
-   * @return null-free; a message starting with "error:" is a refusal, anything else is the receipt
-   */
   public String placePlant(String typeName, int row, int col) {
     if (isFinished()) {
       return "error: the match is over";
@@ -620,7 +572,6 @@ public final class IZombieEngine {
     return won || lost;
   }
 
-  /** How long this type still has to wait before it can be deployed again, in ticks. */
   public int rechargeTicksLeft(String typeName) {
     Integer left = rechargeLeft.get(typeName == null ? "" : typeName.toLowerCase().trim());
     return left == null ? 0 : left;
@@ -630,7 +581,6 @@ public final class IZombieEngine {
     return spec.cost * RECHARGE_TICKS_PER_SUN;
   }
 
-  /** The same, for the defending player's side of the board. */
   public int plantRechargeTicksLeft(String typeName) {
     Integer left = plantRechargeLeft.get(key(typeName));
     return left == null ? 0 : left;

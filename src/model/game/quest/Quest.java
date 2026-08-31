@@ -63,10 +63,6 @@ public class Quest {
 
   private static final String[] PLACEHOLDERS = {"sun_amount", "family_type", "n"};
 
-  /**
-   * متن شرط برای نمایش، با جای‌گذاری Variable روی جاهای خالیِ Quests.json. getCondition() دست
-   * نمی‌خورد چون موتور تطبیق کوئست‌ها روی همان رشته‌ی خام کلید می‌خورد.
-   */
   public String getDescription() {
     if (condition == null) {
       return null;
@@ -74,7 +70,6 @@ public class Quest {
     if (variable == null || variable.isBlank()) {
       return condition;
     }
-    // "from the chapter chapter": اولی جای‌خالی است، دومی خودِ کلمه
     String text =
         condition.replaceAll("\\bchapter chapter\\b", Matcher.quoteReplacement(variable) + " chapter");
     for (String token : PLACEHOLDERS) {
@@ -104,19 +99,6 @@ public class Quest {
     this.isCompleted = true;
   }
 
-  // ===========================================================================================
-  // Contextual condition engine (the "14 quests" problem)
-  // ---------------------------------------------------------------------------------------------
-  // addProgress()/triggerQuestEvent() only ever answer "how many times did X happen?". A chunk
-  // of quests instead ask "how was the match played?" (no sun spent at all, a symmetric garden,
-  // a certain column left untouched, ...). Those can't be expressed as a running counter because
-  // they depend on the state of the match as a whole, not on a stream of discrete events. This
-  // engine reads that state from a MatchContext instead.
-  //
-  // Every entry below matches a distinctive substring of the "Completion Condition" field from
-  // Quests.json against a predicate over MatchContext. This mirrors the keyword-match style
-  // already used by User.QUEST_EVENT_KEYWORDS, just condition-based instead of event-based.
-  // ===========================================================================================
 
   @FunctionalInterface
   private interface ContextCondition {
@@ -161,8 +143,6 @@ public class Quest {
                     && !ctx.isGardenSymmetricExceptMiddleRow());
 
     // "The final garden layout must be symmetric": باید در پایان مسابقه (نه هر لحظه از وسط بازی) و
-    // روی چیدمانی که واقعا روی زمین ایستاده سنجیده شود، وگرنه یک گیاه در ردیف وسط یا زمینِ خالی
-    // (بعد از خورده‌شدن همه‌ی گیاه‌ها) هم کوئست را کامل می‌کرد
     map.put("must be symmetric", (q, ctx) ->
             ctx.isMatchWon() && ctx.getPlantsOnBoard() > 0 && ctx.isGardenSymmetric());
 

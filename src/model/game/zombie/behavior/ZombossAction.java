@@ -17,27 +17,14 @@ import model.game.zombie.ZombieParts.ZombieTemplate;
 import model.game.zombie.ZombieParts.ZombieTypeResolver;
 import model.game.zombie.factory.ZombieFactory;
 
-/**
- * دکتر زامباس، باسِ آخرِ هر فصل.
- *
- * <p>Holds the right-hand columns rather than walking to the house -- the pressure in a boss stage
- * comes from what it throws at the lawn, not from the robot reaching the porch. On top of the parts
- * every chapter shares (three health segments with a stun between them, moving between lanes,
- * dropping the odd zombie) each chapter gets the two attacks the doc names for it: a small one it
- * fires often and the big one it saves.
- */
 public class ZombossAction implements ZombieAction {
 
-  /** Zomboss stands in two lanes, so plants in either of them can shoot it. */
   public static final int ROW_SPAN = 2;
 
-  /** What the boss is doing, for the renderer to pick a clip. Reporting only, drives nothing. */
   public enum Pose { IDLE, MOVING, ATTACKING, STUNNED }
 
-  /** How long the attack pose is held after a shot, so the clip has time to read. */
   private static final int ATTACK_POSE_TICKS = 12;
 
-  /** Long enough to be a real opening; the sheet's own StunTime is 3-4 seconds. */
   private static final int STUN_TICKS = 40;
 
   private static final int SUMMON_INTERVAL = 200;
@@ -58,7 +45,6 @@ public class ZombossAction implements ZombieAction {
   private static final double CHARGE_STOP_COLUMN = 0.5;
   private static final double CRUSH_REACH = 0.7;
 
-  /** More than anything on the lawn has, so destroyed means destroyed. */
   private static final int DESTROY_DAMAGE = 100000;
 
   private final ZombieType chapter;
@@ -96,7 +82,6 @@ public class ZombossAction implements ZombieAction {
     return chapter;
   }
 
-  /** Stunned means a free hit: it neither moves nor attacks. */
   public boolean isStunned() {
     return stunTicksLeft > 0;
   }
@@ -116,7 +101,6 @@ public class ZombossAction implements ZombieAction {
     }
     if (station < 0) {
       station = Math.max(1, board.getColumns() - 2);
-      // Both its lanes have to be on the board, wherever the wave put it.
       zombie.setRow(Math.max(0, Math.min(zombie.getRow(), board.getRows() - ROW_SPAN)));
     }
     seedTimers(currentTick);
@@ -175,7 +159,6 @@ public class ZombossAction implements ZombieAction {
     lastUltimateTick = currentTick + ATTACK_INTERVAL;
   }
 
-  /** A cleared segment is a stun, which is the whole rhythm of the fight. */
   private void checkSegments(Zombie zombie) {
     int cleared = health.segmentsCleared(zombie.getCurrentHealth());
     if (cleared <= segmentsCleared) {
@@ -194,9 +177,7 @@ public class ZombossAction implements ZombieAction {
             ZombossHealth.SEGMENTS);
   }
 
-  // ---- shared behaviour ----------------------------------------------------
 
-  /** فقط مَمِوتِ غارهای یخی بین ردیف‌ها جابه‌جا نمی‌شود و زامبی هم احضار نمی‌کند. */
   private boolean movesBetweenRows() {
     return chapter != ZombieType.ZOMBOSS_COWBOY;
   }
@@ -248,7 +229,6 @@ public class ZombossAction implements ZombieAction {
     };
   }
 
-  /** Squashes whatever is under it, otherwise walks back to the column it holds. */
   private void crushOrHoldStation(Zombie zombie, Board board, int currentTick) {
     Plant underfoot = plantUnderneath(zombie, board, currentTick);
     if (underfoot != null) {
@@ -281,7 +261,6 @@ public class ZombossAction implements ZombieAction {
     return null;
   }
 
-  // ---- the small attack, one per chapter -----------------------------------
 
   private void fireAtTheLawn(Zombie zombie, Board board, int currentTick) {
     lastAttackTick = currentTick;
@@ -293,7 +272,6 @@ public class ZombossAction implements ZombieAction {
     }
   }
 
-  /** مصر: موشک به یک خانهٔ تصادفی؛ گیاه نابود می‌شود و دو قبر تازه بالا می‌آید. */
   private void fireMissile(Zombie zombie, Board board) {
     int[] cell = randomCell(board);
     System.out.printf("%s fired a missile at (%d, %d)!%n",
@@ -309,7 +287,6 @@ public class ZombossAction implements ZombieAction {
     }
   }
 
-  /** دوران تاریکی: گلولهٔ آتش؛ خانه آتش می‌گیرد و یک ایمپ‌اژدها از دلش بیرون می‌آید. */
   private void breatheFireball(Zombie zombie, Board board) {
     int[] cell = randomCell(board);
     System.out.printf("%s breathed a fireball onto (%d, %d)!%n",
@@ -319,7 +296,6 @@ public class ZombossAction implements ZombieAction {
     spawnAt(board, ZombieType.IMP_DRAGON, cell[0], cell[1]);
   }
 
-  /** غارهای یخی: موشک یخی، فقط گیاه همان خانه را می‌برد. */
   private void fireIceMissile(Zombie zombie, Board board) {
     int[] cell = randomCell(board);
     System.out.printf("%s fired an ice missile at (%d, %d)!%n",
@@ -327,7 +303,6 @@ public class ZombossAction implements ZombieAction {
     destroyPlantAt(board, cell[0], cell[1]);
   }
 
-  /** ساحل: یک اختاپوس کوچک از زیر آب بالا می‌آید و یک گیاه را می‌خورد. */
   private void sendLittleOctopus(Zombie zombie, Board board) {
     Plant victim = randomLivingPlant(board);
     if (victim == null) {
@@ -338,7 +313,6 @@ public class ZombossAction implements ZombieAction {
     victim.takeDamage(DESTROY_DAMAGE);
   }
 
-  // ---- the big attack, one per chapter -------------------------------------
 
   private void unleashUltimate(Zombie zombie, Board board, int currentTick) {
     lastUltimateTick = currentTick;
@@ -350,7 +324,6 @@ public class ZombossAction implements ZombieAction {
     }
   }
 
-  /** مصر: یورش به جلو و نابودی همهٔ گیاهانِ دو ردیف خودش. */
   private void beginCharge(Zombie zombie) {
     charging = true;
     System.out.printf("%s is charging down rows %d and %d!%n",
@@ -375,7 +348,6 @@ public class ZombossAction implements ZombieAction {
     }
   }
 
-  /** دوران تاریکی: دو ردیفِ روبه‌رو را آتش می‌زند؛ همهٔ گیاهانشان می‌سوزند. */
   private void igniteOppositeRows(Zombie zombie, Board board) {
     int top = oppositeTopRow(zombie, board);
     for (int row = top; row < top + ROW_SPAN && row < board.getRows(); row++) {
@@ -388,7 +360,6 @@ public class ZombossAction implements ZombieAction {
             zombie.getDisplayName(), top + 1, Math.min(board.getRows(), top + ROW_SPAN));
   }
 
-  /** غارهای یخی: باد یخی روی دو ردیف تصادفی، به‌علاوهٔ یک ستون که کامل یخ می‌زند. */
   private void deepFreeze(Zombie zombie, Board board, int currentTick) {
     int rows = board.getRows();
     int first = random.nextInt(rows);
@@ -418,7 +389,6 @@ public class ZombossAction implements ZombieAction {
     }
   }
 
-  /** ساحل: گیاهان و زامبی‌های دو ردیفِ روبه‌رو را به سمت دهانش می‌کشد. */
   private void beginSuckingIn(Zombie zombie, Board board) {
     suckTopRow = oppositeTopRow(zombie, board);
     suckTicksLeft = SUCK_TICKS;
@@ -448,13 +418,11 @@ public class ZombossAction implements ZombieAction {
     }
   }
 
-  /** دو ردیفِ آن‌طرفِ زمین، طوری که با ردیف‌های خود باس همپوشانی نداشته باشد. */
   private static int oppositeTopRow(Zombie zombie, Board board) {
     int rows = board.getRows();
     return zombie.getRow() < rows / 2 ? Math.max(0, rows - ROW_SPAN) : 0;
   }
 
-  // ---- helpers -------------------------------------------------------------
 
   private int[] randomCell(Board board) {
     return new int[] {random.nextInt(board.getRows()), random.nextInt(board.getColumns())};
@@ -496,7 +464,6 @@ public class ZombossAction implements ZombieAction {
     }
   }
 
-  /** The sheet standing for one of these types, picked at random among the ones that exist. */
   private String aliasForAny(ZombieType[] types) {
     List<String> found = new ArrayList<>();
     for (ZombieType type : types) {

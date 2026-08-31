@@ -72,7 +72,6 @@ public class ZombieFactory {
     return switch (type) {
       case NORMAL, CONEHEAD, BUCKETHEAD, KNIGHT, BLOCKHEAD, IMP,
            ZOMBOTANY_WALLNUT -> new StandardZombieAction(eatDamage);
-      // Segment sizes come off the sheet's own Stages, rescaled to the health it actually got.
       case ZOMBOSS_EGYPT, ZOMBOSS_PIRATE, ZOMBOSS_COWBOY, ZOMBOSS_DARK ->
               new ZombossAction(type,
                       new ZombossHealth(template.getStageHitPoints(), Math.max(1, scaledHp)),

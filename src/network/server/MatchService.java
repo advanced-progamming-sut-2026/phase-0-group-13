@@ -9,18 +9,6 @@ import java.util.concurrent.TimeUnit;
 import model.enums.MatchRole;
 import model.game.minigame.arcade.IZombieMatch;
 
-/**
- * Every live match, and the one clock that advances all of them.
- *
- * <p>The match is the server's, not a client's: nothing a client sends moves a zombie or a plant
- * along, it only asks for a placement. Time itself comes from here, a single daemon thread
- * stepping every open match at {@link IZombieMatch#TICK_MILLIS}, which is the rate the engine's
- * recharges, walking speeds and firing cadences are all written in. One loop for all matches
- * rather than one thread each, so two players cannot end up on two slightly different clocks.
- *
- * <p>A match that throws is dropped rather than allowed to take the loop down with it, and a
- * finished one is handed to the listener exactly once and then forgotten.
- */
 public final class MatchService {
 
   private static final int DEFAULT_LEVEL = 1;
@@ -28,7 +16,6 @@ public final class MatchService {
   /** Long enough for any tick to finish, short enough that shutdown can never hang the server. */
   private static final long SHUTDOWN_WAIT_MILLIS = 2000;
 
-  /** What the router wants to know: a board moved, or a match is over. */
   public interface Listener {
     void onTick(NetworkMatch match);
 
@@ -52,7 +39,6 @@ public final class MatchService {
     return match;
   }
 
-  /** Idempotent: calling it twice does not give the same match two clocks. */
   public synchronized void start() {
     if (scheduler != null) {
       return;
@@ -66,17 +52,6 @@ public final class MatchService {
         IZombieMatch.TICK_MILLIS, TimeUnit.MILLISECONDS);
   }
 
-  /**
-   * Stops the clock, and does not return until the tick that was in flight has finished.
-   *
-   * <p>shutdownNow() only interrupts, and a tick is not interruptible -- it is plain arithmetic
-   * over the board -- so without the wait a tick that had already started could still land after
-   * this returned, and a caller that then read the tick number got a match that was still moving.
-   *
-   * <p>The scheduler is taken out of the field before the wait so a concurrent start() is not
-   * blocked behind it, and the wait is bounded: a listener that calls shutdown from inside its
-   * own onTick would otherwise be waiting for itself.
-   */
   public void shutdown() {
     ScheduledExecutorService stopping;
     synchronized (this) {
@@ -94,10 +69,6 @@ public final class MatchService {
     }
   }
 
-  /**
-   * Nothing may escape this method: scheduleAtFixedRate stops rescheduling a task that throws, so
-   * one bad match would silently freeze every other one.
-   */
   private void tickAll() {
     try {
       for (NetworkMatch match : matches.values()) {
@@ -129,7 +100,6 @@ public final class MatchService {
     }
   }
 
-  /** Off the board and reported, once. A second caller only does the removal. */
   private void retire(NetworkMatch match) {
     matches.remove(match.getId());
     if (!match.claimEnded()) {
@@ -159,7 +129,6 @@ public final class MatchService {
     return match == null ? null : match.roleOf(username);
   }
 
-  /** Abandons a match without a winner, for the player who walked out of it. */
   public void end(String matchId) {
     NetworkMatch match = matches.remove(matchId);
     if (match != null) {

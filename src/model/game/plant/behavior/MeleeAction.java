@@ -19,10 +19,6 @@ public class MeleeAction implements PlantAction {
     this(actionInterval, damage, aoeRadius, false);
   }
 
-  /**
-   * hitsBehind برای Bonk Choy و Wasabi Whip است: دیتا می‌گوید «خانه‌های جلو <b>و پشت</b> خودش» را
-   * می‌زنند، ولی جست‌وجوی هدف فقط رو به جلو بود.
-   */
   public MeleeAction(int actionInterval, int damage, int aoeRadius, boolean hitsBehind) {
     this.actionInterval = actionInterval;
     this.damage = damage;

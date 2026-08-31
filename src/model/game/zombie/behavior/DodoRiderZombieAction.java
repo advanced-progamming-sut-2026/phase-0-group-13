@@ -10,9 +10,6 @@ public class DodoRiderZombieAction implements ZombieAction {
   private boolean isFlying = true;
   private final double eatingDamage;
 
-  // FIX (GDD Target 1.3): قبلا هر گیاهی رو با ۱۰۰۰۰ دمیج نابود میکرد و بعدش پیاده میشد. حالا از رو
-  // گیاه‌های معمولی/دفاعی بی‌آسیب پرواز میکنه رد میشه (اصلا بهشون آسیب نمیزنه) و فقط Tall-nut
-  // مجبورش میکنه فرود بیاد و مثل زامبی عادی شروع به خوردنش کنه
   public DodoRiderZombieAction(double eatingDamage) {
     this.eatingDamage = eatingDamage;
   }

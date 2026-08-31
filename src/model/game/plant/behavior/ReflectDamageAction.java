@@ -20,7 +20,6 @@ public class ReflectDamageAction implements PlantAction {
       if (attacker != null) {
         attacker.takeDamage(damageTaken, false);
         // The rig has an attack clip for this; without marking the tick it never plays, and
-        // Endurian looks like it is just standing there while it reflects the damage back.
         plant.setLastActionTick(currentTick);
       }
     }

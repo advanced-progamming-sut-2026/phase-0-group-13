@@ -15,25 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-/**
- * One entity's animation, baked from its PAM and drawn out of its own atlas.
- *
- * <p>A PAM is a tree: the main timeline attaches sub-sprites, those attach more sub-sprites, and
- * only the leaves are images. Walking that tree every frame would be wasteful, so the constructor
- * plays the whole timeline once and records each frame as a flat list of quads in PAM space. Draw
- * time is then a loop over one frame's quads.
- *
- * <p>Clip boundaries come from the PAM, but how fast a clip plays comes from the manifest: the
- * frame span is divided by the duration listed in {@code assets/animations}. Nothing about a
- * particular plant or zombie is known here, which is what makes the same class serve idle, walk,
- * eat and everything the later phases add.
- *
- * <p>Parts whose name marks them optional -- armour, butter, ink, the ground swatch -- are hidden
- * unless a visibility map turns them on, the same default the art was authored with.
- */
 public final class EntityAnimation {
 
-  /** Frames per second to fall back on when a clip is not in the manifest. */
   private static final float DEFAULT_FPS = 30f;
 
   private final Frame[] frames;
@@ -66,19 +49,6 @@ public final class EntityAnimation {
     return frames.length > 0 && !clips.isEmpty();
   }
 
-  /**
-   * The first of these clips this entity actually has, or null if it has none of them.
-   *
-   * <p>Names are not consistent across rigs: Peashooter's idle is "idle", Puff-shroom's is
-   * "idle_stage1" and Doom-shroom's is "stage1_idle". For each name in turn, an exact match wins,
-   * then the shortest clip that starts with it; only once a candidate has neither is the next one
-   * tried. That per-candidate order matters: Caulipower's rig has an exact clip named "attack" and
-   * an "idle"-prefixed family (idle1_1, idle2_1, ...) but no clip literally named "idle" -- asking
-   * "idle" before "attack" has to make the idle variant win via its prefix match, not fall through
-   * to attack's exact one, or the plant would show as permanently attacking. A last pass over every
-   * candidate by "contains" is the least specific fallback, tried only once every candidate has
-   * failed the first two.
-   */
   public String pickClip(String... preferred) {
     for (String clip : preferred) {
       if (clips.containsKey(clip)) {
@@ -109,14 +79,6 @@ public final class EntityAnimation {
     return best;
   }
 
-  /**
-   * Every part name in this rig, for a caller that wants to build a visibility map.
-   *
-   * <p>Armour, butter and ink are authored as parts of the body rig rather than as separate
-   * entities, and {@link Part#isOptional} hides them by default. A caller that knows a zombie is
-   * still wearing its cone needs the rig's own name for that cone to switch it back on, and the
-   * names differ between rigs, so they are read off the rig instead of being listed anywhere.
-   */
   public Set<String> partNames() {
     Set<String> names = new LinkedHashSet<>();
     for (Part part : parts) {
@@ -127,13 +89,6 @@ public final class EntityAnimation {
     return names;
   }
 
-  /**
-   * How long one pass of a clip takes, in seconds, or 0 if this rig has no such clip.
-   *
-   * <p>For a caller that wants to hold a one-shot pose for exactly as long as it runs -- an attack,
-   * say -- rather than guessing a duration that is the same for every rig. The number is the clip's
-   * own frame span over its own frame rate, which is what {@link #draw} steps through.
-   */
   public float duration(String clip) {
     Clip found = clips.get(clip);
     if (found == null || found.fps <= 0f) {
@@ -142,7 +97,6 @@ public final class EntityAnimation {
     return (found.end - found.start + 1) / found.fps;
   }
 
-  /** Height of the drawn art in PAM units, for sizing the sprite against a lane. */
   public float height(String clip) {
     Bounds bounds = boundsOf(clip);
     return bounds == null ? 0f : bounds.maxY - bounds.minY;
@@ -178,7 +132,6 @@ public final class EntityAnimation {
     Frame frame = frames[found.start + step % span];
 
     boolean[] visible = visibleParts(visibility);
-    // PAM space has y going down from the top left, libGDX has it going up, hence the -scale.
     float sx = flip ? -scale : scale;
     float anchorX = (bounds.minX + bounds.maxX) / 2f;
     float originX = x - sx * anchorX;
@@ -210,14 +163,6 @@ public final class EntityAnimation {
     }
   }
 
-  /**
-   * Where the topmost part of the current frame sits on screen, as
-   * {@code {centreX, centreY, width, height}}, or null if the clip has no drawable frame.
-   *
-   * <p>On a walker rig the highest part is the head, so this is what a caller overlays something
-   * onto. Uses the same transform as {@link #draw}, so it tracks the head through the walk cycle
-   * instead of pinning it to the sprite box. The array is reused between calls.
-   */
   public float[] topPartBox(String clip, float time, float x, float y, float scale, boolean flip) {
     Clip found = clips.get(clip);
     Bounds bounds = boundsOf(clip);
@@ -281,7 +226,6 @@ public final class EntityAnimation {
     return scratch.toFloatBits();
   }
 
-  /** Walks the part tree so hiding a parent hides everything hanging off it. */
   private boolean[] visibleParts(Map<String, Boolean> visibility) {
     if (visibility == null && defaultVisible != null) {
       return defaultVisible;
@@ -315,7 +259,6 @@ public final class EntityAnimation {
     return found.bounds;
   }
 
-  /** Only the parts that are actually drawn count, or a hidden shadow would offset every plant. */
   private Bounds measure(Clip clip) {
     boolean[] visible = visibleParts(null);
     Bounds bounds = new Bounds();
@@ -396,7 +339,6 @@ public final class EntityAnimation {
     }
   }
 
-  /** One frame of the main timeline, flattened to quads. */
   private static final class Frame {
     final int count;
     final float[] corners;
@@ -411,7 +353,6 @@ public final class EntityAnimation {
     }
   }
 
-  /** Plays the PAM timeline once and records what every frame draws. */
   private static final class Bake {
 
     private final PamFile pam;
@@ -585,7 +526,6 @@ public final class EntityAnimation {
       }
     }
 
-    /** Older PAMs leave the part size out; the atlas region it points at is the same thing. */
     private float[] sizeOf(PamFile.Image image) {
       float[] cached = sizes.get(image);
       if (cached != null) {
@@ -645,7 +585,6 @@ public final class EntityAnimation {
 
   private static final float[] IDENTITY = {1f, 0f, 0f, 1f, 0f, 0f};
 
-  /** Affine transforms packed as {a, b, c, d, tx, ty}, the order the PAM stores them in. */
   private static float[] matrix(float[] packed) {
     if (packed == null || packed.length == 0) {
       return IDENTITY.clone();
@@ -671,7 +610,6 @@ public final class EntityAnimation {
         left[1] * right[4] + left[3] * right[5] + left[5]};
   }
 
-  /** Playback position of one sprite while the timeline is being baked. */
   private static final class Timeline {
     final PamFile.Sprite sprite;
     final TreeMap<Integer, Slot> slots = new TreeMap<>();
@@ -695,7 +633,6 @@ public final class EntityAnimation {
     }
   }
 
-  /** One attached image or sub-sprite, at whatever transform the last move gave it. */
   private static final class Slot {
     String name;
     PamFile.Image image;

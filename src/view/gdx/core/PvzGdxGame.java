@@ -22,22 +22,14 @@ public class PvzGdxGame extends Game {
     return assets;
   }
 
-  /** Shared batch, shapes, camera and viewport. Screens borrow these, they don't own them. */
   public RenderContext getContext() {
     return context;
   }
 
-  /** Shared skin source. See UiSkinProvider for why it might give back nothing yet. */
   public UiSkinProvider getUiSkin() {
     return uiSkin;
   }
 
-  /**
-   * Swaps the screen and disposes the old one.
-   *
-   * <p>setScreen() only calls hide() on the old screen, so anything holding native resources
-   * leaks. Screens should switch through here.
-   */
   public void switchScreen(Screen next) {
     Screen previous = getScreen();
     setScreen(next);
@@ -58,14 +50,7 @@ public class PvzGdxGame extends Game {
     setScreen(new LoadingScreen(this));
   }
 
-  /**
-   * What shows through where the world does not reach: the letterbox bars.
-   *
-   * <p>Every viewport in the game is a FitViewport on one 16:9 virtual size, so on any window that
-   * is not 16:9 this is what the player actually sees down the sides or across the top and bottom.
-   * It used to be a lawn green, which on a 21:9 monitor reads as a rendering fault -- two wide
-   * green stripes beside the picture. Near-black reads as a frame instead, which is what it is.
-   */
+  /** Cleared to this each frame; the viewports cover the window, so it should never be seen. */
   private static final float BORDER_R = 0.05f;
   private static final float BORDER_G = 0.05f;
   private static final float BORDER_B = 0.06f;
@@ -77,14 +62,6 @@ public class PvzGdxGame extends Game {
     super.render();
   }
 
-  /**
-   * F11 (or Alt+Enter) toggles fullscreen.
-   *
-   * <p>Polled here rather than through a listener because every screen installs its own input
-   * processor, so a Scene2D listener would only work on whichever screen registered it. The
-   * viewports do the rest: world and UI are both letterboxed to the same virtual size, so the
-   * whole game scales to the new resolution instead of shrinking into a corner of it.
-   */
   private void pollFullscreenToggle() {
     boolean altEnter = Gdx.input.isKeyJustPressed(Input.Keys.ENTER)
         && (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)

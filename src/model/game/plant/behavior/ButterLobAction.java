@@ -7,16 +7,6 @@ import model.game.Projectile;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-/**
- * Kernel-pult: طبق plants.json دمیجش "20/40" است و «یک دانهٔ ذرت (دمیج کم) یا کره (که زامبی را
- * کوتاه‌مدت گیج می‌کند)» پرتاب می‌کند. قبلا فقط LobAction با دمیج ۲۰ بود و کره اصلا وجود نداشت.
- *
- * <p>«Butter +5%» در Lvl 2 یعنی شانس کره پایه‌ای دارد؛ خود دیتا عدد پایه را ننوشته، پس
- * {@link #BASE_BUTTER_CHANCE_PERCENT} به عنوان پایه گرفته شده و بونوس لِوِل رویش سوار می‌شود.
- *
- * <p>گیج‌شدن با StatusEffect.FROZEN مدل شده چون تنها حالتی است که در
- * {@link Zombie#update} جلوی حرکت و حملهٔ زامبی را می‌گیرد؛ حالت جدیدی اضافه نشده.
- */
 public class ButterLobAction implements PlantAction {
 
   public static final int BASE_BUTTER_CHANCE_PERCENT = 25;
@@ -45,7 +35,6 @@ public class ButterLobAction implements PlantAction {
     }
 
     if (alwaysButter) {
-      // اثر غذای گیاه: «روی سر هر زامبیِ روی زمین کره می‌اندازد»
       int buttered = 0;
       for (Zombie zombie : board.getZombies()) {
         if (!zombie.isDead() && !zombie.isHypnotized()) {

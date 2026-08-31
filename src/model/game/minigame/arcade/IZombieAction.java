@@ -1,6 +1,5 @@
 package model.game.minigame.arcade;
 
-/** What a player wants to do. Mouse, keyboard and network messages all produce these. */
 public record IZombieAction(Kind kind, String type, int row, int col) {
 
   public enum Kind {

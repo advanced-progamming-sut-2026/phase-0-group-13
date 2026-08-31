@@ -8,12 +8,10 @@ public class Sun {
   private int amount;
   private double x;
   private double y;
-  private int timeToLive; // به واحد تیک
+  private int timeToLive;
   private SunType sunType;
   private boolean isCollected;
   private int fallingTicks;
-  // تیکی که این خورشید قابل‌برداشت شد (اگه از آسمون میفته، لحظه‌ی رسیدن به زمین)؛ برای امتیاز
-  // SPEED_SUN_COLLECT استفاده میشه
   private int groundedTick = -1;
 
   public Sun(int amount, int timeToLive, SunType sunType) {
@@ -58,7 +56,7 @@ public class Sun {
     if (!isCollected && !isExpired()) {
       this.isCollected = true;
       state.addSun(this.amount);
-      this.timeToLive = 0; // تیک بعدی پاک می‌شود
+      this.timeToLive = 0;
     }
   }
 
@@ -77,7 +75,6 @@ public class Sun {
   public void setType(SunType sunType) { this.sunType = sunType; }
   public boolean isFalling() { return fallingTicks > 0; }
   public void setCollected(boolean collected) { this.isCollected = collected; }
-  /** خورشیدهایی که مستقیم از گیاه تولید میشن (نه از آسمون) از همون لحظه‌ی ساخت قابل‌برداشتن. */
   public void setGroundedTick(int tick) { if (this.groundedTick < 0) this.groundedTick = tick; }
   public int getGroundedTick() { return groundedTick; }
 }

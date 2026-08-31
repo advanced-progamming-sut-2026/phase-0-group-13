@@ -4,10 +4,6 @@ import model.game.Board;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-/**
- * اختاپوس‌پرت‌کن (ساحل موج بزرگ): هر چند ثانیه یک اختاپوس به گیاهان سطر خودش پرت می‌کند.
- * اثر اختاپوس مشابه یخ‌زدگی است: گیاه تا وقتی اختاپوس روی سرش است نمی‌تواند کاری کند.
- */
 public class OctopusThrowerZombieAction implements ZombieAction {
   private static final double THROW_RANGE = 5.0;
   private static final int OCTOPUS_HOLD_TICKS = 120;

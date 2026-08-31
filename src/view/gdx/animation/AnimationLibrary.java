@@ -7,17 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Loads and caches one {@link EntityAnimation} per plant or zombie.
- *
- * <p>Three files have to line up for an entity to animate: the manifest in
- * {@code assets/animations}, the atlas it names under {@code assets/textures}, and the PAM it
- * names under {@code resources/raw}. Not every entity has all three -- the extractor only pulled
- * the ones the game uses, and a few of those have art but no rig -- so a miss is normal and comes
- * back as null for the caller to fall back on a still portrait.
- *
- * <p>Misses are cached too, otherwise every frame would go looking for the same absent files.
- */
 public final class AnimationLibrary implements Disposable {
 
   public static final String PLANTS = "plants";
@@ -26,7 +15,6 @@ public final class AnimationLibrary implements Disposable {
   private final Map<String, EntityAnimation> cache = new HashMap<>();
   private final List<TextureAtlas> atlases = new ArrayList<>();
 
-  /** The animation for this entity's name, or null if it has none. */
   public EntityAnimation find(String kind, String entityName) {
     String key = kind + "/" + normalise(entityName);
     if (cache.containsKey(key)) {
@@ -55,7 +43,6 @@ public final class AnimationLibrary implements Disposable {
     return animation.isUsable() ? animation : null;
   }
 
-  /** Same key PlantArt and ZombieArt use, so one name resolves art and animation alike. */
   private static String normalise(String name) {
     return name == null ? "" : name.toLowerCase().replaceAll("[^a-z0-9]", "");
   }

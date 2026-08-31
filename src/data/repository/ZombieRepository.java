@@ -36,15 +36,6 @@ public class ZombieRepository implements ReadOnlyRepository<Object> {
     return zombies;
   }
 
-  /**
-   * فهرست دانشنامه: یک کارت به‌ازای هر نوع زامبی.
-   *
-   * <p>{@link #getAll()} is the raw sheet list, which is not what an almanac wants. It carries
-   * scenery filed alongside the zombies (the arcade cabinet is a GridItem), several unused sheets
-   * that fall through to the basic walker, and four upstream variants of each Zomboss -- so the
-   * almanac showed "Basic" four times and Dr. Zomboss nine. One entry per {@link ZombieType},
-   * first sheet in file order winning, which is the same one {@code Season.templateFor} spawns.
-   */
   public List<ZombieTemplate> getAlmanacEntries() {
     List<ZombieTemplate> entries = new ArrayList<>();
     Set<ZombieType> seen = EnumSet.noneOf(ZombieType.class);
@@ -60,7 +51,6 @@ public class ZombieRepository implements ReadOnlyRepository<Object> {
     return entries;
   }
 
-  /** GridItem* entries share the file with the zombies but are scenery, not zombies. */
   private static final String ZOMBIE_SHEET_PREFIX = "Zombie";
 
   public ZombieTemplate find(String name) {

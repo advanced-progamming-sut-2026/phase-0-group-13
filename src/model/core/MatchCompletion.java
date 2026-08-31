@@ -15,20 +15,10 @@ import model.game.reward.Reward;
 import network.client.ClientSession;
 import network.protocol.Payloads;
 
-/**
- * Everything that happens to the account once a match is over: score, quests, level reward and
- * adventure progression.
- *
- * <p>It lives here rather than in a controller because both builds finish a level: the typed
- * GamePlayController when the last tick runs out, and the graphical GameplayScreen when the match
- * stops running. It used to be private to the typed one, so the graphical build showed "Level
- * cleared!" and then unlocked nothing.
- */
 public final class MatchCompletion {
 
   private MatchCompletion() {}
 
-  /** Call once, when {@code match.isRunning()} has just gone false. */
   public static void apply(GameManager match) {
     if (match == null || match.getMatchResult() == null) {
       return;
@@ -37,8 +27,6 @@ public final class MatchCompletion {
     if (result.isWon() && allLawnmowersUnused(match)) {
       match.registerCombatEvent(ScoreEvent.WAVE_CLEARED_NO_LOSS);
     }
-    // Read before applyScoresToUser: banking the points to the account resets the run counter to
-    // zero, so asking afterwards would send the server a nought on every single run.
     int bonusScore = match.getScoreManager().getCurrentMatchScore();
     if (match.isBonusMatch()) {
       System.out.println("Game Bonus finished! MyoPoints earned this run: " + bonusScore);
@@ -48,8 +36,6 @@ public final class MatchCompletion {
     if (user == null) {
       return;
     }
-    // فاز ۱: MyoPoint همان امتیاز Game Bonus است، پس فقط همان‌جا به حساب بازیکن اضافه می‌شود؛
-    // مرحله‌های عادی امتیازشان را فقط در صفحه‌ی پایان مرحله نشان می‌دهند.
     if (match.isBonusMatch()) {
       match.getScoreManager().applyScoresToUser(user);
       submitBonusScore(bonusScore);
@@ -68,7 +54,6 @@ public final class MatchCompletion {
 
     MiniGameType miniGame = MatchSetup.getInstance().getCurrentMiniGame();
     if (miniGame != MiniGameType.NONE) {
-      // مینی‌گیم پیشرفت ادونچر رو جلو نمیبره؛ فقط مرحله‌ی خودش ثبت میشه
       if (result.isWon()) {
         int level = MatchSetup.getInstance().getMiniGameLevel();
         System.out.println("You cleared " + miniGame + " (Level " + level + ")!");
@@ -84,10 +69,6 @@ public final class MatchCompletion {
     save();
   }
 
-  /**
-   * Only the level the player is actually up to moves the map on; replaying a cleared one is
-   * allowed but hands out neither the reward nor the next unlock a second time.
-   */
   private static void advance(User user, int stage, int level) {
     Progress progress = user.getProgress();
     user.triggerQuestEvent("STAGE_CLEAR", 1);
@@ -100,8 +81,6 @@ public final class MatchCompletion {
     }
     grantLevelReward(user, AdventureMap.getLevelReward(stage, level));
     System.out.println(progress.advanceAdventure().message());
-    // Clearing the last level does not move the cursor on, so there is no new chapter to unlock;
-    // unlocking blindly here is what used to create a "stage_5" that the map has no room for.
     if (!progress.isAdventureCompleted()) {
       user.unlockItem("stage_" + progress.getCurrentStage());
     }
@@ -119,10 +98,6 @@ public final class MatchCompletion {
     return true;
   }
 
-  /**
-   * جایزه‌ی مرحله را می‌دهد. اگر جایزه‌ی از پیش تعیین‌شده گیاهی باشد که بازیکن همین الان دارد،
-   * به جایش اولین گیاه قفل‌بودهٔ بازی داده می‌شود تا جایزه همیشه چیز جدیدی باشد.
-   */
   private static void grantLevelReward(User user, model.Result reward) {
     String unlockId = reward.success() && reward.getObject() instanceof String id ? id : null;
 
@@ -147,7 +122,6 @@ public final class MatchCompletion {
     }
   }
 
-  /** اولین گیاهی که بازیکن هنوز باز نکرده (ترتیب فایل plants.json = ترتیب پیشرفت). */
   private static String firstLockedPlant(User user) {
     if (GameDataManager.plantRepository == null) {
       return null;
@@ -160,14 +134,6 @@ public final class MatchCompletion {
     return null;
   }
 
-  /**
-   * Sends a bonus run's My-Point to the server, which is the only thing that ever fills the
-   * leaderboard's My Point column.
-   *
-   * <p>The server keeps the higher of the two, so sending a worse run is harmless and the record
-   * is decided there rather than here. A failure is reported and swallowed: the run itself already
-   * counted towards the account, and losing the connection should not lose the match.
-   */
   private static void submitBonusScore(int score) {
     ClientSession session = ClientSession.getInstance();
     if (!session.isAuthenticated()) {

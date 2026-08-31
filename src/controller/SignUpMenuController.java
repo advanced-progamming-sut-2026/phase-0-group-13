@@ -11,7 +11,6 @@ import model.enums.SecurityQuestion;
 public class SignUpMenuController implements BaseController {
   @Override
   public void initController() {
-    // System.out.println("Entered SignUp Menu");
   }
 
   @Override
@@ -26,7 +25,7 @@ public class SignUpMenuController implements BaseController {
       String targetMenu = matcher.group("menuName").trim().toLowerCase();
       handleEnterMenu(targetMenu);
     } else if ((matcher = MenuCommands.ShowCurrentMenu.getMatcher(input)) != null) {
-      System.out.println("Sign Up Menu"); // اصلاح نام منو
+      System.out.println("Sign Up Menu");
     } else if ((matcher = MenuCommands.ExitMenu.getMatcher(input)) != null) {
       exit();
     } else {

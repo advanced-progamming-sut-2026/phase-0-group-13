@@ -66,7 +66,6 @@ public class ZombieTemplate {
     public List<Stage> stages;
   }
 
-  /** یک فاز از باس؛ زامبوس‌ها به جای Hitpoints، جانشان را در Stages ثبت کرده‌اند. */
   public static class Stage {
     @SerializedName("HitPoints")
     public Integer hitPoints;
@@ -113,11 +112,6 @@ public class ZombieTemplate {
     return getStagedHp();
   }
 
-  /**
-   * جان باس‌ها. زامبوس‌ها فیلد Hitpoints ندارند و جانشان در Stages[].HitPoints (سه فاز) ثبت شده،
-   * پس جان کلشان جمع فازهاست؛ بدون این، getBaseHp صفر برمی‌گرداند و فکتوری مجبور می‌شود یک عدد
-   * ثابت جایگزین کند.
-   */
   public int getStagedHp() {
     if (objdata == null || objdata.stages == null) {
       return 0;
@@ -131,7 +125,6 @@ public class ZombieTemplate {
     return total;
   }
 
-  /** جان هر فاز، به ترتیب. برای زامبی‌های عادی خالی است. */
   public List<Integer> getStageHitPoints() {
     if (objdata == null || objdata.stages == null) {
       return List.of();

@@ -9,15 +9,14 @@ public class IceTrailEffect extends TileEffect {
     this(duration, speedMultiplier, false, 0);
   }
 
-  // fullFreeze=true یعنی "تایل یخ‌زده" (زامبی رو کاملا فریز میکنه، مثل Frostbite Caves)؛
-  // fullFreeze=false همون "تایل لیزخوردن" قبلیه (فقط کند میکنه)
   public IceTrailEffect(int duration, double speedMultiplier, boolean fullFreeze) {
     this(duration, speedMultiplier, fullFreeze, 0);
   }
 
   /**
+   *
    * @param laneShift جهت ذاتی زمین لیز: {@code -1} لیز به بالا، {@code +1} لیز به پایین،
-   *     {@code 0} یعنی فقط سُر می‌خورد و ردیف عوض نمی‌کند. این جهت وسط مرحله تغییر نمی‌کند.
+   * {@code 0} یعنی فقط سُر می‌خورد و ردیف عوض نمی‌کند. این جهت وسط مرحله تغییر نمی‌کند.
    */
   public IceTrailEffect(int duration, double speedMultiplier, boolean fullFreeze, int laneShift) {
     super("Ice Trail", duration);
@@ -48,7 +47,6 @@ public class IceTrailEffect extends TileEffect {
     return fullFreeze;
   }
 
-  /** نام دیگر {@link #getLaneShift()} (استفاده‌شده در Board و خروجی دیباگ نقشه). */
   public int getSlideDirection() {
     return laneShift;
   }

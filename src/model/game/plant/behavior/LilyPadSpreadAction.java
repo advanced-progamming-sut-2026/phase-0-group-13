@@ -4,10 +4,6 @@ import model.game.Board;
 import model.game.plant.Factory.PlantFactory;
 import model.game.plant.Plant;
 
-/**
- * اثر غذای گیاه برای Lily Pad: روی خانه‌های آب خالی، چند کپی از خودش می‌سازد تا بازیکن بتواند
- * روی آب گیاه بکارد.
- */
 public class LilyPadSpreadAction implements PlantAction {
   private final PlantFactory factory;
   private final int copies;

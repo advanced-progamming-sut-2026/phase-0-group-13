@@ -10,21 +10,8 @@ import java.util.List;
 import java.util.Map;
 import model.game.Projectile;
 
-/**
- * Which sprite a projectile flies as.
- *
- * <p>Phase Two asks for the projectile types to be told apart on sight, and the art is already
- * here: every lobber's melon, cabbage and pepper, and every shooter's pea, sit as parts in that
- * plant's own atlas under {@code textures/plants}. So each kind names an atlas and a region
- * instead of everything sharing the one HUD pea.
- *
- * <p>The kind comes off the projectile itself -- arcing, splash, piercing, elemental effect --
- * which is what the model already records, so nothing had to be tagged for the view's benefit.
- * Anything that cannot be resolved falls back to the pea, which is where it started.
- */
 public final class ProjectileArt implements Disposable {
 
-  /** One projectile sprite: the art, its height as a fraction of a lane, and its facing. */
   public record Shot(TextureRegion region, float rowFraction, float angle) {}
 
   private static final String HUD_ATLAS = "textures/ui/hud.atlas";
@@ -39,23 +26,19 @@ public final class ProjectileArt implements Disposable {
   private static final float KERNEL_FILL = 0.12f;
   private static final float BUTTER_FILL = 0.20f;
   private static final String KERNEL_PULT = "Kernel-pult";
-  // The spike is stored pointing up, so this is its length once it is turned to fly flat.
   private static final float SPIKE_FILL = 0.34f;
 
   private final Map<String, TextureAtlas> atlases = new HashMap<>();
   private final List<TextureAtlas> loaded = new ArrayList<>();
 
-  /** The sprite for this shot, or null if even the pea is missing. */
   public Shot find(Projectile projectile) {
     if (projectile.isFromZombie()) {
-      // reflected and zombie-fired shots stay peas: the caller tints them so they read as wrong
       return pea(ZOMBIE_PEA_FILL);
     }
     if (projectile.isLobbed()) {
       return lobbed(projectile);
     }
     if (projectile.isPiercing()) {
-      // Cactus is the one with a pass limit; Fume-shroom's cloud goes through everything
       return projectile.getPierceLimit() > 0
           ? shot("cactus", "cactus_21x65", SPIKE_FILL, -90f)
           : shot("fumeshroom", "fumeshroom_48x44", CLOUD_FILL, 0f);
@@ -72,9 +55,6 @@ public final class ProjectileArt implements Disposable {
     return switch (projectile.getEffect()) {
       case ICE -> shot("wintermelon", "wintermelon_122x83", MELON_FILL, 0f);
       case FIRE -> shot("pepperpult", "pepperpult_55x61", PEPPER_FILL, 0f);
-      // Kernel-pult throws one of two things and the model already says which: the buttered
-      // shot is the one that stuns. Both are in its own atlas, so neither has to borrow the
-      // cabbage -- which is what they did while the only question asked here was about splash.
       case NORMAL -> KERNEL_PULT.equals(projectile.getSourceName())
           ? (projectile.getStunTicks() > 0
               ? shot("kernelpult", "kernalpult_34x37", BUTTER_FILL, 0f)
@@ -84,7 +64,6 @@ public final class ProjectileArt implements Disposable {
     };
   }
 
-  /** splash is what separates Melon-pult's watermelon from Cabbage-pult's cabbage */
   private Shot melonOrCabbage(Projectile projectile) {
     return projectile.getSplashRadius() > 0
         ? shot("melonpult", "Melonpult_122x83", MELON_FILL, 0f)

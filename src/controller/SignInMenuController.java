@@ -11,7 +11,6 @@ public class SignInMenuController implements BaseController {
 
   @Override
   public void initController() {
-    // System.out.println("Entered SignIn Menu.");
   }
 
   @Override
@@ -28,7 +27,7 @@ public class SignInMenuController implements BaseController {
       String newPassword = input.replace("set new password ", "").trim();
       handleResetPassword(newPassword);
     } else if ((matcher = MenuCommands.ShowCurrentMenu.getMatcher(input)) != null) {
-      System.out.println("Sign In Menu"); // اصلاح نام منو
+      System.out.println("Sign In Menu");
     } else if ((matcher = MenuCommands.ExitMenu.getMatcher(input)) != null) {
       exit();
     } else {

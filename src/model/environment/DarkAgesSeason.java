@@ -32,10 +32,6 @@ public class DarkAgesSeason extends Season {
 
   @Override
   public List<Zombie> getAvailableZombies() {
-    // ویزارد تنها زامبی این فصل است که alias اش "Dark" ندارد (ZombieWizardDefault, با objclass
-    // ZombieDarkWizardProps)، برای همین اسمش جدا آمده؛ بدون این، طلسم گوسفندکردن گیاه هیچ‌وقت
-    // در بازی دیده نمی‌شود
-    // Dark Ages: Jester, Wizard, King, Imp Dragon
     return rosterOf(ZombieType.JUGGLER, ZombieType.WIZARD, ZombieType.KING,
             ZombieType.IMP_DRAGON);
   }
@@ -50,8 +46,6 @@ public class DarkAgesSeason extends Season {
     return plainGrid();
   }
 
-  // چند تا سنگ‌قبر رندوم روی نقشه میزاره؛ هرکدوم ۷۰۰ HP داره، جلوی تیر گیاهی رو میگیره (تا وقتی
-  // نابود بشه)، و هر ۴۰ ثانیه یه زامبی از دلش زنده میکنه (نکرومنسی)
   @Override
   public void placeHazards(Board board) {
     for (int i = 0; i < TOMBSTONE_COUNT; i++) {
@@ -68,8 +62,6 @@ public class DarkAgesSeason extends Season {
   }
 
   // داک: در ابتدای هر موجِ زامبی ممکن است چند سنگ‌قبر به‌صورت رندوم به وجود بیایند (مگر اینکه در آن
-  // خانه گیاهی کاشته شده باشد)؛ بعضی‌شان ۵۰ خورشید یا یک غذای گیاه دارند و تشکیل هر قبر باید به
-  // بازیکن اطلاع داده شود
   private void spawnWaveGraves(Board board) {
     int count = MIN_WAVE_GRAVES + random.nextInt(MAX_WAVE_GRAVES - MIN_WAVE_GRAVES + 1);
     for (int i = 0; i < count; i++) {

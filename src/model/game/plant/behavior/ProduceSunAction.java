@@ -21,10 +21,6 @@ public class ProduceSunAction implements PlantAction {
     this(productionInterval, sunAmount, false);
   }
 
-  /**
-   * singleUse برای گیاهانی مثل Gold Bloom که در plants.json «یک‌بار خورشید می‌دهد و بعد ناپدید
-   * می‌شود» ثبت شده‌اند؛ بدون این، همان گیاه بی‌نهایت بار خورشید تولید می‌کند.
-   */
   public ProduceSunAction(int productionInterval, int sunAmount, boolean singleUse) {
     this.productionInterval = productionInterval;
     this.sunAmount = sunAmount > 0 ? sunAmount : DEFAULT_SUN_AMOUNT;

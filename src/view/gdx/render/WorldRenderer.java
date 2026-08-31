@@ -4,14 +4,6 @@ import com.badlogic.gdx.utils.Disposable;
 import model.core.GameManager;
 
 
-/**
- * Anything that draws match state in world space.
- *
- * <p>Same shape as view.BoardRenderer.render(GameManager) in the terminal version: read the
- * manager, draw it, don't change it.
- *
- * <p>The HUD goes through Scene2D instead (see HudStage), so this is only for the world.
- */
 public interface WorldRenderer extends Disposable {
 
   /**

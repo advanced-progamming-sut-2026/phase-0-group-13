@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import java.util.UUID;
 
-/** One line of JSON on the socket. The id is what pairs a reply with its request. */
 public final class NetworkMessage {
 
   private static final Gson GSON = new Gson();

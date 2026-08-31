@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import data.persistence.UserManager;
 import model.account.User;
 import model.core.MiniGameLauncher;
@@ -35,32 +35,13 @@ import view.gdx.ui.Popup;
 import view.gdx.ui.Toast;
 import view.gdx.ui.UiSkinProvider;
 
-/**
- * What the three arcade mini-games have in common: a lawn, a clock and a way out.
- *
- * <p>Each of them runs a Phase One engine over a five-by-nine board, so the parts that are the
- * same are the parts that are not about the game -- the season backdrop and its measured lawn
- * bounds, stepping the engine at the model's own tick rate, turning a click into a cell, pausing,
- * and awarding the clear through {@link MiniGameLauncher}. What is left to a subclass is the two
- * things that differ: what to draw and what a click means.
- *
- * <p>Two clocks, same as {@link GameplayScreen}: {@link FixedStepClock} steps the engine and the
- * frame delta only drives animation. Pausing gives the renderers a delta of zero so the rigs
- * freeze with the simulation instead of walking on the spot.
- *
- * <p>The HUD shares the world's 1280x720 shape for the same reason {@link view.gdx.ui.HudStage}
- * does: the picker strip sits directly above the board, and a viewport that does not scale with
- * the lawn slides down over the top lane as soon as the window is not the design size.
- */
 public abstract class ArcadeBoardScreen extends BaseScreen {
 
   protected static final int ROWS = 5;
   protected static final int COLUMNS = 9;
 
-  /** Gap between the lawn's left edge and anything standing beside it. */
   protected static final float LANE_PROP_GAP = 8f;
 
-  /** Below the picker strip, so a refused click is not written behind a row of cards. */
   private static final float MESSAGE_TOP_PADDING = 200f;
 
   private static final Color LIGHT_LANE = new Color(1f, 1f, 1f, 0.10f);
@@ -91,38 +72,28 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     this.level = level;
   }
 
-  /** Which season's lawn this mini-game is played on. See {@link LawnRenderer#lawnBounds}. */
   protected abstract String seasonKey();
 
-  /** Shown top left, above the lawn. */
   protected abstract String title();
 
-  /** The line of resources and objectives under the title, redrawn every frame. */
   protected abstract String statusLine();
 
-  /** Fills the strip beside the title: seed packets, a belt, a zombie picker. */
   protected abstract void buildPicker(Table picker, Skin skin);
 
-  /** Called after every engine tick, for a picker whose contents change with the game. */
   protected void refreshPicker() {}
 
-  /** Draws the board. The batch is already begun and the camera already applied. */
   protected abstract void drawWorld(float delta);
 
-  /** Filled shapes over the board: health bars, the red line, markers. */
   protected void drawOverlays(ShapeRenderer shapes) {}
 
-  /** Outlines, for an entity with no verified art. Drawn after the filled pass. */
   protected void drawOutlines(ShapeRenderer shapes) {}
 
-  /** One engine tick. */
   protected abstract void tickEngine();
 
   protected abstract boolean engineFinished();
 
   protected abstract boolean engineWon();
 
-  /** A click on a lawn cell. Return a message to toast, or null to say nothing. */
   protected abstract String onCellClicked(int row, int column);
 
   /**
@@ -134,12 +105,6 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     return false;
   }
 
-  /**
-   * Puts down whatever the player is holding -- a seed, a zombie, half a swap -- so Escape can back
-   * out of a choice before it backs out of the game.
-   *
-   * @return true if something was actually being held, false if there was nothing to cancel
-   */
   protected boolean clearSelection() {
     return false;
   }
@@ -151,7 +116,7 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     art = new ArcadeRenderer(geometry);
     skin = game.getUiSkin().get();
 
-    stage = new Stage(new FitViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
+    stage = new Stage(new FillViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
     if (skin != null) {
       buildHud();
     }
@@ -203,7 +168,6 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     return button;
   }
 
-  /** Rebuilds the picker strip from scratch. Subclasses call it when their contents change. */
   protected final void rebuildPicker() {
     if (picker == null || skin == null) {
       return;
@@ -281,7 +245,6 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     refreshPicker();
   }
 
-  /** The lane grid and the cell under the mouse, so a click has something to aim at. */
   private void drawLanes() {
     ShapeRenderer shapes = context().getShapes();
     Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -300,14 +263,12 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     shapes.end();
   }
 
-  /** The red line neither Bowling nor I, Zombie lets the player plant past. */
   protected final void drawRedLine(ShapeRenderer shapes, int column, boolean onTheRight) {
     shapes.setColor(0.85f, 0.15f, 0.15f, 0.75f);
     float x = onTheRight ? geometry.columnToX(column + 1) : geometry.columnToX(column);
     shapes.rect(x - 2f, geometry.rowToY(ROWS - 1), 4f, geometry.getCellHeight() * ROWS);
   }
 
-  /** False for a match whose clock is somewhere else, which nothing here may stop. */
   protected boolean canPause() {
     return true;
   }
@@ -344,7 +305,6 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
         leaveButtonLabel(), this::leave, null, null);
   }
 
-  /** The clear is recorded by the same Phase One path the terminal build uses. */
   protected void recordOutcome(boolean won) {
     User user = UserManager.getInstance().getCurrentUser();
     if (!won || user == null) {
@@ -428,21 +388,16 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
 
     @Override
     public boolean keyDown(int keycode) {
-      // The subclass gets first refusal: a screen that plays on the keyboard needs the keys more
-      // than the two shortcuts do, and it is the only one that knows which ones it uses.
       if (onKeyPressed(keycode)) {
         return true;
       }
       if (keycode == Input.Keys.ESCAPE) {
-        // Same ladder the main game uses: close the pause menu, else put down what is held, else
-        // pause. Leaving is the header's Give up button, not one keypress from mid-match.
         if (paused) {
           togglePause();
         } else if (!clearSelection()) {
           if (canPause()) {
             togglePause();
           } else {
-            // Nothing to cancel and no clock of ours to stop, so this one really is the way out.
             leave();
           }
         }

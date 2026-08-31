@@ -10,12 +10,6 @@ import view.gdx.input.GameplayInputHandler;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
 
-/**
- * What the mouse is about to do: the target cell and the thing on the cursor.
- *
- * <p>Its own renderer because it is the only part of the world drawn from input state rather than
- * board state. Draws last so it sits over the lawn. Reads the input handler, never writes to it.
- */
 public final class CursorRenderer implements WorldRenderer {
 
   private static final float PREVIEW_ALPHA = 0.65f;
@@ -49,7 +43,6 @@ public final class CursorRenderer implements WorldRenderer {
     drawCursorItem(context);
   }
 
-  /** Filled faintly then outlined, so it reads on any background. */
   private void drawCellHighlight(RenderContext context) {
     float x = geometry.columnToX(input.getHoverColumn());
     float y = geometry.rowToY(input.getHoverRow());
@@ -105,7 +98,6 @@ public final class CursorRenderer implements WorldRenderer {
     drawGhost(context, art, art.getRegionWidth() * height / art.getRegionHeight(), height);
   }
 
-  /** Centred on the pointer, not snapped to the cell, so it reads as carried. */
   private void drawGhost(RenderContext context, TextureRegion art, float width, float height) {
     context.getBatch().begin();
     context.getBatch().setColor(1f, 1f, 1f, PREVIEW_ALPHA);
@@ -115,7 +107,6 @@ public final class CursorRenderer implements WorldRenderer {
     context.getBatch().end();
   }
 
-  /** No shovel in the atlas, so it is drawn rather than borrowing some other icon. */
   private void drawShovel(RenderContext context) {
     float size = geometry.getCellHeight() * 0.42f;
     float x = input.getPointerWorldX();

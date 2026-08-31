@@ -7,7 +7,6 @@ import model.game.zombie.Zombie;
 public class DeadLineRule extends MiniGame implements SpecialStageRule {
   private final int deadlineColumn;
 
-  // خط قرمز سخت‌گیرانه‌تر از چمن‌زن معمولی: اگه هر زامبی از این ستون رد بشه، همون لحظه باخت
   public DeadLineRule(int deadlineColumn) {
     this.deadlineColumn = deadlineColumn;
   }

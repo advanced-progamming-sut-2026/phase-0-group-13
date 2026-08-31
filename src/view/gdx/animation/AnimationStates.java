@@ -4,16 +4,6 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * Keeps every entity's place in whatever clip it is currently playing.
- *
- * <p>Playback has to belong to the entity rather than to the animation: two zombies of the same
- * kind share one {@link EntityAnimation}, but one of them can be walking while the other eats.
- * Asking for a different clip than last frame restarts the timer, so a zombie that reaches a plant
- * starts its eat cycle from the beginning instead of halfway through.
- *
- * <p>Keyed by identity and swept once a frame, so nothing is held onto after a zombie dies.
- */
 public final class AnimationStates {
 
   private static final class State {
@@ -45,7 +35,6 @@ public final class AnimationStates {
     return state.time;
   }
 
-  /** Forgets anything that was not drawn this frame. */
   public void endFrame() {
     Iterator<State> it = states.values().iterator();
     while (it.hasNext()) {

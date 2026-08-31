@@ -42,12 +42,10 @@ public class ShootForwardAction implements PlantAction {
     this.directions = directions == null || directions.length == 0 ? FORWARD_ONLY : directions;
   }
 
-  /** تیرهای این گیاه مثل Bowling Bulb بین ردیف‌ها کمانه می‌کنند. */
   public void setRicochet(int lifeTicks) {
     this.ricochetLifeTicks = Math.max(0, lifeTicks);
   }
 
-  /** سقف عبور تیر از زامبی‌ها (Cactus: ۳). صفر یعنی بدون سقف، مثل Fume-shroom. */
   public void setPierceLimit(int pierceLimit) {
     this.pierceLimit = Math.max(0, pierceLimit);
   }
@@ -73,7 +71,6 @@ public class ShootForwardAction implements PlantAction {
           projectile.withPierceLimit(pierceLimit);
           projectile.setDirection(direction[0], direction[1]);
           if (ricochetLifeTicks > 0) {
-            // گلوله‌های کمانه‌کننده به صورت مورب حرکت می‌کنند تا از دیواره‌ها برگردند
             projectile.setDirection(direction[0], direction[1] != 0 ? direction[1] : 1);
             projectile.makeBouncing(ricochetLifeTicks);
           }

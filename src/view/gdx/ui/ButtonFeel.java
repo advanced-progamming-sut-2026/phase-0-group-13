@@ -8,18 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo;
 
-/**
- * The lift a button gets under the pointer, and the dip when it is pressed.
- *
- * <p>The doc's polish list asks for button animations alongside the menu transitions
- * {@code MenuScreen.playEntrance} already plays. Kept as one helper so every screen's buttons feel
- * the same and no screen has to remember the numbers.
- *
- * <p>Scaling a Scene2D widget needs {@code setTransform(true)}, which only groups have, so this
- * takes the {@link Table} that {@code TextButton} already is. The origin is set on the way in
- * rather than at construction, because a button has no size until the layout has run. Hit testing
- * is unaffected: the cell keeps its own bounds, only the drawing is scaled.
- */
 public final class ButtonFeel {
 
   private static final float HOVER = 1.06f;

@@ -3,7 +3,6 @@ package model.core;
 import model.account.User;
 
 public class Session {
-  // با الگوی سینگلتون رفتار میکنیم
   private static Session instance;
   private User loggedInUser;
 

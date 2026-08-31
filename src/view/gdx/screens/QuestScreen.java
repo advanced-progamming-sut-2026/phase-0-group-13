@@ -24,18 +24,9 @@ import view.gdx.ui.LayeredDrawable;
 import view.gdx.ui.UiSkinProvider;
 
 
-/**
- * Graphical Travel Log, the screen behind the Phase 1 Quest Menu.
- *
- * <p>Quest.claimReward already refuses an unfinished or claimed quest, so the claim rules are not
- * repeated here; the button state is only there to show which quests are claimable.
- *
- * <p>Mini-games, the other half of the Phase 1 Travel Log, live on {@link MiniGamesScreen}.
- */
 public final class QuestScreen extends MenuScreen {
 
   private static final Color CHIP = new Color(0f, 0f, 0f, 0.16f);
-  /** Top padding on an epic card, enough to clear the panel's blue header band. */
   private static final float EPIC_HEADER_CLEARANCE = 44f;
 
   private static final String ALL = "All";
@@ -75,7 +66,6 @@ public final class QuestScreen extends MenuScreen {
       return;
     }
 
-    // Same seeding QuestMenuController does, so a fresh account has its quests.
     if (GameDataManager.questRepository != null) {
       user.seedQuestsIfNeeded(GameDataManager.questRepository.getAll());
     }
@@ -143,7 +133,6 @@ public final class QuestScreen extends MenuScreen {
         quests.add(quest);
       }
     }
-    // Same order the terminal Travel Log prints in.
     quests.sort(Comparator.comparingInt(QuestScreen::priorityRank));
     return quests;
   }
@@ -168,22 +157,11 @@ public final class QuestScreen extends MenuScreen {
     return 5;
   }
 
-  /**
-   * One quest, as a card.
-   *
-   * <p>The old row was four stacked "label: value" lines with an oversized grey button under them,
-   * which made the least useful thing on the row the most prominent and ran two quests together
-   * with nothing between them. This gives each quest its own surface, puts the title first, states
-   * the goal once, and shows how far along it is as a bar -- the quests already carry progress and
-   * a target, and nothing was drawing them.
-   */
   private Table questCard(User user, Quest quest) {
     boolean claimable = quest.isCompleted() && !quest.isRewardClaimed();
 
     Table card = new Table();
     card.setBackground(questPanel(quest, claimable));
-    // The epic panel carries a blue header band across its top; content starts under it rather
-    // than on it, or the goal line ends up as dark text on a dark blue stripe.
     card.pad(isEpic(quest) ? EPIC_HEADER_CLEARANCE : 14f, 18f, 14f, 18f);
     card.top().left();
 
@@ -207,14 +185,6 @@ public final class QuestScreen extends MenuScreen {
     return card;
   }
 
-  /**
-   * The Travel Log's own panel for this quest's state.
-   *
-   * <p>Epic challenges get the blue-headed panel the game reserves for them, everything else the
-   * plain one, and a finished quest wears the green completion frame over whichever it is -- which
-   * is why the two are layered rather than swapped: the frames are hollow outlines meant to go on
-   * top of a panel, not to be one.
-   */
   private Drawable questPanel(Quest quest, boolean claimable) {
     boolean epic = isEpic(quest);
     Drawable base = skin.getDrawable(
@@ -235,10 +205,6 @@ public final class QuestScreen extends MenuScreen {
     Table holder = new Table();
     holder.left();
 
-    // A quest only learns its target the first time it is progressed, so an untouched one reports
-    // zero. Treating that as a range of one keeps the bar on every card and reads correctly for
-    // both kinds of quest: empty for a counter nobody has started, and empty for a one-shot
-    // condition nobody has met yet.
     float target = Math.max((float) quest.getQuestTarget(), 1f);
     float done = quest.isCompleted() ? target
         : Math.min((float) quest.getProgressOfQuest(), target);
@@ -252,7 +218,6 @@ public final class QuestScreen extends MenuScreen {
     return holder;
   }
 
-  /** A small pill for the quest's category, so the list is scannable when the filter is All. */
   private Table chip(String text) {
     Table chip = new Table();
     chip.setBackground(skin.newDrawable(UiSkinProvider.WHITE_PIXEL, CHIP));
@@ -261,7 +226,6 @@ public final class QuestScreen extends MenuScreen {
     return chip;
   }
 
-  /** The reward, with the currency icon when the reward is one. */
   private Table rewardChip(Quest quest) {
     Table reward = new Table();
     String text = quest.getRewardType() == null ? "-" : quest.getRewardType();
@@ -281,12 +245,10 @@ public final class QuestScreen extends MenuScreen {
         ? "general" : quest.getCategory();
   }
 
-  /** Claim when there is something to claim, otherwise a quiet statement of where it stands. */
   private Actor action(User user, Quest quest, boolean claimable) {
     if (claimable) {
       return button("Claim Reward", UiSkinProvider.BUTTON_GREEN, () -> claim(user, quest));
     }
-    // The green style has no disabled drawable, so a disabled green button still looks live.
     TextButton disabled = new TextButton(
         quest.isRewardClaimed() ? "Claimed" : "In progress",
         skin, UiSkinProvider.BUTTON_BROWN);

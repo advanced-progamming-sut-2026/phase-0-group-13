@@ -21,20 +21,12 @@ import view.gdx.ui.Popup;
 import view.gdx.ui.UiSkinProvider;
 
 
-/**
- * Graphical Shop over the existing Shop model.
- *
- * <p>Items, prices and purchase rules all come from Shop; Buy just calls buyItem and shows the
- * Result, so there's no second copy of the validation here. One Shop per screen, same as
- * ShopMenuController builds one per controller.
- */
 public final class ShopScreen extends MenuScreen {
 
   private static final float SHELF_WIDTH = 1020f;
   private static final float CARD_WIDTH = 318f;
   private static final float CARD_HEIGHT = 240f;
   private static final int CARDS_PER_ROW = 3;
-  /** Top padding on a daily card, so the promo ribbon does not sit over the item's icon. */
   private static final float RIBBON_CLEARANCE = 46f;
   /** Gap under a shelf heading; wide enough that a promo ribbon never touches the words. */
   private static final float SHELF_HEADING_GAP = 14f;
@@ -111,12 +103,10 @@ public final class ShopScreen extends MenuScreen {
     content.add(frame).row();
   }
 
-  /** A section heading, outlined so it reads against the panel and carries some weight. */
   private Label shelfHeading(String text) {
     return new Label(text, skin, UiSkinProvider.LABEL_BIG_OUTLINE);
   }
 
-  /** One row of item cards, wrapping every {@link #CARDS_PER_ROW}. */
   private Table shelf(User user, List<ShopItem> items) {
     Table shelf = new Table();
     shelf.left().top();
@@ -130,13 +120,6 @@ public final class ShopScreen extends MenuScreen {
     return shelf;
   }
 
-  /**
-   * The player's balances, big, at the top of the shop.
-   *
-   * <p>The header's CurrencyHud is deliberately small because most screens do not care what you
-   * are holding. A store is the one screen where it is the first thing you look at, so it gets its
-   * own readout on a counter plate.
-   */
   private Table wallet(User user) {
     Table wallet = new Table();
     wallet.add(purse(UiSkinProvider.COIN_ICON, user.getCoins())).padRight(12f);
@@ -153,19 +136,11 @@ public final class ShopScreen extends MenuScreen {
     return purse;
   }
 
-  /**
-   * One item, as a card.
-   *
-   * <p>The card art is the store's own: a coloured band over a cream body, a different colour per
-   * kind of thing being sold, which is what lets a shelf be read at a glance instead of as a list
-   * of identical rows. A daily deal additionally gets the store's promo ribbon over the top.
-   */
   private Table itemCard(User user, ShopItem item) {
     boolean affordable = canAfford(user, item);
 
     Table card = new Table();
     card.setBackground(skin.getDrawable(cardArt(item)));
-    // A daily card carries the ribbon across its top, so its contents start below it.
     card.pad(item.isDaily() ? RIBBON_CLEARANCE : 12f, 16f, 16f, 16f);
     card.top();
 
@@ -178,8 +153,6 @@ public final class ShopScreen extends MenuScreen {
     card.add(blurb).width(CARD_WIDTH - 44f).growY().row();
 
     card.add(priceTag(item, affordable)).padBottom(8f).row();
-    // Refused either way by Shop.buyItem; greying it out says so before the click rather than
-    // after it, which is the difference between a store and a form that rejects you.
     card.add(affordable
             ? button("Buy", UiSkinProvider.BUTTON_GREEN, () -> openPurchase(user, item))
             : disabledButton(item))
@@ -197,7 +170,6 @@ public final class ShopScreen extends MenuScreen {
     return wrapper;
   }
 
-  /** The promo ribbon, pinned across the top of a card. */
   private Table ribbon(String text) {
     Table holder = new Table();
     holder.top().padTop(2f);
@@ -223,7 +195,6 @@ public final class ShopScreen extends MenuScreen {
     return purse >= item.getPrice();
   }
 
-  /** Card art per category, so each kind of thing on the shelf has its own colour. */
   private static String cardArt(ShopItem item) {
     if (item.isDaily()) {
       return "image_ui_cards_store_store_bundle_card";
@@ -272,7 +243,6 @@ public final class ShopScreen extends MenuScreen {
     body.add(blurb).width(430f).row();
     body.add(priceTag(item)).padTop(10f).row();
 
-    // Shop refuses a custom seed without a plant, so ask for one here.
     SelectBox<String> plantPicker = null;
     if (needsPlantChoice(item)) {
       List<String> owned = user.getUnlockedPlants();
@@ -302,7 +272,6 @@ public final class ShopScreen extends MenuScreen {
     return item.getCategory() == model.enums.ItemCategory.CUSTOM_SEED;
   }
 
-  /** Readable names for the model's item ids. */
   private String displayName(ShopItem item) {
     return switch (item.getCategory()) {
       case POT -> "Greenhouse pot";
@@ -314,7 +283,6 @@ public final class ShopScreen extends MenuScreen {
     };
   }
 
-  /** Mirrors what Shop.applyPurchaseEffect does for each category. */
   private String description(ShopItem item) {
     return switch (item.getCategory()) {
       case POT -> "Unlocks the next pot in your greenhouse.";

@@ -14,13 +14,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import java.util.function.Consumer;
 
-/**
- * The plant card shared by the Collection almanac, the Plant Selection grid and the in-match seed
- * bank. Pure view: it shows what it is told and reports clicks.
- */
 public final class SeedCard extends Table {
 
-  /** COMPACT is the in-match bank, FULL is the menu grids. */
   public enum Size {
     COMPACT,
     FULL
@@ -43,15 +38,11 @@ public final class SeedCard extends Table {
 
   private boolean selected;
   private boolean enabled = true;
-  /** The almanac card art this card rests on, or null for the plain panel. */
   private String cardArt;
 
-  // Size is pinned at build time. The selected background is a nine-patch with a 159x158 minimum,
-  // so without this a card would grow when picked and squash its own rows.
   private final float lockedPrefWidth;
   private final float lockedPrefHeight;
 
-  /** key is what the click reports; label is what is written on it (the almanac shows "???"). */
   public SeedCard(Skin skin, Size size, String key, String label, TextureRegion art,
       HudArt hudArt, Consumer<String> onSelect) {
     this.skin = skin;
@@ -64,8 +55,6 @@ public final class SeedCard extends Table {
     float textWidth = compact ? 96f : 118f;
 
     setBackground(skin.getDrawable(UiSkinProvider.PANEL_BACKGROUND));
-    // Pad for the frame in both states, or the contents jump when a card is picked: the frame
-    // wants 22/17/24 and the panel only 7.
     if (compact) {
       pad(4f);
     } else {
@@ -90,8 +79,6 @@ public final class SeedCard extends Table {
     }
     add(nameLabel).width(textWidth).colspan(2).row();
 
-    // Cost and boost share a row; there is no room for two in the match bank. The cost half stays
-    // empty until withCost() fills it.
     boostLabel = new Label("", skin, "secondary");
     boostLabel.setColor(BOOST_COLOR);
     costRow = new Table();
@@ -100,7 +87,6 @@ public final class SeedCard extends Table {
     priceLine.add(boostLabel).padLeft(6f);
     add(priceLine).colspan(2).row();
 
-    // Small face even at menu size; the medium font pushes the card taller than the grid allows.
     statusLabel = new Label("", skin, "secondary");
     statusLabel.setAlignment(Align.center);
     add(statusLabel).width(textWidth).colspan(2);
@@ -149,7 +135,6 @@ public final class SeedCard extends Table {
     return key;
   }
 
-  /** Left off for lists with no price, like the almanac's zombie tab. */
   public SeedCard withCost(int sunCost) {
     costRow.clear();
     TextureRegion sun = hudArt == null ? null : hudArt.find("sun");
@@ -162,7 +147,6 @@ public final class SeedCard extends Table {
     return this;
   }
 
-  /** Free text under the card: "Lv 3", "2.4s", "need sun", "locked in this stage". */
   public void setStatus(String text) {
     statusLabel.setText(text == null ? "" : text);
   }
@@ -171,13 +155,6 @@ public final class SeedCard extends Table {
     boostLabel.setText(boosted ? "BOOST" : "");
   }
 
-  /**
-   * Puts the game's own padlock in the card's corner.
-   *
-   * <p>A locked entry was only a dimmer card, which is easy to miss in a grid where several
-   * plants are pale anyway. The padlock says it outright, and is small enough to sit over the
-   * artwork without hiding which plant it is.
-   */
   public SeedCard withLock() {
     if (compact) {
       return this;
@@ -191,14 +168,6 @@ public final class SeedCard extends Table {
     return this;
   }
 
-  /**
-   * Rests this card on one of the game's own almanac cards instead of the plain panel.
-   *
-   * <p>The almanac pages are a matched pair -- a green header over a cream body for plants, a
-   * purple one for zombies -- so a grid of them reads as an almanac at a glance rather than as a
-   * grid of identical panels. Only the menu-sized cards wear one; the in-match seed bank keeps the
-   * plain backing, which is what its recharge and can't-afford tints are drawn against.
-   */
   public SeedCard withCardArt(String drawableName) {
     if (compact || drawableName == null) {
       return this;
@@ -213,7 +182,6 @@ public final class SeedCard extends Table {
       return;
     }
     this.selected = selected;
-    // The frame swamps a packet-sized card, so a compact one golds its name instead.
     if (compact) {
       nameLabel.setColor(selected ? PICKED_NAME : Color.WHITE);
       return;
@@ -221,7 +189,6 @@ public final class SeedCard extends Table {
     applyBackground();
   }
 
-  /** Card art underneath, selection frame over the top of it when picked. */
   private void applyBackground() {
     Drawable resting = skin.getDrawable(
         cardArt == null ? UiSkinProvider.PANEL_BACKGROUND : cardArt);
@@ -234,13 +201,11 @@ public final class SeedCard extends Table {
     return selected;
   }
 
-  /** Dimmed and click-through, for a plant that is locked or unavailable. */
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
     setColor(enabled ? NORMAL : DISABLED);
   }
 
-  /** For the match bank's recharging and can't-afford states. */
   public void setTint(Color tint) {
     setColor(tint);
   }

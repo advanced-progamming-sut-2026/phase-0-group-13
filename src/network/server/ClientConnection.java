@@ -58,7 +58,6 @@ public final class ClientConnection implements Runnable {
         handle(line);
       }
     } catch (IOException e) {
-      // client went away; fall through to cleanup
     } finally {
       router.onDisconnect(this);
       close();
@@ -85,7 +84,6 @@ public final class ClientConnection implements Runnable {
     try {
       socket.close();
     } catch (IOException ignored) {
-      // already closed
     }
   }
 
