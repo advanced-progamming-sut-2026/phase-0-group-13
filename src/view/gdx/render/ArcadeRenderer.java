@@ -176,6 +176,12 @@ public final class ArcadeRenderer implements Disposable {
   }
 
   public void drawProp(Batch batch, TextureRegion region, double col, int row, float rowFraction) {
+    drawProp(batch, region, col, (double) row, rowFraction);
+  }
+
+  /** Same, for a prop that is between lanes -- a bowling nut on its way across a bounce. */
+  public void drawProp(Batch batch, TextureRegion region, double col, double row,
+      float rowFraction) {
     if (region == null) {
       return;
     }

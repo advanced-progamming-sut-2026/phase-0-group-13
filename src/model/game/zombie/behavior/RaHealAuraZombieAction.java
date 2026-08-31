@@ -62,7 +62,8 @@ public class RaHealAuraZombieAction implements ZombieAction {
         stolenSun += sun.getAmount();
         taken.add(sun);
       } else {
-        sun.changinCordinate(sun.getX() + Math.signum(gap) * PULL_SPEED, sun.getY());
+        // changinCordinate adds to the position, so this takes a step, not a destination.
+        sun.changinCordinate(Math.signum(gap) * PULL_SPEED, 0);
       }
     }
     for (Sun sun : taken) {
