@@ -70,7 +70,7 @@ public class SunManager {
 
   public Integer collectSunAt(int col, int row, Board board, int currentTick) {
     for (Sun sun : suns) {
-      if (!sun.isExpired() && Math.abs(sun.getX() - col) <= 0.5 && sun.getY() == row) {
+      if (!sun.isExpired() && sun.occupiesTile(col, row)) {
         if (sun.getType() == model.enums.SunType.RADIOACTIVE && sun.isFalling()) {
           System.out.printf("Radioactive sun exploded at (%d, %d)!%n", col + 1, row + 1);
           board.applyAreaDamageToZombies(col, row, 2, 150);

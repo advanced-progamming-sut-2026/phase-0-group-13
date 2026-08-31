@@ -70,10 +70,16 @@ public final class WallnutBowlingEngine {
     }
   }
 
-  private static final class RollingNut {
+  /**
+   * A nut rolling down a lane. It steps a whole cell a tick, which is what collision is worked out
+   * on; the previous cell is kept only so the screen can draw it on its way between the two.
+   */
+  public static final class RollingNut {
     private final NutType type;
     private int lane;
     private int column;
+    private int previousLane;
+    private int previousColumn;
     private int dLane;
     private int dColumn;
     private int bounceStage;
@@ -83,8 +89,30 @@ public final class WallnutBowlingEngine {
       this.type = type;
       this.lane = lane;
       this.column = column;
+      this.previousLane = lane;
+      this.previousColumn = column;
       this.dLane = 0;
       this.dColumn = 1;
+    }
+
+    public NutType getType() {
+      return type;
+    }
+
+    public int getLane() {
+      return lane;
+    }
+
+    public int getColumn() {
+      return column;
+    }
+
+    public int getPreviousLane() {
+      return previousLane;
+    }
+
+    public int getPreviousColumn() {
+      return previousColumn;
     }
   }
 
@@ -245,6 +273,8 @@ public final class WallnutBowlingEngine {
     if (nut.spent) {
       return;
     }
+    nut.previousLane = nut.lane;
+    nut.previousColumn = nut.column;
 
     int nextLane = nut.lane + nut.dLane;
     if (nextLane < 0 || nextLane >= LANES) {
@@ -375,5 +405,20 @@ public final class WallnutBowlingEngine {
       }
     }
     return null;
+  }
+
+  public List<RollingNut> getRollingNuts() {
+    return java.util.Collections.unmodifiableList(activeNuts);
+  }
+
+  /**
+   * How far the lane's zombies are through their long stride, 0 at the step they just took and 1
+   * at the next one. They only ever stand on whole cells, so this is what lets the screen walk
+   * them between two cells instead of teleporting once every three seconds.
+   *
+   * @param tickAlpha how far the frame sits inside the current tick
+   */
+  public double getZombieStrideProgress(double tickAlpha) {
+    return Math.min(1.0, (ticksSinceZombieAdvance + tickAlpha) / ZOMBIE_MOVE_INTERVAL_TICKS);
   }
 }

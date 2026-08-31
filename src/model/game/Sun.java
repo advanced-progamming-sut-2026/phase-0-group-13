@@ -5,6 +5,9 @@ import model.enums.SunType;
 public class Sun {
   public static final int INFINITE_LIFETIME = -1;
 
+  /** How far above its landing tile a sky sun starts, in lanes. It has to clear the top row. */
+  private static final double FALL_HEIGHT_ROWS = 7.0;
+
   private int amount;
   private double x;
   private double y;
@@ -12,6 +15,10 @@ public class Sun {
   private SunType sunType;
   private boolean isCollected;
   private int fallingTicks;
+  private int fallTotalTicks;
+  private double landingY;
+  private double previousY;
+  private boolean fallPrepared;
   private int groundedTick = -1;
 
   public Sun(int amount, int timeToLive, SunType sunType) {
@@ -33,9 +40,27 @@ public class Sun {
     this.y += y;
   }
 
+  /**
+   * A sky sun is created on the tile it will land on, so the first tick lifts it back up to the
+   * clouds; from there update() walks it down. The landing tile is remembered because that
+   * is what collection matches on, and it must not drift while the sun is in the air.
+   */
+  private void prepareFall() {
+    if (fallPrepared || fallingTicks <= 0) {
+      return;
+    }
+    fallPrepared = true;
+    fallTotalTicks = fallingTicks;
+    landingY = y;
+    y = landingY - FALL_HEIGHT_ROWS;
+  }
+
   public void update(int currentTick) {
+    prepareFall();
+    previousY = y;
     if (fallingTicks > 0) {
       fallingTicks--;
+      y = landingY - FALL_HEIGHT_ROWS * (fallingTicks / (double) fallTotalTicks);
       if (fallingTicks == 0) {
         groundedTick = currentTick;
         System.out.printf(
@@ -71,6 +96,20 @@ public class Sun {
   public void setAmount(int amount) { this.amount = amount; }
   public double getX() { return x; }
   public double getY() { return y; }
+  /** The tile this sun belongs to; the same as {@link #getY()} once it has landed. */
+  public double getLandingY() { return fallPrepared ? landingY : y; }
+  /** Where it hung a tick ago, so the drop is drawn smoothly between ticks. */
+  public double getPreviousY() { return previousY; }
+
+  /**
+   * Whether a click on this tile should pick this sun up. A sun in mid-air counts both on the tile
+   * it is passing over, which is where the player sees it, and on the tile it is heading for, which
+   * is where it has always been collectable.
+   */
+  public boolean occupiesTile(int col, int row) {
+    return Math.abs(x - col) <= 0.5
+            && (getLandingY() == row || (int) Math.round(y) == row);
+  }
   public SunType getType() { return sunType; }
   public void setType(SunType sunType) { this.sunType = sunType; }
   public boolean isFalling() { return fallingTicks > 0; }

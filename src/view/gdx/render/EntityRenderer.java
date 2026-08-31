@@ -75,6 +75,13 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float ARMOUR_STAGE_2 = 0.33f;
   private static final int PLANT_ATTACK_HOLD_TICKS = 4;
   private static final float LOB_ARC_HEIGHT = 0.85f;
+  /** How far across the plant's head the mouth sits, as a share of the head's own width. */
+  private static final float MUZZLE_HEAD_REACH = 0.35f;
+  private static final float MUZZLE_RELEASE_OF_CLIP = 0.4f;
+  private static final float MUZZLE_MIN_RELEASE = 0.15f;
+  private static final float MUZZLE_MAX_RELEASE = 0.5f;
+  private static final float MUZZLE_MAX_FORWARD = 0.5f;
+  private static final float MUZZLE_MAX_LIFT_LANES = 0.4f;
   private static final float FREEZE_LEVELS = Plant.MAX_FREEZE_LEVEL;
   private static final String OCTOPUS_RIG = "zombiebeachoctopus";
   private static final String OCTOPUS_REGION = "zombie_beach_octopus_66x76";
@@ -140,12 +147,16 @@ public final class EntityRenderer implements WorldRenderer {
   private float shakeMagnitude;
   private float shakeSeed;
   private int currentTick;
+  /** How far this frame sits between two simulation ticks; everything moving is drawn along it. */
+  private float tickAlpha;
   private TextureRegion octopus;
   private boolean octopusChecked;
   private final Map<Plant, Boolean> knownPlants = new java.util.IdentityHashMap<>();
   private final Map<Plant, Boolean> seenPlants = new java.util.IdentityHashMap<>();
   private final Map<Sun, double[]> knownSuns = new java.util.IdentityHashMap<>();
   private final Map<Sun, double[]> seenSuns = new java.util.IdentityHashMap<>();
+  /** Muzzle of each plant drawn this frame, filled in as the lawn is drawn. See muzzleOf. */
+  private final Map<Plant, float[]> muzzles = new java.util.IdentityHashMap<>();
   private boolean seenABoard;
 
   public EntityRenderer(LawnGeometry geometry) {
@@ -174,6 +185,7 @@ public final class EntityRenderer implements WorldRenderer {
     }
     Board board = game.getBoard();
     currentTick = game.getCurrentTick();
+    tickAlpha = context.getTickAlpha();
     clock += delta;
     hits.advance(delta);
     spawnLootPickups(board);
@@ -199,7 +211,7 @@ public final class EntityRenderer implements WorldRenderer {
     }
     for (Zombie zombie : board.getZombies()) {
       if (!zombie.isDead()) {
-        drawShadow(context, shadow, onBoard(zombie.getX()), footRow(zombie),
+        drawShadow(context, shadow, drawColumn(zombie), footRow(zombie),
             ZOMBIE_SHADOW_WIDTH_LANES, ZOMBIE_FOOT_INSET);
       }
     }
@@ -233,7 +245,7 @@ public final class EntityRenderer implements WorldRenderer {
     }
     TextureRegion art = zombieArt.find(zombie.getName());
     if (art != null) {
-      drawStanding(context, art, onBoard(zombie.getX()), footRow(zombie),
+      drawStanding(context, art, drawColumn(zombie), footRow(zombie),
           zombieScale(zombie, art), ZOMBIE_FOOT_INSET, spinAngle(zombie));
     }
   }
@@ -278,6 +290,7 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   private void drawSprites(RenderContext context, Board board, float delta) {
+    muzzles.clear();
     context.getBatch().begin();
     drawGroundShadows(context, board);
     TextureRegion sheep = hudArt.find("sheep");
@@ -308,7 +321,7 @@ public final class EntityRenderer implements WorldRenderer {
       for (Sun s : board.getSuns()) {
         // the doc wants the sun kinds told apart; a big one is bigger and a radioactive one glows
         context.getBatch().setColor(s.getType() == SunType.RADIOACTIVE ? radioactiveSun : Color.WHITE);
-        drawCentred(context, sun, s.getX(), s.getY(),
+        drawCentred(context, sun, s.getX(), lerp(s.getPreviousY(), s.getY(), tickAlpha),
             geometry.getCellHeight() * (s.getType() == SunType.LARGE ? 0.58f : 0.42f));
       }
       context.getBatch().setColor(Color.WHITE);
@@ -547,11 +560,48 @@ public final class EntityRenderer implements WorldRenderer {
     if (clip == null) {
       return false;
     }
-    animation.draw(context.getBatch(), clip, playback.advance(plant, clip, delta),
-        geometry.columnCentreX(plant.getCol()),
-        geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * PLANT_FOOT_INSET,
-        scaleFor(animation.width(clip), PLANT_ANIM_UNITS, PLANT_ROW_FILL), false);
+    float time = playback.advance(plant, clip, delta);
+    float x = geometry.columnCentreX(plant.getCol());
+    float y = geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * PLANT_FOOT_INSET;
+    float scale = scaleFor(animation.width(clip), PLANT_ANIM_UNITS, PLANT_ROW_FILL);
+    animation.draw(context.getBatch(), clip, time, x, y, scale, false);
+    noteMuzzle(plant, animation, clip, time, x, y, scale);
     return true;
+  }
+
+  /**
+   * Records where this plant's shots should leave it, taken from the head of the rig that was just
+   * drawn rather than from a hand-written offset per plant, so it follows the animation instead of
+   * drifting away from it. The release is how far into the firing tick the shot leaves the mouth,
+   * read off the length of the clip that is playing and kept inside the tick it was fired on so
+   * the shot is never held back past the tick that already dealt its damage.
+   */
+  private void noteMuzzle(Plant plant, EntityAnimation animation, String clip, float time,
+      float x, float y, float scale) {
+    if (geometry.getCellWidth() <= 0f) {
+      return;
+    }
+    float[] head = animation.topPartBox(clip, time, x, y, scale, false);
+    if (head == null) {
+      return;
+    }
+    float forward = (head[0] + head[2] * MUZZLE_HEAD_REACH - x) / geometry.getCellWidth();
+    float lift = head[1] - geometry.rowCentreY(plant.getRow());
+    float lane = geometry.getCellHeight();
+    muzzles.put(plant, new float[] {
+        clamp(forward, -MUZZLE_MAX_FORWARD, MUZZLE_MAX_FORWARD),
+        clamp(lift, -lane * MUZZLE_MAX_LIFT_LANES, lane * MUZZLE_MAX_LIFT_LANES),
+        clamp(animation.duration(clip) * MUZZLE_RELEASE_OF_CLIP / GdxConfig.SECONDS_PER_TICK,
+            MUZZLE_MIN_RELEASE, MUZZLE_MAX_RELEASE)});
+  }
+
+  private static float clamp(float value, float low, float high) {
+    return value < low ? low : Math.min(value, high);
+  }
+
+  /** Where to draw a zombie: between the tile it stood on last tick and the one it stands on now. */
+  private double drawColumn(Zombie zombie) {
+    return onBoard(lerp(zombie.getPreviousX(), zombie.getX(), tickAlpha));
   }
 
   private static final Map<String, String[]> ACTION_CLIP_NAMES = Map.of(
@@ -616,12 +666,12 @@ public final class EntityRenderer implements WorldRenderer {
       return false;
     }
     String clip = zombieClip(animation, zombie);
-    float time = playback.advance(zombie, clip, delta * animationRate(zombie));
+    float time = playback.advance(zombie, clip, delta * animationRate(zombie, clip));
     float flight = zombie.flightProgress();
     double column = flight > 0f
-        ? zombie.getX() + (zombie.getThrownFromX() - zombie.getX()) * flight
-        : zombie.getX();
-    float x = geometry.columnCentreX(onBoard(column));
+        ? onBoard(zombie.getX() + (zombie.getThrownFromX() - zombie.getX()) * flight)
+        : drawColumn(zombie);
+    float x = geometry.columnCentreX(column);
     float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
         + throwLift(flight);
     float scale = zombieAnimationScale(zombie, animation, clip);
@@ -829,11 +879,24 @@ public final class EntityRenderer implements WorldRenderer {
     return "";
   }
 
-  private static float animationRate(Zombie zombie) {
+  /**
+   * How fast to play a zombie's clip. A walk cycle is tied to how far the zombie actually travels
+   * per tick, so a chilled one plods, an enraged Newspaper's legs keep up with its sprint and an
+   * All-Star that has slowed to a crawl stops skating over the lawn. Everything else -- eating,
+   * dying, a special pose -- keeps its own pace apart from the chill.
+   */
+  private static float animationRate(Zombie zombie, String clip) {
     if (zombie.getActiveEffects().containsKey(StatusEffect.FROZEN)) {
       return 0f;
     }
+    if (isWalkClip(clip)) {
+      return (float) zombie.getStrideFraction();
+    }
     return zombie.getActiveEffects().containsKey(StatusEffect.CHILLED) ? CHILLED_ANIM_RATE : 1f;
+  }
+
+  private static boolean isWalkClip(String clip) {
+    return clip != null && clip.toLowerCase().contains("walk");
   }
 
   private float zombieAnimationScale(Zombie zombie, EntityAnimation animation, String clip) {
@@ -939,7 +1002,7 @@ public final class EntityRenderer implements WorldRenderer {
     float size = geometry.getCellHeight() * 2.9f;
     float pulse = 0.32f + 0.12f * (float) Math.sin(clock * 2.5f);
     context.getBatch().setColor(1f, 0.9f, 0.45f, pulse);
-    context.getBatch().draw(aura, geometry.columnCentreX(onBoard(zombie.getX())) - size / 2f,
+    context.getBatch().draw(aura, geometry.columnCentreX(drawColumn(zombie)) - size / 2f,
         geometry.rowCentreY(zombie.getRow()) - size / 2f, size, size);
     context.getBatch().setColor(Color.WHITE);
   }
@@ -958,7 +1021,7 @@ public final class EntityRenderer implements WorldRenderer {
     float size = geometry.getCellHeight() * 2.4f;
     float pulse = 0.28f + 0.12f * (float) Math.sin(clock * 2.5f);
     context.getBatch().setColor(0.5f, 0.95f, 0.55f, pulse);
-    context.getBatch().draw(aura, geometry.columnCentreX(onBoard(zombie.getX())) - size / 2f,
+    context.getBatch().draw(aura, geometry.columnCentreX(drawColumn(zombie)) - size / 2f,
         geometry.rowCentreY(zombie.getRow()) - size / 2f, size, size);
     context.getBatch().setColor(Color.WHITE);
   }
@@ -969,15 +1032,63 @@ public final class EntityRenderer implements WorldRenderer {
       if (shot == null) {
         continue;
       }
+      float[] muzzle = muzzleOf(board, projectile);
+      double column = shotColumn(projectile, muzzle);
+      double row = lerp(projectile.getPreviousY(), projectile.getExactY(), tickAlpha);
       context.getBatch().setColor(projectile.isFromZombie() ? reflectedPea : Color.WHITE);
-      drawCentred(context, shot.region(), projectile.getXCoordinate(),
-          projectile.getYCoordinate(), geometry.getCellHeight() * shot.rowFraction(),
-          arcLift(projectile), shot.angle());
+      drawCentred(context, shot.region(), column, row,
+          geometry.getCellHeight() * shot.rowFraction(),
+          arcLift(projectile, column) + (muzzle == null ? 0f : muzzle[1]), shot.angle());
     }
     context.getBatch().setColor(Color.WHITE);
   }
 
-  private float arcLift(Projectile projectile) {
+  /**
+   * Where to draw a shot this frame.
+   *
+   * <p>Two things happen here. The shot is drawn between its last tick position and its current
+   * one so it glides instead of hopping half a tile at a time, and on the tick it is fired it
+   * waits in the plant's muzzle until the shooting animation reaches its release frame before
+   * setting off. Neither touches the simulation: the shot has already been placed, has already
+   * been tested against zombies and does its damage on exactly the tick it always did.
+   */
+  private double shotColumn(Projectile projectile, float[] muzzle) {
+    double from = projectile.getPreviousX();
+    double to = projectile.getXCoordinate();
+    if (muzzle == null || from != projectile.getLaunchX()) {
+      return lerp(from, to, tickAlpha);
+    }
+    double mouth = from + muzzle[0];
+    float release = muzzle[2];
+    if (tickAlpha <= release) {
+      return mouth;
+    }
+    return lerp(mouth, to, (tickAlpha - release) / (1f - release));
+  }
+
+  private static double lerp(double from, double to, float alpha) {
+    return from + (to - from) * alpha;
+  }
+
+  /**
+   * The mouth of the plant that fired this shot as {forward tiles, lift in pixels, release}, or
+   * null when there is nothing to line the shot up with -- a zombie's shot, a lob, or a plant that
+   * has since been eaten. The offsets are read off the rig that is on screen rather than being
+   * guessed per plant, so nothing about the artwork has to change.
+   */
+  private float[] muzzleOf(Board board, Projectile projectile) {
+    if (projectile.isFromZombie() || projectile.isLobbed()) {
+      return null;
+    }
+    int col = (int) Math.round(projectile.getLaunchX());
+    Plant plant = board.getPlantAt(projectile.getYCoordinate(), col);
+    if (plant == null || plant.isDead()) {
+      return null;
+    }
+    return muzzles.get(plant);
+  }
+
+  private float arcLift(Projectile projectile, double column) {
     if (!projectile.isLobbed()) {
       return 0f;
     }
@@ -985,7 +1096,7 @@ public final class EntityRenderer implements WorldRenderer {
     if (span <= 0) {
       return 0f;
     }
-    double travelled = (projectile.getXCoordinate() - projectile.getLaunchX()) / span;
+    double travelled = (column - projectile.getLaunchX()) / span;
     if (travelled <= 0 || travelled >= 1) {
       return 0f;
     }
@@ -1003,7 +1114,7 @@ public final class EntityRenderer implements WorldRenderer {
     float scale = targetHeight / region.getRegionHeight();
     float width = region.getRegionWidth() * scale;
     context.getBatch().draw(region, geometry.columnCentreX(col) - width / 2f,
-        geometry.rowCentreY((int) Math.round(row)) - targetHeight / 2f + lift,
+        geometry.rowCentreY(row) - targetHeight / 2f + lift,
         width / 2f, targetHeight / 2f, width, targetHeight, 1f, 1f, angle);
   }
 
@@ -1015,15 +1126,18 @@ public final class EntityRenderer implements WorldRenderer {
     shapes.setColor(peaColor);
     for (Projectile projectile : board.getProjectiles()) {
       if (projectileArt.find(projectile) == null) {
-        shapes.circle(geometry.columnCentreX(projectile.getXCoordinate()),
-            geometry.rowCentreY(Math.round(projectile.getYCoordinate())), 7f);
+        shapes.circle(
+            geometry.columnCentreX(
+                lerp(projectile.getPreviousX(), projectile.getXCoordinate(), tickAlpha)),
+            geometry.rowCentreY(
+                lerp(projectile.getPreviousY(), projectile.getExactY(), tickAlpha)), 7f);
       }
     }
     if (hudArt.find("sun") == null) {
       shapes.setColor(sunColor);
       for (Sun sun : board.getSuns()) {
         shapes.circle(geometry.columnCentreX(sun.getX()),
-            geometry.rowCentreY((int) Math.round(sun.getY())), 16f);
+            geometry.rowCentreY(lerp(sun.getPreviousY(), sun.getY(), tickAlpha)), 16f);
       }
     }
     for (Zombie zombie : board.getZombies()) {
@@ -1040,7 +1154,7 @@ public final class EntityRenderer implements WorldRenderer {
     for (Zombie zombie : board.getZombies()) {
       if (!zombie.isDead() && zombieArt.find(zombie.getName()) == null
           && zombieAnimation(zombie) == null) {
-        shapes.rect(geometry.columnCentreX(onBoard(zombie.getX())) - geometry.getCellWidth() * 0.25f,
+        shapes.rect(geometry.columnCentreX(drawColumn(zombie)) - geometry.getCellWidth() * 0.25f,
             geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * 0.1f,
             geometry.getCellWidth() * 0.5f, geometry.getCellHeight() * 0.7f);
       }
@@ -1104,7 +1218,7 @@ public final class EntityRenderer implements WorldRenderer {
   private void healthBar(ShapeRenderer shapes, Zombie zombie) {
     float spriteHeight = zombieSpriteHeight(zombie);
     float width = geometry.getCellHeight() * (isBoss(zombie) ? 2.1f : 0.62f);
-    float x = geometry.columnCentreX(onBoard(zombie.getX())) - width / 2f;
+    float x = geometry.columnCentreX(drawColumn(zombie)) - width / 2f;
     float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
         + spriteHeight + 4f;
     // a tall zombie in the top lane would otherwise wear its bar up in the seed cards
