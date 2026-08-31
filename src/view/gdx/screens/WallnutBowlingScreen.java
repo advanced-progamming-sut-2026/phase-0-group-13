@@ -12,6 +12,7 @@ import model.enums.MiniGameType;
 import model.game.minigame.arcade.WallnutBowlingEngine;
 import model.game.minigame.arcade.WallnutBowlingEngine.LaneZombie;
 import model.game.minigame.arcade.WallnutBowlingEngine.NutType;
+import model.game.minigame.arcade.WallnutBowlingEngine.RollingNut;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.SeedCard;
@@ -100,25 +101,41 @@ public final class WallnutBowlingScreen extends ArcadeBoardScreen {
   @Override
   protected void drawWorld(float delta) {
     Batch batch = context().getBatch();
+    float alpha = context().getTickAlpha();
+    double stride = engine.getZombieStrideProgress(alpha);
     for (LaneZombie zombie : engine.getZombies()) {
-      art.drawZombie(batch, zombie, "zombie", zombie.getColumn(), zombie.getLane(), false);
+      art.drawZombie(batch, zombie, "zombie", walkedColumn(zombie, stride), zombie.getLane(),
+          false);
     }
-    for (int lane = 0; lane < ROWS; lane++) {
-      for (int col = 0; col < COLUMNS; col++) {
-        NutType nut = engine.getNutTypeAt(lane, col);
-        if (nut != null) {
-          art.drawProp(batch, art.plantPortrait(packetOf(nut)), col, lane,
-              nut == NutType.GIANT ? GIANT_ROW_FILL : NUT_ROW_FILL);
-        }
-      }
+    for (RollingNut nut : engine.getRollingNuts()) {
+      art.drawProp(batch, art.plantPortrait(packetOf(nut.getType())),
+          lerp(nut.getPreviousColumn(), nut.getColumn(), alpha),
+          lerp(nut.getPreviousLane(), nut.getLane(), alpha),
+          nut.getType() == NutType.GIANT ? GIANT_ROW_FILL : NUT_ROW_FILL);
     }
+  }
+
+  /**
+   * A lane zombie stands on whole cells and only steps every few seconds. Drawing it part way into
+   * its next step turns that hop into a walk without the engine's cell-by-cell rules changing.
+   */
+  private static double walkedColumn(LaneZombie zombie, double stride) {
+    if (zombie.getColumn() <= 0) {
+      return zombie.getColumn();
+    }
+    return zombie.getColumn() - stride;
+  }
+
+  private static double lerp(int from, int to, float alpha) {
+    return from + (to - from) * (double) alpha;
   }
 
   @Override
   protected void drawOverlays(ShapeRenderer shapes) {
     drawRedLine(shapes, WallnutBowlingEngine.RED_LINE_COLUMN, true);
+    double stride = engine.getZombieStrideProgress(context().getTickAlpha());
     for (LaneZombie zombie : engine.getZombies()) {
-      art.healthBar(shapes, zombie.getColumn(), zombie.getLane(),
+      art.healthBar(shapes, walkedColumn(zombie, stride), zombie.getLane(),
           zombie.getHealth() / (float) zombie.getMaxHealth(), 0.86f);
     }
   }

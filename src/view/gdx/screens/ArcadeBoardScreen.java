@@ -209,6 +209,7 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
       clock.update(delta * GameSettings.getGameSpeed(), this::step);
     }
     float worldDelta = paused ? 0f : delta;
+    context().setTickAlpha(clock.alpha());
 
     context().applyCamera();
     lawn.renderBackdrop(context(), seasonKey(), worldDelta);

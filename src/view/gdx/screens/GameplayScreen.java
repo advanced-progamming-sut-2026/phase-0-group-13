@@ -350,6 +350,9 @@ public final class GameplayScreen extends BaseScreen {
       clock.update(delta * GameSettings.getGameSpeed(), actions::advanceOneTick);
     }
     float worldDelta = paused || intro ? 0f : delta;
+    // The clock stops accumulating while paused, so its alpha is already frozen: publishing it
+    // unconditionally leaves everything exactly where the last live frame drew it.
+    context().setTickAlpha(clock.alpha());
 
     input.updateHover(Gdx.input.getX(), Gdx.input.getY());
     if (!paused && !intro) {

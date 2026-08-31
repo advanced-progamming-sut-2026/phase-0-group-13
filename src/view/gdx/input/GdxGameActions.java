@@ -143,7 +143,7 @@ public final class GdxGameActions implements GameActionBridge {
       return false;
     }
     for (Sun sun : board.getSuns()) {
-      if (sun.isExpired() || Math.abs(sun.getX() - column) > 0.5 || sun.getY() != row) {
+      if (sun.isExpired() || !sun.occupiesTile(column, row)) {
         continue;
       }
       if (sun.getType() == SunType.RADIOACTIVE && sun.isFalling()) {

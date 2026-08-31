@@ -20,6 +20,8 @@ public class Projectile {
   private final double speed;
   private double xCoordinate;
   private double yCoordinate;
+  private double previousX;
+  private double previousY;
   private int stepCol = 1;
   private int stepRow = 0;
   private final boolean isFromZombie;
@@ -59,6 +61,8 @@ public class Projectile {
     this.isActive = true;
     this.launchX = x;
     this.targetX = x;
+    this.previousX = x;
+    this.previousY = y;
   }
 
   public Projectile(int damage, double speed, double x, int y, boolean isSlowing, boolean isFromZombie) {
@@ -75,6 +79,8 @@ public class Projectile {
 
   public void move() {
     if (isActive) {
+      this.previousX = xCoordinate;
+      this.previousY = yCoordinate;
       this.xCoordinate += speed * stepCol;
       this.yCoordinate += speed * stepRow;
       if (remainingLifeTicks > 0) {
@@ -152,12 +158,14 @@ public class Projectile {
       stepRow = 1;
     }
     yCoordinate = Math.max(0, Math.min(rows - 1.0, yCoordinate + stepRow));
+    previousY = yCoordinate;
     alreadyHit.clear();
   }
 
   public void bounceHorizontally(int columns) {
     stepCol = -stepCol;
     xCoordinate = Math.max(0, Math.min(columns - 1.0, xCoordinate + stepCol));
+    previousX = xCoordinate;
     alreadyHit.clear();
   }
 
@@ -253,8 +261,25 @@ public class Projectile {
     return xCoordinate;
   }
 
+  /**
+   * Where this shot sat at the previous tick. Rendering walks from here to the current position
+   * over the frames of one tick, which is what stops a shot jumping half a tile at a time.
+   */
+  public double getPreviousX() {
+    return previousX;
+  }
+
+  public double getPreviousY() {
+    return previousY;
+  }
+
   public int getYCoordinate() {
     return (int) Math.round(yCoordinate);
+  }
+
+  /** The unrounded row, so a ricochet crossing lanes can be drawn between them. */
+  public double getExactY() {
+    return yCoordinate;
   }
 
   public boolean isFromZombie() {
@@ -302,6 +327,8 @@ public class Projectile {
     lit.withStun(stunTicks);
     lit.firedBy(sourceName);
     lit.aimedAt(targetX);
+    lit.previousX = this.previousX;
+    lit.previousY = this.previousY;
     return lit;
   }
 }

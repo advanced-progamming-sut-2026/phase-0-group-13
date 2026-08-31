@@ -19,6 +19,7 @@ public class Zombie {
   private int row;
   private double x;
   private double y;
+  private double previousX;
 
   public static final int NO_CELL = -1;
 
@@ -49,6 +50,7 @@ public class Zombie {
     this.speed = speed;
     this.row = row;
     this.x = startX;
+    this.previousX = startX;
     this.armors = new ArrayList<>();
     this.behavior = behavior;
     this.isEating = false;
@@ -96,8 +98,27 @@ public class Zombie {
     if (!isEating && !activeEffects.containsKey(StatusEffect.FROZEN)) {
       double actualSpeed = activeEffects.containsKey(StatusEffect.CHILLED) ? speed / 2.0 : speed;
       double direction = hypnotized ? 1.0 : -1.0;
+      this.previousX = x;
       this.x += direction * actualSpeed * speedMultiplier;
     }
+  }
+
+  /**
+   * How far this zombie walked on the last tick, as a share of its own unhindered pace. The
+   * renderer drives the walk cycle with it so the feet keep up with a buffed zombie and slow down
+   * with a chilled one instead of scuffing along at a fixed rate.
+   */
+  public double getStrideFraction() {
+    if (activeEffects.containsKey(StatusEffect.FROZEN)) {
+      return 0.0;
+    }
+    double chill = activeEffects.containsKey(StatusEffect.CHILLED) ? 0.5 : 1.0;
+    return chill * speedMultiplier;
+  }
+
+  /** Where this zombie stood at the previous tick, for drawing between the two. */
+  public double getPreviousX() {
+    return previousX;
   }
 
   public void takeDamage(int damage, boolean ignoresArmor) {
@@ -175,7 +196,7 @@ public class Zombie {
   public boolean isDead() { return this.currentHealth <= 0; }
   public double getX() { return x; }
 
-  public void setX(double x) { this.x = x; }
+  public void setX(double x) { this.x = x; this.previousX = x; }
   public double getY() { return y; }
   public int getRow() { return row; }
   public void setRow(int row) { this.row = row; }

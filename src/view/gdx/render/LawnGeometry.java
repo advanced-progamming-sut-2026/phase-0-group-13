@@ -46,6 +46,11 @@ public final class LawnGeometry {
     return rowToY(row) + cellHeight / 2f;
   }
 
+  /** Lane centre for a fractional row, so a falling sun can sit between two lanes. */
+  public float rowCentreY(double row) {
+    return originY + (float) (rows - 1 - row) * cellHeight + cellHeight / 2f;
+  }
+
   public int xToColumn(float worldX) {
     if (cellWidth <= 0f) {
       return -1;

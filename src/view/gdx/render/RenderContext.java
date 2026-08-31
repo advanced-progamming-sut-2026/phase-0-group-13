@@ -16,6 +16,9 @@ public final class RenderContext implements Disposable {
   private final OrthographicCamera camera;
   private final Viewport viewport;
 
+  /** How far the render sits between the last simulation tick and the next, 0..1. */
+  private float tickAlpha;
+
   public RenderContext() {
     this.batch = new SpriteBatch();
     this.shapes = new ShapeRenderer();
@@ -38,6 +41,18 @@ public final class RenderContext implements Disposable {
 
   public Viewport getViewport() {
     return viewport;
+  }
+
+  /**
+   * Publishes how far this frame sits between two simulation ticks so renderers can draw entities
+   * between their last and current tick positions instead of snapping once per tick.
+   */
+  public void setTickAlpha(float alpha) {
+    this.tickAlpha = alpha < 0f ? 0f : Math.min(alpha, 1f);
+  }
+
+  public float getTickAlpha() {
+    return tickAlpha;
   }
 
   public void applyCamera() {
