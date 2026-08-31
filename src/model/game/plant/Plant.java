@@ -173,6 +173,17 @@ public class Plant {
     return plantFood != null;
   }
 
+  /**
+   * True while a plant-food dose is still running.
+   *
+   * <p>Separate from {@link #hasPlantFoodEffect}, which only says the plant has an effect at all.
+   * This is the live one, and it is what the renderer needs: every rig ships a {@code plantfood}
+   * clip, and without knowing the dose is running there is no moment at which to play it.
+   */
+  public boolean isPlantFoodActive() {
+    return plantFood != null && plantFood.canExecute();
+  }
+
   public void applyPlantFood() {
     if (plantFood != null) {
       plantFood.activate();

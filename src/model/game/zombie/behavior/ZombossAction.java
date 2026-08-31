@@ -21,9 +21,19 @@ public class ZombossAction implements ZombieAction {
 
   public static final int ROW_SPAN = 2;
 
-  public enum Pose { IDLE, MOVING, ATTACKING, STUNNED }
+  /**
+   * What the boss is doing, for the rig to match.
+   *
+   * <p>SUMMONING is its own pose rather than folded into ATTACKING because every chapter's rig
+   * draws it differently -- Egypt opens a portal, the pirate has a spawn, the mammoth calls up a
+   * glacier column -- and none of those look anything like firing a missile.
+   */
+  public enum Pose { IDLE, MOVING, ATTACKING, SUMMONING, STUNNED }
 
   private static final int ATTACK_POSE_TICKS = 12;
+
+  /** Longer than the attack pose: the portal and spawn clips are wind-ups, not a single blow. */
+  private static final int SUMMON_POSE_TICKS = 18;
 
   private static final int STUN_TICKS = 40;
 
@@ -67,6 +77,7 @@ public class ZombossAction implements ZombieAction {
   private double station = -1;
   private Pose pose = Pose.IDLE;
   private int attackPoseLeft;
+  private int summonPoseLeft;
 
   public ZombossAction(ZombieType chapter, ZombossHealth health, double eatingDamage) {
     this.chapter = chapter;
@@ -124,11 +135,25 @@ public class ZombossAction implements ZombieAction {
       return;
     }
 
+    // The summon pose runs to its end before the boss goes back to firing: the portal and spawn
+    // clips are wind-ups, and cutting one off after a tick shows nothing at all.
+    if (summonPoseLeft > 0) {
+      summonPoseLeft--;
+      // Station-keeping first and the pose after it, not the other way round: crushOrHoldStation
+      // picks a pose of its own every time it runs, so setting SUMMONING before calling it had the
+      // summon wiped on the very next tick and the portal clip never got past its first frame.
+      crushOrHoldStation(zombie, board, currentTick);
+      pose = Pose.SUMMONING;
+      return;
+    }
     if (movesBetweenRows() && currentTick - lastRowMoveTick >= ROW_MOVE_INTERVAL) {
       moveToAnotherRow(zombie, board, currentTick);
     }
     if (summonsZombies() && currentTick - lastSummonTick >= SUMMON_INTERVAL) {
       summonMinion(zombie, board, currentTick);
+      summonPoseLeft = SUMMON_POSE_TICKS;
+      pose = Pose.SUMMONING;
+      return;
     }
     if (currentTick - lastUltimateTick >= ULTIMATE_INTERVAL) {
       attackPoseLeft = ATTACK_POSE_TICKS;

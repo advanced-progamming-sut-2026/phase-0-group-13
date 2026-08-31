@@ -12,6 +12,7 @@ public class GargantuarAction implements ZombieAction {
   private final int maxHealth;
   private boolean hasThrownImp;
   private int throwTick = -1;
+  private int smashTick = -1;
 
   public GargantuarAction(int maxHealth) {
     this.maxHealth = maxHealth;
@@ -20,6 +21,18 @@ public class GargantuarAction implements ZombieAction {
 
   public int getThrowTick() {
     return throwTick;
+  }
+
+  /**
+   * The tick the pole last came down, or -1 before the first one.
+   *
+   * <p>A Gargantuar does not bite: it stops at a plant and smashes it, and its rig has a
+   * smash_left for exactly that. The model still reports it as eating, because that is what the
+   * Hypno-shroom and the terminal board read to know a zombie is occupied; this is only so the
+   * renderer can tell a landed smash from the wind-up between them.
+   */
+  public int getSmashTick() {
+    return smashTick;
   }
 
   @Override
@@ -44,6 +57,7 @@ public class GargantuarAction implements ZombieAction {
       zombie.setEating(true);
       if (currentTick % 15 == 0) {
         targetPlant.takeDamage(10000);
+        smashTick = currentTick;
       }
     } else {
       zombie.setEating(false);

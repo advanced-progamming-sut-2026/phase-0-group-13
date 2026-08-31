@@ -169,6 +169,19 @@ public final class HitEffects {
     seenAliveState.put(zombie, !isDead);
   }
 
+  /**
+   * Records a death seen from outside, by a caller that watched the zombie disappear.
+   *
+   * <p>{@link #observeZombieState} can only fire when a dead zombie is still in the board's list,
+   * and it never is: Board.cleanupEntities drops it in the same tick it dies, so the alive-to-dead
+   * transition happens entirely between frames. The renderer is the one that can tell -- it keeps
+   * last frame's zombies -- so it reports the death here instead.
+   */
+  public void spawnDeathPuff(double column, int row) {
+    deathPuffs.add(new DeathPuff(column, row, 0f));
+    freshDeaths++;
+  }
+
   public void spawnPickup(String kind, double column, int row) {
     pickups.add(new LootPickup(kind, column, row, 0f));
   }
