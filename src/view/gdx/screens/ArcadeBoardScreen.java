@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import data.persistence.UserManager;
 import model.account.User;
 import model.core.MiniGameLauncher;
@@ -28,6 +28,9 @@ import view.gdx.core.PvzGdxGame;
 import view.gdx.render.ArcadeRenderer;
 import view.gdx.render.LawnGeometry;
 import view.gdx.render.LawnRenderer;
+import view.gdx.ui.ButtonFeel;
+import view.gdx.ui.CurrencyHud;
+import view.gdx.ui.DebugPanel;
 import view.gdx.ui.Popup;
 import view.gdx.ui.Toast;
 import view.gdx.ui.UiSkinProvider;
@@ -44,6 +47,10 @@ import view.gdx.ui.UiSkinProvider;
  * <p>Two clocks, same as {@link GameplayScreen}: {@link FixedStepClock} steps the engine and the
  * frame delta only drives animation. Pausing gives the renderers a delta of zero so the rigs
  * freeze with the simulation instead of walking on the spot.
+ *
+ * <p>The HUD shares the world's 1280x720 shape for the same reason {@link view.gdx.ui.HudStage}
+ * does: the picker strip sits directly above the board, and a viewport that does not scale with
+ * the lawn slides down over the top lane as soon as the window is not the design size.
  */
 public abstract class ArcadeBoardScreen extends BaseScreen {
 
@@ -127,6 +134,16 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     return false;
   }
 
+  /**
+   * Puts down whatever the player is holding -- a seed, a zombie, half a swap -- so Escape can back
+   * out of a choice before it backs out of the game.
+   *
+   * @return true if something was actually being held, false if there was nothing to cancel
+   */
+  protected boolean clearSelection() {
+    return false;
+  }
+
   @Override
   public void show() {
     GameAudio.getInstance().playMusic(GameAudio.Track.BATTLE);
@@ -134,7 +151,7 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     art = new ArcadeRenderer(geometry);
     skin = game.getUiSkin().get();
 
-    stage = new Stage(new ScreenViewport());
+    stage = new Stage(new FitViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
     if (skin != null) {
       buildHud();
     }
@@ -152,7 +169,8 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     Table header = new Table();
     header.add(new Label(title(), skin, UiSkinProvider.LABEL_BIG)).left().padRight(24f);
     status = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
-    header.add(status).left().expandX();
+    header.add(status).left().expandX().padRight(16f);
+    header.add(new CurrencyHud(skin)).right().padRight(16f);
     if (canPause()) {
       header.add(barButton("Pause", this::togglePause)).width(120f).height(44f).padRight(6f);
     }
@@ -163,10 +181,19 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     picker.left();
     root.add(picker).left().padTop(4f).padLeft(6f).row();
     buildPicker(picker, skin);
+
+    if (DebugPanel.isEnabled()) {
+      Table corner = new Table();
+      corner.setFillParent(true);
+      corner.bottom().right().pad(12f);
+      corner.add(new DebugPanel(skin, this::toast));
+      stage.addActor(corner);
+    }
   }
 
   private TextButton barButton(String label, Runnable action) {
     TextButton button = new TextButton(label, skin, UiSkinProvider.BUTTON_BROWN);
+    ButtonFeel.apply(button);
     button.addListener(new ClickListener() {
       @Override
       public void clicked(InputEvent event, float x, float y) {
@@ -407,7 +434,18 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
         return true;
       }
       if (keycode == Input.Keys.ESCAPE) {
-        leave();
+        // Same ladder the main game uses: close the pause menu, else put down what is held, else
+        // pause. Leaving is the header's Give up button, not one keypress from mid-match.
+        if (paused) {
+          togglePause();
+        } else if (!clearSelection()) {
+          if (canPause()) {
+            togglePause();
+          } else {
+            // Nothing to cancel and no clock of ours to stop, so this one really is the way out.
+            leave();
+          }
+        }
         return true;
       }
       if (keycode == Input.Keys.SPACE) {

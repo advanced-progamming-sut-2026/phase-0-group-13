@@ -1,0 +1,34 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "die": 5.0667,
+        "die_exit": 7.6667,
+        "die_talk": 3.0667,
+        "emerge": 1.6,
+        "idle": 4,
+        "intro": 6.2,
+        "spawn": 3,
+        "stun_end": 1.1,
+        "stun_loop": 1.8333,
+        "stun_start": 0.1333,
+        "submerge": 1.7,
+        "suction_loop": 2,
+        "suction_off": 2.5,
+        "suction_on": 2.1333,
+        "tangled_loop": 0.9667,
+        "tangled_off": 1.8,
+        "tangled_on": 1.1333
+      },
+      "name": "ZOMBIE_BEACH_ZOMBOSS",
+      "pam": "768/FULL/ZOMBIE/ZOMBIE_BEACH_ZOMBOSS/ZOMBIE_BEACH_ZOMBOSS.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombiezombossmechpirate.atlas",
+  "entity": "ZombieZombossMechPirate",
+  "source_folder": "images/768/.../Zombie_beach_Zomboss"
+}

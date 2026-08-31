@@ -33,17 +33,32 @@ final class GamePlayCheatHandler {
       return;
     }
     try {
-      Zombie zombie =
-              new ZombieFactory(GameDataManager.zombieRepository).createZombie(type, row, col);
+      Zombie zombie = new ZombieFactory(GameDataManager.zombieRepository)
+              .createZombie(resolveZombieAlias(type), row, col);
       if (zombie == null) {
         System.out.println("error: unknown zombie type '" + type + "'");
         return;
       }
       gm.getBoard().spawnZombie(zombie);
-      System.out.println("Spawned zombie " + type + ".");
+      System.out.println("Spawned zombie " + zombie.getDisplayName() + ".");
     } catch (RuntimeException e) {
       System.out.println("error: could not spawn zombie (data unavailable)");
     }
+  }
+
+  /** Accepts either the raw alias or the name the almanac shows. */
+  private static String resolveZombieAlias(String typed) {
+    String wanted = typed == null ? "" : typed.trim();
+    if (GameDataManager.zombieRepository.find(wanted) != null) {
+      return wanted;
+    }
+    for (var template : GameDataManager.zombieRepository.getAll()) {
+      String display = template.getDisplayName();
+      if (display != null && display.equalsIgnoreCase(wanted)) {
+        return template.getName();
+      }
+    }
+    return wanted;
   }
 
   static void unlockAllPlants(GameManager gm) {

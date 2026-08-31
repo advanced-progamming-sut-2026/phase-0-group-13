@@ -150,6 +150,15 @@ ZOMBIE_ART_ALIASES = {
     # common to every chapter, so it rides the Big Wave Beach walker to be visible and animated
     # at all; its umbrella is not drawn. Replace this line once parasol art is sourced.
     "ZombieParasolDefault": "zombie_beach_basic",
+    # The four bosses. Upstream files them by world ("beach"), the project by mech name
+    # ("Pirate"), so nothing normalised onto anything and all four were left with no rig at all.
+    # Each pairing below is the boss the spec describes, matched on its own clip list:
+    # dark has fire_attack/fire_bomb/summoning, iceage has wind_1..4 and glacier_column_1..6,
+    # beach has suction_on/loop/off and tangled_*, egypt has missile_start and rocket_launch.
+    "ZombieZombossMechEgypt": "zombie_egypt_zomboss",
+    "ZombieZombossMechPirate": "zombie_beach_zomboss",
+    "ZombieZombossMechCowboy": "zombie_iceage_zomboss",
+    "ZombieZombossMechDark": "zombie_dark_zomboss",
 }
 
 
@@ -238,8 +247,14 @@ def match_worlds(folders, prefix):
 # --------------------------------------------------------------------------- emitting
 
 
-def atlas_text(pages, regions, page_files):
-    """libGDX atlas format. One block per page, regions sorted by name."""
+def atlas_text(pages, regions, page_files, texture_filter="Nearest,Nearest"):
+    """libGDX atlas format. One block per page, regions sorted by name.
+
+    ``texture_filter`` is Nearest by default because a seed packet or a rig part is drawn at
+    roughly the size it was authored at. The world backdrops are the exception: they are one
+    1024x768 painting resampled to fill a 1280x720 world, which Nearest turns into stair-stepped
+    tile edges, so those pages ask for Linear instead.
+    """
     by_page = collections.defaultdict(list)
     for region in regions:
         by_page[region["parent"]].append(region)
@@ -250,7 +265,7 @@ def atlas_text(pages, regions, page_files):
         lines = [record["file"],
                  "size: {},{}".format(record["width"], record["height"]),
                  "format: RGBA8888",
-                 "filter: Nearest,Nearest",
+                 "filter: " + texture_filter,
                  "repeat: none"]
         for region in sorted(by_page[page_id], key=lambda r: r["path"]):
             name = region["path"].split("\\")[-1]
@@ -342,7 +357,8 @@ def page_filename(page_id):
     return page_id.replace("ATLASIMAGE_ATLAS_", "") + ".PNG"
 
 
-def emit(entity_key, folder_entry, out_dir, pages, dry_run, stats):
+def emit(entity_key, folder_entry, out_dir, pages, dry_run, stats,
+         texture_filter="Nearest,Nearest"):
     """Copies the entity's page(s) and writes its .atlas. Returns the record."""
     page_ids = sorted(folder_entry["pages"])
     page_files = {}
@@ -374,7 +390,8 @@ def emit(entity_key, folder_entry, out_dir, pages, dry_run, stats):
         os.makedirs(out_dir, exist_ok=True)
         with open(os.path.join(out_dir, atlas_name), "w", encoding="utf-8",
                   newline="\n") as handle:
-            handle.write(atlas_text(page_ids, folder_entry["regions"], page_files))
+            handle.write(atlas_text(page_ids, folder_entry["regions"], page_files,
+                                    texture_filter))
     stats["atlas"] += 1
 
     return {"atlas": atlas_name,
@@ -411,19 +428,24 @@ def run(dry_run):
         "unresolved": sorted(unresolved, key=lambda u: (u["roster"], u["entity"])),
     }
 
+    # Backdrops are one big painting resampled to fill the window, so they get Linear; every
+    # other page is drawn near its authored size and keeps Nearest.
     targets = [
-        ("plants", plants_map, plant_folders, os.path.join(ASSETS, "textures", "plants")),
-        ("zombies", zombies_map, zombie_folders, os.path.join(ASSETS, "textures", "zombies")),
-        ("lawn", mowers_map, mower_folders, os.path.join(ASSETS, "textures", "lawn")),
+        ("plants", plants_map, plant_folders, os.path.join(ASSETS, "textures", "plants"),
+         "Nearest,Nearest"),
+        ("zombies", zombies_map, zombie_folders, os.path.join(ASSETS, "textures", "zombies"),
+         "Nearest,Nearest"),
+        ("lawn", mowers_map, mower_folders, os.path.join(ASSETS, "textures", "lawn"),
+         "Nearest,Nearest"),
         ("environment", worlds_map, background_folders,
-         os.path.join(ASSETS, "textures", "environment")),
+         os.path.join(ASSETS, "textures", "environment"), "Linear,Linear"),
     ]
 
-    for section, resolved, folders, out_dir in targets:
+    for section, resolved, folders, out_dir, texture_filter in targets:
         for entity in sorted(resolved):
             folder = resolved[entity]
             record = emit(norm(entity) or norm(folder), folders[folder], out_dir,
-                          pages, dry_run, stats)
+                          pages, dry_run, stats, texture_filter)
             if record is None:
                 mapping["unresolved"].append(
                     {"entity": entity, "roster": section,
@@ -434,7 +456,7 @@ def run(dry_run):
             mapping[section][entity] = record
 
     anim_index = load_animations()
-    for section, _, _, _ in targets:
+    for section, _, _, _, _ in targets:
         out_dir = os.path.join(ASSETS, "animations", ANIM_DIR[section])
         _, missing = emit_animations(section, mapping[section], anim_index, out_dir,
                                      dry_run, stats)
@@ -727,6 +749,27 @@ HUD_PIECES = {
     "sandstreak": ("ATLASIMAGE_ATLAS_SANDSTORMGROUP_768_00", "sandstorm_rear",
                    "sandstorm_speedline_filtered"),
     "snowgust": ("ATLASIMAGE_ATLAS_SNOWSTORMGROUP_768_00", "snowstorm_top", "snowstorm_top_86x66"),
+    # ------------------------------------------------------------------ in-match feedback
+    # EntityRenderer used to say, in two separate comments, that the library had no impact art and
+    # no death art, so both were drawn as ShapeRenderer rings. It does have them: the level-common
+    # page every world loads carries the pea splat, the generic explosion cloud and the ash a
+    # zombie leaves behind, and they are the pieces the original game plays for exactly these
+    # events. Cropped and looked at before being listed, same as everything else here.
+    "splatpea": ("ATLASIMAGE_ATLAS_LEVELCOMMON_768_00", "splat_pea", "splat_pea_150x88"),
+    "dustpuff": ("ATLASIMAGE_ATLAS_LEVELCOMMON_768_00", "generic_explosion_front",
+                 "generic_explosion_front_236x223"),
+    "zombieash": ("ATLASIMAGE_ATLAS_LEVELCOMMON_768_00", "zombie_ash", "zombie_ash_104x95"),
+    # The white star the game pops where a mower launches, and the soft one plant food leaves on
+    # the ground. Used for the mower firing and for a plant being set down.
+    "whiteburst": ("ATLASIMAGE_ATLAS_LEVELCOMMON_768_00", "mower_spawn", "mower_spawn_293x263"),
+    "plantpuff": ("ATLASIMAGE_ATLAS_LEVELCOMMON_768_00", "plantfood_fx",
+                  "plantfood_fx_ground_filtered"),
+    "dirtclods": ("ATLASIMAGE_ATLAS_DIRT_SPAWN_DIRT_768_00", "dirt_spawn_Dirt",
+                  "dirt_spawn_Dirt_179x50"),
+    # The gold burst the Nutcracker plays when its armour comes apart. Armour dropping off a
+    # zombie was previously silent -- the piece simply stopped being drawn.
+    "armourbreak": ("ATLASIMAGE_ATLAS_ZOMBIENUTCRACKEREFFECTS_768_00", "armor_break_effect",
+                    "armor_break_effect_149x150"),
 }
 
 

@@ -23,8 +23,13 @@ import model.game.plant.PlantParts.PlantTemplate;
 public final class SeedBar extends Table implements Disposable {
 
   /** Named, not just a literal on the add() call below, so HudStage can size its own row against
-   * it -- the tools beside this bar must never end up taller than the cards they sit next to. */
-  public static final float CARD_WIDTH = 96f;
+   * it -- the tools beside this bar must never end up taller than the cards they sit next to.
+   *
+   * <p>Wide enough that the longest name in the roster ("Cabbage-pult") stays on one line. It
+   * used to be 12px narrower, which was a hair under what the name needed: the label wrapped to
+   * two lines and the second line pushed the cost and the "need sun" face out through the bottom
+   * of the card. Eight of these plus the tool buttons still leave room at 1280 wide. */
+  public static final float CARD_WIDTH = 108f;
   public static final float CARD_HEIGHT = 110f;
 
   private static final Color READY = new Color(1f, 1f, 1f, 1f);

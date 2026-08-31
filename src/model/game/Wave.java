@@ -68,7 +68,7 @@ public class Wave {
           totalStartingHealth += zombie.getMaxHealth();
           System.out.printf(
                   "Zombie %s spawned at wave %d in lane %d which costed %d.%n",
-                  entry.zombieName, waveNumber, lane + 1, entry.waveCost);
+                  zombie.getDisplayName(), waveNumber, lane + 1, entry.waveCost);
         }
         iterator.remove();
       }

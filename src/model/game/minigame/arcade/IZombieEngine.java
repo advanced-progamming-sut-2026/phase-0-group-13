@@ -28,6 +28,14 @@ public final class IZombieEngine {
    * asks it to display.
    */
   public static final int RECHARGE_TICKS_PER_SUN = 1;
+  /**
+   * فاز ۱ می‌گوید نرخ تولید خورشیدِ sun-imp اولش خیلی کم است و با گذر زمان زیاد می‌شود، پس فاصلهٔ
+   * بین دو خورشید از ۲۴ ثانیه شروع می‌شود و هر ۸ تیک یک تیک کوتاه‌تر می‌شود تا کف ۲.۵ ثانیه.
+   */
+  public static final int SUN_INTERVAL_START_TICKS = 240;
+  public static final int SUN_INTERVAL_FLOOR_TICKS = 25;
+  public static final int SUN_INTERVAL_RAMP_TICKS = 8;
+  public static final int SUN_PER_IMP = 25;
   // Cutout plants fire on the same cadence as every other plant in the game: one shot per
   // 1.5s (15 ticks at 10 ticks/second), matching the Peashooter's Action Interval in plants.json.
   public static final int PLANT_FIRE_INTERVAL = 15;
@@ -480,9 +488,9 @@ public final class IZombieEngine {
         continue;
       }
       zombie.sunTimer++;
-      if (zombie.sunTimer >= Math.max(8, 48 - tickCount / 100)) {
+      if (zombie.sunTimer >= sunIntervalTicks()) {
         zombie.sunTimer = 0;
-        zombieSun += 25;
+        zombieSun += SUN_PER_IMP;
         System.out.printf("zombie %s produced a sun at (%d, %d); you now have %d sun.%n",
                 zombie.spec.name, (int) Math.round(zombie.column) + 1, zombie.row + 1, zombieSun);
       }
@@ -646,6 +654,11 @@ public final class IZombieEngine {
 
   public List<DefensePlant> getDefensePlants() {
     return defensePlants;
+  }
+
+  public int sunIntervalTicks() {
+    return Math.max(
+        SUN_INTERVAL_FLOOR_TICKS, SUN_INTERVAL_START_TICKS - tickCount / SUN_INTERVAL_RAMP_TICKS);
   }
 
   public int getZombieSun() {

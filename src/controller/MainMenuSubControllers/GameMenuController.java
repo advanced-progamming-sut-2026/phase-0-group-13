@@ -36,6 +36,8 @@ public class GameMenuController implements BaseController {
       handleShowWallet("diamond");
     } else if ((matcher = GameMenuCommands.CheatAdd.getMatcher(command)) != null) {
       handleCheatAdd(matcher.group("count"), matcher.group("currency"));
+    } else if (GameMenuCommands.CheatUnlockChapters.getMatcher(command) != null) {
+      handleUnlockChapters();
     } else if (MenuCommands.ShowCurrentMenu.getMatcher(command) != null) {
       System.out.println("Game Menu");
     } else if (MenuCommands.ExitMenu.getMatcher(command) != null) {
@@ -125,6 +127,20 @@ public class GameMenuController implements BaseController {
     System.out.println(UserManager.getInstance().getCurrentUser().getCoins() + " coins.");
     if (currency.equalsIgnoreCase("diamond"))
       System.out.println(UserManager.getInstance().getCurrentUser().getDiamonds() + " diamonds.");
+  }
+
+  private void handleUnlockChapters() {
+    User currentUser = UserManager.getInstance().getCurrentUser();
+    if (currentUser == null) {
+      System.out.println("error: no user logged in");
+      return;
+    }
+    System.out.println(currentUser.unlockAllChapters().message());
+    try {
+      UserManager.getInstance().updateCurrentUserGameState();
+    } catch (Exception e) {
+      System.out.println(e.getMessage());
+    }
   }
 
   private void handleCheatAdd(String countStr, String currency) {

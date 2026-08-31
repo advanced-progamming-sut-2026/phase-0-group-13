@@ -86,6 +86,7 @@ public final class Popup {
     actions.defaults().pad(stacked ? 6f : 8f).width(buttonWidth).height(66f);
     for (Choice choice : choices) {
       TextButton button = new TextButton(choice.label(), skin, choice.style());
+      ButtonFeel.apply(button);
       button.addListener(new ClickListener() {
         @Override
         public void clicked(InputEvent event, float x, float y) {

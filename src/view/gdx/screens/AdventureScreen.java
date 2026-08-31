@@ -105,7 +105,11 @@ public final class AdventureScreen extends MenuScreen {
     // maxHeight so a short level grid doesn't leave a huge empty panel.
     content.add(scroll).growX().maxHeight(520f).row();
 
-    content.add(button("Back", UiSkinProvider.BUTTON_BROWN, this::back)).width(240f).padTop(8f);
+    Table actions = new Table();
+    actions.defaults().pad(6f).width(240f);
+    actions.add(button("Travel Log", UiSkinProvider.BUTTON_GREEN, () -> go(new QuestScreen(game))));
+    actions.add(button("Back", UiSkinProvider.BUTTON_BROWN, this::back));
+    content.add(actions).padTop(8f);
   }
 
   private void back() {

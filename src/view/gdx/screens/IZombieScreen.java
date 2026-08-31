@@ -111,14 +111,23 @@ public final class IZombieScreen extends ArcadeBoardScreen {
     if (!affordable) {
       return "need sun";
     }
-    // Said out loud rather than hidden: three of the engine's types are Plants vs. Zombies 1
-    // zombies with no art anywhere in this project's asset library.
+    // every type has a look now; kept as a guard in case an atlas fails to load
     return drawable ? "ready" : "ready (no art)";
   }
 
   private void choose(String type) {
     chosen = type.equals(chosen) ? null : type;
     paintCards();
+  }
+
+  @Override
+  protected boolean clearSelection() {
+    if (chosen == null) {
+      return false;
+    }
+    chosen = null;
+    paintCards();
+    return true;
   }
 
   @Override

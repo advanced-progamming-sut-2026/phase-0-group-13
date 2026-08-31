@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import view.gdx.core.GdxConfig;
 
 
 /**
@@ -103,6 +104,21 @@ public final class UiSkinProvider implements Disposable {
     return get() != null;
   }
 
+  /**
+   * What to pass {@code Label.setFontScale} for a label that wants to be {@code factor} of its
+   * style's normal size.
+   *
+   * <p>Not just {@code factor}, because the fonts are baked larger than the styles ask for and
+   * scaled back down (see {@link FreeTypeSkin#bakeLarger}), and {@code Label.setFontScale} does
+   * not multiply that down-scale -- it replaces it for the duration of the layout and the draw.
+   * Passing a bare 0.8 to a font baked at 2.25x therefore asks for 2.25x0.8, which is how a seed
+   * packet's name ended up wrapping onto a second line and pushing its own cost row out through
+   * the bottom of the card.
+   */
+  public static float fontScale(float factor) {
+    return factor / GdxConfig.textSupersample();
+  }
+
   @Override
   public void dispose() {
     if (skin != null) {
@@ -153,9 +169,19 @@ public final class UiSkinProvider implements Disposable {
               parameter.minFilter = minFilter;
               parameter.magFilter = magFilter;
 
+              float supersample = GdxConfig.textSupersample();
+              if (supersample > 1.01f) {
+                bakeLarger(parameter, supersample);
+              }
+
               FreeTypeFontGenerator generator =
                   new FreeTypeFontGenerator(skinFile.parent().child(path));
               BitmapFont font = generator.generateFont(parameter);
+              if (supersample > 1.01f) {
+                // Back to the size the styles were written against, so nothing re-lays out: the
+                // glyphs simply carry more texels than they are drawn with.
+                font.getData().setScale(1f / supersample);
+              }
               skin.add(data.name, font);
               if (parameter.incremental) {
                 generator.dispose();
@@ -165,6 +191,27 @@ public final class UiSkinProvider implements Disposable {
             }
           });
       return json;
+    }
+
+    /**
+     * Bakes this font at the monitor's scale instead of the window's.
+     *
+     * <p>Everything measured in pixels has to come with it, or an outlined heading loses its
+     * outline at 1440p: the border and shadow are drawn into the glyph at bake time, so a border
+     * left at 3 while the glyph triples becomes a hairline. Filtering moves off Nearest for the
+     * same reason the backdrops did -- the glyph is no longer being drawn at the size it was baked
+     * at, and mipmaps are what keep it clean when the window is smaller than the screen.
+     */
+    private static void bakeLarger(FreeTypeFontParameter parameter, float scale) {
+      parameter.size = Math.round(parameter.size * scale);
+      parameter.borderWidth *= scale;
+      parameter.shadowOffsetX = Math.round(parameter.shadowOffsetX * scale);
+      parameter.shadowOffsetY = Math.round(parameter.shadowOffsetY * scale);
+      parameter.spaceX = Math.round(parameter.spaceX * scale);
+      parameter.spaceY = Math.round(parameter.spaceY * scale);
+      parameter.genMipMaps = true;
+      parameter.minFilter = TextureFilter.MipMapLinearLinear;
+      parameter.magFilter = TextureFilter.Linear;
     }
   }
 }

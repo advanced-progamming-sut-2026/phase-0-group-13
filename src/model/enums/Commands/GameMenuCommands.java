@@ -10,7 +10,8 @@ public enum GameMenuCommands implements Command {
   LeaderBoard("menu\\s+leaderboard"),
   CoinWallet("coin-wallet\\s+menu"),
   GemWallet("gem-wallet\\s+menu"),
-  CheatAdd("menu\\s+cheat\\s+add\\s+(?<count>\\S+)\\s+(?<currency>coin|diamond)");
+  CheatAdd("menu\\s+cheat\\s+add\\s+(?<count>\\S+)\\s+(?<currency>coin|diamond)"),
+  CheatUnlockChapters("menu\\s+cheat\\s+unlock-chapters");
 
   private final String pattern;
 

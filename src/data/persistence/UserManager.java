@@ -132,14 +132,25 @@ public class UserManager {
     if (data != null && data.isJsonObject()) {
       User restored = GSON.fromJson(data, User.class);
       if (restored != null) {
+        // سندهای قدیمی ایمیل/جنسیت را خالی ذخیره کرده‌اند؛ سرور مرجع است، پس از آن پر می‌کنیم
+        if (isBlank(restored.getEmail()) && !isBlank(profile.email())) {
+          restored.setEmail(profile.email());
+        }
+        if (isBlank(restored.getGender()) && !isBlank(profile.gender())) {
+          restored.setGender(profile.gender());
+        }
         return restored;
       }
     }
-    // An account the server holds no document for yet. It only knows the username and nickname,
-    // so the rest starts at the Phase 1 defaults and is pushed straight back up. A token login
-    // has no password to hash.
+    // An account the server holds no document for yet: the rest starts at the Phase 1 defaults
+    // and is pushed straight back up. A token login has no password to hash.
     return new User(profile.username(), password == null ? "" : AuthService.hashPassword(password),
-        "", profile.nickname(), "");
+        profile.email() == null ? "" : profile.email(), profile.nickname(),
+        profile.gender() == null ? "" : profile.gender());
+  }
+
+  private static boolean isBlank(String value) {
+    return value == null || value.isBlank();
   }
 
   /** Everything about the signed-in player, in the shape the server stores. */

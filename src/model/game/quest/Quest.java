@@ -61,6 +61,28 @@ public class Quest {
   public double getProgressOfQuest() { return progressOfQuest; }
   public boolean isRewardClaimed() { return rewardClaimed; }
 
+  private static final String[] PLACEHOLDERS = {"sun_amount", "family_type", "n"};
+
+  /**
+   * متن شرط برای نمایش، با جای‌گذاری Variable روی جاهای خالیِ Quests.json. getCondition() دست
+   * نمی‌خورد چون موتور تطبیق کوئست‌ها روی همان رشته‌ی خام کلید می‌خورد.
+   */
+  public String getDescription() {
+    if (condition == null) {
+      return null;
+    }
+    if (variable == null || variable.isBlank()) {
+      return condition;
+    }
+    // "from the chapter chapter": اولی جای‌خالی است، دومی خودِ کلمه
+    String text =
+        condition.replaceAll("\\bchapter chapter\\b", Matcher.quoteReplacement(variable) + " chapter");
+    for (String token : PLACEHOLDERS) {
+      text = text.replaceAll("\\b" + token + "\\b", Matcher.quoteReplacement(variable));
+    }
+    return text;
+  }
+
   private double questTarget;
 
   public double getQuestTarget() { return questTarget; }

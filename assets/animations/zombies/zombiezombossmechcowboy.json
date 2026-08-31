@@ -1,0 +1,37 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "almanac_idle": 3.3667,
+        "cover_up": 1.6667,
+        "die": 4.0333,
+        "die_exit": 3.6,
+        "die_talk": 3.3667,
+        "glacier_column_1": 6.3,
+        "glacier_column_2": 6.3,
+        "glacier_column_3": 6.3,
+        "glacier_column_4": 6.3,
+        "glacier_column_5": 6.3,
+        "glacier_column_6": 6.3,
+        "idle": 3.3333,
+        "intro": 4.7,
+        "reveal": 0.6667,
+        "slingshot": 3.5,
+        "stun": 1,
+        "wind_1": 2.8333,
+        "wind_2": 2.8333,
+        "wind_3": 2.8333,
+        "wind_4": 2.8333
+      },
+      "name": "ZOMBIE_ICEAGE_ZOMBOSS",
+      "pam": "768/FULL/ZOMBIE/ZOMBIE_ICEAGE_ZOMBOSS/ZOMBIE_ICEAGE_ZOMBOSS.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombiezombossmechcowboy.atlas",
+  "entity": "ZombieZombossMechCowboy",
+  "source_folder": "images/768/.../zombie_iceage_zomboss"
+}

@@ -19,17 +19,46 @@ public final class Dialogue {
   private Dialogue() {
   }
 
-  /** Penny's briefing for a season. */
-  public static String stageStart(String seasonName) {
+  /** Penny's briefing for a season. She addresses whoever is signed in, not a stand-in name. */
+  public static String stageStart(String seasonName, String playerName) {
+    String player = playerName == null || playerName.isBlank() ? "Commander" : playerName.trim();
     switch (key(seasonName)) {
       case "egypt":
-        return "Ancient Egypt, User Dave. Mind the tombstones -- nothing grows on them.";
+        return "Ancient Egypt, " + player + ". Mind the tombstones -- nothing grows on them.";
       case "frost":
         return "Frostbite Caves. The ice will freeze your plants solid, so keep the lanes clear.";
       case "beach":
         return "Big Wave Beach. The tide comes in with every wave; only water plants survive it.";
       default:
-        return "The Dark Ages. No sun falls at night, User Dave -- grow your own.";
+        return "The Dark Ages. No sun falls at night, " + player + " -- grow your own.";
+    }
+  }
+
+  /** What the chapter's Zomboss is called, for the health bar over the lawn. */
+  public static String zombossTitle(String seasonName) {
+    switch (key(seasonName)) {
+      case "egypt":
+        return "Dr. Zomboss   -   Robot";
+      case "frost":
+        return "Dr. Zomboss   -   Mammoth";
+      case "beach":
+        return "Dr. Zomboss   -   Octopus";
+      default:
+        return "Dr. Zomboss   -   Dragon";
+    }
+  }
+
+  /** Penny's warning on the way into a boss stage. */
+  public static String bossWarning(String seasonName) {
+    switch (key(seasonName)) {
+      case "egypt":
+        return "His robot fires missiles and charges the lanes it stands in. Keep planting.";
+      case "frost":
+        return "The mammoth freezes whole rows and whole columns. Fire plants are your friend.";
+      case "beach":
+        return "He sends octopuses for your plants and sucks two rows into his mouth. Spread out.";
+      default:
+        return "The dragon burns rows to the ground and drops imps in the flames. Stay spread out.";
     }
   }
 

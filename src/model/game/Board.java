@@ -7,6 +7,7 @@ import java.util.Random;
 import model.enums.PlantTag;
 import model.enums.StatusEffect;
 import model.game.TileEffects.BarrelEffect;
+import model.game.TileEffects.FireEffect;
 import model.game.TileEffects.IceTrailEffect;
 import model.game.TileEffects.TileEffect;
 import model.game.TileEffects.TombStoneEffect;
@@ -75,6 +76,9 @@ public class Board {
           if (effect instanceof BarrelEffect barrel) {
             tryBarrelBurst(barrel, i, j);
           }
+          if (effect instanceof FireEffect fire && fire.isActive()) {
+            burnPlantsOn(i, j);
+          }
         }
       }
     }
@@ -96,6 +100,14 @@ public class Board {
     handleDeathDrops();
     cleanupEntities();
   }
+  private void burnPlantsOn(int row, int col) {
+    for (Plant plant : plants) {
+      if (!plant.isDead() && plant.getRow() == row && plant.getCol() == col) {
+        plant.takeDamage(FireEffect.DAMAGE_PER_TICK);
+      }
+    }
+  }
+
   private void tryNecromancy(TombStoneEffect tombstone, int row, int col, int currentTick) {
     if (!tombstone.isDueForNecromancy(currentTick)) {
       return;
@@ -143,9 +155,18 @@ public class Board {
     System.out.printf("The barrel burst open at (%d, %d) and two imps tumbled out!%n",
             (int) Math.round(col) + 1, row + 1);
   }
+  /** How long one visit to a frozen tile holds a zombie. */
+  private static final int ICE_TILE_FREEZE_TICKS = 40;
+
   private void applyTileHazardsToZombies() {
     for (Zombie zombie : zombies) {
       if (zombie.isDead()) {
+        continue;
+      }
+      // A mech on treads neither slides nor freezes. It matters: the Frostbite Zomboss ices whole
+      // columns including the one it is standing in, and it would re-freeze itself every tick;
+      // and sliding something two lanes tall would push its lower half off the board.
+      if (zombie.isBoss()) {
         continue;
       }
       int col = (int) Math.round(zombie.getX());
@@ -153,17 +174,40 @@ public class Board {
         continue;
       }
       TileEffect effect = tiles[zombie.getRow()][col].getEffect();
+      boolean onFrozenTile = false;
       if (effect instanceof IceTrailEffect ice && ice.isActive()) {
         if (ice.getSlideDirection() != 0) {
           slideZombie(zombie, ice.getSlideDirection());
         } else if (ice.isFullFreeze()) {
-          zombie.applyEffect(StatusEffect.FROZEN, 5);
+          onFrozenTile = true;
+          freezeOnIceTile(zombie, zombie.getRow() * columns + col);
         } else if (ice.isSlippery()) {
           slideZombie(zombie, ice.getLaneShift());
         } else {
           zombie.applyEffect(StatusEffect.CHILLED, 5);
         }
       }
+      if (!onFrozenTile) {
+        zombie.setIcedOnCell(Zombie.NO_CELL);
+      }
+    }
+  }
+
+  /**
+   * A frozen tile catches a zombie once per visit.
+   *
+   * <p>These tiles are permanent, so reapplying the freeze every tick renewed it faster than it
+   * could run down: the zombie could never move off the tile, and a stage whose last zombies were
+   * standing on one could neither be won nor lost. The tile is armed again as soon as the zombie
+   * is somewhere else, which is what {@code setIcedOnCell(NO_CELL)} above does.
+   */
+  private void freezeOnIceTile(Zombie zombie, int cell) {
+    if (zombie.getIcedOnCell() == cell) {
+      return;
+    }
+    zombie.setIcedOnCell(cell);
+    if (!zombie.getActiveEffects().containsKey(StatusEffect.FROZEN)) {
+      zombie.applyEffect(StatusEffect.FROZEN, ICE_TILE_FREEZE_TICKS);
     }
   }
   /**
@@ -182,7 +226,7 @@ public class Board {
       return;
     }
     zombie.setRow(targetRow);
-    System.out.printf("%s slipped on the ice to row %d!%n", zombie.getName(), targetRow + 1);
+    System.out.printf("%s slipped on the ice to row %d!%n", zombie.getDisplayName(), targetRow + 1);
   }
 
   /** در غارهای یخی، زامبی‌ها با تیر یخی گیاهان یخ نمی‌زنند. */
@@ -213,7 +257,7 @@ public class Board {
   private void retireDepartedHypnotizedZombies() {
     for (Zombie zombie : zombies) {
       if (zombie.isHypnotized() && !zombie.isDead() && zombie.getX() > columns) {
-        System.out.printf("%s marched off the lawn and left the battle.%n", zombie.getName());
+        System.out.printf("%s marched off the lawn and left the battle.%n", zombie.getDisplayName());
         zombie.takeDamage(zombie.getMaxHealth(), true);
         zombie.markLootDropped();
       }
@@ -255,7 +299,7 @@ public class Board {
     if (row < 0 || row >= lawnmowers.size()) {
       return false;
     }
-    return lawnmowers.get(row).isActive();
+    return lawnmowers.get(row).isAvailable();
   }
   public List<Reward> drainPendingRewards() {
     return lootDropper.drainPendingRewards();
@@ -346,7 +390,7 @@ public class Board {
     Zombie nearest = null;
     double nearestDistance = Double.MAX_VALUE;
     for (Zombie other : zombies) {
-      if (other == zombie || other.isDead() || other.getRow() != zombie.getRow()) {
+      if (other == zombie || other.isDead() || !other.occupiesRow(zombie.getRow())) {
         continue;
       }
       double distance = other.getX() - zombie.getX();
@@ -407,7 +451,7 @@ public class Board {
       reaimLob(p);
       boolean hitRegistered = false;
       for (Zombie zombie : zombies) {
-        if (zombie.getRow() == p.getYCoordinate()
+        if (zombie.occupiesRow(p.getYCoordinate())
                 && Math.abs(zombie.getX() - p.getXCoordinate()) < 0.5) {
           p.hitArea(zombies, zombie);
           if (zombiesResistIce) {
@@ -505,9 +549,14 @@ public class Board {
 
   private void handleLawnmowers() {
     for (Lawnmower mower : lawnmowers) {
+      // Already rolling: it keeps going and crushes whatever it catches up with.
+      if (mower.isTriggered()) {
+        mowerVictims.addAll(mower.move(zombies));
+        continue;
+      }
       if (!mower.isActive()) {
         for (Zombie z : zombies) {
-          if (z.getRow() == mower.getRow() && z.getX() <= -0.5) {
+          if (!z.isBoss() && z.occupiesRow(mower.getRow()) && z.getX() <= -0.5) {
             playerLost = true;
             return;
           }
@@ -515,22 +564,28 @@ public class Board {
         continue;
       }
       for (Zombie z : zombies) {
-        if (z.getRow() == mower.getRow() && z.getX() <= 0.0) {
-          mower.setActive(false);
-          triggerLawnmowerRow(mower.getRow());
+        // A charging Zomboss must not burn the row's mower on its way past.
+        if (!z.isBoss() && z.occupiesRow(mower.getRow()) && z.getX() <= 0.0) {
+          triggerLawnmowerRow(mower);
           break;
         }
       }
     }
   }
-  private void triggerLawnmowerRow(int row) {
+
+  /**
+   * Sets the mower rolling. The names are listed here rather than as each one is crushed so the
+   * Phase 1 output is unchanged -- the mower starts at the left of the row and drives the whole
+   * width of it, so everything listed is something it goes on to run over.
+   */
+  private void triggerLawnmowerRow(Lawnmower mower) {
+    int row = mower.getRow();
+    mower.trigger();
     System.out.printf(
             "The lawn mower in the row %d is triggered and killed these zombies:%n", row + 1);
     for (Zombie z : zombies) {
-      if (z.getRow() == row && !z.isDead()) {
-        z.takeDamage(10000, true);
-        mowerVictims.add(z);
-        System.out.println("- " + z.getName());
+      if (!z.isBoss() && z.occupiesRow(row) && !z.isDead()) {
+        System.out.println("- " + z.getDisplayName());
       }
     }
   }
@@ -539,7 +594,7 @@ public class Board {
       if (zombie.isDead()) {
         System.out.printf(
                 "Zombie of type %s is dead at (%d, %d).%n",
-                zombie.getName(), Math.round(zombie.getX()) + 1, zombie.getRow() + 1);
+                zombie.getDisplayName(), Math.round(zombie.getX()) + 1, zombie.getRow() + 1);
       }
     }
     for (Plant plant : plants) {
@@ -599,7 +654,7 @@ public class Board {
   }
   public Zombie getZombieAt(int row, double x) {
     for (Zombie z : zombies) {
-      if (z.getRow() == row && !z.isDead() && Math.abs(z.getX() - x) < 0.5) {
+      if (z.occupiesRow(row) && !z.isDead() && Math.abs(z.getX() - x) < 0.5) {
         return z;
       }
     }
@@ -647,7 +702,7 @@ public class Board {
 
   public boolean hasZombieInRow(int row, double plantX) {
     for (Zombie zombie : zombies) {
-      if (zombie.getRow() == row && !zombie.isDead() && zombie.getX() >= plantX) {
+      if (zombie.occupiesRow(row) && !zombie.isDead() && zombie.getX() >= plantX) {
         return true;
       }
     }
@@ -701,7 +756,12 @@ public class Board {
 
   public void applyAreaDamageToZombies(int centerCol, int centerRow, int radius, int damage) {
     for (Zombie z : zombies) {
-      if (!z.isDead() && Math.abs(z.getRow() - centerRow) <= radius && Math.abs(z.getX() - centerCol) <= radius) {
+      if (z.isDead() || Math.abs(z.getX() - centerCol) > radius) {
+        continue;
+      }
+      // A boss standing in two lanes counts as being in either of them.
+      if (Math.abs(z.getRow() - centerRow) <= radius
+              || Math.abs(z.getBottomRow() - centerRow) <= radius) {
         z.takeDamage(damage, false);
       }
     }

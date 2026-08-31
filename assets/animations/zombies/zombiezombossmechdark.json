@@ -1,0 +1,35 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "die": 5.6667,
+        "die_exit": 6.1667,
+        "die_talk": 3.3667,
+        "fire_attack": 1.8,
+        "fire_attack_end": 0.8333,
+        "fire_attack_idle": 0.8333,
+        "fire_bomb": 1.8333,
+        "fire_bomb_end": 0.9333,
+        "fire_bomb_loop": 0.5333,
+        "idle": 3.3333,
+        "intro": 10.3333,
+        "stun_end": 0.4667,
+        "stun_loop": 0.8,
+        "stun_start": 0.4333,
+        "summoning": 2.1333,
+        "vulnerable": 0.4333,
+        "vulnerable_end": 0.4667,
+        "vulnerable_loop": 0.8
+      },
+      "name": "ZOMBIE_DARK_ZOMBOSS",
+      "pam": "768/FULL/ZOMBIE/ZOMBIE_DARK_ZOMBOSS/ZOMBIE_DARK_ZOMBOSS.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombiezombossmechdark.atlas",
+  "entity": "ZombieZombossMechDark",
+  "source_folder": "images/768/.../Zombie_Dark_Zomboss"
+}

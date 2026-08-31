@@ -126,7 +126,7 @@ public class QuestMenuController implements BaseController {
             quest.getPriority() != null ? quest.getPriority() : "-",
             quest.getTitle(),
             quest.getCategory() != null ? quest.getCategory() : "general");
-    System.out.println("      goal   : " + quest.getCondition());
+    System.out.println("      goal   : " + quest.getDescription());
     System.out.println("      reward : " + quest.getRewardType());
     System.out.println("      status : " + describeStatus(quest));
   }

@@ -216,17 +216,39 @@ public final class PlantSelectionScreen extends MenuScreen {
     body.add(new Label(user.isPlantBoosted(plant)
             ? plant + " is already boosted."
             : "Boosting costs 2 diamonds and fires its\nPlant Food effect the moment it is planted.",
-            skin, UiSkinProvider.LABEL_MEDIUM));
+            skin, UiSkinProvider.LABEL_MEDIUM)).row();
+    body.add(new Label(upgradeOfferLine(user, plant), skin, UiSkinProvider.LABEL_MEDIUM))
+            .padTop(8f);
 
     Popup.show(stage, skin, plant, body,
             new Popup.Choice("Boost", UiSkinProvider.BUTTON_PURPLE, () -> boost(user, plant)),
+            new Popup.Choice("Upgrade", UiSkinProvider.BUTTON_GREEN, () -> upgrade(user, plant)),
             new Popup.Choice("Remove", UiSkinProvider.BUTTON_BROWN,
                 () -> toggle(user, plant, MatchLauncher.selectionRule())),
             new Popup.Choice("Keep", UiSkinProvider.BUTTON_GREEN, null));
   }
 
+  private String upgradeOfferLine(User user, String plant) {
+    int level = user.getPlantLevel(plant);
+    if (level >= User.MAX_PLANT_LEVEL) {
+      return plant + " is at the maximum level.";
+    }
+    return "Upgrade to level " + (level + 1) + " costs "
+            + user.upgradeSeedCost(plant) + " packets and "
+            + user.upgradeCoinCost(plant) + " coins.";
+  }
+
   private void boost(User user, String plant) {
     Result result = user.boostPlant(plant);
+    toast(result.message());
+    if (result.success()) {
+      save();
+    }
+    refresh();
+  }
+
+  private void upgrade(User user, String plant) {
+    Result result = user.upgradePlant(plant);
     toast(result.message());
     if (result.success()) {
       save();

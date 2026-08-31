@@ -9,11 +9,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import model.core.GameManager;
 import model.game.Board;
 import model.game.Lawnmower;
+import model.game.TileEffects.FireEffect;
 import model.game.TileEffects.IceTrailEffect;
 import model.game.TileEffects.TileEffect;
 import model.game.TileEffects.TombStoneEffect;
+import view.gdx.animation.AnimationLibrary;
+import view.gdx.animation.AnimationStates;
+import view.gdx.animation.EntityAnimation;
 import view.gdx.core.GameSettings;
-import view.gdx.core.GdxConfig;
 import view.gdx.ui.HudArt;
 
 /** Background, lane grid and the tiles that block planting. */
@@ -32,8 +35,27 @@ public final class LawnRenderer implements WorldRenderer {
   private final Color frozenTile = new Color(0.75f, 0.93f, 1f, 0.55f);
   private final Color slipTile = new Color(0.6f, 0.88f, 1f, 0.3f);
   private final Color slipArrow = new Color(0.15f, 0.45f, 0.7f, 0.85f);
+  private final Color burningTile = new Color(0.95f, 0.42f, 0.12f, 0.5f);
   private final Color mowerReady = new Color(0.75f, 0.75f, 0.78f, 0.95f);
   private final Color mowerUsed = new Color(0.35f, 0.35f, 0.35f, 0.6f);
+
+  /** Each world has its own mower rig under animations/effects; kind is "effects". */
+  private static final String MOWER_KIND = "effects";
+  /** On-screen mower height, as a fraction of a lane. Same size the still art was drawn at. */
+  private static final float MOWER_HEIGHT_FRACTION = 0.55f;
+  /**
+   * The white star the original game throws when a mower launches.
+   *
+   * <p>A mower spending itself was previously a silent state change -- the sprite dimmed and that
+   * was the whole event, for the thing that just saved the player's lane. This is that world's own
+   * flash, out of the same HUD sheet the mower's own art comes from.
+   */
+  private static final String MOWER_FLASH_REGION = "whiteburst";
+  private static final float MOWER_FLASH_SIZE_LANES = 1.5f;
+  private static final String MOWER_SPARK = "mower";
+
+  private final AnimationLibrary animations = new AnimationLibrary();
+  private final AnimationStates playback = new AnimationStates();
 
   private TextureAtlas backgroundAtlas;
   private TextureRegion background;
@@ -42,6 +64,8 @@ public final class LawnRenderer implements WorldRenderer {
   // render() rather than threaded through every draw call.
   private String season = "egypt";
   private float clock;
+  /** This frame's delta, so the props can drive their own clips without threading it through. */
+  private float frameDelta;
 
   public LawnRenderer(LawnGeometry geometry) {
     this.geometry = geometry;
@@ -58,9 +82,12 @@ public final class LawnRenderer implements WorldRenderer {
     }
     season = seasonKey(game);
     clock += delta;
+    frameDelta = delta;
     watchGraves(game.getBoard(), delta);
+    watchMowers(game.getBoard());
     drawBackground(context, game);
     drawGrid(context, game.getBoard());
+    playback.endFrame();
   }
 
   /**
@@ -86,12 +113,13 @@ public final class LawnRenderer implements WorldRenderer {
       }
       backgroundAtlas = Gdx.files.internal(path).exists()
           ? new TextureAtlas(Gdx.files.internal(path)) : null;
-      background = backgroundAtlas == null ? null : backgroundAtlas.findRegion("texture");
+      background = backgroundAtlas == null
+          ? null : backgroundAtlas.findRegion(SeasonBackdrop.MAIN_REGION);
       loadedFor = path;
     }
     if (background != null) {
       context.getBatch().begin();
-      context.getBatch().draw(background, 0f, 0f, GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT);
+      SeasonBackdrop.draw(context.getBatch(), backgroundAtlas, season);
       context.getBatch().end();
     }
   }
@@ -112,26 +140,16 @@ public final class LawnRenderer implements WorldRenderer {
   }
 
   private static String atlasForSeason(String seasonKey) {
-    switch (seasonKey) {
-      case "egypt": return "textures/environment/ancientegyptseason.atlas";
-      case "frost": return "textures/environment/frostbitecavesseason.atlas";
-      case "beach": return "textures/environment/bigwavebeachseason.atlas";
-      default: return "textures/environment/darkagesseason.atlas";
-    }
+    return SeasonBackdrop.atlasForSeason(seasonKey);
   }
 
-  // Measured off each season's background art. Seasons we have not measured fall back to Egypt.
+  /** Where this match's lawn sits, straight off the world art. See {@link SeasonBackdrop}. */
   public static float[] lawnBounds(GameManager game) {
     return lawnBounds(seasonKey(game));
   }
 
   public static float[] lawnBounds(String seasonKey) {
-    switch (seasonKey) {
-      case "frost": return new float[] {315.05f, 88.66f, 918.60f, 453.92f};
-      case "beach": return new float[] {218.45f, 80.03f, 918.92f, 452.01f};
-      case "dark": return new float[] {314.12f, 74.43f, 932.74f, 456.75f};
-      default: return new float[] {317f, 74.85f, 919.44f, 458f};
-    }
+    return SeasonBackdrop.lawnBounds(seasonKey);
   }
 
   private void drawGrid(RenderContext context, Board board) {
@@ -204,14 +222,51 @@ public final class LawnRenderer implements WorldRenderer {
     graveHits.endFrame(board.getColumns());
   }
 
+  /**
+   * Watches each mower's armed flag and flashes the one that has just gone off.
+   *
+   * <p>Armed counts as 1 and spent as 0, so the shared count watcher in {@link HitEffects} does
+   * the whole job: it fires on the frame the number drops and never again.
+   */
+  private void watchMowers(Board board) {
+    for (Lawnmower mower : board.getLawnmowers()) {
+      graveHits.observeCount(mower, mower.isAvailable() ? 1 : 0, MOWER_SPARK,
+          mower.getX(), mower.getRow());
+    }
+  }
+
+  /** The flashes queued by {@link #watchMowers}, drawn over the mowers themselves. */
+  private void drawMowerFlashes(RenderContext context) {
+    TextureRegion flash = hudArt.find(MOWER_FLASH_REGION);
+    if (flash == null) {
+      return;
+    }
+    for (HitEffects.Spark spark : graveHits.getSparks()) {
+      if (!MOWER_SPARK.equals(spark.kind())) {
+        continue;
+      }
+      float size = geometry.getCellHeight() * MOWER_FLASH_SIZE_LANES
+          * (0.5f + 0.5f * spark.progress());
+      float width = flash.getRegionWidth() * size / flash.getRegionHeight();
+      context.getBatch().setColor(1f, 1f, 1f, spark.alpha());
+      context.getBatch().draw(flash, geometry.columnCentreX(spark.column()) - width / 2f,
+          geometry.rowCentreY(spark.row()) - size / 2f, width, size);
+    }
+    context.getBatch().setColor(1f, 1f, 1f, 1f);
+  }
+
   private void drawProps(RenderContext context, Board board) {
-    TextureRegion mowerArt = hudArt.find("lawnmower");
-    if (mowerArt == null && !hasGraveArt()) {
+    EntityAnimation mowerRig = animations.find(MOWER_KIND, mowerKeyForSeason(season));
+    TextureRegion mowerArt = mowerRig == null ? hudArt.find("lawnmower") : null;
+    if (mowerRig == null && mowerArt == null && !hasGraveArt()
+        && hudArt.find(MOWER_FLASH_REGION) == null) {
       return;
     }
     context.getBatch().begin();
-    if (mowerArt != null) {
-      float height = geometry.getCellHeight() * 0.55f;
+    if (mowerRig != null) {
+      drawMowers(context, board, mowerRig);
+    } else if (mowerArt != null) {
+      float height = geometry.getCellHeight() * MOWER_HEIGHT_FRACTION;
       float width = mowerArt.getRegionWidth() * height / mowerArt.getRegionHeight();
       for (Lawnmower mower : board.getLawnmowers()) {
         context.getBatch().setColor(1f, 1f, 1f, mower.isActive() ? 1f : 0.35f);
@@ -231,7 +286,48 @@ public final class LawnRenderer implements WorldRenderer {
         }
       }
     }
+    drawMowerFlashes(context);
     context.getBatch().end();
+  }
+
+  /**
+   * The row mowers, in the rig the season ships.
+   *
+   * <p>Board.handleLawnmowers() clears the row the moment a zombie reaches it and never drives the
+   * mower across, so there are only two states to draw: armed loops the rig's idle, spent holds
+   * its fired pose. Position, size and the faded look of a spent mower are what the still art
+   * used, so only the picture changes.
+   */
+  private void drawMowers(RenderContext context, Board board, EntityAnimation rig) {
+    String idle = rig.pickClip("idle");
+    String fired = rig.pickClip("attack", "transition", "idle");
+    if (idle == null || fired == null) {
+      return;
+    }
+    // One reference height for both clips, or the mower would resize as it changed state.
+    float reference = rig.height(idle);
+    if (reference <= 0f) {
+      return;
+    }
+    float scale = geometry.getCellHeight() * MOWER_HEIGHT_FRACTION / reference;
+    for (Lawnmower mower : board.getLawnmowers()) {
+      String clip = mower.isAvailable() ? idle : fired;
+      context.getBatch().setColor(1f, 1f, 1f, mower.isActive() ? 1f : 0.35f);
+      rig.draw(context.getBatch(), clip, playback.advance(mower, clip, frameDelta),
+          geometry.columnCentreX(mower.getX()),
+          geometry.rowToY(mower.getRow()) + geometry.getCellHeight() * 0.12f, scale, false);
+    }
+    context.getBatch().setColor(1f, 1f, 1f, 1f);
+  }
+
+  /** The manifest key for this season's mower, matching assets/animations/effects. */
+  private static String mowerKeyForSeason(String seasonKey) {
+    switch (seasonKey) {
+      case "frost": return "frostbitecavesseason";
+      case "beach": return "bigwavebeachseason";
+      case "dark": return "darkagesseason";
+      default: return "ancientegyptseason";
+    }
   }
 
   /**
@@ -307,6 +403,13 @@ public final class LawnRenderer implements WorldRenderer {
       drawIceTile(shapes, ice, row, col);
       return;
     }
+    if (effect instanceof FireEffect fire && fire.isActive()) {
+      // Nothing grows here while it burns, so it has to read as clearly as the ice does.
+      shapes.setColor(burningTile);
+      shapes.rect(geometry.columnToX(col) + 1f, geometry.rowToY(row) + 1f,
+          geometry.getCellWidth() - 2f, geometry.getCellHeight() - 2f);
+      return;
+    }
     if (hasGraveArt()) {
       return;
     }
@@ -342,6 +445,7 @@ public final class LawnRenderer implements WorldRenderer {
   @Override
   public void dispose() {
     hudArt.dispose();
+    animations.dispose();
     if (backgroundAtlas != null) {
       backgroundAtlas.dispose();
       backgroundAtlas = null;

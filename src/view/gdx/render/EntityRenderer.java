@@ -25,6 +25,7 @@ import model.game.zombie.behavior.ZombossAction;
 import view.gdx.animation.AnimationLibrary;
 import view.gdx.animation.AnimationStates;
 import view.gdx.animation.EntityAnimation;
+import view.gdx.core.GdxConfig;
 import view.gdx.ui.CurrencyArt;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
@@ -46,19 +47,42 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float ZOMBIE_FOOT_INSET = 0.08f;
 
   /**
-   * How far a zombie may spill sideways, in tiles. Wider than a tile on purpose: a gargantuar
-   * overlapping the columns either side of it is how the game reads, and clamping to one tile is
-   * what was flattening the roster.
+   * How far a zombie may spill sideways, measured in lanes rather than in tiles.
+   *
+   * <p>Wider than a tile on purpose: a gargantuar overlapping the columns either side of it is how
+   * the game reads, and clamping to one tile is what was flattening the roster.
+   *
+   * <p>In lanes, not in tiles, because a lane is the one dimension the art is scaled against. A
+   * PvZ2 tile is taller than it is wide (see {@link SeasonBackdrop}), so a limit written in tile
+   * widths would silently resize every rig in the game the moment the board's proportions were
+   * corrected -- which is a rendering change dressed up as a roster change.
    */
-  private static final float ZOMBIE_WIDTH_LIMIT_CELLS = 1.45f;
+  private static final float ZOMBIE_WIDTH_LIMIT_LANES = 1.62f;
   /** And how tall, in lanes -- past this it starts covering the lanes above and below. */
   private static final float ZOMBIE_HEIGHT_LIMIT_LANES = 1.7f;
+  /** The same for a plant, which is drawn to sit in its tile rather than to straddle two. */
+  private static final float PLANT_WIDTH_LIMIT_LANES = 1.06f;
   /** The plant seed-packet set the four Zombotany zombies borrow from is drawn much smaller. */
   private static final float ZOMBOTANY_REFERENCE_HEIGHT = 62f;
 
   /** Columns from the house at which a zombie starts showing the warning tint. */
   private static final double NEAR_HOUSE_COLUMN = 1.2;
   private static final float PLANT_FOOT_INSET = 0.14f;
+
+  /**
+   * The soft ellipse the greenhouse already puts under a pot, reused to ground everything on the
+   * lawn. Without it plants and zombies read as cut-outs pasted on the tiles; PVZ2 sits every
+   * entity on one of these. Kept faint on purpose -- it is depth, not decoration, and the lane
+   * has to stay readable.
+   *
+   * <p>Sized in lanes for the same reason the sprite limits are (see
+   * {@link #ZOMBIE_WIDTH_LIMIT_LANES}): a shadow has to keep its proportion to the thing standing
+   * on it, not to the width of the tile underneath.
+   */
+  private static final String SHADOW_REGION = "potshadow";
+  private static final float SHADOW_ALPHA = 0.36f;
+  private static final float PLANT_SHADOW_WIDTH_LANES = 0.74f;
+  private static final float ZOMBIE_SHADOW_WIDTH_LANES = 0.66f;
   // The stand-in for the entities that still have no rig: a tiny bob on the footInset fraction.
   private static final float PLANT_IDLE_SPEED = 2.2f;
   private static final float PLANT_IDLE_BOB_FRACTION = 0.02f;
@@ -66,13 +90,18 @@ public final class EntityRenderer implements WorldRenderer {
   // keeps the relative sizes the artists drew: a gargantuar stays bigger than an imp.
   private static final float PLANT_ANIM_UNITS = 90f;
   private static final float ZOMBIE_ANIM_UNITS = 150f;
+  /** The walker the plant-headed zombies borrow a body from, and how far the plant overhangs it. */
+  private static final String ZOMBOTANY_BODY = "ZombieTutorialDefault";
+  private static final float ZOMBOTANY_HEAD_FILL = 1.6f;
+  /** Peak of a thrown imp's arc, in lane heights. */
+  private static final float THROW_ARC_HEIGHT = 0.9f;
   // Chilled zombies walk at half speed, so their legs have to as well.
   private static final float CHILLED_ANIM_RATE = 0.5f;
   // Fractions of an armour's health at which the rig's two damaged states take over.
   private static final float ARMOUR_STAGE_1 = 0.66f;
   private static final float ARMOUR_STAGE_2 = 0.33f;
-  // How long a shooter holds its attack clip after firing. The model runs at ten ticks a
-  // second, so this is a little under half a second.
+  // Fallback hold for a rig whose attack clip the manifest gives no duration for. Normally the
+  // clip's own length is used instead; see justActed.
   private static final int PLANT_ATTACK_HOLD_TICKS = 4;
   // How far above its lane a lobbed shot rises at the top of the arc.
   private static final float LOB_ARC_HEIGHT = 0.85f;
@@ -82,6 +111,30 @@ public final class EntityRenderer implements WorldRenderer {
   private static final String OCTOPUS_RIG = "zombiebeachoctopus";
   private static final String OCTOPUS_REGION = "zombie_beach_octopus_66x76";
   private static final float OCTOPUS_ROW_FILL = 0.44f;
+
+  /**
+   * The in-match feedback art, all of it out of the same HUD sheet the sun and the pea come from.
+   *
+   * <p>Every one of these events used to be either a ShapeRenderer ring or nothing at all. They
+   * are the original game's own pieces for the same moments: the pea splat, the explosion cloud
+   * and the ash a zombie leaves, the white star a mower throws, the soft one plant food leaves on
+   * the ground, a spray of dirt, and the gold burst armour comes apart in.
+   */
+  private static final String SPLAT_REGION = "splatpea";
+  private static final String DUST_REGION = "dustpuff";
+  private static final String ASH_REGION = "zombieash";
+  private static final String DIRT_REGION = "dirtclods";
+  private static final String PLANT_PUFF_REGION = "plantpuff";
+  private static final String ARMOUR_BREAK_REGION = "armourbreak";
+  /** Spark kinds, matched in {@link #sparkArt}. */
+  static final String SPARK_ARMOUR = "armour";
+  static final String SPARK_PLANTED = "planted";
+  static final String SPARK_SUN = "sun";
+  /** Impact sprite size at the end of its life, in lanes. It starts at half this and grows. */
+  private static final float SPLAT_SIZE_LANES = 0.42f;
+  private static final float DUST_SIZE_LANES = 0.95f;
+  private static final float ASH_SIZE_LANES = 0.5f;
+  private static final float SPARK_SIZE_LANES = 0.8f;
 
   /** How big a lawn pickup icon is drawn, as a fraction of a cell's height. */
   private static final float LOOT_ICON_FRACTION = 0.34f;
@@ -108,6 +161,8 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color healthBack = new Color(0f, 0f, 0f, 0.55f);
   private final Color healthFront = new Color(0.25f, 0.85f, 0.3f, 0.95f);
   private final Color healthLow = new Color(0.9f, 0.5f, 0.15f, 0.95f);
+  /** The armour strip: a cold grey-blue, so it never reads as more health. */
+  private final Color armourTint = new Color(0.72f, 0.78f, 0.88f, 0.95f);
   private final Color peaColor = new Color(0.55f, 0.9f, 0.3f, 1f);
   private final Color sunColor = new Color(1f, 0.85f, 0.2f, 1f);
   private final Color noArt = new Color(1f, 1f, 1f, 0.85f);
@@ -135,6 +190,12 @@ public final class EntityRenderer implements WorldRenderer {
   private int currentTick;
   private TextureRegion octopus;
   private boolean octopusChecked;
+  /** Plants and suns seen last frame, so an arrival or a departure can be spotted. */
+  private final Map<Plant, Boolean> knownPlants = new java.util.IdentityHashMap<>();
+  private final Map<Plant, Boolean> seenPlants = new java.util.IdentityHashMap<>();
+  private final Map<Sun, double[]> knownSuns = new java.util.IdentityHashMap<>();
+  private final Map<Sun, double[]> seenSuns = new java.util.IdentityHashMap<>();
+  private boolean seenABoard;
 
   public EntityRenderer(LawnGeometry geometry) {
     this.geometry = geometry;
@@ -160,6 +221,78 @@ public final class EntityRenderer implements WorldRenderer {
     drawShapes(context, board);
     hits.endFrame(geometry.getColumns());
     playback.endFrame();
+  }
+
+  /**
+   * Every entity's ground shadow, in one pass before anything stands on them.
+   *
+   * <p>Its own pass rather than one shadow per sprite, so a shadow can never land on top of the
+   * neighbour drawn before it. Costs no extra texture: HudArt is already loaded for the sun and
+   * the pea.
+   */
+  private void drawGroundShadows(RenderContext context, Board board) {
+    TextureRegion shadow = hudArt.find(SHADOW_REGION);
+    if (shadow == null) {
+      return;
+    }
+    context.getBatch().setColor(1f, 1f, 1f, SHADOW_ALPHA);
+    for (Plant plant : board.getPlants()) {
+      if (!plant.isDead()) {
+        drawShadow(context, shadow, plant.getCol(), plant.getRow(),
+            PLANT_SHADOW_WIDTH_LANES, PLANT_FOOT_INSET);
+      }
+    }
+    for (Zombie zombie : board.getZombies()) {
+      if (!zombie.isDead()) {
+        drawShadow(context, shadow, onBoard(zombie.getX()), footRow(zombie),
+            ZOMBIE_SHADOW_WIDTH_LANES, ZOMBIE_FOOT_INSET);
+      }
+    }
+    context.getBatch().setColor(Color.WHITE);
+  }
+
+  private void drawPlant(RenderContext context, Plant plant, TextureRegion sheep, float delta) {
+    // A Wizard's curse turns the plant into a harmless sheep until the wizard dies, so the
+    // board has to show a sheep, not a plant that has quietly stopped shooting.
+    boolean cursed = plant.isCursed() && sheep != null;
+    context.getBatch().setColor(flashed(plantTint(plant), plant));
+    if (!cursed && drawPlantAnimation(context, plant, delta)) {
+      return;
+    }
+    TextureRegion art = cursed ? sheep : plantArt.find(plant.getName());
+    if (art == null) {
+      return;
+    }
+    // the fleece is one effect frame, not a seed packet, so it is sized to the tile directly
+    float scale = cursed
+        ? geometry.getCellHeight() * PLANT_ROW_FILL / art.getRegionHeight()
+        : scaleFor(art, PLANT_REFERENCE_HEIGHT, PLANT_ROW_FILL);
+    drawStanding(context, art, plant.getCol(), plant.getRow(), scale,
+        PLANT_FOOT_INSET + idleBobFraction(plant));
+  }
+
+  private void drawZombie(RenderContext context, Zombie zombie, float delta) {
+    drawKingAura(context, zombie);
+    context.getBatch().setColor(flashed(zombieTint(zombie), zombie));
+    if (drawZombieAnimation(context, zombie, delta)) {
+      return;
+    }
+    TextureRegion art = zombieArt.find(zombie.getName());
+    if (art != null) {
+      drawStanding(context, art, onBoard(zombie.getX()), footRow(zombie),
+          zombieScale(zombie, art), ZOMBIE_FOOT_INSET, spinAngle(zombie));
+    }
+  }
+
+  /** One shadow, centred on the foot line the sprite above it stands on. */
+  private void drawShadow(RenderContext context, TextureRegion shadow, double column, int row,
+      float widthInLanes, float footInset) {
+    float width = geometry.getCellHeight() * widthInLanes;
+    float height = width * shadow.getRegionHeight() / (float) shadow.getRegionWidth();
+    context.getBatch().draw(shadow,
+        geometry.columnCentreX(column) - width / 2f,
+        geometry.rowToY(row) + geometry.getCellHeight() * footInset - height / 2f,
+        width, height);
   }
 
   /** Turns whatever LootDropper queued this frame into pickups sitting on the lawn. */
@@ -197,49 +330,32 @@ public final class EntityRenderer implements WorldRenderer {
 
   private void drawSprites(RenderContext context, Board board, float delta) {
     context.getBatch().begin();
+    drawGroundShadows(context, board);
     TextureRegion sheep = hudArt.find("sheep");
-    for (Plant plant : board.getPlants()) {
-      // A Wizard's curse turns the plant into a harmless sheep until the wizard dies, so the
-      // board has to show a sheep, not a plant that has quietly stopped shooting.
-      boolean cursed = plant.isCursed() && sheep != null;
-      context.getBatch().setColor(flashed(plantTint(plant), plant));
-      if (!cursed && drawPlantAnimation(context, plant, delta)) {
-        continue;
+    // Back to front: a lower row is nearer the camera, so it is drawn last and overlaps the row
+    // above it. Within a row the zombies come after the plants, so one eating a plant stands in
+    // front of it.
+    for (int row = 0; row < board.getRows(); row++) {
+      for (Plant plant : board.getPlants()) {
+        if (plant.getRow() == row) {
+          drawPlant(context, plant, sheep, delta);
+        }
       }
-      TextureRegion art = cursed ? sheep : plantArt.find(plant.getName());
-      if (art == null) {
-        continue;
+      // Its own pass over the row, so an octopus is never hidden under the neighbour drawn next.
+      context.getBatch().setColor(Color.WHITE);
+      for (Plant plant : board.getPlants()) {
+        if (plant.getRow() == row) {
+          drawOctopusHold(context, plant);
+        }
       }
-      // the fleece is one effect frame, not a seed packet, so it is sized to the tile directly
-      float scale = cursed
-          ? geometry.getCellHeight() * PLANT_ROW_FILL / art.getRegionHeight()
-          : scaleFor(art, PLANT_REFERENCE_HEIGHT, PLANT_ROW_FILL);
-      drawStanding(context, art, plant.getCol(), plant.getRow(), scale,
-          PLANT_FOOT_INSET + idleBobFraction(plant));
+      context.getBatch().setColor(Color.WHITE);
+      for (Zombie zombie : board.getZombies()) {
+        if (footRow(zombie) == row && !zombie.isDead()) {
+          drawZombie(context, zombie, delta);
+        }
+      }
+      context.getBatch().setColor(Color.WHITE);
     }
-    // After the plants and in its own pass, so an octopus is never hidden under the neighbour
-    // drawn next. Animated plants take the `continue` above and would otherwise be skipped.
-    context.getBatch().setColor(Color.WHITE);
-    for (Plant plant : board.getPlants()) {
-      drawOctopusHold(context, plant);
-    }
-    context.getBatch().setColor(Color.WHITE);
-    for (Zombie zombie : board.getZombies()) {
-      if (zombie.isDead()) {
-        continue;
-      }
-      drawKingAura(context, zombie);
-      context.getBatch().setColor(flashed(zombieTint(zombie), zombie));
-      if (drawZombieAnimation(context, zombie, delta)) {
-        continue;
-      }
-      TextureRegion art = zombieArt.find(zombie.getName());
-      if (art != null) {
-        drawStanding(context, art, onBoard(zombie.getX()), zombie.getRow(),
-            zombieScale(zombie, art), ZOMBIE_FOOT_INSET, spinAngle(zombie));
-      }
-    }
-    context.getBatch().setColor(Color.WHITE);
     drawProjectiles(context, board);
     TextureRegion sun = hudArt.find("sun");
     if (sun != null) {
@@ -262,7 +378,105 @@ public final class EntityRenderer implements WorldRenderer {
           geometry.getCellHeight() * LOOT_LIFT_FRACTION * pickup.progress(), 0f);
     }
     context.getBatch().setColor(Color.WHITE);
+    drawImpacts(context);
+    drawDeaths(context);
+    drawSparks(context);
+    context.getBatch().setColor(Color.WHITE);
     context.getBatch().end();
+  }
+
+  /**
+   * The splat where a shot landed.
+   *
+   * <p>Grows from half size and fades, which is what makes a splat read as an impact rather than
+   * as a sticker: the eye catches the change, not the shape. Drawn after the entities so a hit on
+   * a zombie's face is not hidden behind the zombie.
+   */
+  private void drawImpacts(RenderContext context) {
+    TextureRegion art = hudArt.find(SPLAT_REGION);
+    if (art == null) {
+      return;
+    }
+    for (HitEffects.Burst burst : hits.getBursts()) {
+      float size = geometry.getCellHeight() * SPLAT_SIZE_LANES * (0.5f + 0.5f * burst.progress());
+      context.getBatch().setColor(1f, 1f, 1f, burst.alpha());
+      drawCentred(context, art, burst.column(), burst.row(), size);
+    }
+  }
+
+  /**
+   * Where a zombie went down: the explosion cloud swelling and thinning, with the ash under it.
+   *
+   * <p>Two pieces because the original plays it as two: the cloud carries the motion and the ash
+   * is what is left on the tile, so the ash barely grows and fades later than the cloud does.
+   */
+  private void drawDeaths(RenderContext context) {
+    TextureRegion cloud = hudArt.find(DUST_REGION);
+    if (cloud == null) {
+      return;
+    }
+    TextureRegion ash = hudArt.find(ASH_REGION);
+    for (HitEffects.DeathPuff puff : hits.getDeathPuffs()) {
+      float lane = geometry.getCellHeight();
+      double column = onBoard(puff.column());
+      if (ash != null) {
+        context.getBatch().setColor(1f, 1f, 1f, Math.min(1f, puff.alpha() * 1.4f));
+        drawCentred(context, ash, column, puff.row(),
+            lane * ASH_SIZE_LANES * (0.7f + 0.3f * puff.progress()),
+            lane * ZOMBIE_FOOT_INSET, 0f);
+      }
+      context.getBatch().setColor(1f, 1f, 1f, puff.alpha() * 0.7f);
+      drawCentred(context, cloud, column, puff.row(),
+          lane * DUST_SIZE_LANES * (0.45f + 0.55f * puff.progress()),
+          lane * (0.1f + 0.25f * puff.progress()), 0f);
+    }
+  }
+
+  /**
+   * The one-off bursts.
+   *
+   * <p>Each kind gets its own art, size and height off the tile, because they mean different
+   * things: armour comes apart around the zombie wearing it, soil is thrown at ground level where
+   * the plant went in, and a collected sun pops where it was picked up.
+   */
+  private void drawSparks(RenderContext context) {
+    float lane = geometry.getCellHeight();
+    for (HitEffects.Spark spark : hits.getSparks()) {
+      TextureRegion art = sparkArt(spark.kind());
+      if (art == null) {
+        continue;
+      }
+      float grow = 0.45f + 0.55f * spark.progress();
+      switch (spark.kind()) {
+        case SPARK_PLANTED -> {
+          // At the plant's foot, not across its middle: drawCentred measures from the middle of
+          // the lane, so getting the soil onto the ground means coming back down most of a half
+          // lane. Kept low and wide -- it is meant to read as the tile being disturbed, not as a
+          // smear over the plant that just went in.
+          context.getBatch().setColor(1f, 1f, 1f, spark.alpha() * 0.85f);
+          drawCentred(context, art, spark.column(), spark.row(),
+              lane * 0.16f * grow, lane * (PLANT_FOOT_INSET - 0.46f), 0f);
+        }
+        case SPARK_SUN -> {
+          context.getBatch().setColor(1f, 0.95f, 0.6f, spark.alpha());
+          drawCentred(context, art, spark.column(), spark.row(), lane * 0.6f * grow);
+        }
+        default -> {
+          context.getBatch().setColor(1f, 1f, 1f, spark.alpha());
+          drawCentred(context, art, spark.column(), spark.row(),
+              lane * SPARK_SIZE_LANES * grow, lane * 0.28f, 0f);
+        }
+      }
+    }
+  }
+
+  private TextureRegion sparkArt(String kind) {
+    return switch (kind) {
+      case SPARK_ARMOUR -> hudArt.find(ARMOUR_BREAK_REGION);
+      case SPARK_PLANTED -> hudArt.find(DIRT_REGION);
+      case SPARK_SUN -> hudArt.find(PLANT_PUFF_REGION);
+      default -> null;
+    };
   }
 
   /** The icon for one kind of lawn drop, or null if nothing to draw it with is loaded. */
@@ -311,18 +525,75 @@ public final class EntityRenderer implements WorldRenderer {
     for (Plant plant : board.getPlants()) {
       if (!plant.isDead()) {
         hits.observe(plant, plant.getCurrentHealth());
+        seenPlants.put(plant, Boolean.TRUE);
+        noteNewPlant(plant);
       }
     }
+    // Rebuilt from the board every frame, so a dug-up plant's entry goes with it.
+    knownPlants.clear();
+    knownPlants.putAll(seenPlants);
+    seenPlants.clear();
+    hits.forgetCounts(entity -> entity instanceof Zombie zombie && zombie.isDead());
+    seenABoard = true;
     for (Zombie zombie : board.getZombies()) {
-      hits.observeZombieState(zombie, zombie.isDead(), zombie.getX(), zombie.getRow());
+      hits.observeZombieState(zombie, zombie.isDead(), zombie.getX(), footRow(zombie));
       if (!zombie.isDead()) {
         hits.observe(zombie, zombie.getCurrentHealth());
+        // Armour is a count that goes down. Nothing announces a piece breaking, so this watches
+        // for it: the piece simply stopped being drawn, which on its own reads as a glitch.
+        hits.observeCount(zombie, intactArmour(zombie), SPARK_ARMOUR,
+            onBoard(zombie.getX()), footRow(zombie));
       }
     }
     for (Projectile projectile : board.getProjectiles()) {
       hits.observeProjectile(projectile, projectile.getXCoordinate(),
           Math.round(projectile.getYCoordinate()));
     }
+    noteCollectedSuns(board);
+  }
+
+  private static int intactArmour(Zombie zombie) {
+    int intact = 0;
+    for (Armor armor : zombie.getArmors()) {
+      if (armor != null && !armor.isDestroyed()) {
+        intact++;
+      }
+    }
+    return intact;
+  }
+
+  /**
+   * A puff of soil for a plant that was not on the board last frame.
+   *
+   * <p>Skipped on the first frame a board is seen, so a stage that starts with plants already
+   * standing (Save Our Seeds) does not open with a shower of dirt.
+   */
+  private void noteNewPlant(Plant plant) {
+    if (!knownPlants.containsKey(plant) && seenABoard) {
+      hits.spawnSpark(SPARK_PLANTED, plant.getCol(), plant.getRow());
+    }
+  }
+
+  /**
+   * A pop where a sun left the lawn.
+   *
+   * <p>Collecting sun is the one thing the player does constantly, and the sun simply vanished:
+   * with the counter up in the corner there was nothing at the pointer to say the click landed.
+   * Suns that time out get the same pop, which is honest -- both are "that sun is gone now".
+   */
+  private void noteCollectedSuns(Board board) {
+    for (Sun sun : board.getSuns()) {
+      seenSuns.put(sun, new double[] {sun.getX(), sun.getY()});
+    }
+    knownSuns.entrySet().removeIf(entry -> {
+      if (seenSuns.containsKey(entry.getKey())) {
+        return false;
+      }
+      hits.spawnSpark(SPARK_SUN, entry.getValue()[0], (int) Math.round(entry.getValue()[1]));
+      return true;
+    });
+    knownSuns.putAll(seenSuns);
+    seenSuns.clear();
   }
 
   /**
@@ -420,20 +691,38 @@ public final class EntityRenderer implements WorldRenderer {
    * only for "idle" left it silently falling back to its seed packet.
    */
   private String plantClip(EntityAnimation animation, Plant plant) {
-    if (justActed(plant)) {
-      String attack = animation.pickClip("attack");
-      if (attack != null) {
-        return attack;
-      }
+    String attack = animation.pickClip("attack");
+    if (attack != null && justActed(plant, animation.duration(attack))) {
+      return attack;
     }
     return animation.pickClip("idle", "attack");
   }
 
-  /** True for {@link #PLANT_ATTACK_HOLD} seconds after the plant's last action tick. */
-  private boolean justActed(Plant plant) {
+  /**
+   * True while the plant's attack clip is still running.
+   *
+   * <p>Held for as long as the clip itself lasts rather than for a fixed number of ticks. Every
+   * attack used to be cut off after {@link #PLANT_ATTACK_HOLD_TICKS} and snapped back to idle
+   * part-way through the motion: a Peashooter got 39% of its second-long shot, a Cabbage-pult 24%
+   * of its throw, and a Repeater -- whose clip is one volley of two peas -- only ever played the
+   * first of them. Reading the length off the rig fixes all of them at once and needs no per-plant
+   * numbers.
+   *
+   * <p>Not capped. The clips run from a third of a second (Bonk Choy's punch) to four and a half
+   * (Hot Potato thawing), and each of those is how long that plant is genuinely busy, so the rig's
+   * own number is the answer in both directions. A plant whose attack outlasts the gap between its
+   * shots simply stays in attack, which is what it is in fact doing. The fallback is the old fixed
+   * hold, for a clip the manifest gives no duration for.
+   */
+  private boolean justActed(Plant plant, float attackSeconds) {
     int sinceAction = currentTick - plant.getLastActionTick();
-    return plant.getLastActionTick() > 0 && sinceAction >= 0
-        && sinceAction < PLANT_ATTACK_HOLD_TICKS;
+    if (plant.getLastActionTick() <= 0 || sinceAction < 0) {
+      return false;
+    }
+    int holdTicks = attackSeconds > 0f
+        ? Math.round(attackSeconds * GdxConfig.TICKS_PER_SECOND)
+        : PLANT_ATTACK_HOLD_TICKS;
+    return sinceAction < holdTicks;
   }
 
   /** Same for a zombie, which unlike a plant has to switch clips as it goes. */
@@ -443,13 +732,56 @@ public final class EntityRenderer implements WorldRenderer {
       return false;
     }
     String clip = zombieClip(animation, zombie);
-    animation.draw(context.getBatch(), clip,
-        playback.advance(zombie, clip, delta * animationRate(zombie)),
-        geometry.columnCentreX(onBoard(zombie.getX())),
-        geometry.rowToY(zombie.getRow()) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET,
-        zombieAnimationScale(zombie, animation, clip), zombie.isHypnotized(),
+    float time = playback.advance(zombie, clip, delta * animationRate(zombie));
+    float flight = zombie.flightProgress();
+    double column = flight > 0f
+        ? zombie.getX() + (zombie.getThrownFromX() - zombie.getX()) * flight
+        : zombie.getX();
+    float x = geometry.columnCentreX(onBoard(column));
+    float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
+        + throwLift(flight);
+    float scale = zombieAnimationScale(zombie, animation, clip);
+    animation.draw(context.getBatch(), clip, time, x, y, scale, zombie.isHypnotized(),
         armourVisibility(animation, zombie));
+    drawPlantHead(context, zombie, animation, clip, time, x, y, scale);
     return true;
+  }
+
+  /** How high a thrown imp rides above its lane: nothing at either end, a full arc in between. */
+  private float throwLift(float flight) {
+    if (flight <= 0f) {
+      return 0f;
+    }
+    return geometry.getCellHeight() * THROW_ARC_HEIGHT * 4f * flight * (1f - flight);
+  }
+
+  /**
+   * The plant a Zombotany wears instead of its own head.
+   *
+   * <p>The body is an ordinary walker rig, so the head has to be found per frame rather than
+   * pinned to the sprite box, or it slides off during the walk cycle. Plant art is authored
+   * facing right and the walker facing left, so the head is mirrored against the body's own flip
+   * to leave both looking the same way.
+   */
+  private void drawPlantHead(RenderContext context, Zombie zombie, EntityAnimation body,
+      String clip, float time, float x, float y, float scale) {
+    String plant = ZombieArt.zombotanyPlant(zombie.getName());
+    if (plant == null) {
+      return;
+    }
+    EntityAnimation rig = animations.find(AnimationLibrary.PLANTS, plant);
+    String idle = rig == null ? null : rig.pickClip("idle");
+    float[] head = body.topPartBox(clip, time, x, y, scale, zombie.isHypnotized());
+    if (idle == null || head == null) {
+      return;
+    }
+    float span = Math.max(head[2], head[3]) * ZOMBOTANY_HEAD_FILL;
+    float headHeight = rig.height(idle);
+    if (headHeight <= 0f) {
+      return;
+    }
+    rig.draw(context.getBatch(), idle, time, head[0], head[1] - span / 2f,
+        span / headHeight, !zombie.isHypnotized());
   }
 
   /**
@@ -523,14 +855,52 @@ public final class EntityRenderer implements WorldRenderer {
     return isStage1 ? left <= ARMOUR_STAGE_1 && left > ARMOUR_STAGE_2 : left <= ARMOUR_STAGE_2;
   }
 
-  /** Null unless this zombie has a rig with a clip worth playing. */
+  /**
+   * The rig this zombie is drawn from.
+   *
+   * <p>The four Zombotany zombies have none of their own -- no folder, no packet, no PAM anywhere
+   * upstream. They are plant-headed zombies, so they walk on the ordinary walker rig and
+   * {@link #drawPlantHead} puts the plant where its head would be.
+   */
   private EntityAnimation zombieAnimation(Zombie zombie) {
     EntityAnimation animation = animations.find(AnimationLibrary.ZOMBIES, zombie.getName());
+    if (animation == null && ZombieArt.zombotanyPlant(zombie.getName()) != null) {
+      animation = animations.find(AnimationLibrary.ZOMBIES, ZOMBOTANY_BODY);
+    }
     return animation != null && zombieClip(animation, zombie) != null ? animation : null;
   }
 
-  /** Eating while it chews a plant, walking the rest of the time. */
+  /**
+   * Zomboss drives its clip off what it is doing, not off walking and eating.
+   *
+   * <p>Each world's boss rig carries its own attack clip -- Egypt fires a missile, the Dark Ages
+   * dragon breathes fire, the mammoth slings ice, the octopus sucks -- so one candidate list
+   * covers all four and {@code pickClip} takes whichever the loaded rig actually has.
+   */
+  private static String bossClip(EntityAnimation animation, Zombie zombie) {
+    if (!(zombie.getBehavior() instanceof ZombossAction boss)) {
+      return null;
+    }
+    switch (boss.getPose()) {
+      case STUNNED:
+        return animation.pickClip("stun_loop", "stun", "stun_start");
+      case MOVING:
+        return animation.pickClip("walk_forward", "walk", "idle");
+      case ATTACKING:
+        return animation.pickClip("missile_start", "fire_attack", "suction_loop",
+            "slingshot", "rocket_launch", "idle");
+      default:
+        return animation.pickClip("idle");
+    }
+  }
+
   private static String zombieClip(EntityAnimation animation, Zombie zombie) {
+    if (zombie.isBoss()) {
+      String boss = bossClip(animation, zombie);
+      if (boss != null) {
+        return boss;
+      }
+    }
     if (zombie.isEating()) {
       String eat = animation.pickClip("eat");
       if (eat != null) {
@@ -572,7 +942,17 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   private static boolean isBoss(Zombie zombie) {
-    return zombie.getBehavior() instanceof ZombossAction;
+    return zombie.isBoss();
+  }
+
+  /**
+   * The lane a zombie's feet are in.
+   *
+   * <p>Zomboss stands in two, and the sprite is drawn upwards from its foot line, so it has to
+   * stand on the lower of them for the robot to cover both lanes rather than the lane above it.
+   */
+  private static int footRow(Zombie zombie) {
+    return zombie.getBottomRow();
   }
 
   /** Walkers share one reference height so a gargantuar stays bigger; Zomboss is its own size. */
@@ -620,7 +1000,7 @@ public final class EntityRenderer implements WorldRenderer {
       return 0f;
     }
     float scale = geometry.getCellHeight() * ZOMBIE_ROW_FILL / referenceHeight;
-    float widest = geometry.getCellWidth() * ZOMBIE_WIDTH_LIMIT_CELLS;
+    float widest = geometry.getCellHeight() * ZOMBIE_WIDTH_LIMIT_LANES;
     if (spriteWidth * scale > widest) {
       scale = widest / spriteWidth;
     }
@@ -637,8 +1017,8 @@ public final class EntityRenderer implements WorldRenderer {
 
   private float scaleFor(float spriteWidth, float referenceHeight, float rowFill) {
     float scale = geometry.getCellHeight() * rowFill / referenceHeight;
-    // nothing may spill sideways into the neighbouring lane
-    float widest = geometry.getCellWidth() * 0.95f;
+    // nothing may spill far enough sideways to sit over its neighbour's tile
+    float widest = geometry.getCellHeight() * PLANT_WIDTH_LIMIT_LANES;
     if (spriteWidth * scale > widest) {
       scale = widest / spriteWidth;
     }
@@ -681,7 +1061,7 @@ public final class EntityRenderer implements WorldRenderer {
     if (aura == null || !(zombie.getBehavior() instanceof KingAuraZombieAction)) {
       return;
     }
-    float size = geometry.getCellWidth() * 2.6f;
+    float size = geometry.getCellHeight() * 2.9f;
     float pulse = 0.32f + 0.12f * (float) Math.sin(clock * 2.5f);
     context.getBatch().setColor(1f, 0.9f, 0.45f, pulse);
     context.getBatch().draw(aura, geometry.columnCentreX(onBoard(zombie.getX())) - size / 2f,
@@ -773,7 +1153,7 @@ public final class EntityRenderer implements WorldRenderer {
       if (!zombie.isDead() && zombieArt.find(zombie.getName()) == null
           && zombieAnimation(zombie) == null) {
         shapes.rect(geometry.columnCentreX(onBoard(zombie.getX())) - geometry.getCellWidth() * 0.25f,
-            geometry.rowToY(zombie.getRow()) + geometry.getCellHeight() * 0.1f,
+            geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * 0.1f,
             geometry.getCellWidth() * 0.5f, geometry.getCellHeight() * 0.7f);
       }
     }
@@ -792,13 +1172,15 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   /**
-   * The small burst where a projectile landed.
+   * The small burst where a projectile landed, for as long as there is no art for it.
    *
-   * <p>Shapes rather than art: assets/metadata/asset-map.json resolved no effect art at all, so
-   * there is no impact sprite in the library to use, and a ring that grows and fades reads as a
-   * hit without pretending to be something it is not.
+   * <p>The library does have the art -- see {@link #drawImpacts} -- so this only runs on a build
+   * whose HUD sheet predates it, and a ring that grows and fades still reads as a hit.
    */
   private void drawHitBursts(ShapeRenderer shapes) {
+    if (hudArt.find(SPLAT_REGION) != null) {
+      return;
+    }
     for (HitEffects.Burst burst : hits.getBursts()) {
       burstColor.a = burst.alpha() * 0.75f;
       shapes.setColor(burstColor);
@@ -814,11 +1196,12 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float[] DEATH_PUFF_OFFSETS_Y = {0.08f, 0.05f, 0.22f};
 
   /**
-   * Where a zombie died: a small cluster of dust rings growing and fading, rather than the zombie
-   * simply vanishing. No dedicated death-effect art exists in the library, so this uses the same
-   * shapes-not-art approach as {@link #drawHitBursts}.
+   * Where a zombie died, for as long as there is no art for it. See {@link #drawDeaths}.
    */
   private void drawDeathPuffs(ShapeRenderer shapes) {
+    if (hudArt.find(DUST_REGION) != null) {
+      return;
+    }
     for (HitEffects.DeathPuff puff : hits.getDeathPuffs()) {
       dustColor.a = puff.alpha() * 0.7f;
       shapes.setColor(dustColor);
@@ -844,23 +1227,48 @@ public final class EntityRenderer implements WorldRenderer {
         || plantArt.find(plant.getName()) != null;
   }
 
-  /** Sits just above the sprite, so a tall zombie does not wear its bar on its chest. */
+  /**
+   * Sits just above the sprite, so a tall zombie does not wear its bar on its chest.
+   *
+   * <p>An armoured zombie gets a second bar stacked over the first for what its cone, bucket or
+   * helmet has left. They are separate pools in the model -- {@link Zombie#takeDamage} spends the
+   * armour before the body and a piercing hit skips it -- so one blended bar would say a zombie was
+   * nearly dead while its bucket was still taking every shot. Once the armour is gone the strip
+   * goes with it, which is the same moment the rig stops drawing the headwear.
+   */
   private void healthBar(ShapeRenderer shapes, Zombie zombie) {
     float spriteHeight = zombieSpriteHeight(zombie);
     // the chapter ends when this one dies, so its bar has to be readable from across the lawn
-    float width = geometry.getCellWidth() * (isBoss(zombie) ? 1.9f : 0.55f);
+    float width = geometry.getCellHeight() * (isBoss(zombie) ? 2.1f : 0.62f);
     float x = geometry.columnCentreX(onBoard(zombie.getX())) - width / 2f;
-    float y = geometry.rowToY(zombie.getRow()) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
+    float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
         + spriteHeight + 4f;
     // a tall zombie in the top lane would otherwise wear its bar up in the seed cards
     y = Math.min(y, geometry.rowToY(0) + geometry.getCellHeight() - 7f);
-    float fraction = zombie.getCurrentHealth() / (float) Math.max(1, zombie.getMaxHealth());
-    fraction = Math.max(0f, Math.min(1f, fraction));
     float thickness = isBoss(zombie) ? 11f : 5f;
+
+    float health = zombie.getCurrentHealth() / (float) Math.max(1, zombie.getMaxHealth());
+    bar(shapes, x, y, width, thickness, health,
+        health < 0.35f ? healthLow : healthFront);
+
+    int armourMax = zombie.getMaxArmorHealth();
+    if (armourMax > 0 && zombie.hasIntactArmor()) {
+      // Thinner than the health bar and directly over it: the eye reads the pair as one stack, and
+      // it is the health underneath that decides whether the zombie is nearly down.
+      float armourThickness = Math.max(3f, thickness - 2f);
+      bar(shapes, x, y + thickness + 2f, width, armourThickness,
+          zombie.getRemainingArmorHealth() / (float) armourMax, armourTint);
+    }
+  }
+
+  /** One backed bar: a dark plate, then the fill clamped to 0..1. */
+  private void bar(ShapeRenderer shapes, float x, float y, float width, float thickness,
+      float fraction, Color fill) {
+    float clamped = Math.max(0f, Math.min(1f, fraction));
     shapes.setColor(healthBack);
     shapes.rect(x - 1f, y - 1f, width + 2f, thickness + 2f);
-    shapes.setColor(fraction < 0.35f ? healthLow : healthFront);
-    shapes.rect(x, y, width * fraction, thickness);
+    shapes.setColor(fill);
+    shapes.rect(x, y, width * clamped, thickness);
   }
 
   @Override

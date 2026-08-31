@@ -19,9 +19,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import view.gdx.audio.GameAudio;
+import view.gdx.core.GdxConfig;
 import view.gdx.core.PvzGdxGame;
+import view.gdx.ui.ButtonFeel;
 import view.gdx.ui.CurrencyHud;
 import view.gdx.ui.DebugPanel;
 import view.gdx.ui.LayeredDrawable;
@@ -36,14 +38,21 @@ import view.gdx.ui.UiSkinProvider;
  * <p>A subclass only says what it is called and what goes in the middle. Everything a menu shares
  * with the other menus — including Escape going back — is handled here.
  *
- * <p>Own ScreenViewport rather than the shared world one, same reason HudStage has one: the world
- * is letterboxed so the lawn keeps its shape, but a menu wants one unit per real pixel so the text
- * stays sharp.
+ * <p>Own ScreenViewport rather than the world's letterboxed one, so a menu gets one unit per real
+ * pixel and its text stays sharp at any window size. The in-match HUD used to do the same and no
+ * longer can -- it has to line up with the lawn underneath it, see HudStage -- but a menu has only
+ * a backdrop under it, which is drawn to fill whatever shape the window is, so nothing here can
+ * fall out of alignment with anything.
  */
 public abstract class MenuScreen extends BaseScreen {
 
   protected Stage stage;
   protected Skin skin;
+
+  @Override
+  public Stage uiStage() {
+    return stage;
+  }
 
   private String notice;
   private TextureAtlas backgroundAtlas;
@@ -113,10 +122,24 @@ public abstract class MenuScreen extends BaseScreen {
     return null;
   }
 
+  /**
+   * What Escape does on this screen. Goes back by default, and does nothing on a screen with
+   * nowhere to go back to.
+   *
+   * <p>Overridable because the root menu has no back and should offer to close the game instead:
+   * Escape on the first screen is how a player expects to leave one.
+   */
+  protected void onEscape() {
+    Screen back = backTarget();
+    if (back != null) {
+      go(back);
+    }
+  }
+
   @Override
   public void show() {
     GameAudio.getInstance().playMusic(musicTrack());
-    stage = new Stage(new ScreenViewport());
+    stage = new Stage(new FitViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
     skin = game.getUiSkin().get();
     Gdx.input.setInputProcessor(stage);
     if (skin == null) {
@@ -147,10 +170,11 @@ public abstract class MenuScreen extends BaseScreen {
 
     if (DebugPanel.isEnabled()) {
       // Floats over the corner instead of taking a row - it can be toggled on any screen now,
-      // and the taller ones have no spare height to give it.
+      // and the taller ones have no spare height to give it. Bottom left, because the footer
+      // buttons sit centre-right and the panel used to cover Start.
       Table corner = new Table();
       corner.setFillParent(true);
-      corner.bottom().right().pad(12f);
+      corner.bottom().left().pad(12f);
       corner.add(new DebugPanel(skin, this::toast));
       stage.addActor(corner);
     }
@@ -162,10 +186,7 @@ public abstract class MenuScreen extends BaseScreen {
             if (keycode != Input.Keys.ESCAPE) {
               return false;
             }
-            Screen back = backTarget();
-            if (back != null) {
-              go(back);
-            }
+            onEscape();
             return true;
           }
         });
@@ -263,6 +284,7 @@ public abstract class MenuScreen extends BaseScreen {
 
   protected TextButton button(String text, String style, Runnable action) {
     TextButton button = new TextButton(text, skin, style);
+    ButtonFeel.apply(button);
     button.addListener(
         new ClickListener() {
           @Override

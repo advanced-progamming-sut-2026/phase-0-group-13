@@ -41,6 +41,7 @@ public final class EntityAnimation {
   private final Part root;
   private final Map<String, Clip> clips = new LinkedHashMap<>();
   private final float[] vertices = new float[20];
+  private final float[] topBox = new float[4];
   private final Color scratch = new Color();
   private boolean[] defaultVisible;
 
@@ -123,6 +124,21 @@ public final class EntityAnimation {
     return names;
   }
 
+  /**
+   * How long one pass of a clip takes, in seconds, or 0 if this rig has no such clip.
+   *
+   * <p>For a caller that wants to hold a one-shot pose for exactly as long as it runs -- an attack,
+   * say -- rather than guessing a duration that is the same for every rig. The number is the clip's
+   * own frame span over its own frame rate, which is what {@link #draw} steps through.
+   */
+  public float duration(String clip) {
+    Clip found = clips.get(clip);
+    if (found == null || found.fps <= 0f) {
+      return 0f;
+    }
+    return (found.end - found.start + 1) / found.fps;
+  }
+
   /** Height of the drawn art in PAM units, for sizing the sprite against a lane. */
   public float height(String clip) {
     Bounds bounds = boundsOf(clip);
@@ -189,6 +205,61 @@ public final class EntityAnimation {
           originY - scale * frame.corners[corner + 7], packed, u2, v);
       batch.draw(part.texture, vertices, 0, 20);
     }
+  }
+
+  /**
+   * Where the topmost part of the current frame sits on screen, as
+   * {@code {centreX, centreY, width, height}}, or null if the clip has no drawable frame.
+   *
+   * <p>On a walker rig the highest part is the head, so this is what a caller overlays something
+   * onto. Uses the same transform as {@link #draw}, so it tracks the head through the walk cycle
+   * instead of pinning it to the sprite box. The array is reused between calls.
+   */
+  public float[] topPartBox(String clip, float time, float x, float y, float scale, boolean flip) {
+    Clip found = clips.get(clip);
+    Bounds bounds = boundsOf(clip);
+    if (found == null || bounds == null) {
+      return null;
+    }
+    int span = found.end - found.start + 1;
+    int step = (int) (Math.max(0f, time) * found.fps);
+    Frame frame = frames[found.start + step % span];
+
+    boolean[] visible = visibleParts(null);
+    float sx = flip ? -scale : scale;
+    float originX = x - sx * ((bounds.minX + bounds.maxX) / 2f);
+    float originY = y + scale * bounds.maxY;
+
+    float highest = -Float.MAX_VALUE;
+    boolean any = false;
+    for (int i = 0; i < frame.count; i++) {
+      Part part = parts[frame.partIds[i]];
+      if (!visible[part.id] || part.texture == null) {
+        continue;
+      }
+      int corner = i * 8;
+      float minX = Float.MAX_VALUE;
+      float maxX = -Float.MAX_VALUE;
+      float minY = Float.MAX_VALUE;
+      float maxY = -Float.MAX_VALUE;
+      for (int c = 0; c < 8; c += 2) {
+        float wx = originX + sx * frame.corners[corner + c];
+        float wy = originY - scale * frame.corners[corner + c + 1];
+        minX = Math.min(minX, wx);
+        maxX = Math.max(maxX, wx);
+        minY = Math.min(minY, wy);
+        maxY = Math.max(maxY, wy);
+      }
+      if (maxY > highest) {
+        highest = maxY;
+        any = true;
+        topBox[0] = (minX + maxX) / 2f;
+        topBox[1] = (minY + maxY) / 2f;
+        topBox[2] = maxX - minX;
+        topBox[3] = maxY - minY;
+      }
+    }
+    return any ? topBox : null;
   }
 
   private static void set(float[] vertices, int offset, float x, float y, float color, float u,

@@ -267,8 +267,9 @@ public final class ClientSession {
     Payloads.Ack result =
         ack(client.request(MessageType.RENAME_REQUEST, new Payloads.RenameRequest(newUsername)));
     if (result.success() && profile != null) {
-      profile = new Payloads.Profile(newUsername, profile.nickname(), profile.coins(),
-          profile.diamonds(), profile.bestScore(), profile.gameData());
+      profile = new Payloads.Profile(newUsername, profile.nickname(), profile.email(),
+          profile.gender(), profile.coins(), profile.diamonds(), profile.bestScore(),
+          profile.gameData());
     }
     return result;
   }

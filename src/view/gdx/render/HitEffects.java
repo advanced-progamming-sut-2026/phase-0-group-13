@@ -34,6 +34,9 @@ public final class HitEffects {
   /** How long a coin/pot/diamond drop sits on the lawn before it fades. */
   public static final float PICKUP_SECONDS = 1.1f;
 
+  /** How long a one-off burst -- armour coming apart, a mower firing, a plant going in -- lasts. */
+  public static final float SPARK_SECONDS = 0.42f;
+
   /** Rings any bigger than this read as an explosion rather than a pea landing. */
   private static final float BURST_MAX_RADIUS_FRACTION = 0.42f;
 
@@ -83,6 +86,23 @@ public final class HitEffects {
     }
   }
 
+  /**
+   * A one-off burst somewhere on the lawn, named by what caused it.
+   *
+   * <p>Deliberately just a kind string and a spot: the renderer picks the art, so a new kind of
+   * feedback is one call here and one case there, and none of it can reach the model.
+   */
+  public record Spark(String kind, double column, int row, float age) {
+
+    public float progress() {
+      return Math.min(1f, age / SPARK_SECONDS);
+    }
+
+    public float alpha() {
+      return Math.max(0f, 1f - progress());
+    }
+  }
+
   private final Map<Object, Integer> health = new IdentityHashMap<>();
   private final Map<Object, Float> flash = new IdentityHashMap<>();
   private final Map<Object, double[]> projectiles = new IdentityHashMap<>();
@@ -91,6 +111,9 @@ public final class HitEffects {
   private final Map<Object, Boolean> aliveState = new IdentityHashMap<>();
   private final List<DeathPuff> deathPuffs = new ArrayList<>();
   private final List<LootPickup> pickups = new ArrayList<>();
+  private final List<Spark> sparks = new ArrayList<>();
+  /** Per-entity counters watched for a drop: armour pieces left, plants on a tile, and so on. */
+  private final Map<Object, Integer> counters = new IdentityHashMap<>();
   private int freshDeaths;
 
   private final Map<Object, Integer> seenHealth = new IdentityHashMap<>();
@@ -133,6 +156,16 @@ public final class HitEffects {
         pickups.remove(i);
       } else {
         pickups.set(i, new LootPickup(pickup.kind(), pickup.column(), pickup.row(), age));
+      }
+    }
+
+    for (int i = sparks.size() - 1; i >= 0; i--) {
+      Spark spark = sparks.get(i);
+      float age = spark.age() + delta;
+      if (age >= SPARK_SECONDS) {
+        sparks.remove(i);
+      } else {
+        sparks.set(i, new Spark(spark.kind(), spark.column(), spark.row(), age));
       }
     }
   }
@@ -186,6 +219,36 @@ public final class HitEffects {
     pickups.add(new LootPickup(kind, column, row, 0f));
   }
 
+  /** Starts a one-off burst of this kind at this spot. */
+  public void spawnSpark(String kind, double column, int row) {
+    sparks.add(new Spark(kind, column, row, 0f));
+  }
+
+  /**
+   * Offers a per-entity counter and fires a spark on the frame it goes down.
+   *
+   * <p>Same observed-not-pushed idea as {@link #observe}: armour coming off a zombie is a number
+   * that got smaller, and the model has no reason to announce it. First sight only records, so
+   * a zombie that walks on already wearing one helmet does not arrive in a shower of sparks.
+   *
+   * @param key the entity the count belongs to, matched by identity
+   */
+  public void observeCount(Object key, int count, String sparkKind, double column, int row) {
+    if (key == null) {
+      return;
+    }
+    Integer before = counters.get(key);
+    if (before != null && count < before) {
+      spawnSpark(sparkKind, column, row);
+    }
+    counters.put(key, count);
+  }
+
+  /** Drops the counter for an entity that is gone, so its identity cannot be reused stale. */
+  public void forgetCounts(java.util.function.Predicate<Object> gone) {
+    counters.keySet().removeIf(gone);
+  }
+
   /** Zombies that died since the last call, for the renderer to turn into a screen shake. */
   public int drainFreshDeaths() {
     int count = freshDeaths;
@@ -237,6 +300,10 @@ public final class HitEffects {
     return pickups;
   }
 
+  public List<Spark> getSparks() {
+    return sparks;
+  }
+
   /** Drops everything, for a screen that is starting a new match with the same renderer. */
   public void clear() {
     health.clear();
@@ -246,6 +313,8 @@ public final class HitEffects {
     aliveState.clear();
     deathPuffs.clear();
     pickups.clear();
+    sparks.clear();
+    counters.clear();
     freshDeaths = 0;
   }
 }

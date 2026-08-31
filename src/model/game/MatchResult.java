@@ -21,7 +21,25 @@ public class MatchResult {
     won = false;
   }
 
-  public void calculateRewards() {}
+  public void setScore(int score) {
+    this.score = score;
+  }
+
+  /**
+   * فاز ۱: سکه از مراحل هم در می‌آید. واحدش همان ۵۰ سکه‌ای است که یک زامبی می‌اندازد، به ازای هر
+   * موجی که بازیکن تمام کرده، پس مرحله‌ی طولانی‌تر جایزه‌ی بیشتری دارد.
+   */
+  public static final int COINS_PER_WAVE_CLEARED = 50;
+
+  public void calculateRewards(int wavesCleared) {
+    if (!won) {
+      rewardCoins = 0;
+      return;
+    }
+    // یک برد زودهنگام (مثلا Deadline) ممکن است هیچ موجی را تمام نکرده باشد؛ باز هم جایزه دارد
+    rewardCoins = Math.max(1, wavesCleared) * COINS_PER_WAVE_CLEARED;
+    addEarnedReward(new model.game.reward.Currency("COIN", rewardCoins));
+  }
 
   // زامبی‌هایی که وسط بازی از خودشون دراپ انداختن (Board.drainPendingRewards) اینجا انباشته میشن؛
   // اعمال واقعی این جایزه‌ها رو یوزر (calculateRewards/applyScoresToUser) هنوز کار GamePlayController
