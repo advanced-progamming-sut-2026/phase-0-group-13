@@ -15,7 +15,7 @@ import model.game.zombie.Zombie;
 public class FrostbiteCavesSeason extends Season {
   private static final int SLIP_TILE_COUNT = 4;
   private static final int FROZEN_TILE_COUNT = 2;
-  private static final int HAZARD_DURATION_TICKS = -1; // -1 یعنی دائمی، مثل خود Tombstone
+  private static final int HAZARD_DURATION_TICKS = -1;
   private static final int WIND_INTERVAL_TICKS = 200;
   private static final int FREEZE_INCREMENT = 1;
   private static final int FREEZE_DURATION_TICKS = 100;
@@ -24,7 +24,6 @@ public class FrostbiteCavesSeason extends Season {
   // داک: اگر گیاه آتشین در یکی از ۸ خانهٔ اطراف باشد، یخ با نرخ ۶۰ جان بر ثانیه آب می‌شود
   private static final int FIRE_MELT_PER_TICK = 6;
 
-  /** How long a gust stays on the record, for anything drawing it. */
   public static final int WIND_EVENT_TICKS = 28;
 
   private final Random random = new Random();
@@ -36,7 +35,6 @@ public class FrostbiteCavesSeason extends Season {
     this.name = "Frostbite Caves";
   }
 
-  /** -1 until the first gust. */
   public int getWindRow() {
     return windRow;
   }
@@ -52,7 +50,6 @@ public class FrostbiteCavesSeason extends Season {
 
   @Override
   public List<Zombie> getAvailableZombies() {
-    // Frostbite Caves: Dodo Rider, Hunter, Troglobite
     return rosterOf(ZombieType.DODO_RIDER, ZombieType.HUNTER, ZombieType.TROGLOBITE);
   }
 
@@ -66,8 +63,6 @@ public class FrostbiteCavesSeason extends Season {
     return plainGrid();
   }
 
-  // چند «زمین لیز» با جهت از پیش تعیین‌شده (بالا/پایین) و چند خانهٔ کاملا یخ‌زده رندوم روی نقشه
-  // می‌گذارد، به‌علاوهٔ چند زامبیِ یخ‌زده که تا آب‌شدن یخشان هیچ کاری نمی‌کنند
   @Override
   public void placeHazards(Board board) {
     // طبق داک، زامبی‌های این فصل با تیر یخی گیاهان یخ نمی‌زنند
@@ -75,7 +70,6 @@ public class FrostbiteCavesSeason extends Season {
     for (int i = 0; i < SLIP_TILE_COUNT; i++) {
       int row = random.nextInt(board.getRows());
       int col = random.nextInt(board.getColumns());
-      // در ردیف اول/آخر جهت طوری انتخاب می‌شود که زامبی از زمین بیرون نیفتد
       int laneShift =
               row == 0 ? 1 : (row == board.getRows() - 1 ? -1 : (random.nextBoolean() ? 1 : -1));
       board.placeTileEffect(

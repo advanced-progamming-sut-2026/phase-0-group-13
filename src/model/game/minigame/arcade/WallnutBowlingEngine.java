@@ -248,7 +248,6 @@ public final class WallnutBowlingEngine {
 
     int nextLane = nut.lane + nut.dLane;
     if (nextLane < 0 || nextLane >= LANES) {
-      // Hit the row boundary: bounce off it by reflecting the vertical component.
       nut.dLane = -nut.dLane;
       nextLane = nut.lane + nut.dLane;
       System.out.printf("The %s bounced off the lawn edge at lane %d.%n",
@@ -258,7 +257,6 @@ public final class WallnutBowlingEngine {
     nut.column += nut.dColumn;
 
     if (nut.column < 0 || nut.column >= LANE_LENGTH) {
-      // Rolled off the far end of the lane without anything left to hit.
       nut.spent = true;
     }
   }

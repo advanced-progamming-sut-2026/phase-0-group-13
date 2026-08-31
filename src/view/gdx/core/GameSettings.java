@@ -1,19 +1,6 @@
 package view.gdx.core;
 
 
-/**
- * The settings the player can change while the graphical build is running.
- *
- * <p>All of them are view-only: speed scales the frame delta handed to {@link FixedStepClock}, so
- * the model still ticks at {@link GdxConfig#TICKS_PER_SECOND}, it just gets asked for more ticks
- * per frame. Debug starts from the {@code -Dpvz.debug} launcher flag and can then be flipped at
- * runtime, which is what the Settings screen does.
- *
- * <p>The two volumes are 0..1 and are read by view.gdx.audio.GameAudio every time it plays
- * something, so changing one here takes effect without anything needing to be notified. Mute is
- * kept separately from a zero volume so that turning sound off and back on restores the levels the
- * player had set rather than dropping them to nothing.
- */
 public final class GameSettings {
 
   public static final int MIN_SPEED = 1;

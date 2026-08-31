@@ -8,14 +8,6 @@ import com.badlogic.gdx.utils.Disposable;
 import java.util.function.Consumer;
 import model.game.minigame.ConveyorRule;
 
-/**
- * The Conveyor Belt stage's seed bar: the belt's rotation, with the plant it has just delivered
- * lit up and clickable.
- *
- * <p>Cards are {@link SeedCard}, the same ones the deck builder and the normal seed bar use. The
- * belt itself is ConveyorRule's; this only reads what it is offering, and the card goes dark again
- * as soon as the plant is used because GdxGameActions consumes it.
- */
 public final class ConveyorBar extends Table implements Disposable {
 
   private static final Color READY = new Color(1f, 1f, 1f, 1f);
@@ -37,7 +29,6 @@ public final class ConveyorBar extends Table implements Disposable {
     rebuild();
   }
 
-  /** Repaints only when the belt has moved on, so the cards aren't rebuilt every frame. */
   public void update() {
     String ready = rule.peekReadyPlant();
     String key = ready == null ? "" : ready;

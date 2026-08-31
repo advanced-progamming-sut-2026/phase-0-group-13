@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 public class SunManager {
-  // امتیاز SPEED_SUN_COLLECT: برداشتن خورشید تا ۲ ثانیه (۲۰ تیک) بعد از قابل‌برداشت شدنش "سریع" حساب میشه
   private static final int FAST_COLLECT_WINDOW_TICKS = 20;
 
   private final List<Sun> suns;
@@ -35,7 +34,6 @@ public class SunManager {
     double t = currentTick / 10.0;
     double secondsInterval = Math.max(6 + 0.05 * t, 12);
     // The doc's fourth difficulty effect: the rate sun falls at goes down as difficulty goes up,
-    // which is the same thing as the gap between two suns getting longer.
     secondsInterval *= model.core.Difficulty.skySunInterval();
     int ticksInterval = (int) (secondsInterval * 10);
 
@@ -90,7 +88,6 @@ public class SunManager {
     return null;
   }
 
-  /** آیا آخرین برداشت (فراخوانی موفق collectSunAt) در بازه‌ی زمانی "سریع" بوده؟ برای امتیاز بازی. */
   public boolean wasLastCollectFast() {
     boolean fast = lastCollectWasFast;
     lastCollectWasFast = false;

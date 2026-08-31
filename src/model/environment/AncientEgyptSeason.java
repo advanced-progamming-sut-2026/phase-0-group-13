@@ -14,12 +14,10 @@ import model.game.zombie.Zombie;
 
 public class AncientEgyptSeason extends Season {
   // داک: «فقط در موج آخر» ممکن است زامبی به‌جای ورود عادی، با گردباد و بین ۱ تا ۴ ستون جلوتر از
-  // نقطهٔ ورود عادی وارد نقشه شود
   private static final double TORNADO_CHANCE = 0.5;
   private static final int MIN_TORNADO_JUMP = 1;
   private static final int MAX_TORNADO_JUMP = 4;
 
-  /** How long a tornado stays on the record, for anything drawing it. */
   public static final int TORNADO_EVENT_TICKS = 22;
   private static final int MAX_REMEMBERED_TORNADOES = 24;
 
@@ -56,7 +54,6 @@ public class AncientEgyptSeason extends Season {
       if (zombie.isDead() || !tornadoChecked.add(zombie)) {
         continue;
       }
-      // فقط زامبی‌هایی که همین حالا از لبهٔ راست وارد شده‌اند
       if (zombie.getX() < board.getColumns() - 0.5 || random.nextDouble() >= TORNADO_CHANCE) {
         continue;
       }
@@ -75,10 +72,6 @@ public class AncientEgyptSeason extends Season {
     board.placeRandomTombstones(3, 5, 700);
   }
 
-  /**
-   * گردباد: فقط در موج آخر، زامبی‌ها به جای ورود عادی از لبه، بین ۱ تا ۴ ستون جلوتر وارد
-   * می‌شوند.
-   */
   @Override
   public void onWaveStart(
           model.game.Board board, int waveNumber, int currentTick, boolean finalWave) {
@@ -108,7 +101,6 @@ public class AncientEgyptSeason extends Season {
 
   @Override
   public List<Zombie> getAvailableZombies() {
-    // Ancient Egypt: Ra, Explorer, Tomb Raiser
     return rosterOf(ZombieType.RA, ZombieType.EXPLORER, ZombieType.TOMBRAISER);
   }
 

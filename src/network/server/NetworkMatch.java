@@ -12,12 +12,6 @@ public final class NetworkMatch {
   private final int level;
   private final IZombieMatch state;
 
-  /**
-   * Whoever flips this is the one who gets to announce the end.
-   *
-   * <p>The clock can finish a match on the same tick the loser's socket drops, and both paths want
-   * to send MATCH_ENDED. Only one of them may, or the winner is told twice and paid twice.
-   */
   private final AtomicBoolean ended = new AtomicBoolean();
   private volatile boolean finished;
 

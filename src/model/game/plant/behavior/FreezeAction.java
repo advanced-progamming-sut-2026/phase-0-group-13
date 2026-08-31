@@ -5,16 +5,6 @@ import model.game.Board;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-/**
- * گیاهان یخی‌ای که در plants.json دمیجشان صفر است و کارشان «یخ‌زدنِ» زامبی‌هاست، نه آسیب‌زدن:
- * Iceberg Lettuce اولین زامبی‌ای که رویش پا بگذارد و Ice-shroom کل زمین را یخ می‌زند.
- *
- * <p>قبلا هر دو با ExplodeAction ساخته می‌شدند و چون دمیج صفرشان به ۱۸۰۰ فالبک می‌خورد، به جای
- * یخ‌زدن، زامبی‌ها را منفجر می‌کردند.
- *
- * <p>دیتا مدت یخ‌زدگی را مشخص نکرده (فقط «Freeze Time +2s» در لِوِل ۳ آمده)، پس پایه روی
- * {@link #DEFAULT_FREEZE_SECONDS} ثانیه گذاشته شده.
- */
 public class FreezeAction implements PlantAction {
 
   public static final int DEFAULT_FREEZE_SECONDS = 5;
@@ -31,7 +21,6 @@ public class FreezeAction implements PlantAction {
     this.consumedOnUse = consumedOnUse;
   }
 
-  /** یخ‌زدگی با مدت پیش‌فرض. */
   public static FreezeAction defaultFreeze(boolean wholeLawn, boolean consumedOnUse) {
     return new FreezeAction(DEFAULT_FREEZE_SECONDS * TICKS_PER_SECOND, wholeLawn, consumedOnUse);
   }

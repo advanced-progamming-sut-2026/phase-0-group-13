@@ -12,17 +12,8 @@ import model.enums.Menu;
 import network.client.ClientSession;
 import network.protocol.Payloads;
 
-/**
- * The terminal leaderboard.
- *
- * <p>Rows come from the server, the same LEADERBOARD_REQUEST the graphical LeaderboardScreen
- * sends, so both builds rank the same players off the same authoritative data. It used to read
- * UserManager.getAllUsers(), which is only the accounts this machine happens to have cached
- * locally -- on a fresh install that is one row, the player themselves.
- */
 public class ScoreBoardMenuController implements BaseController {
 
-  /** 0 asks for every row; the terminal has no paging, so it prints them all. */
   private static final int NO_LIMIT = 0;
 
   private String lastSortedLabel = null;
@@ -90,13 +81,6 @@ public class ScoreBoardMenuController implements BaseController {
     printLeaderboard(label, ascending, ranked);
   }
 
-  /**
-   * The server's rows, or null when it could not be asked -- the reason is printed by then.
-   *
-   * <p>The server answers this only for a signed-in connection, and an unauthenticated request
-   * comes back as an ERROR rather than an empty table, so the two cases are told apart here
-   * instead of both looking like "nobody has registered".
-   */
   private static List<Payloads.LeaderboardEntry> fetch() throws IOException {
     ClientSession session = ClientSession.getInstance();
     if (!session.isConnected() && !session.connect()) {
@@ -140,7 +124,6 @@ public class ScoreBoardMenuController implements BaseController {
     System.out.println();
   }
 
-  /** "2-3" for season 2 stage 3, or a dash for an account that has cleared nothing yet. */
   static String progressOf(Payloads.LeaderboardEntry entry) {
     if (entry.lastSeason() <= 0 || entry.lastStage() <= 0) {
       return "-";
@@ -148,7 +131,6 @@ public class ScoreBoardMenuController implements BaseController {
     return entry.lastSeason() + "-" + entry.lastStage();
   }
 
-  /** Ranks an unplayed bonus game below a zero-scoring one rather than alongside it. */
   static int meowPoints(Payloads.LeaderboardEntry entry) {
     return entry.myPoint() == null ? Integer.MIN_VALUE : entry.myPoint();
   }

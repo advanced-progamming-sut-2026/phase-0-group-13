@@ -61,10 +61,6 @@ public final class BoardRenderer {
                     + " Coordinates are (column, row), both 1-indexed.");
   }
 
-  /**
-   * خروجی دیباگ: دقیقا همان نقشهٔ عادی، به‌علاوهٔ جدول زره/آسیب زامبی‌ها و وضعیت هزاردهای زمین.
-   * رندر عادی دست‌نخورده می‌ماند.
-   */
   public static void renderDebug(GameManager gm) {
     render(gm);
     printZombieDebugTable(gm.getBoard(), gm.getCurrentTick());
@@ -141,7 +137,6 @@ public final class BoardRenderer {
     return effect.getName();
   }
 
-  /** خلاصهٔ زرهِ زامبی برای خروجی دیباگ. */
   private static String armourOf(Zombie zombie) {
     if (zombie.getArmors().isEmpty()) {
       return "-";
@@ -150,7 +145,6 @@ public final class BoardRenderer {
             + (zombie.isArmorBroken() ? " BROKEN" : "");
   }
 
-  /** نوع زامبی طبق همان قرارداد ZombieTypeResolver. */
   public static String typeOf(Zombie zombie) {
     if (zombie == null || zombie.getName() == null || data.GameDataManager.zombieRepository == null) {
       return "UNKNOWN";
@@ -159,7 +153,6 @@ public final class BoardRenderer {
     return template == null ? "UNKNOWN" : ZombieTypeResolver.resolve(template).name();
   }
 
-  /** وضعیت جاری زامبی: یخ‌زده/کند‌شده، در حال خوردن، هیپنوتیزم، زیر آب، زرهِ شکسته و ... */
   public static String stateOf(Zombie zombie) {
     StringBuilder state = new StringBuilder();
     Integer frozen = zombie.getActiveEffects().get(StatusEffect.FROZEN);
@@ -453,7 +446,6 @@ public final class BoardRenderer {
     System.out.println(healthLine);
   }
 
-  /** متن خانه را به اندازه ستون کوتاه می‌کند تا جدول هرگز به‌هم نریزد. */
   private static String fit(String text) {
     if (text == null) {
       return "";
@@ -488,7 +480,6 @@ public final class BoardRenderer {
     for (Zombie z : board.getZombies()) {
       if (z.getRow() == row && Math.round(z.getX()) == col && !z.isDead()) {
         entities.append("Z").append(initialOf(z.getDisplayName()));
-        // جان بدنه + زرهِ باقی‌مانده، تا آسیب وارد شده به زره هم روی نقشه دیده شود
         int armorLeft = z.getRemainingArmorHealth();
         healths.append(z.getCurrentHealth());
         if (armorLeft > 0) {

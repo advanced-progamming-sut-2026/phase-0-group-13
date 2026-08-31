@@ -24,13 +24,6 @@ import view.gdx.ui.Popup;
 import view.gdx.ui.SeedCard;
 import view.gdx.ui.UiSkinProvider;
 
-/**
- * The deck builder between the Adventure map and the lawn.
- *
- * <p>No rules of its own: User owns the eight-slot limit and the boost price, MatchLauncher says
- * which plants a stage locks out and when Start is allowed. Same calls the typed
- * PlantSelectionMenuController makes. Cards are {@link SeedCard}.
- */
 public final class PlantSelectionScreen extends MenuScreen {
 
   private static final int GRID_COLUMNS = 6;
@@ -46,14 +39,6 @@ public final class PlantSelectionScreen extends MenuScreen {
     this(game, chapter, false);
   }
 
-  /**
-   * Deck building for the daily bonus run.
-   *
-   * <p>Same screen because the choosing is the same: the only differences are where Back goes and
-   * which launcher Start hands off to. {@link MatchSetup#setBonusRun()} has already told
-   * {@link MatchLauncher#selectionRule()} that no stage is locking plants out, so the almanac needs
-   * no special case. Egypt's backdrop stands in, the bonus run having no season of its own.
-   */
   public static PlantSelectionScreen forBonusGame(PvzGdxGame game) {
     MatchSetup.getInstance().setBonusRun();
     return new PlantSelectionScreen(game, 1, true);
@@ -72,7 +57,6 @@ public final class PlantSelectionScreen extends MenuScreen {
 
   @Override
   protected Screen backTarget() {
-    // For a chapter, back into its level grid rather than the chapter list already stepped past.
     return bonus ? new MainMenuScreen(game) : new AdventureScreen(game, chapter);
   }
 
@@ -131,7 +115,6 @@ public final class PlantSelectionScreen extends MenuScreen {
     return panel;
   }
 
-  /** Tapping a card in the bank offers boost or remove. */
   private SeedCard chosenCard(User user, String plant) {
     PlantTemplate template = template(plant);
     SeedCard card = new SeedCard(skin, SeedCard.Size.COMPACT, plant, displayName(plant, template),
@@ -154,7 +137,6 @@ public final class PlantSelectionScreen extends MenuScreen {
     return slot;
   }
 
-  /** Everything the player owns, taken or not. */
   private ScrollPane almanac(User user) {
     SpecialStageRule rule = MatchLauncher.selectionRule();
     Table grid = panel();
@@ -192,13 +174,11 @@ public final class PlantSelectionScreen extends MenuScreen {
     return card;
   }
 
-  /** Level plus packets held. The upgrade price stays in CollectionMenuController. */
   private String upgradeLine(User user, String plant) {
     int packets = user.getInventory().getItemCount("seed_" + plant.toLowerCase().trim());
     return "Lv " + user.getPlantLevel(plant) + "   " + packets + " pkt";
   }
 
-  /** Click to add, click again to remove. */
   private void toggle(User user, String plant, SpecialStageRule rule) {
     if (rule != null && !rule.isPlantAllowed(plant)) {
       toast("error: " + plant + " is locked in this stage");
@@ -277,7 +257,6 @@ public final class PlantSelectionScreen extends MenuScreen {
     return row;
   }
 
-  /** Same hand-off the typed menu does: lock the setup in, then let MatchLauncher build it. */
   private void start(User user) {
     int required = MatchLauncher.requiredDeckSlots(user);
     if (user.getSelectedDeck().size() < required) {
@@ -314,7 +293,6 @@ public final class PlantSelectionScreen extends MenuScreen {
         e -> toast(e.getMessage()));
   }
 
-  /** The deck stores lowercase keys, the almanac has the real spelling. */
   private static String displayName(String plant, PlantTemplate template) {
     return template == null ? plant : template.name;
   }

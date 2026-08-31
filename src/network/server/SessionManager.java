@@ -9,8 +9,9 @@ public final class SessionManager {
   private final Map<String, ClientConnection> byUsername = new ConcurrentHashMap<>();
 
   /**
+   *
    * @return false when that account is already signed in somewhere else. Re-binding the same
-   *     connection is allowed: it is the same session, not a second one.
+   * connection is allowed: it is the same session, not a second one.
    */
   public boolean bind(String username, ClientConnection connection) {
     ClientConnection existing = byUsername.putIfAbsent(username.toLowerCase(), connection);

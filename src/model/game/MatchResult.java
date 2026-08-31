@@ -9,8 +9,6 @@ public class MatchResult {
   private int score;
   private int rewardCoins;
 
-  // transient: فقط وضعیت حین مچه؛ آخر مچ به کیف پول اعمال میشه. اگه توی Users.json ذخیره بشه
-  // Gson موقع لود نمی‌تونه اینترفیس Reward رو بسازه و کل دیتابیس یوزرها می‌پره
   private transient List<Reward> earnedRewards = new ArrayList<>();
 
   public void markWin() {
@@ -25,10 +23,6 @@ public class MatchResult {
     this.score = score;
   }
 
-  /**
-   * فاز ۱: سکه از مراحل هم در می‌آید. واحدش همان ۵۰ سکه‌ای است که یک زامبی می‌اندازد، به ازای هر
-   * موجی که بازیکن تمام کرده، پس مرحله‌ی طولانی‌تر جایزه‌ی بیشتری دارد.
-   */
   public static final int COINS_PER_WAVE_CLEARED = 50;
 
   public void calculateRewards(int wavesCleared) {
@@ -36,14 +30,10 @@ public class MatchResult {
       rewardCoins = 0;
       return;
     }
-    // یک برد زودهنگام (مثلا Deadline) ممکن است هیچ موجی را تمام نکرده باشد؛ باز هم جایزه دارد
     rewardCoins = Math.max(1, wavesCleared) * COINS_PER_WAVE_CLEARED;
     addEarnedReward(new model.game.reward.Currency("COIN", rewardCoins));
   }
 
-  // زامبی‌هایی که وسط بازی از خودشون دراپ انداختن (Board.drainPendingRewards) اینجا انباشته میشن؛
-  // اعمال واقعی این جایزه‌ها رو یوزر (calculateRewards/applyScoresToUser) هنوز کار GamePlayController
-  // موقع پایان مچه
   public void addEarnedReward(Reward reward) {
     if (reward == null) {
       return;

@@ -20,7 +20,6 @@ public enum GamePlayMenuCommands implements Command {
   ShowPlantsStatus("show\\s+plants?\\s+status"),
   ShowTileStatus("show\\s+tile\\s+status\\s+-l\\s+\\((?<x>\\S+),\\s*(?<y>\\S+)\\)"),
   ZombiesInfo("zombies\\s+info"),
-  // every other -l command takes (x, y); angle brackets stay accepted for older scripts
   CheatSpawnZombie(
       "cheat\\s+spawn-zombie\\s+-t\\s+(?<zombieType>.+?)\\s+-l\\s+[(<]\\s*(?<x>[^,\\s]+)\\s*,"
           + "\\s*(?<y>[^)>\\s]+)\\s*[)>]"),

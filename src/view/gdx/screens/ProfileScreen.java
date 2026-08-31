@@ -12,12 +12,6 @@ import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.UiSkinProvider;
 
 
-/**
- * Graphical profile, so the Phase 1 Profile Menu is reachable from the graphical main menu.
- *
- * <p>Shows what "show info" shows and offers the same four changes the typed menu does, all through
- * the existing UserManager methods, which are the ones that validate and save.
- */
 public final class ProfileScreen extends MenuScreen {
 
   public ProfileScreen(PvzGdxGame game) {
@@ -93,14 +87,12 @@ public final class ProfileScreen extends MenuScreen {
         .padTop(14f)
         .row();
 
-    // Too many rows for a short window now, so it scrolls like the sign-up form does.
     ScrollPane scroll = new ScrollPane(panel, skin);
     scroll.setFadeScrollBars(false);
     scroll.setScrollingDisabled(true, false);
     content.add(scroll).grow();
   }
 
-  /** Same count "show info" prints: four levels a stage, plus however far into the current one. */
   private static int completedStages(User user) {
     return Math.max(0, (user.getProgress().getMaxClearedStage() - 1) * AdventureMap.LEVELS_PER_STAGE
         + user.getProgress().getMaxClearedLevel());

@@ -15,22 +15,6 @@ import network.protocol.Payloads;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.UiSkinProvider;
 
-/**
- * The lobby: where a networked I, Zombie match is arranged.
- *
- * <p>Two ways in, both of them the server's. Naming an opponent sends MATCH_INVITE and the named
- * player gets a popup they can accept or refuse; asking for anybody sends MATCHMAKING_REQUEST and
- * waits in the queue until someone else does the same. Either way the match itself arrives as a
- * MATCH_FOUND event carrying the role, and this screen does nothing but hand that straight to
- * {@link NetworkIZombieScreen}.
- *
- * <p>Every protocol call blocks on the socket, so all of them run on a worker thread and come back
- * through {@code Gdx.app.postRunnable}; the screen keeps repainting while it waits instead of
- * freezing on a server that is thinking about it.
- *
- * <p>Because the match lives on the server, walking out of one is not the same as ending it. If
- * there is still a match in progress when this screen opens, it offers the way back into it.
- */
 public final class MultiplayerScreen extends MenuScreen {
 
   private static final String GAME = "i-zombie";
@@ -124,7 +108,6 @@ public final class MultiplayerScreen extends MenuScreen {
       return;
     }
     say("Inviting " + target + "...");
-    // The server owns "does that account exist" and "is it online"; its answer is what is shown.
     ask(() -> session.invite(target));
   }
 
@@ -153,11 +136,8 @@ public final class MultiplayerScreen extends MenuScreen {
     }
   }
 
-  // MATCH_INVITE_EVENT and MATCH_FOUND belong to InviteWatcher now, so an invite reaches the
-  // player wherever they are and only one popup is ever raised for it.
   private void onServerEvent(NetworkMessage message) {
     if (message.type() == MessageType.ACK) {
-      // The only unsolicited ACK the server pushes is the host being told an invite was refused.
       Payloads.Ack ack = message.payloadAs(Payloads.Ack.class);
       if (ack != null) {
         Gdx.app.postRunnable(() -> ifStillCurrent(() -> say(ack.message())));
@@ -165,12 +145,6 @@ public final class MultiplayerScreen extends MenuScreen {
     }
   }
 
-  /**
-   * The listener is removed in hide()/dispose(), but an event dispatched right before that can
-   * still have queued a postRunnable that only runs on a later frame - by which point the player
-   * may have navigated somewhere else entirely. Dropping it here instead of acting on it keeps a
-   * stale event from touching a stage that is already gone.
-   */
   private void ifStillCurrent(Runnable action) {
     if (game.getScreen() == this) {
       action.run();
@@ -182,7 +156,6 @@ public final class MultiplayerScreen extends MenuScreen {
     go(new NetworkIZombieScreen(game, found));
   }
 
-  /** Runs a blocking protocol call off the render thread and shows whatever it answers. */
   private void ask(ProtocolCall call) {
     Thread worker = new Thread(() -> {
       String message;

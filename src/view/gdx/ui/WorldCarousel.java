@@ -17,23 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 import view.gdx.audio.GameAudio;
 
-/**
- * The chapter chooser: the four worlds side by side, the selected one large and centred.
- *
- * <p>Everything is placed from the group's own size, so the row keeps its shape at any window size
- * and in fullscreen.
- */
 public final class WorldCarousel extends WidgetGroup {
 
-  /** Card height as a share of the group's height, for the selected card. */
   private static final float CARD_HEIGHT = 0.86f;
   private static final float SIDE_SCALE = 0.70f;
   private static final float SIDE_ALPHA = 0.62f;
-  /** Gap between neighbouring cards, as a share of a card width. */
   private static final float GAP = 0.30f;
   private static final float GLIDE = 9f;
 
-  /** Selection index while it slides; whole numbers are a settled selection. */
   private float shown;
   private int selected;
 
@@ -69,7 +60,6 @@ public final class WorldCarousel extends WidgetGroup {
     }
   }
 
-  /** What the screen knows about a chapter. */
   public interface State {
     boolean locked(int stage);
 
@@ -84,7 +74,6 @@ public final class WorldCarousel extends WidgetGroup {
     selected = MathUtils.clamp(stage - 1, 0, cards.size() - 1);
   }
 
-  /** Steps the selection one world along, stopping at either end. Gives back the new stage. */
   public int step(int direction) {
     selected = MathUtils.clamp(selected + direction, 0, cards.size() - 1);
     return selectedStage();
@@ -115,9 +104,6 @@ public final class WorldCarousel extends WidgetGroup {
       return;
     }
     float cardHeight = height * CARD_HEIGHT;
-    // One step is a card plus a real gap, so the row reads as a wide path with space between the
-    // worlds rather than as four pictures pushed together. The selected one sits in the middle
-    // and its neighbours show at the edges.
     float step = cardHeight * cards.get(0).aspect() * (1f + GAP);
 
     for (int i = 0; i < cards.size(); i++) {
@@ -148,7 +134,6 @@ public final class WorldCarousel extends WidgetGroup {
     return 0f;
   }
 
-  /** One world: its island art, a padlock when it is shut, and how far through it the player is. */
   private static final class Card extends Table {
 
     private static final Color OPEN = new Color(1f, 1f, 1f, 1f);

@@ -13,13 +13,6 @@ import model.core.MatchSetup;
 import model.game.plant.PlantParts.PlantLevel;
 import model.game.plant.PlantParts.PlantTemplate;
 
-/**
- * The seed packets during a match: plant picture, sun cost, and whether it can be planted now.
- *
- * <p>The cards are {@link SeedCard}, shared with the almanac and the deck builder. Only the match
- * reading lives here: recharge uses the same numbers GamePlayController checks, so a card looks
- * ready exactly when the model would accept the plant.
- */
 public final class SeedBar extends Table implements Disposable {
 
   /** Named, not just a literal on the add() call below, so HudStage can size its own row against
@@ -54,14 +47,12 @@ public final class SeedBar extends Table implements Disposable {
     }
   }
 
-  /** Boosts bought on the selection screen, locked in when the match started. */
   private static boolean isBoosted(String plantName) {
     List<String> boosted = MatchSetup.getInstance().getBoostedPlants();
     return plantName != null && boosted != null
         && boosted.contains(plantName.toLowerCase().trim());
   }
 
-  /** Repaints the cards from the live match. */
   public void update(GameManager match, String selected, ToIntFunction<String> levelOf) {
     if (match == null) {
       return;

@@ -4,8 +4,6 @@ import model.game.Board;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-// Hypno-shroom خودش حمله نمیکنه؛ منتظر میمونه تا زامبی شروع به خوردنش کنه و همون لحظه زامبی رو
-// هیپنوتیزم میکنه (Zombie.setHypnotized که StandardZombieAction قبلا هندلش میکرد) و خودش مصرف میشه
 public class HypnoShroomAction implements PlantAction {
   private static final int GARGANTUAR_HEALTH = 3000;
 
@@ -15,7 +13,6 @@ public class HypnoShroomAction implements PlantAction {
     this(false);
   }
 
-  /** حالت غذای گیاه: زامبی هیپنوتیزم‌شده به قدرت یک غول‌پیکر هم‌پیمان تبدیل می‌شود. */
   public HypnoShroomAction(boolean gargantuarMode) {
     this.gargantuarMode = gargantuarMode;
   }

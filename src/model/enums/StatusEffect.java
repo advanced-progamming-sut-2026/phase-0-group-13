@@ -1,10 +1,10 @@
 package model.enums;
 
 public enum StatusEffect {
-  FROZEN, // یخ‌زدگی )
+  FROZEN,
   CHILLED,
-  POISONED, // مسمومیت
-  HYPNOTIZED, // هیپنوتیزم شده
-  BURNED, // سوختگی
-  OCTOPUS_BIND // گیر افتاده در شاخک اختاپوس
+  POISONED,
+  HYPNOTIZED,
+  BURNED,
+  OCTOPUS_BIND
 }

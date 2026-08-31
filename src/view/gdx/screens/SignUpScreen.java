@@ -12,17 +12,6 @@ import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.UiSkinProvider;
 
 
-/**
- * Graphical registration.
- *
- * <p>Phase 1 registers in two steps: registerUser validates everything and parks the account as
- * pending, then setSecurityQuestionForLatestUser commits it and writes the file. The form collects
- * both steps at once and then calls them in that order, so every rule in AuthService still decides
- * what is valid and nothing is re-checked here.
- *
- * <p>The two confirmation fields are the exception: SignUpMenuController compares those itself
- * before it calls UserManager, so the same comparison happens here.
- */
 public final class SignUpScreen extends MenuScreen {
 
   private static final String[] GENDERS = {"male", "female"};
@@ -121,7 +110,6 @@ public final class SignUpScreen extends MenuScreen {
           return null;
         },
         ignored -> go(new LoginScreen(game).withNotice("Account created. You can log in now.")),
-        // Stay put with everything still filled in, so only the bad field has to be fixed.
         e -> toast(e.getMessage()));
   }
 

@@ -8,9 +8,6 @@ public class ParasolZombieAction implements ZombieAction {
   private final int parasolHp;
   private final double eatingDamage;
 
-  // parasolHp عدد قراردادیه (فعلا تو دیتای زامبی مقدار مشخصی براش نداریم)؛ تا وقتی این مقدار دمیج
-  // نخورده چتر باز میمونه و جلوی تیرهای لوب (لوبر) رو میگیره، بعدش zombie.setShieldBlocker(false)
-  // میشه و مثل بقیه رفتار میکنه
   public ParasolZombieAction(int parasolHp, double eatingDamage) {
     this.parasolHp = parasolHp;
     this.eatingDamage = eatingDamage;

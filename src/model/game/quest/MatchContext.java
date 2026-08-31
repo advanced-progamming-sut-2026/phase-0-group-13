@@ -166,7 +166,6 @@ public final class MatchContext {
   public Set<PlantTag> getPlantFamiliesPlaced() { return plantFamiliesPlaced; }
   public boolean isGardenSymmetric() { return gardenSymmetric; }
 
-  /** تعداد گیاهانی که همین الان روی زمین ایستاده‌اند (نه تعداد کاشته‌شده‌ها در کل مسابقه). */
   public int getPlantsOnBoard() { return plantsOnBoard; }
   public boolean isGardenSymmetricExceptMiddleRow() { return gardenSymmetricExceptMiddleRow; }
   public int getCurrentTick() { return currentTick; }

@@ -5,13 +5,6 @@ import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 import model.game.zombie.ZombieParts.Armor;
 
-/**
- * Magnet-shroom: طبق plants.json دمیجش صفر است و کارش «کندنِ وسایل فلزی (سطل/کلاهخود) از سر
- * زامبی‌هاست»، نه شلیک. قبلا با HomingAction و دمیج صفر ساخته می‌شد، یعنی عملا هیچ کاری نمی‌کرد.
- *
- * <p>زره فلزی را نابود می‌کند (همان مسیر Armor.takeDamage که تیرها هم استفاده می‌کنند)، پس جانِ
- * بدنِ زامبی دست‌نخورده می‌ماند و فقط بی‌زره می‌شود.
- */
 public class MagnetAction implements PlantAction {
 
   private final int actionInterval;

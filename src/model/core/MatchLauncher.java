@@ -27,10 +27,6 @@ import model.game.minigame.TimedWarRule;
 import model.game.zombie.Zombie;
 import model.game.zombie.behavior.ZombossAction;
 
-/**
- * Builds a {@link GameManager} from the current {@link MatchSetup} and hands control to the
- * gameplay menu: resolves the chapter's {@link Season}, generates its waves, and starts the match.
- */
 public final class MatchLauncher {
   private static final int ROWS = 5;
   private static final int COLS = 9;
@@ -62,10 +58,6 @@ public final class MatchLauncher {
                     + "'plant plant -t <type> -l (x,y)', or 'menu exit'.");
   }
 
-  /**
-   * Levels 2 and 3 of each chapter are special levels; each of the 8 special types appears once
-   * across the adventure. Level 1 is a normal level and level 4 is the boss (next phase).
-   */
   private static void attachSpecialRule(GameManager gameManager, int stage) {
     int levelInStage = levelInStage();
     List<String> deck = new ArrayList<>(MatchSetup.getInstance().getSelectedPlants());
@@ -80,7 +72,6 @@ public final class MatchLauncher {
 
     gameManager.setSpecialStageRule(rule);
     System.out.println("Special level active: " + rule.getClass().getSimpleName());
-    // Boss stages run on the belt too, so this reads the rule's belt rather than its type.
     ConveyorRule conveyor = rule.belt();
     if (conveyor != null) {
       gameManager.enableFreePlanting();
@@ -92,7 +83,6 @@ public final class MatchLauncher {
       placeProtectedPlants(gameManager);
     }
     if (rule instanceof PlantWhatYouGetRule) {
-      // زامبی‌ها تا وقتی بازیکن 'start zombie waves' نزنه وارد نمیشن
       gameManager.pauseZombieWaves();
       gameManager.getBoard().getGameState()
               .addSun(800 - gameManager.getBoard().getGameState().getCurrentSun());
@@ -112,13 +102,8 @@ public final class MatchLauncher {
         System.out.printf("PROTECT THIS: %s at (1, %d)%n", guarded.getName(), row + 1);}}}
   private static final int BOSS_LEVEL_IN_STAGE = AdventureMap.LEVELS_PER_STAGE;
 
-  /** How many ordinary waves come before Zomboss rolls on. */
   private static final int BOSS_WARMUP_WAVES = 2;
 
-  /**
-   * Which level of the chapter is being played. The map screen puts the clicked level in
-   * MatchSetup; without one -- the typed menu -- it is wherever the account has got to.
-   */
   public static int levelInStage() {
     int chosen = MatchSetup.getInstance().getTargetLevel();
     if (chosen > 0) {
@@ -150,11 +135,6 @@ public final class MatchLauncher {
     }
   }
 
-  /**
-   * How many plants the seed bank needs before the stage will start. Normally MIN_DECK_SLOTS, but
-   * a stage that locks most plants out can't ask for more than it allows. Shared by the typed and
-   * the graphical Plant Selection menus so they can't disagree.
-   */
   public static int requiredDeckSlots(User user) {
     if (user == null) {
       return 0;
@@ -166,7 +146,6 @@ public final class MatchLauncher {
   }
 
   public static SpecialStageRule selectionRule() {
-    // A mini-game and the bonus run are both outside the adventure, so no stage locks their deck.
     if (MatchSetup.getInstance().getCurrentMiniGame() != model.enums.MiniGameType.NONE
             || MatchSetup.getInstance().isBonusRun()) {
       return null;
@@ -176,7 +155,6 @@ public final class MatchLauncher {
     return rule != null && rule.restrictsSelection() ? rule : null;
   }
 
-  /** The chapter being played, from whatever the menus put in MatchSetup. */
   public static int stageNumber() {
     String chapter = MatchSetup.getInstance().getTargetChapter();
     if (chapter == null) {
@@ -226,16 +204,13 @@ public final class MatchLauncher {
     List<String> pool = filterPoolForLevel(level, season, zombieNames);
     List<Wave> waves = WaveGenerator.generate(level, pool);
 
-    // مرحله‌ی آخر هر فصل با یه موج اضافه که فقط زامباس توشه تموم میشه
     if (levelInStage() == BOSS_LEVEL_IN_STAGE && season.getBossZombieName() != null) {
       // The doc replaces the wave meter with Zomboss's own health bar on these stages, so the
       // health bar is the progress readout -- which it cannot be behind ten ordinary waves the
-      // player has no meter for. A short warm-up, then the boss.
       if (waves.size() > BOSS_WARMUP_WAVES) {
         waves = new ArrayList<>(waves.subList(0, BOSS_WARMUP_WAVES));
       }
       List<Wave.SpawnEntry> spawns = new ArrayList<>();
-      // Zomboss stands in two lanes, so its top lane has to leave room for the second one.
       int bossLane = Math.max(0, Math.min(ROWS / 2, ROWS - ZombossAction.ROW_SPAN));
       spawns.add(new Wave.SpawnEntry(season.getBossZombieName(), bossLane, 0, 1000));
       waves.add(new Wave(waves.size() + 1, true, spawns));
@@ -243,7 +218,6 @@ public final class MatchLauncher {
     return waves;
   }
 
-  /** Intro levels should not spawn boss-tier zombies (Gargantuar, mechs, ...). */
   private static List<String> filterPoolForLevel(
       int level, Season season, List<String> zombieNames) {
     if (level > EARLY_LEVEL_THRESHOLD) {
@@ -260,15 +234,10 @@ public final class MatchLauncher {
     return gentle.isEmpty() ? zombieNames : gentle;
   }
 
-  /**
-   * The Conveyor Belt special level (chapter 1, level 2) skips plant selection entirely: the belt
-   * delivers plants on its own, so entering it launches the battle directly.
-   */
   public static boolean skipsPlantSelection(int stage, int levelInStage) {
     return stage == 1 && levelInStage == 2;
   }
 
-  /** Overall level index across chapters, used to scale wave difficulty. */
   private static int levelNumber(int stage) {
     return (stage - 1) * LEVELS_PER_STAGE + levelInStage();
   }

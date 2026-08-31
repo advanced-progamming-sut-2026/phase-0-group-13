@@ -19,18 +19,6 @@ import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.SeedCard;
 
-/**
- * Vase Breaker: a lawn of vases, and whatever is inside them.
- *
- * <p>All of it is {@link VasebreakerEngine}'s -- which tile holds which vase, what comes out, how
- * long a dropped packet lasts, where the zombies are and whether the board is clear. This asks
- * and draws.
- *
- * <p>The three vases are the three the Phase One board prints as V? / VG / VX, in the world's own
- * art: the brown one wears a question mark and could be anything, the green one holds a plant, and
- * the purple one with the face is the gargantuar. A smashed vase leaves the world's burst behind
- * for a moment so the click reads as a hit, then the tile is free to plant on.
- */
 public final class VasebreakerScreen extends ArcadeBoardScreen {
 
   private static final float FLASH_SECONDS = 0.35f;
@@ -123,7 +111,6 @@ public final class VasebreakerScreen extends ArcadeBoardScreen {
     return key.toString();
   }
 
-  /** Only the countdown changes between rebuilds, so the cards are repainted rather than rebuilt. */
   private void updateCards() {
     List<PendingSeed> seeds = engine.getPendingSeeds();
     for (int i = 0; i < cards.size() && i < seeds.size(); i++) {
@@ -151,8 +138,6 @@ public final class VasebreakerScreen extends ArcadeBoardScreen {
   @Override
   protected void tickEngine() {
     engine.tick();
-    // A packet the player was holding can wilt while it is held; drop it rather than let the
-    // next click fail with "no fresh seed packet available".
     if (heldSeed != null && !isStillOffered(heldSeed)) {
       heldSeed = null;
     }
@@ -227,7 +212,6 @@ public final class VasebreakerScreen extends ArcadeBoardScreen {
     art.drawProp(batch, art.icon(vaseIcon(content)), col, row, VASE_ROW_FILL);
   }
 
-  /** Phase One's own three kinds: unknown, plant, gargantuar. */
   private static String vaseIcon(VaseContent content) {
     return switch (content) {
       case PLANT_VASE -> "vaseplant";

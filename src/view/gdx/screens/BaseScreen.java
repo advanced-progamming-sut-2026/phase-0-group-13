@@ -17,17 +17,6 @@ public abstract class BaseScreen implements Screen {
     this.game = game;
   }
 
-  /**
-   * Runs blocking work (a network round trip, usually) off the render thread, then hands the
-   * result back on it. Every UserManager call that reaches {@code ClientSession} blocks on a
-   * socket, and calling that straight from a Scene2D {@code ClickListener} freezes the whole
-   * window for as long as the request takes - the leaderboard and multiplayer screens already
-   * avoided this by hand-rolling a worker thread plus {@code Gdx.app.postRunnable}; this is that
-   * same pattern, shared.
-   *
-   * <p>If the player has navigated to another screen by the time the work finishes, the result is
-   * dropped instead of touching a stage nobody can see any more.
-   */
   protected <T> void runAsync(
       Callable<T> work, Consumer<T> onSuccess, Consumer<Exception> onError) {
     Thread worker = new Thread(() -> {
@@ -59,15 +48,10 @@ public abstract class BaseScreen implements Screen {
     return game.getAssets();
   }
 
-  /** Shared batch, shapes and camera. The game owns them, not the screen. */
   protected RenderContext context() {
     return game.getContext();
   }
 
-  /**
-   * The Scene2D stage a session-wide popup (a match invite) can be put on, or null while this
-   * screen has none.
-   */
   public Stage uiStage() {
     return null;
   }
@@ -75,10 +59,6 @@ public abstract class BaseScreen implements Screen {
   @Override
   public void show() {}
 
-  /**
-   * Keeps the world viewport matching the window. Screens with their own viewport (a Scene2D
-   * stage, say) should override this and call super.resize first.
-   */
   @Override
   public void resize(int width, int height) {
     context().resize(width, height);

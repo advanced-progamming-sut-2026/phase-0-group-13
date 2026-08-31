@@ -46,7 +46,6 @@ final class GamePlayCheatHandler {
     }
   }
 
-  /** Accepts either the raw alias or the name the almanac shows. */
   private static String resolveZombieAlias(String typed) {
     String wanted = typed == null ? "" : typed.trim();
     if (GameDataManager.zombieRepository.find(wanted) != null) {
@@ -134,7 +133,5 @@ final class GamePlayCheatHandler {
       }
     }
     System.out.println("Nuke released. Zombies wiped: " + killed);
-    // امتیاز SIMULTANEOUS_KILL دیگه خودکار و عمومی از GameManager.processBoardEvents ثبت میشه
-    // (وقتی چند زامبی تو یه تیک بمیرن)، پس اینجا دیگه لازم نیست جدا صداش بزنیم
   }
 }

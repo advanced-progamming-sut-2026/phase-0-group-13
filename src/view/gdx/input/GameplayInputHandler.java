@@ -10,15 +10,8 @@ import view.gdx.render.LawnGeometry;
 import view.gdx.render.RenderContext;
 
 
-/**
- * Turns clicks and key presses into GameActionBridge calls. Sits under the HUD in an
- * InputMultiplexer, so buttons win and the rest falls through to the lawn.
- *
- * <p>Holds the armed tool and the hovered cell, nothing else. No planting rules live here.
- */
 public final class GameplayInputHandler extends InputAdapter {
 
-  /** What the next click on the lawn will do. */
   public enum Tool {
     NONE,
     SEED,
@@ -31,13 +24,10 @@ public final class GameplayInputHandler extends InputAdapter {
   private final GameActionBridge actions;
   private final Runnable onTogglePause;
 
-  /** Reused so we don't make a new Vector2 on every event. */
   private final Vector2 scratch = new Vector2();
 
-  /** Seed order as the seed bar shows it, so key 1 arms the first card. */
   private final List<String> seedOrder = new ArrayList<>();
 
-  /** Template name of the seed the player picked, or null. */
   private String selectedPlantType;
 
   private Tool tool = Tool.NONE;
@@ -58,7 +48,6 @@ public final class GameplayInputHandler extends InputAdapter {
     this.onTogglePause = onTogglePause;
   }
 
-  /** Null disarms everything. */
   public void setSelectedPlantType(String plantType) {
     this.selectedPlantType = plantType;
     this.tool = plantType == null ? Tool.NONE : Tool.SEED;
@@ -83,7 +72,6 @@ public final class GameplayInputHandler extends InputAdapter {
     setTool(Tool.PLANT_FOOD);
   }
 
-  // pressing the armed tool again disarms it
 
   private void setTool(Tool wanted) {
     boolean alreadyOn = tool == wanted;
@@ -100,7 +88,6 @@ public final class GameplayInputHandler extends InputAdapter {
     return tool;
   }
 
-  /** Frozen game: clicks stop reaching the lawn. */
   public void setPaused(boolean paused) {
     this.paused = paused;
   }
@@ -125,8 +112,6 @@ public final class GameplayInputHandler extends InputAdapter {
     return hoverRow >= 0 && hoverColumn >= 0;
   }
 
-  // The screen calls this every frame, not just from mouseMoved: the HUD is in front in the
-  // multiplexer and can swallow a move event, which would leave the highlight stuck.
   public void updateHover(int screenX, int screenY) {
     scratch.set(screenX, screenY);
     context.getViewport().unproject(scratch);
@@ -136,14 +121,6 @@ public final class GameplayInputHandler extends InputAdapter {
     hoverColumn = geometry.xToColumn(scratch.x);
   }
 
-  /**
-   * Picks up a sun the pointer is resting on or sweeping across.
-   *
-   * <p>The doc collects suns by moving over them rather than by clicking, so this is called every
-   * frame from the screen rather than only when the mouse moves: a sun that lands under a still
-   * pointer should be taken too. Separate from {@link #updateHover} so that stays a pure
-   * where-is-the-mouse question, since the drag and move handlers call it as well.
-   */
   public void collectSunUnderPointer() {
     if (paused || !isHoveringLawn()) {
       return;
@@ -178,7 +155,6 @@ public final class GameplayInputHandler extends InputAdapter {
     int row = hoverRow;
     int column = hoverColumn;
 
-    // a sun on the tile always wins, it is what the player meant
     if (actions.collectSunAt(row, column)) {
       GameAudio.getInstance().play(GameAudio.Sfx.SUN);
       return true;
@@ -187,7 +163,6 @@ public final class GameplayInputHandler extends InputAdapter {
       case SEED:
         if (actions.plantAt(row, column, selectedPlantType)) {
           GameAudio.getInstance().play(GameAudio.Sfx.PLANT);
-          // packet is on cooldown now, staying armed would only produce refusals
           clearTool();
         }
         return true;
@@ -208,14 +183,6 @@ public final class GameplayInputHandler extends InputAdapter {
     }
   }
 
-  /**
-   * Escape backs out of one thing at a time, innermost first.
-   *
-   * <p>With the pause menu up it closes that; with a seed or a tool armed it puts that down; and
-   * with nothing held it pauses. It used to leave the match outright from the middle of a wave,
-   * which is a long way to fall for one keypress -- leaving is still a click away, on the pause
-   * menu's own Save &amp; Exit.
-   */
   @Override
   public boolean keyDown(int keycode) {
     if (keycode == Input.Keys.ESCAPE) {
@@ -245,7 +212,6 @@ public final class GameplayInputHandler extends InputAdapter {
     return false;
   }
 
-  /** 0-based slot for a number key, or -1. Numpad too. */
   private static int seedSlotFor(int keycode) {
     if (keycode >= Input.Keys.NUM_1 && keycode <= Input.Keys.NUM_9) {
       return keycode - Input.Keys.NUM_1;

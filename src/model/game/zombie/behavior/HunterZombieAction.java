@@ -4,10 +4,6 @@ import model.game.Board;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-/**
- * زامبی شکارچی (غارهای یخی): به نزدیک‌ترین گیاه سطر خودش یخ پرت می‌کند. هر برخورد یک سطح
- * یخ‌زدگی اضافه می‌کند و در سطح سوم گیاه کاملا یخ می‌زند و دیگر نمی‌تواند کاری کند.
- */
 public class HunterZombieAction implements ZombieAction {
   private static final double THROW_RANGE = 6.0;
   private static final int FREEZE_DURATION_TICKS = 100;

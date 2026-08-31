@@ -18,15 +18,6 @@ import model.game.plant.PlantParts.PlantTemplate;
 import model.enums.PlantTag;
 
 
-/**
- * The graphical implementation of {@link GameActionBridge}: turns a click into the same
- * GameManager calls the terminal's GamePlayController makes, so planting rules, cooldowns and
- * plant levels behave identically in both builds. Nothing here is duplicated game logic -- it's
- * just the click-to-call plumbing GameActionBridge's javadoc asked for.
- *
- * <p>Messages go to the notifier the screen hands in, normally the HUD toast, so a refusal shows
- * up on screen instead of in a console the player never sees.
- */
 public final class GdxGameActions implements GameActionBridge {
 
   private final GameManager match;
@@ -39,7 +30,6 @@ public final class GdxGameActions implements GameActionBridge {
     this.notifier = notifier;
   }
 
-  /** One simulation tick, for FixedStepClock to call every fixed interval. */
   public void advanceOneTick() {
     if (match != null && match.isRunning()) {
       match.advanceTime();
@@ -52,8 +42,6 @@ public final class GdxGameActions implements GameActionBridge {
       return false;
     }
 
-    // Imitater has no behaviour of its own; it copies another plant already in the seed bank,
-    // same as the terminal build (GamePlayController.resolveImitaterTarget).
     String buildType = plantType;
     if (plantType.equalsIgnoreCase("imitater")) {
       buildType = resolveImitaterTarget(plantType);
@@ -87,7 +75,6 @@ public final class GdxGameActions implements GameActionBridge {
       return report(explainRefusedPlanting(plant, row, column));
     }
     match.recordPlanting(plantType);
-    // Same hand-off GamePlayController makes: the belt slot is spent, so the next click waits.
     ConveyorRule belt = match.getSpecialStageRule() == null
             ? null : match.getSpecialStageRule().belt();
     if (belt != null) {
@@ -96,8 +83,6 @@ public final class GdxGameActions implements GameActionBridge {
     return true;
   }
 
-  // Why placePlant said no. The model has already refused; this only re-reads the board in the
-  // same order to name the reason, so the player gets a message instead of a dead click.
   private String explainRefusedPlanting(Plant plant, int row, int column) {
     Board board = board();
     if (board == null) {
@@ -148,8 +133,6 @@ public final class GdxGameActions implements GameActionBridge {
     if (match == null) {
       return false;
     }
-    // GameManager takes (col, row), this interface takes (row, column) like Board.getTile.
-    // Null means no sun there, which is how the click falls through to planting.
     return match.collectSunAt(column, row) != null;
   }
 
@@ -160,13 +143,10 @@ public final class GdxGameActions implements GameActionBridge {
       return false;
     }
     for (Sun sun : board.getSuns()) {
-      // Same tile test SunManager.collectSunAt uses, so a sweep picks up exactly what a click on
-      // that tile would have. Asking first is the only way to know what is there before taking it.
       if (sun.isExpired() || Math.abs(sun.getX() - column) > 0.5 || sun.getY() != row) {
         continue;
       }
       if (sun.getType() == SunType.RADIOACTIVE && sun.isFalling()) {
-        // Collecting this one is an explosion, not a pickup. Leave it for a deliberate click.
         return false;
       }
       return collectSunAt(row, column);
@@ -201,7 +181,6 @@ public final class GdxGameActions implements GameActionBridge {
     }
   }
 
-  /** Message + "didn't happen", in one statement. */
   private boolean report(String message) {
     notify(message);
     return false;

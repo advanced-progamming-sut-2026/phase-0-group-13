@@ -15,8 +15,6 @@ public class TacklerZombieAction implements ZombieAction {
     this.selfDestructs = selfDestructs;
   }
 
-  // برخلاف زامبی معمولی، این یکی (All-Star/Footballer) اصلا وایمیسته گیاه رو نمیخوره؛ همینجوری در
-  // حرکت از روش رد میشه و نابودش میکنه
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());

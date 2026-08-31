@@ -5,16 +5,6 @@ import model.game.TileEffects.TombStoneEffect;
 import model.game.Tile;
 import model.game.plant.Plant;
 
-/**
- * Grave Buster: در plants.json کارش «نابودکردن سنگ‌قبرهاست» (ضروری در مصر باستان و دوران تاریکی).
- * قبلا با ExplodeAction ساخته می‌شد و به جای سنگ‌قبر، به زامبی‌ها دمیج می‌زد.
- *
- * <p>از همان {@link TombStoneEffect} موجود روی تایل استفاده می‌کند و متد
- * {@link TombStoneEffect#breakStone()} خودش را صدا می‌زند، پس جایزهٔ دفن‌شده (۵۰ خورشید یا غذای
- * گیاه) هم مثل حالت عادی توسط Board آزاد می‌شود.
- *
- * <p>«Eat Time -1s» در Lvl 2 یعنی زمان جویدن قبر؛ به صورت fuse روی همین اکشن اعمال می‌شود.
- */
 public class GraveBusterAction implements PlantAction {
 
   private static final int DEFAULT_EAT_TICKS = 30;
@@ -37,7 +27,6 @@ public class GraveBusterAction implements PlantAction {
             ? stone : null;
 
     if (grave == null || !grave.isActive()) {
-      // بدون سنگ‌قبر کاری ندارد؛ طبق دیتا یک‌بارمصرف است، پس همان‌جا مصرف می‌شود
       System.out.printf("%s found no gravestone here and was wasted.%n", plant.getName());
       plant.takeDamage(plant.getMaxHealth());
       return;

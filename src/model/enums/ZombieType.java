@@ -52,7 +52,6 @@ public enum ZombieType {
     this.displayName = displayName;
   }
 
-  /** What the player is shown, instead of the raw asset alias. */
   public String getDisplayName() {
     return displayName;
   }

@@ -6,17 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 
 
-/**
- * In-match icon lookups for HUD/entity overlays (sun, pea, plant food, shovel, ...), keyed by a
- * short lowercase name.
- *
- * <p>Same shape as {@link PlantArt}: a single shared atlas, looked up lazily, returning null
- * rather than throwing when the art (or the atlas itself) isn't there yet. {@code textures/ui/}
- * is still empty at the time this class was written (only a .gitkeep), so every lookup returns
- * null for now and callers fall back to drawn shapes -- see EntityRenderer.drawShapes(), which
- * already branches on {@code find(...) == null}. Once a real hud.atlas lands in
- * {@code textures/ui/}, this starts returning real art with no caller changes needed.
- */
 public final class HudArt implements Disposable {
 
   private static final String ATLAS_PATH = "textures/ui/hud.atlas";
@@ -24,7 +13,6 @@ public final class HudArt implements Disposable {
   private TextureAtlas atlas;
   private boolean loadFailed;
 
-  /** Icon for this name (e.g. "sun", "pea"), or null if there is none. */
   public TextureRegion find(String iconName) {
     TextureAtlas loaded = atlas();
     if (loaded == null) {

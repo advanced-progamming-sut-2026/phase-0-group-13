@@ -15,13 +15,6 @@ import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.UiSkinProvider;
 
 
-/**
- * Graphical settings, so the Phase 1 Settings Menu is reachable from the graphical main menu.
- *
- * <p>Difficulty is the model's, same as SettingsMenuController: the select box only stops an
- * out-of-range value from being offered. Speed, the grid overlay and debug mode are the graphical
- * build's own, so they live in {@link GameSettings} and are not saved to the account.
- */
 public final class SettingsScreen extends MenuScreen {
 
   private static final String[] LEVELS = {"1", "2", "3", "4", "5"};
@@ -73,7 +66,6 @@ public final class SettingsScreen extends MenuScreen {
         .right().padRight(14f);
     panel.add(volumeSlider(GameSettings.getSfxVolume(), volume -> {
       GameSettings.setSfxVolume(volume);
-      // Played on release so the player hears the level they just chose.
       GameAudio.getInstance().play(GameAudio.Sfx.CLICK);
     })).width(200f).height(46f).row();
 
@@ -93,8 +85,6 @@ public final class SettingsScreen extends MenuScreen {
         () -> GameSettings.setDebugMode(!GameSettings.isDebugMode())))
         .width(200f).height(46f).row();
 
-    // Side by side rather than stacked: eight rows of settings plus two full-width buttons is
-    // taller than the window, which pushed the panel off the bottom and clipped the header.
     Table actions = new Table();
     actions.defaults().pad(6f).width(200f).height(56f);
     actions.add(button("Apply", UiSkinProvider.BUTTON_GREEN, () -> apply(user, difficulty, speed)));
@@ -103,12 +93,6 @@ public final class SettingsScreen extends MenuScreen {
     content.add(panel);
   }
 
-  /**
-   * A 0..1 slider that applies as it is dragged, so the change is audible while moving it.
-   *
-   * <p>Unlike difficulty and speed this is not behind Apply: a volume you cannot hear until you
-   * commit it is not a volume control.
-   */
   private Slider volumeSlider(float initial, FloatSetter apply) {
     Slider slider = new Slider(GameSettings.MIN_VOLUME, GameSettings.MAX_VOLUME, 0.05f, false,
         skin);
@@ -128,7 +112,6 @@ public final class SettingsScreen extends MenuScreen {
     void set(float value);
   }
 
-  // Re-entering the screen is what makes the change show: the debug panel is built in show().
   private com.badlogic.gdx.scenes.scene2d.ui.TextButton toggle(boolean on, Runnable flip) {
     return button(on ? "On" : "Off",
         on ? UiSkinProvider.BUTTON_GREEN : UiSkinProvider.BUTTON_BROWN,

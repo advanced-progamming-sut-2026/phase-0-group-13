@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 import network.protocol.MessageType;
 import network.protocol.NetworkMessage;
 
-/** Requests block until the reply with the same id arrives. Anything without an id is an event. */
 public final class NetworkClient implements Closeable {
 
   public static final String DEFAULT_HOST = "localhost";
@@ -89,7 +88,6 @@ public final class NetworkClient implements Closeable {
         dispatch(NetworkMessage.decode(line));
       }
     } catch (IOException | RuntimeException e) {
-      // connection dropped; the finally below wakes up anyone still waiting
     } finally {
       pending.values().forEach(future -> future.completeExceptionally(new IOException("disconnected")));
       pending.clear();
@@ -113,7 +111,6 @@ public final class NetworkClient implements Closeable {
         socket.close();
       }
     } catch (IOException ignored) {
-      // already closed
     }
   }
 }

@@ -11,9 +11,6 @@ public class SubmergedZombieAction implements ZombieAction {
   private int phaseStartTick = -1;
   private boolean submerged = true;
 
-  // شنا کردن واقعی (بی‌آسیب بودن زیر آب در برابر حمله‌های سطحی): با zombie.setSubmerged هر تیک وضعیت
-  // فعلی رو به خود Zombie اطلاع میده؛ Projectile.hitZombie از این پرچم برای معافیت در برابر
-  // شلیک‌های مستقیم استفاده میکنه (فقط پرتابه‌های Lobbed هنوز اثر میکنن)
   public SubmergedZombieAction(int submergedTicks, int surfacedTicks, double eatingDamage) {
     this.submergedTicks = submergedTicks;
     this.surfacedTicks = surfacedTicks;

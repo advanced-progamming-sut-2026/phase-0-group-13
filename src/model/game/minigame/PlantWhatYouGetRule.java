@@ -12,8 +12,6 @@ public class PlantWhatYouGetRule extends MiniGame implements SpecialStageRule {
   private int elapsedTicks;
   private String currentOffer;
 
-  // برخلاف Conveyor (که رایگانه)، اینجا بازیکن هنوز باید هزینه خورشید بده؛ فقط انتخاب نمیکنه کدوم
-  // گیاه، بازی بهش تحمیل میکنه (هر rotationIntervalTicks یکی رندوم از دک انتخاب میشه)
   public PlantWhatYouGetRule(List<String> deck, int rotationIntervalTicks) {
     this.deck = new ArrayList<>(deck);
     this.rotationIntervalTicks = rotationIntervalTicks;

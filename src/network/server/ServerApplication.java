@@ -63,7 +63,6 @@ public final class ServerApplication {
         serverSocket.close();
       }
     } catch (IOException ignored) {
-      // shutting down anyway
     }
   }
 

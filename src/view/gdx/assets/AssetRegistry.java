@@ -1,16 +1,8 @@
 package view.gdx.assets;
 
 
-/**
- * Contract for the future asset loading layer.
- *
- * <p>Deliberately unimplemented. It exists so Phase 2 screens can be written against a stable
- * shape while the real loader (atlas parsing, PAM decoding, caching) is still being designed.
- * The terminal build does not touch this type.
- */
 public interface AssetRegistry {
 
-  /** Registers every asset the game needs with the underlying loader. Does not block. */
   void queueAll();
 
   /**
@@ -20,7 +12,6 @@ public interface AssetRegistry {
    */
   boolean update();
 
-  /** Fraction of the queue that has finished loading, from 0 to 1. */
   float progress();
 
   /**
@@ -30,6 +21,5 @@ public interface AssetRegistry {
    */
   boolean isLoaded(String assetPath);
 
-  /** Releases every loaded asset. Safe to call when nothing was ever queued. */
   void unloadAll();
 }

@@ -8,16 +8,6 @@ import data.persistence.UserManager;
 import model.account.User;
 
 
-/**
- * Coin and diamond readout, shown in every graphical menu and in the match HUD.
- *
- * <p>Reads the logged-in User straight out of UserManager on every act(), so it always agrees with
- * the terminal version. There is no second copy of the balances anywhere in the graphical layer,
- * which also means a cheat or a reward shows up here on the next frame without anyone telling it.
- *
- * <p>Draws dashes when nobody is logged in, since the login and sign up screens carry the same
- * header.
- */
 public final class CurrencyHud extends Table {
 
   private static final String NO_USER = "-";
@@ -34,7 +24,6 @@ public final class CurrencyHud extends Table {
     add(new Image(skin.getDrawable(UiSkinProvider.GEM_ICON))).size(34f).padRight(6f);
     add(diamonds);
 
-    // Also here, or the first frame of every screen shows dashes before the first act().
     refresh();
   }
 

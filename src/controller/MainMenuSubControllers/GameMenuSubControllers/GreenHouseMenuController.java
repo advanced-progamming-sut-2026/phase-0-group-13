@@ -172,7 +172,6 @@ public class GreenHouseMenuController implements BaseController {
     }
 
     long remainingMs = pot.getRemainingGrowTime();
-    // محاسبه الماس‌ها: هر ساعت باقی‌مانده (حتی یک دقیقه) 1 الماس هزینه دارد
     int requiredDiamonds = (int) Math.ceil(remainingMs / (double) (60 * 60 * 1000));
 
     if (user.getDiamonds() < requiredDiamonds) {

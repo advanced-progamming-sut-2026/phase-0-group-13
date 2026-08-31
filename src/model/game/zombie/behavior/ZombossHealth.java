@@ -3,18 +3,10 @@ package model.game.zombie.behavior;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * جان زامباس، تقسیم‌شده به سه بخش. اندازهٔ هر بخش از Stages[].HitPoints خودِ Zombies.json می‌آید،
- * پس باسی که فاز میانی‌اش سنگین‌تر است همان‌طور هم می‌ماند.
- *
- * <p>Holds no state of its own: every answer is worked out from the boss's current health, so the
- * bar the HUD draws and the stun the behaviour fires can never drift apart.
- */
 public final class ZombossHealth {
 
   public static final int SEGMENTS = 3;
 
-  /** Segment 0 empties first. */
   private final int[] capacity;
   private final int total;
 
@@ -31,7 +23,6 @@ public final class ZombossHealth {
     return segment < 0 || segment >= SEGMENTS ? 0 : capacity[segment];
   }
 
-  /** How much of one segment is still standing at this health. */
   public int remainingOf(int segment, int currentHealth) {
     if (segment < 0 || segment >= SEGMENTS) {
       return 0;
@@ -48,7 +39,6 @@ public final class ZombossHealth {
     return room <= 0 ? 0f : remainingOf(segment, currentHealth) / (float) room;
   }
 
-  /** How many segments are empty. Three means the boss is down. */
   public int segmentsCleared(int currentHealth) {
     int cleared = 0;
     for (int i = 0; i < SEGMENTS; i++) {
@@ -63,14 +53,6 @@ public final class ZombossHealth {
     return SEGMENTS - segmentsCleared(currentHealth);
   }
 
-  /**
-   * The three chunk sizes, always adding up to exactly {@code total}.
-   *
-   * <p>The raw stage numbers cannot be used as they stand: the factory scales a zombie's health by
-   * the difficulty, so the sheet's 4000/8000/6500 would no longer match the health the boss
-   * actually has. They are rescaled to the real total instead, and a boss whose sheet does not
-   * carry three stages just gets even thirds.
-   */
   private static int[] split(List<Integer> stageHitPoints, int total) {
     List<Integer> stages = new ArrayList<>();
     if (stageHitPoints != null) {

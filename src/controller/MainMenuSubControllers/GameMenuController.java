@@ -89,7 +89,6 @@ public class GameMenuController implements BaseController {
 
     int levelInStage = user.getProgress().getCurrentLevel();
     if (MatchLauncher.skipsPlantSelection(stageNumber, levelInStage)) {
-      // مرحله نوار نقاله: انتخاب گیاه ندارد، خود نوار گیاه تحویل می‌دهد
       MatchSetup.getInstance().setSelectedPlants(user.getUnlockedPlants());
       System.out.println(
           "Entering " + chapterName + ". Conveyor level: the belt delivers your plants!");

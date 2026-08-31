@@ -1,14 +1,13 @@
 package model.game.news;
 
 public class News {
-  private String type; // plant ,stage ,zombie این سه تا مدل و داریم برای خبرا
+  private String type;
   private String targetId;
   private String message;
   private long timestamp;
   private boolean isRead;
 
   public News() {
-    // واسه ی جیسون
   }
 
   public News(String type, String targetId, String message) {

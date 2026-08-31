@@ -15,10 +15,6 @@ public class PlantLevel {
   private final int actionIntervalDeltaSeconds;
   private final List<String> rawEffects;
 
-  /**
-   * دسته‌های اضافه‌شده برای اثرهای لِوِلی که قبلا فقط داخل rawEffects ذخیره می‌شدند و هیچ‌وقت
-   * اعمال نمی‌شدند ("Atk Speed +10%"، "Sun +50"، "Pierce +1"، ...).
-   */
   private final int attackSpeedPercent;
   private final int sunDelta;
   private final int pierceDelta;
@@ -91,7 +87,6 @@ public class PlantLevel {
       return new PlantLevel(0, 0, 0, 0, value, effects);
     }
 
-    // اثرهایی که تا حالا فقط متن بودند و روی گیم‌پلی سوار نمی‌شدند
     if (lower.contains("atk speed")) {
       return withExtra(effects, value, 0, 0, 0, 0, 0, 0, 0);
     }

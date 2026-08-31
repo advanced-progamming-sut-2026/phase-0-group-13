@@ -30,12 +30,6 @@ public class DataPath {
     registerPath(name, resolveDataFile(fileName));
   }
 
-  /**
-   * Resolves a database file regardless of the working directory the app was launched from:
-   * project root (Gradle/IntelliJ) sees {@code src/data/database}, while running inside {@code src}
-   * sees {@code data/database}. Files that may not exist yet (e.g. session.json after logout) are
-   * anchored to whichever database directory exists.
-   */
   private static Path resolveDataFile(String fileName) {
     Path[] candidates = {
       Paths.get("src", "data", "database", fileName),

@@ -9,8 +9,6 @@ public class RangedDemolisherZombieAction implements ZombieAction {
   private final double range;
   private int fuseStartTick = -1;
 
-  // پراسپکتور به‌جای خوردن گیاه، از فاصله دینامیت پرت میکنه؛ وقتی گیاهی تو برد باشه یه فیوز شروع
-  // میشه و بعد از fuseTicks گیاه هدف مستقیم نابود میشه، بدون اینکه زامبی نزدیکش بشه
   public RangedDemolisherZombieAction(int fuseTicks, double range) {
     this.fuseTicks = fuseTicks;
     this.range = range;

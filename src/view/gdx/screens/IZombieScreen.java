@@ -18,19 +18,6 @@ import view.gdx.render.ArcadeRenderer;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.SeedCard;
 
-/**
- * I, Zombie: you are the zombies, and the five brains behind the plants are the point.
- *
- * <p>The picker replaces the seed bank with {@link IZombieEngine#availableZombieTypes()} -- the
- * types this level offers -- and each card carries the zombie's own portrait, its name, what it
- * costs in zombie-sun and how long it still has to recharge. Placing goes straight to
- * {@link IZombieEngine#placeZombie}, so the red line, the price, the recharge and the level's
- * roster are all refused by the engine and reported as it words them, not re-checked here.
- *
- * <p>The lawn's defenders are the engine's cardboard cutouts, which it names for what they do --
- * a Peashooter's range and rate of fire -- so each one is drawn as the plant it says it is. The
- * zombie the player deploys walks, eats and dies from its own rig.
- */
 public final class IZombieScreen extends ArcadeBoardScreen {
 
   private static final float BRAIN_ROW_FILL = 0.42f;
@@ -85,7 +72,6 @@ public final class IZombieScreen extends ArcadeBoardScreen {
     paintCards();
   }
 
-  /** Cost, recharge and affordability, repainted every tick rather than rebuilt. */
   @Override
   protected void refreshPicker() {
     paintCards();
@@ -111,7 +97,6 @@ public final class IZombieScreen extends ArcadeBoardScreen {
     if (!affordable) {
       return "need sun";
     }
-    // every type has a look now; kept as a guard in case an atlas fails to load
     return drawable ? "ready" : "ready (no art)";
   }
 

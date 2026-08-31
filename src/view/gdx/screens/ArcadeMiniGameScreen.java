@@ -20,16 +20,6 @@ import view.gdx.ui.Popup;
 import view.gdx.ui.UiSkinProvider;
 
 
-/**
- * The four arcade mini-games on a clickable grid, so they are no longer typing-only.
- *
- * <p>One screen for all four because they are all a 5x9 board plus one action: the engines are the
- * Phase 1 ones, the cell text comes from {@link BoardRenderer}'s own cell helpers, and the reward
- * goes through {@link MiniGameLauncher#awardClear}. Nothing about a mini-game is decided here.
- *
- * <p>Zombotany isn't one of these: it's an ordinary stage with plant-zombies, so it plays on
- * GameplayScreen like any other level.
- */
 public final class ArcadeMiniGameScreen extends MenuScreen {
 
   private static final int ROWS = 5;
@@ -49,7 +39,6 @@ public final class ArcadeMiniGameScreen extends MenuScreen {
   private float accumulator;
   private boolean finished;
 
-  /** What the next cell click will use: a seed, a zombie type, or the first half of a swap. */
   private String chosenSeed;
   private String chosenZombie;
   private int swapRow = -1;
@@ -117,7 +106,6 @@ public final class ArcadeMiniGameScreen extends MenuScreen {
     super.render(delta);
   }
 
-  /** Real time into engine ticks, at the same rate the rest of the graphical build steps. */
   private void step(float delta) {
     if (finished || skin == null) {
       return;
@@ -223,7 +211,6 @@ public final class ArcadeMiniGameScreen extends MenuScreen {
     };
   }
 
-  /** Whatever this mini-game needs picking before a cell click means anything. */
   private void buildSidebar() {
     sidebar.clear();
     sidebar.defaults().pad(3f).width(260f).height(46f);

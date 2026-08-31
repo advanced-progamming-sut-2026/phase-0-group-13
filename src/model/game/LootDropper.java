@@ -14,11 +14,9 @@ public class LootDropper {
   private static final int MAX_PENDING_NOTICES = 8;
   private static final int MAX_PENDING_LOOT_SPAWNS = 24;
 
-  /** Where a drop happened, so the graphical build can show something on the lawn there. */
   public record LootSpawn(String kind, double column, int row) {}
 
   private final List<Reward> pendingRewards = new ArrayList<>();
-  // The same lines the terminal prints, so the graphical build can show them too.
   private final List<String> pendingNotices = new ArrayList<>();
   // Terminal mode never drains this; the cap keeps a long match from growing it forever.
   private final List<LootSpawn> pendingLootSpawns = new ArrayList<>();

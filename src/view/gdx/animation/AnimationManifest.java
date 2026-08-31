@@ -10,18 +10,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * One entry from {@code assets/animations/{plants,zombies}/<entity>.json}.
- *
- * <p>The manifests are the index the asset extractor wrote: for each entity they name the atlas
- * holding its part images, the PAM holding its timelines, and every clip in that PAM with its
- * duration in seconds. Playback speed comes from those durations rather than from anything
- * hard-coded here.
- */
 final class AnimationManifest {
 
   private static final String MANIFEST_DIR = "animations/";
-  /** Where the extractor left the PAMs. Tracked, but not on the classpath: it is 840 MB. */
   private static final String PAM_DIR = "resources/raw/pvz2/IMAGES/";
 
   private final String atlasPath;
@@ -73,7 +64,6 @@ final class AnimationManifest {
     return Gdx.files.internal(PAM_DIR + pamPath);
   }
 
-  /** Seconds the clip should take, or null if this entity has no such clip. */
   Float duration(String clip) {
     return clips.get(clip);
   }

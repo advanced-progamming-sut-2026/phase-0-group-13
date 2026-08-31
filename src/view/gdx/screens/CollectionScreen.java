@@ -27,15 +27,8 @@ import view.gdx.ui.UiSkinProvider;
 import view.gdx.ui.ZombieArt;
 
 
-/**
- * Graphical Collection: the plant and zombie almanac.
- *
- * <p>Shows what CollectionMenuController prints, with the same unlock checks, so an unseen zombie
- * stays behind "???" here too.
- */
 public final class CollectionScreen extends MenuScreen {
 
-  /** The almanac's own zombie stat icons: a shield for toughness, a runner for speed. */
   private static final String ZOMBIE_TOUGHNESS_ICON =
       "image_ui_almanac_zombies_zombietoughness_icon";
   private static final String ZOMBIE_SPEED_ICON = "image_ui_almanac_zombies_zombiespeed_icon";
@@ -105,7 +98,6 @@ public final class CollectionScreen extends MenuScreen {
       content.add(filters()).padBottom(8f).row();
     }
 
-    // The filter strip costs two rows, so the panes give that back or the window clips them.
     float paneHeight = showingPlants ? 396f : 468f;
     Table split = new Table();
     split.add(gridPane(user)).width(760f).height(paneHeight).padRight(18f).top();
@@ -115,7 +107,6 @@ public final class CollectionScreen extends MenuScreen {
 
   private TextButton tab(String text, boolean active, boolean plants) {
     if (active) {
-      // Not disabled on purpose - greying it out would make it look like the inactive tab.
       return new TextButton(text, skin, UiSkinProvider.BUTTON_GREEN);
     }
     return button(text, UiSkinProvider.BUTTON_BROWN, () -> {
@@ -126,7 +117,6 @@ public final class CollectionScreen extends MenuScreen {
     });
   }
 
-  /** Same filter-button strip the Travel Log uses. Family names come from the plant data. */
   private Table filters() {
     Table row = new Table();
     row.defaults().pad(3f).width(160f).height(44f);
@@ -171,7 +161,6 @@ public final class CollectionScreen extends MenuScreen {
     }
   }
 
-  /** Affordable right now, at the prices CollectionMenuController charges. */
   private boolean isUpgradable(User user, PlantTemplate template) {
     if (!user.hasUnlockedPlant(template.name)) {
       return false;
@@ -186,7 +175,6 @@ public final class CollectionScreen extends MenuScreen {
     return user.getInventory().getItemCount("seed_" + template.name.toLowerCase().trim());
   }
 
-  /** Level, packets held, and how many the next level wants. */
   private static String packetLine(User user, PlantTemplate template) {
     int level = user.getPlantLevel(template.name);
     int have = packets(user, template);
@@ -232,11 +220,9 @@ public final class CollectionScreen extends MenuScreen {
     SeedCard card = new SeedCard(skin, SeedCard.Size.FULL, template.name, template.name,
             plantArt.find(template.name), hudArt, this::select)
             .withCost(template.cost);
-    // The terminal almanac names locked plants too, so the card can show it.
     card.setStatus(unlocked ? packetLine(user, template)
             : "locked - " + CollectionMenuController.PURCHASE_COST_COINS + " coins");
     card.setBoosted(user.isPlantBoosted(template.name));
-    // A locked plant stays clickable: the details pane is where it gets bought.
     if (!unlocked) {
       card.setTint(LOCKED_TINT);
     }
@@ -250,8 +236,6 @@ public final class CollectionScreen extends MenuScreen {
 
   private SeedCard zombieCard(User user, ZombieTemplate template) {
     boolean seen = hasSeen(user, template);
-    // SeedCard draws its own placeholder when the art is null, which is what an unseen zombie gets.
-    // no withCost: a zombie has no sun price
     SeedCard card = new SeedCard(skin, SeedCard.Size.FULL, template.getName(),
             seen ? template.getDisplayName() : "???", seen ? zombieArt.find(template.getName()) : null,
             hudArt, this::select);
@@ -330,8 +314,6 @@ public final class CollectionScreen extends MenuScreen {
             .left().width(260f).height(58f).padTop(12f).row();
   }
 
-  // The controller owns the price and the unlock, so this only checks affordability up front so
-  // the player gets a reason instead of a dead button, then reports what actually happened.
   private void purchase(User user, PlantTemplate template) {
     if (user.getCoins() < CollectionMenuController.PURCHASE_COST_COINS) {
       toast("error: not enough coins (need " + CollectionMenuController.PURCHASE_COST_COINS
@@ -374,19 +356,11 @@ public final class CollectionScreen extends MenuScreen {
     addSprite(details, "zombies", template.getName(), "textures/zombies/");
 
     field(details, "type", String.valueOf(ZombieTypeResolver.resolve(template)));
-    // Toughness and speed are the two the almanac itself calls out, and it has an icon for each.
     details.add(statLine(template)).left().padTop(8f).row();
     field(details, "eat dps", String.valueOf(template.getEatDps()));
     field(details, "abilities", template.getStatsSummary());
   }
 
-  /**
-   * Toughness and speed, behind the almanac's own two stat icons.
-   *
-   * <p>The shield and the runner are drawn for exactly this pair of numbers on the zombie side of
-   * the almanac, and were sitting unused in the skin while the screen printed the same two values
-   * as plain "label / value" rows.
-   */
   private Table statLine(ZombieTemplate template) {
     Table stats = new Table();
     stats.left();
@@ -412,7 +386,6 @@ public final class CollectionScreen extends MenuScreen {
     details.add(text).left().width(384f).padTop(1f).row();
   }
 
-  /** Sprite for this entity, or a short "no art" note when PlantArt has none. */
   private void addSprite(Table details, String section, String name, String dir) {
     TextureRegion region =
         "plants".equals(section) ? plantArt.find(name) : zombieArt.find(name);

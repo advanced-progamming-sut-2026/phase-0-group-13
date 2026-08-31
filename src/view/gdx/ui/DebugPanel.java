@@ -14,16 +14,6 @@ import model.core.GameManager;
 import view.gdx.core.GameSettings;
 
 
-/**
- * The debug-only cheats: currency in the menus, sun and plant food in a match.
- *
- * <p>The buttons don't add anything themselves, they hand the Phase 1 cheat command to the Phase 1
- * controllers, so there is exactly one cheat implementation and the graphical one can't drift from
- * the typed one. It doesn't save either, same as the terminal cheat.
- *
- * <p>Only built when debug mode is on. Callers use {@link #isEnabled()} rather than reading the
- * setting themselves, so the check lives in one place.
- */
 public final class DebugPanel extends Table {
 
   private static final int COINS_PER_CLICK = 100;
@@ -34,19 +24,18 @@ public final class DebugPanel extends Table {
   private final GamePlayController matchCheats = new GamePlayController();
   private final Consumer<String> notifier;
 
-  /** Whether the debug controls should be built at all. */
   public static boolean isEnabled() {
     return GameSettings.isDebugMode();
   }
 
   /**
+   *
    * @param notifier where the result message goes, normally the screen's toast
    */
   public DebugPanel(Skin skin, Consumer<String> notifier) {
     this(skin, notifier, null);
   }
 
-  /** With a match, the in-game cheats come along too. */
   public DebugPanel(Skin skin, Consumer<String> notifier, GameManager match) {
     this.notifier = notifier;
 
@@ -79,7 +68,6 @@ public final class DebugPanel extends Table {
     return button;
   }
 
-  // The message is worked out before the command runs, because the controller only prints it.
   private TextButton matchButton(Skin skin, String text, String command,
       java.util.function.Supplier<String> message) {
     TextButton button = new TextButton(text, skin, UiSkinProvider.BUTTON_PURPLE);
@@ -95,7 +83,6 @@ public final class DebugPanel extends Table {
     return button;
   }
 
-  /** Opens the whole adventure map, so every chapter and boss is reachable without grinding. */
   private TextButton unlockButton(Skin skin) {
     TextButton button = new TextButton("Unlock Chapters", skin, UiSkinProvider.BUTTON_PURPLE);
     button.addListener(

@@ -190,7 +190,6 @@ public class GameManager {
     if (activeSpecialRule != null && !activeSpecialRule.isPlantAllowed(plant.getName())) return false;
     if (row < 0 || row >= board.getRows() || col < 0 || col >= board.getColumns()) return false;
 
-    // سنگ‌قبر و موانع مشابه، خانه را غیرقابل کاشت می‌کنند
     model.game.Tile tile = board.getTile(row, col);
     if (tile != null && tile.getEffect() != null && tile.getEffect().blocksPlanting()) {
       return false;
@@ -226,7 +225,6 @@ public class GameManager {
     return true;
   }
 
-  // تگ stack یعنی یا روی هم‌نوع خودش سوار میشه (Pea Pod) یا پوسته‌ی محافظ بقیه‌ست (Pumpkin)
   private boolean canStackOn(Plant plant, Plant existingPlant) {
     if (!plant.getTags().contains(model.enums.PlantTag.STACK)) {
       return false;
@@ -267,7 +265,6 @@ public class GameManager {
 
   public boolean usePlantFood(Plant targetPlant) {
     if (board == null || !running) return false;
-    // غذای گیاه نباید روی گیاهی که اصلا اثری ندارد مصرف (و سوخت) شود
     if (targetPlant != null && !targetPlant.hasPlantFoodEffect()) {
       System.out.println("Error: " + targetPlant.getName() + " has no Plant Food effect!");
       return false;

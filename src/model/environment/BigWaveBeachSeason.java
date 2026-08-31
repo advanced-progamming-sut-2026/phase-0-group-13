@@ -13,7 +13,6 @@ import model.game.zombie.Zombie;
 public class BigWaveBeachSeason extends Season {
   private static final int TIDE_DESTROY_DAMAGE = 10000;
   // طبق داک فقط چند ستون سمت راست دریاست و سطح آب بین جزر و مد تغییر می‌کند (مثلا ۳ ستون تا ۵ ستون)
-  /** تعداد ستون‌های سمت راست که در جزر (کم‌ترین حالت) دریا هستند. */
   private static final int LOW_TIDE_COLUMNS = 3;
   /** خط قرمز مد: آب حداکثر تا این تعداد ستونِ سمت راست بالا می‌آید. */
   private static final int HIGH_TIDE_COLUMNS = 5;
@@ -31,7 +30,6 @@ public class BigWaveBeachSeason extends Season {
 
   @Override
   public List<Zombie> getAvailableZombies() {
-    // Big Wave Beach: Fisherman, Snorkel, Octopus
     return rosterOf(ZombieType.FISHERMAN, ZombieType.SNORKEL, ZombieType.OCTOPUS);
   }
 
@@ -42,10 +40,8 @@ public class BigWaveBeachSeason extends Season {
 
   @Override
   public List<Tile> generateMap() {
-    // خونه‌های آب (برای Lily Pad و گیاهان شناور) هنوز تو Tile مدل نشدن؛ فعلا شبکه معمولی برمیگردونیم
     return plainGrid();
   }
-  /** در شروع مرحله، دریا با جزرِ پایه (۳ ستون سمت راست) روی نقشه نشانده می‌شود. */
   @Override
   public void placeHazards(Board board) {
     applyWaterLine(board, LOW_TIDE_COLUMNS);
@@ -63,7 +59,6 @@ public class BigWaveBeachSeason extends Season {
       return;
     }
 
-    // فقط گیاهانی که تازه زیر آب رفته‌اند و شناور نیستند از بین می‌روند (نه کل گیاهان زمین)
     for (Plant plant : new ArrayList<>(board.getPlants())) {
       if (plant.isDead() || !board.isWaterAt(plant.getRow(), plant.getCol())) {
         continue;
@@ -92,7 +87,6 @@ public class BigWaveBeachSeason extends Season {
     return Math.max(1, boardColumns - waterColumns);
   }
 
-  /** ستون‌های سمت راست را آب و بقیه را خشکی می‌کند و شمارهٔ اولین ستون آب را برمی‌گرداند. */
   private int applyWaterLine(Board board, int waterColumns) {
     int firstWaterColumn = firstWaterColumn(board.getColumns(), waterColumns);
     for (int row = 0; row < board.getRows(); row++) {

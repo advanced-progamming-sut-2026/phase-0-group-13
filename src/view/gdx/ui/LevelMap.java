@@ -16,20 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import view.gdx.audio.GameAudio;
 
-/**
- * One chapter's adventure map: its island, a route of level nodes, and the glowing links between
- * them.
- *
- * <p>Node positions are fractions of the group's own size, so the route keeps its shape at any
- * window size. The chapter's own art is used throughout -- the stone the nodes sit on, the colour
- * of the links and the swirl marking where the player is are all that chapter's pieces.
- */
 public final class LevelMap extends WidgetGroup {
 
-  /**
-   * Where each level sits, as a fraction of the map: a wide left-to-right route with room between
-   * the stops, rising and falling so it reads as a path rather than a row.
-   */
   private static final float[][] ROUTE = {
       {0.295f, 0.40f},
       {0.485f, 0.63f},
@@ -94,7 +82,6 @@ public final class LevelMap extends WidgetGroup {
     selected = MathUtils.clamp(source.currentLevel() - 1, 0, Math.max(0, levels - 1));
   }
 
-  /** What the screen knows about this chapter's levels. */
   public interface Source {
     NodeState stateOf(int level);
 
@@ -113,7 +100,6 @@ public final class LevelMap extends WidgetGroup {
     selected = MathUtils.clamp(level - 1, 0, nodes.size() - 1);
   }
 
-  /** Steps the selection one level along the route, stopping at either end. */
   public int step(int direction) {
     selected = MathUtils.clamp(selected + direction, 0, nodes.size() - 1);
     return selectedLevel();
@@ -202,7 +188,6 @@ public final class LevelMap extends WidgetGroup {
         getY() + getHeight() * fy - targetHeight / 2f, w, targetHeight);
   }
 
-  /** The route itself: one link stretched and turned between each pair of nodes. */
   private void drawLinks(Batch batch, float alpha) {
     if (link == null) {
       return;
@@ -227,7 +212,6 @@ public final class LevelMap extends WidgetGroup {
     batch.setColor(1f, 1f, 1f, alpha);
   }
 
-  /** The chapter's swirl behind whichever level the player is on. */
   private void drawHere(Batch batch, float alpha) {
     if (portal == null || selected < 0 || selected >= nodes.size()) {
       return;
@@ -252,7 +236,6 @@ public final class LevelMap extends WidgetGroup {
     return 0f;
   }
 
-  /** One stop on the route: the chapter's own stone, and the level number on top of it. */
   private final class Node extends Group {
 
     private final TextureRegion region;
@@ -289,8 +272,6 @@ public final class LevelMap extends WidgetGroup {
 
     @Override
     protected void drawChildren(Batch batch, float parentAlpha) {
-      // The dome sits in the upper part of the stone, so the number rides there rather than in
-      // the middle of the whole sprite. Local coordinates: the group's transform places it.
       number.setSize(getWidth(), getHeight() * 0.34f);
       number.setPosition(0f, getHeight() * 0.45f);
       super.drawChildren(batch, parentAlpha);

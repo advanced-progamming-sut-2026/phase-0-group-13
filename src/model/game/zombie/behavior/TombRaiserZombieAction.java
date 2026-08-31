@@ -11,19 +11,6 @@ import model.game.zombie.Zombie;
 public class TombRaiserZombieAction implements ZombieAction {
   private static final int TOMBSTONE_HEALTH = 400;
 
-  /**
-   * A raised grave stops direct shots, the same as every other grave.
-   *
-   * <p>The doc describes one kind of grave and gives it one rule: it "prevents the passage of
-   * shots from plants that shoot horizontally", it takes damage when a shot hits it, and only once
-   * it is destroyed can direct shots pass through that tile. It says nothing about the Tomb
-   * Raiser's graves being different -- they are simply graves, thrown onto two tiles.
-   *
-   * <p>This was false, which made the Tomb Raiser's graves scenery: {@code
-   * Board.isBlockedByTombstone} skips a grave that does not block, so shots flew straight through
-   * to the zombie behind, and the grave itself never took a point of damage and so could never be
-   * destroyed. The graves the seasons place were already true; only this one disagreed.
-   */
   private static final boolean TOMBSTONE_BLOCKS_SHOTS = true;
 
   private final int raiseInterval;

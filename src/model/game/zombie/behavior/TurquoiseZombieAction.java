@@ -4,9 +4,6 @@ import model.game.Board;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-// زامبی فیروزه‌ای: تا وقتی گیاهی تو شعاع ۴ خونه‌ی جلوش ببینه وایمیسته و هر ثانیه ۲۵ خورشید از
-// ذخیره‌ی بازیکن میدزده؛ بعد از ۵ ثانیه یه لیزر تو همون ردیف شلیک میکنه و اون ۴ خونه رو پاک میکنه.
-// با مردنش نصف خورشیدهای دزدیده‌شده برمیگرده به بازیکن (onDeath)
 public class TurquoiseZombieAction implements ZombieAction {
   private static final int SUN_PER_STEAL = 25;
   private static final int LASER_RANGE = 4;

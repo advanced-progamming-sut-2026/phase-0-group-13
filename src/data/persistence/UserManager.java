@@ -13,18 +13,6 @@ import model.core.AuthService;
 import network.client.ClientSession;
 import network.protocol.Payloads;
 
-/**
- * The account layer. Since Phase 3 the server is the authority: registration, login and the
- * player's data all go through {@link ClientSession}, and nothing here decides who exists or
- * whether a password is right.
- *
- * <p>The local file is still written, but only as a mirror. Nothing in register, login, password
- * recovery or profile retrieval reads it any more; it is there so the parts of Phase 1 that still
- * walk the local list (the offline leaderboard) keep working until they are moved across too.
- *
- * <p>The method signatures are unchanged on purpose, so the typed controllers and the LibGDX
- * screens call exactly what they called before.
- */
 public class UserManager {
   private static final Gson GSON = new Gson();
 
@@ -39,7 +27,6 @@ public class UserManager {
   // The server hashes the password itself, so the plain one has to survive until the account is
   // actually committed in setSecurityQuestionForLatestUser. It never leaves this object.
   private String pendingPassword;
-  // The answer is only held so the reset call can send it again; the server decides if it is right.
   private String recoveryUsername;
   private String recoveryAnswer;
   private boolean isStayLoggedIn = false;
@@ -63,8 +50,6 @@ public class UserManager {
     Result usernameCheck = AuthService.checkUsername(username);
     if (!usernameCheck.success()) throw new Exception(usernameCheck.message());
 
-    // No local duplicate scan any more: the server keeps the account list, so it is the only place
-    // that can answer whether a username is taken. It reports it at the commit step below.
     Result passCheck = AuthService.checkPassword(password);
     if (!passCheck.success()) throw new Exception(passCheck.message());
 
@@ -83,10 +68,6 @@ public class UserManager {
     this.pendingPassword = password;
   }
 
-  /**
-   * Signs in against the server. The username lookup and the password comparison happen there, so
-   * the same account works from any machine; the messages thrown are the server's own.
-   */
   public void loginUser(String username, String password, boolean stayLoggedIn) throws Exception {
     ClientSession session = requireSession();
     Payloads.AuthResponse response;
@@ -103,8 +84,6 @@ public class UserManager {
     this.currentUser = user;
     seedQuests(user);
     if (response.profile().gameData() == null) {
-      // First sign-in of an account the server has no document for; hand it the defaults so it
-      // becomes the authority from here on.
       pushCurrentUser();
     }
     cacheLocally(user);
@@ -126,13 +105,11 @@ public class UserManager {
     return session;
   }
 
-  /** Rebuilds the player from what the server sent back. */
   private static User userFromProfile(Payloads.Profile profile, String password) {
     JsonElement data = profile.gameData();
     if (data != null && data.isJsonObject()) {
       User restored = GSON.fromJson(data, User.class);
       if (restored != null) {
-        // سندهای قدیمی ایمیل/جنسیت را خالی ذخیره کرده‌اند؛ سرور مرجع است، پس از آن پر می‌کنیم
         if (isBlank(restored.getEmail()) && !isBlank(profile.email())) {
           restored.setEmail(profile.email());
         }
@@ -142,8 +119,6 @@ public class UserManager {
         return restored;
       }
     }
-    // An account the server holds no document for yet: the rest starts at the Phase 1 defaults
-    // and is pushed straight back up. A token login has no password to hash.
     return new User(profile.username(), password == null ? "" : AuthService.hashPassword(password),
         profile.email() == null ? "" : profile.email(), profile.nickname(),
         profile.gender() == null ? "" : profile.gender());
@@ -153,7 +128,6 @@ public class UserManager {
     return value == null || value.isBlank();
   }
 
-  /** Everything about the signed-in player, in the shape the server stores. */
   private static Payloads.ProfileUpdate profileUpdateFor(User user) {
     return new Payloads.ProfileUpdate(
         user.getNickname(),
@@ -166,7 +140,6 @@ public class UserManager {
         GSON.toJsonTree(user));
   }
 
-  /** Writes the signed-in player back to the server, which is where the account lives. */
   private void pushCurrentUser() throws Exception {
     ClientSession session = requireSession();
     try {
@@ -193,11 +166,6 @@ public class UserManager {
     return new ArrayList<>(Arrays.asList(loadedArray));
   }
 
-  /**
-   * Commits the registration. Phase 1 only counted an account as real once the security question
-   * was picked, so this is where the server is asked to create it - and where it answers whether
-   * the username was free.
-   */
   public void setSecurityQuestionForLatestUser(String qNumber, String answer) throws Exception {
     if (this.pendingUser == null) {
       throw new Exception("error: no pending registration - please register first");
@@ -221,8 +189,6 @@ public class UserManager {
       throw new Exception(response.message());
     }
 
-    // The account exists on the server now; give it the player's document too (security question
-    // included) so nothing about the account is left behind on this machine.
     try {
       session.login(pendingUser.getUsername(), pendingPassword);
       session.pushProfile(profileUpdateFor(pendingUser));
@@ -237,7 +203,6 @@ public class UserManager {
     this.pendingPassword = null;
   }
 
-  /** Step one of recovery: the server owns the lookup, the email match and the question. */
   public String initiatePasswordRecovery(String username, String email) throws Exception {
     ClientSession session = requireSession();
     Payloads.SecurityQuestionResponse response;
@@ -262,7 +227,6 @@ public class UserManager {
     return "Your security question is: " + questionText;
   }
 
-  /** Step two. The server holds the answer, so it is the only thing that can check it. */
   public void verifyRecoveryAnswer(String answer) throws Exception {
     if (this.recoveryUsername == null) {
       throw new Exception("error: no password recovery session initiated");
@@ -343,10 +307,6 @@ public class UserManager {
     }
   }
 
-  /**
-   * Signs back in with the token the last "stay logged in" login saved. The server still
-   * authenticates; a token it no longer recognises is dropped and the player signs in normally.
-   */
   public boolean restoreSession() {
     // Called from both GameDataManager and the front end's start-up, so it must be safe to ask
     // twice: the second call must not go back to the server and must not drop the file.
@@ -362,7 +322,6 @@ public class UserManager {
 
     ClientSession session = ClientSession.getInstance();
     if (!session.connect()) {
-      // The server is down, not the token's fault; keep it for the next start-up.
       return false;
     }
     try {

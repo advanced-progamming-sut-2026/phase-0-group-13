@@ -37,7 +37,6 @@ public class Projectile {
   private double targetX;
 
   private final Set<Zombie> alreadyHit = new HashSet<>();
-  // چند زامبی رو همین یه تیر (پیرسینگ/strike-through) کشته؛ برای امتیاز MULTI_KILL_ONE_SHOT
   private int killCount = 0;
 
   public Projectile(
@@ -84,14 +83,7 @@ public class Projectile {
     }
   }
 
-  // ---- انگورهای کمانه‌کننده Grapeshot ----
 
-  /**
-   * سقف تعداد زامبی‌هایی که یک تیر پیرسینگ می‌تواند از آن‌ها رد شود. صفر یعنی بی‌نهایت.
-   *
-   * <p>Cactus در plants.json «از ۳ زامبی رد می‌شود» ثبت شده (و Lvl 2 یکی اضافه می‌کند)، ولی
-   * Fume-shroom سقفی ندارد؛ پس این محدودیت اختیاری است نه سراسری.
-   */
   public Projectile withPierceLimit(int limit) {
     this.pierceLimit = Math.max(0, limit);
     return this;
@@ -101,7 +93,6 @@ public class Projectile {
     return pierceLimit;
   }
 
-  /** شعاع پاشش برحسب خانه؛ صفر یعنی تیر فقط به همان هدف می‌خورد. */
   public Projectile withSplash(double tiles) {
     this.splashRadius = Math.max(0, tiles);
     return this;
@@ -111,7 +102,6 @@ public class Projectile {
     return splashRadius;
   }
 
-  /** کره‌ی Kernel-pult: برخورد علاوه بر دمیج، زامبی را چند تیک میخکوب می‌کند. */
   public Projectile withStun(int ticks) {
     this.stunTicks = Math.max(0, ticks);
     return this;
@@ -121,25 +111,15 @@ public class Projectile {
     return stunTicks;
   }
 
-  /**
-   * نام گیاهی که این تیر را شلیک کرده. روی خود شبیه‌سازی اثری ندارد؛ فقط برای نما است، چون
-   * دو تیر می‌توانند از نظر مدل یکسان باشند و باز هم دو چیز متفاوت باشند: کلم Cabbage-pult و
-   * دانهٔ ذرت Kernel-pult هر دو کمانی، بدون splash و بدون افکت‌اند.
-   */
   public Projectile firedBy(String plantName) {
     this.sourceName = plantName;
     return this;
   }
 
-  /** گیاه شلیک‌کننده، یا null اگر ثبت نشده باشد. */
   public String getSourceName() {
     return sourceName;
   }
 
-  /**
-   * خانه‌ای که تیر کمانی به سمتش پرتاب شده. مدل همچنان مستقیم حرکت می‌کند؛ این فقط بازه‌ای است
-   * که نمای گرافیکی قوس را رویش می‌کشد.
-   */
   public Projectile aimedAt(double column) {
     this.targetX = column;
     return this;
@@ -153,7 +133,6 @@ public class Projectile {
     return targetX;
   }
 
-  /** این پرتابه از دیواره‌ها کمانه می‌کند و بعد از {@code lifeTicks} تیک ناپدید می‌شود. */
   public void makeBouncing(int lifeTicks) {
     this.bouncing = true;
     this.remainingLifeTicks = lifeTicks;
@@ -167,7 +146,6 @@ public class Projectile {
     return remainingLifeTicks == 0;
   }
 
-  /** کمانه از سقف/کف زمین: جهت عمودی برعکس می‌شود. */
   public void bounceVertically(int rows) {
     stepRow = -stepRow;
     if (stepRow == 0) {
@@ -177,7 +155,6 @@ public class Projectile {
     alreadyHit.clear();
   }
 
-  /** کمانه از دیوارهٔ چپ/راست: جهت افقی برعکس می‌شود. */
   public void bounceHorizontally(int columns) {
     stepCol = -stepCol;
     xCoordinate = Math.max(0, Math.min(columns - 1.0, xCoordinate + stepCol));
@@ -209,11 +186,6 @@ public class Projectile {
 
   }
 
-  /**
-   * برخورد یک پرتابه‌ی انفجاری: اول هرچه در شعاع پاشش است، بعد خود هدف.
-   *
-   * <p>پاشش قبل از هدف اعمال می‌شود چون خوردن به هدف تیر غیرپیرسینگ را غیرفعال می‌کند.
-   */
   public void hitArea(List<Zombie> others, Zombie landedOn) {
     if (!isActive || isFromZombie) return;
 
@@ -244,16 +216,11 @@ public class Projectile {
       zombie.extinguishFrozenStatus();
     }
     if (stunTicks > 0) {
-      // کره‌ی Kernel-pult: زامبی برای لحظه‌ای میخکوب می‌شود
       zombie.setEating(false);
       zombie.applyEffect(StatusEffect.FROZEN, stunTicks);
     }
   }
 
-  // FIX (GDD Target 1.4 - Jester Zombie): قبلا این متود اصلا از هیچ‌جا صدا زده نمیشد (پرتابه‌های
-  // زامبی‌محور هیچ‌وقت با گیاه برخورد نمیکردن)، پس افکت المنتال (یخ) هیچ‌وقت به گیاه نمیرسید. حالا هم
-  // دمیج معمولی میزنه و هم - اگه یخی باشه - گیاه رو موقتا فریز میکنه (دقیقا مثل CHILLED زامبی‌ها،
-  // همون مدت ۵۰ تیک)
   private static final int PLANT_FREEZE_DURATION_TICKS = 50;
 
   public void hitPlant(Plant plant, int currentTick) {
@@ -261,7 +228,6 @@ public class Projectile {
     plant.takeDamage(this.damage);
     if (effect == ProjectileEffect.ICE) {
       // طبق داک، تیر یخی زامبی‌ها (شکارچی و تیرهای برگردانده‌شده‌ی ژانگولر) یک سطح یخ‌زدگی
-      // اضافه می‌کند و گیاه در سومین برخورد کاملا یخ می‌زند
       plant.addFreezeExposure(1, currentTick, PLANT_FREEZE_DURATION_TICKS);
     }
     this.isActive = false;
@@ -271,7 +237,6 @@ public class Projectile {
     return damage;
   }
 
-  /** چند زامبی تاحالا با همین یه شلیک کشته شده (برای امتیاز MULTI_KILL_ONE_SHOT). */
   public int getKillCount() {
     return killCount;
   }
@@ -315,8 +280,9 @@ public class Projectile {
   }
 
   /**
+   *
    * @param blueFlame شعله آبی Torchwood (غذای گیاه): چون FIRE موقع برخورد دمیج را ۲ برابر می‌کند،
-   *     پایه را ۱.۵ برابر می‌کنیم تا مجموع ۳ برابر شود.
+   * پایه را ۱.۵ برابر می‌کنیم تا مجموع ۳ برابر شود.
    */
   public Projectile ignited(boolean blueFlame) {
     if (effect == ProjectileEffect.FIRE || isFromZombie) {

@@ -6,14 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 
 
-/**
- * Plant portraits for the menus, taken from the seed-packet page.
- *
- * <p>The per-plant atlases are loose body parts, so the packets are the only place with one
- * finished picture per plant. Regions are named after the plant with the punctuation stripped
- * (see SEED_PACKETS in tools/asset-extract/extract_assets.py). A few plants have no packet and
- * come back null, which is better than showing the wrong plant.
- */
 public final class PlantArt implements Disposable {
 
   private static final String ATLAS_PATH = "textures/plants/seedpackets.atlas";
@@ -21,7 +13,6 @@ public final class PlantArt implements Disposable {
   private TextureAtlas atlas;
   private boolean loadFailed;
 
-  /** Portrait for this plant, or null if it has no packet. */
   public TextureRegion find(String plantName) {
     TextureAtlas loaded = atlas();
     if (loaded == null) {

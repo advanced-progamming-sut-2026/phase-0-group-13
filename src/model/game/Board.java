@@ -21,7 +21,7 @@ public class Board {
   private Tile[][] tiles;
   private final List<Zombie> zombies;
   private final List<Plant> plants;
-  private final SunManager sunManager; // کلاسی که مدیریت خورشیدها را بر عهده دارد
+  private final SunManager sunManager;
   private final List<Projectile> projectiles;
   private final List<Lawnmower> lawnmowers;
   private final LootDropper lootDropper;
@@ -32,7 +32,6 @@ public class Board {
   private int pendingPlantsLostCount;
   private int pendingFastZombieKills;
   private int pendingMultiKillShots;
-  // زامبی سریع‌تر از سرعت معمولی (0.0185 تایل/تیک، طبق Zombies.json) برای امتیاز KILL_FAST_ZOMBIE
   private static final double FAST_ZOMBIE_SPEED_THRESHOLD = 0.0185;
   private final java.util.Set<Zombie> mowerVictims =
           java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
@@ -83,7 +82,6 @@ public class Board {
       }
     }
     applyTileHazardsToZombies();
-    // مدیریت و آپدیت خورشیدها توسط SunManager انجام می‌شود
     sunManager.update(currentTick, this);
     for (Plant plant : plants) {
       plant.update(currentTick, this);
@@ -120,7 +118,6 @@ public class Board {
     }
     tombstone.markRaised(currentTick);
   }
-  // سنگ‌قبرهای دوران تاریکی می‌توانند ۵۰ خورشید یا یک غذای گیاه داشته باشند که با نابودی قبر آزاد شود
   private void tryGraveReward(TombStoneEffect tombstone, int row, int col) {
     if (tombstone.isActive() || tombstone.getBuriedReward() == null) {
       return;
@@ -155,7 +152,6 @@ public class Board {
     System.out.printf("The barrel burst open at (%d, %d) and two imps tumbled out!%n",
             (int) Math.round(col) + 1, row + 1);
   }
-  /** How long one visit to a frozen tile holds a zombie. */
   private static final int ICE_TILE_FREEZE_TICKS = 40;
 
   private void applyTileHazardsToZombies() {
@@ -163,9 +159,6 @@ public class Board {
       if (zombie.isDead()) {
         continue;
       }
-      // A mech on treads neither slides nor freezes. It matters: the Frostbite Zomboss ices whole
-      // columns including the one it is standing in, and it would re-freeze itself every tick;
-      // and sliding something two lanes tall would push its lower half off the board.
       if (zombie.isBoss()) {
         continue;
       }
@@ -193,14 +186,6 @@ public class Board {
     }
   }
 
-  /**
-   * A frozen tile catches a zombie once per visit.
-   *
-   * <p>These tiles are permanent, so reapplying the freeze every tick renewed it faster than it
-   * could run down: the zombie could never move off the tile, and a stage whose last zombies were
-   * standing on one could neither be won nor lost. The tile is armed again as soon as the zombie
-   * is somewhere else, which is what {@code setIcedOnCell(NO_CELL)} above does.
-   */
   private void freezeOnIceTile(Zombie zombie, int cell) {
     if (zombie.getIcedOnCell() == cell) {
       return;
@@ -210,10 +195,6 @@ public class Board {
       zombie.applyEffect(StatusEffect.FROZEN, ICE_TILE_FREEZE_TICKS);
     }
   }
-  /**
-   * زمین لیز: زامبی به ردیف بالا/پایین منتقل می‌شود. زامبی دودوسوار (که از موانع پرواز می‌کند)
-   * از زمین لیز هم فرار می‌کند.
-   */
   private void slideZombie(Zombie zombie, int laneShift) {
     if (zombie.getBehavior() instanceof model.game.zombie.behavior.DodoRiderZombieAction) {
       return;
@@ -229,7 +210,6 @@ public class Board {
     System.out.printf("%s slipped on the ice to row %d!%n", zombie.getDisplayName(), targetRow + 1);
   }
 
-  /** در غارهای یخی، زامبی‌ها با تیر یخی گیاهان یخ نمی‌زنند. */
   public void setZombiesResistIce(boolean resist) {
     this.zombiesResistIce = resist;
   }
@@ -253,7 +233,6 @@ public class Board {
       }
     }
   }
-  // وگرنه Wave همچنان جونشون رو حساب میکنه و موج بعدی هیچ‌وقت شروع نمیشه
   private void retireDepartedHypnotizedZombies() {
     for (Zombie zombie : zombies) {
       if (zombie.isHypnotized() && !zombie.isDead() && zombie.getX() > columns) {
@@ -315,7 +294,6 @@ public class Board {
     pendingNotices.add(message);
     System.out.println(message);
   }
-  /** Loot and plant-food messages since the last call. */
   public List<String> drainPendingNotices() {
     List<String> drained = new ArrayList<>(pendingNotices);
     pendingNotices.clear();
@@ -353,7 +331,6 @@ public class Board {
       for (int j = 0; j < columns; j++) {
         TileEffect effect = tiles[i][j].getEffect();
         // فقط قبرهایی که «قابلیت نکرومنسی» دارند زامبی بیرون می‌دهند (طبق داک، همهٔ خانه‌ها این
-        // قابلیت را ندارند)
         if (effect instanceof TombStoneEffect tombstone
                 && tombstone.isActive()
                 && tombstone.isNecromancy()) {
@@ -402,10 +379,6 @@ public class Board {
     return nearest;
   }
 
-  /**
-   * انگورهای Grapeshot به جای حذف شدن، از دیواره‌های زمین کمانه می‌کنند و فقط وقتی عمرشان
-   * تمام شد ناپدید می‌شوند.
-   */
   private void handleBouncingProjectile(Projectile p, ListIterator<Projectile> iterator) {
     if (p.getYCoordinate() < 0 || p.getYCoordinate() >= rows) {
       p.bounceVertically(rows);
@@ -455,10 +428,8 @@ public class Board {
                 && Math.abs(zombie.getX() - p.getXCoordinate()) < 0.5) {
           p.hitArea(zombies, zombie);
           if (zombiesResistIce) {
-            // غارهای یخی: تیر یخی گیاهان این زامبی‌ها را یخ نمی‌زند
             zombie.extinguishFrozenStatus();
           }
-          // فقط لحظه‌ای که همین تیر برای اولین بار به ۲ کشتار می‌رسد شمارش می‌شود (نه هر کشتار بعدی)
           if (p.getKillCount() == 2) {
             pendingMultiKillShots++;
           }
@@ -477,16 +448,6 @@ public class Board {
       }
     }
   }
-  /**
-   * Keeps a lobbed shot's aim point on the zombie it is actually going to land on.
-   *
-   * <p>{@link Projectile#aimedAt} is view-only -- it does not steer anything, it is the span the
-   * graphical arc is drawn across. It was set once, to where the target stood when the shot left
-   * the plant, but zombies walk towards the plant while the melon is in the air, so the shot met
-   * them a good way short of that point: the arc was still climbing at the moment of impact and
-   * the melon hit a lane above the zombie's head. Re-reading the nearest target each tick makes
-   * the drawn arc come down exactly where the shot lands.
-   */
   private void reaimLob(Projectile p) {
     if (!p.isLobbed() || p.isFromZombie()) {
       return;
@@ -523,7 +484,6 @@ public class Board {
             && tombstone.isActive()
             && tombstone.isBlocksShots()) {
       // طبق داک سنگ‌قبر ۷۰۰ جان دارد و «وقتی تیر می‌خورد آسیب می‌بیند» تا نابود شود؛ قبلا تیر را
-      // می‌گرفت ولی هیچ آسیبی نمی‌دید، یعنی عملا نابودشدنی نبود
       tombstone.takeDamage(p.getDamage());
       return true;
     }
@@ -532,7 +492,6 @@ public class Board {
   // طبق داک، یخِ روی گیاه باید با تیر گیاهان شکسته شود و تیر آتشین آن را فورا آب می‌کند
   private boolean breaksIceBlock(Projectile p) {
     if (p.isLobbed()) {
-      // تیر کمانی از روی گیاه یخ‌زده رد می‌شود، مثل بقیه‌ی موانع
       return false;
     }
     Plant iced = getPlantAt(Math.round(p.getYCoordinate()), p.getXCoordinate());
@@ -549,7 +508,6 @@ public class Board {
 
   private void handleLawnmowers() {
     for (Lawnmower mower : lawnmowers) {
-      // Already rolling: it keeps going and crushes whatever it catches up with.
       if (mower.isTriggered()) {
         mowerVictims.addAll(mower.move(zombies));
         continue;
@@ -573,11 +531,6 @@ public class Board {
     }
   }
 
-  /**
-   * Sets the mower rolling. The names are listed here rather than as each one is crushed so the
-   * Phase 1 output is unchanged -- the mower starts at the left of the row and drives the whole
-   * width of it, so everything listed is something it goes on to run over.
-   */
   private void triggerLawnmowerRow(Lawnmower mower) {
     int row = mower.getRow();
     mower.trigger();
@@ -728,7 +681,6 @@ public class Board {
     return plants;
   }
 
-  /** برای رابط گرافیکی: خورشیدهای روی زمین، همان چیزی که SunManager نگه می‌دارد. */
   public List<Sun> getSuns() {
     return sunManager.getSuns();
   }
@@ -749,7 +701,6 @@ public class Board {
     return sunManager.collectSunAt(col, row, this, currentTick);
   }
 
-  /** آیا آخرین برداشت خورشید سریع بوده؟ (برای امتیاز SPEED_SUN_COLLECT) */
   public boolean wasLastSunCollectFast() {
     return sunManager.wasLastCollectFast();
   }
@@ -759,7 +710,6 @@ public class Board {
       if (z.isDead() || Math.abs(z.getX() - centerCol) > radius) {
         continue;
       }
-      // A boss standing in two lanes counts as being in either of them.
       if (Math.abs(z.getRow() - centerRow) <= radius
               || Math.abs(z.getBottomRow() - centerRow) <= radius) {
         z.takeDamage(damage, false);

@@ -3,17 +3,8 @@ package view.gdx.ui;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
-/**
- * A number that runs up to its value instead of appearing at it.
- *
- * <p>Only for the end-of-level rewards, where the number is the point of the screen: watching a
- * coin total climb is what makes a reward feel earned rather than reported. It is deliberately
- * short and it always finishes -- the final value is set the moment the roll is over, so a player
- * who reads the panel late still sees the right number, and nothing else waits on it.
- */
 public final class CountUpLabel extends Label {
 
-  /** How long the roll takes, however large the number is. */
   private static final float SECONDS = 0.7f;
 
   private final int target;
@@ -45,7 +36,6 @@ public final class CountUpLabel extends Label {
       finish();
       return;
     }
-    // Eases out, so it slows as it lands rather than stopping dead.
     float progress = elapsed / SECONDS;
     float eased = 1f - (1f - progress) * (1f - progress);
     setText(Math.round(target * eased) + suffix);

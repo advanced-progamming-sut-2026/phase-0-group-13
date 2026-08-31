@@ -52,19 +52,6 @@ import view.gdx.ui.HudStage;
 import view.gdx.ui.Popup;
 import view.gdx.ui.UiSkinProvider;
 
-/**
- * The in-match screen.
- *
- * <p>The match itself is the same GameManager the terminal build runs, stepped through
- * GamePlayController so planting rules, waves, win/loss and the end-of-match rewards are not
- * duplicated here.
- *
- * <p>Two clocks on purpose: FixedStepClock runs the simulation at the model's tick rate, and the
- * frame delta is only for drawing.
- *
- * <p>Pausing stops both: no tick, and the renderers get a delta of zero so animations freeze
- * too. Only the HUD keeps acting, since the pause menu lives in it.
- */
 public final class GameplayScreen extends BaseScreen {
 
   private final GameManager match;
@@ -76,17 +63,13 @@ public final class GameplayScreen extends BaseScreen {
   private StageRuleRenderer stageRuleRenderer;
   private CursorRenderer cursorRenderer;
   private HudStage hud;
-  /** Only for the result panel's trophy and brain; the HUD keeps its own copy. */
   private final HudArt hudArt = new HudArt();
   private GameplayInputHandler input;
   private GdxGameActions actions;
   private boolean ended;
   private boolean paused;
-  /** The run's MyoPoints, read at the whistle before the account banks (and clears) them. */
   private int bonusScore;
-  /** How many zombies were chewing last frame; see listenForBites. */
   private int zombiesEating;
-  /** True while the level-start popups are up, so nobody loses the lawn while reading them. */
   private boolean intro;
   private int lastWave;
 
@@ -110,7 +93,6 @@ public final class GameplayScreen extends BaseScreen {
 
     hud = new HudStage();
     hud.build(game.getUiSkin(), this::leave, match);
-    // A boss stage shows Zomboss's health where every other stage shows the wave meter.
     if (bossRule() != null) {
       hud.buildBossBar(Dialogue.zombossTitle(seasonName()));
     } else {
@@ -133,7 +115,6 @@ public final class GameplayScreen extends BaseScreen {
     showBriefing();
   }
 
-  /** Boss stages run on the belt too, so this asks the rule for one rather than checking its type. */
   private ConveyorRule belt() {
     return match == null || match.getSpecialStageRule() == null
         ? null : match.getSpecialStageRule().belt();
@@ -143,7 +124,6 @@ public final class GameplayScreen extends BaseScreen {
     return match != null && match.getSpecialStageRule() instanceof BossStageRule boss ? boss : null;
   }
 
-  /** The belt hands out its own plants, so on a conveyor stage it stands in for the seed bank. */
   private void buildBar() {
     ConveyorRule belt = belt();
     if (belt != null) {
@@ -157,7 +137,6 @@ public final class GameplayScreen extends BaseScreen {
     input.setSeedOrder(deckNames(deck));
   }
 
-  /** Ends the free build phase of a "whatever comes" stage. */
   private void startWaves() {
     if (match == null) {
       return;
@@ -181,7 +160,6 @@ public final class GameplayScreen extends BaseScreen {
     return templates;
   }
 
-  /** The same order the seed bar draws, so key 1 arms the leftmost card. */
   private static List<String> deckNames(List<PlantTemplate> templates) {
     List<String> names = new ArrayList<>();
     for (PlantTemplate template : templates) {
@@ -195,12 +173,10 @@ public final class GameplayScreen extends BaseScreen {
     return user == null ? 1 : Math.max(1, user.getPlantLevel(plant));
   }
 
-  /** True for the daily score run, which belongs to the main menu rather than the adventure map. */
   private boolean isBonus() {
     return match != null && match.isBonusMatch();
   }
 
-  /** Zombotany is an ordinary stage, so it plays here but belongs to the mini-game menu. */
   private boolean isMiniGame() {
     return MatchSetup.getInstance().getCurrentMiniGame() != MiniGameType.NONE;
   }
@@ -216,7 +192,6 @@ public final class GameplayScreen extends BaseScreen {
     }
   }
 
-  /** Save & Exit: keep whatever the match already awarded, then back out. */
   private void saveAndLeave() {
     runAsync(
         () -> {
@@ -231,7 +206,6 @@ public final class GameplayScreen extends BaseScreen {
         });
   }
 
-  /** Rebuilds the level from the same MatchSetup. */
   private void restart() {
     boolean bonus = isBonus();
     boolean miniGame = isMiniGame();
@@ -265,7 +239,6 @@ public final class GameplayScreen extends BaseScreen {
     }
   }
 
-  /** Shown once when the level starts: what to expect this level, per the Phase 2 spec. */
   private void showBriefing() {
     if (match == null || game.getUiSkin().get() == null) {
       return;
@@ -279,7 +252,6 @@ public final class GameplayScreen extends BaseScreen {
         new Popup.Choice("Let's go", UiSkinProvider.BUTTON_GREEN, this::showStageDialogue));
   }
 
-  /** Penny sets the scene, then the red banner says what happens next. */
   private void showStageDialogue() {
     Dialogue.show(hud.getStage(), game.getUiSkin().get(), Dialogue.PENNY,
         Dialogue.stageStart(seasonName(), playerName()), this::beginPlaying);
@@ -307,7 +279,6 @@ public final class GameplayScreen extends BaseScreen {
     return match == null || match.getSeason() == null ? "" : match.getSeason().getName();
   }
 
-  /** The boss's health, or nothing at all until it rolls on. */
   private void updateBossBar() {
     BossStageRule boss = bossRule();
     if (boss == null) {
@@ -323,7 +294,6 @@ public final class GameplayScreen extends BaseScreen {
   private String briefingText() {
     StringBuilder text = new StringBuilder();
     if (isBonus()) {
-      // Same seed for everyone today, which is the whole point of scoring it against other players.
       text.append("Today's Bonus Game: every player faces the same ")
           .append(match.getTotalWaves())
           .append(" waves.\n")
@@ -357,21 +327,17 @@ public final class GameplayScreen extends BaseScreen {
   @Override
   public void render(float delta) {
     if (!paused && !intro && match != null && match.isRunning()) {
-      // speed is a view setting: more ticks per frame, same tick rate in the model
       clock.update(delta * GameSettings.getGameSpeed(), actions::advanceOneTick);
     }
-    // renderers keep their own animation clocks, so freezing means giving them no time
     float worldDelta = paused || intro ? 0f : delta;
 
     input.updateHover(Gdx.input.getX(), Gdx.input.getY());
     if (!paused && !intro) {
-      // Suns are collected by passing the pointer over them, so this is a frame job, not a click.
       input.collectSunUnderPointer();
     }
 
     context().applyCamera();
     lawnRenderer.render(context(), match, worldDelta);
-    // under the entities: these mark cells, they shouldn't cover what stands on them
     stageRuleRenderer.render(context(), match, worldDelta);
     entityRenderer.render(context(), match, worldDelta);
     if (!paused) {
@@ -402,19 +368,15 @@ public final class GameplayScreen extends BaseScreen {
       hud.setStatus("no match running");
       return;
     }
-    // Ahead of the paused check: the counter is frozen either way, but it should read the real
-    // total rather than whatever it happened to show when the menu opened.
     hud.setSun(match.getSunAmount());
     hud.setObjective(objectiveText());
     if (paused) {
       hud.setStatus("paused");
       return;
     }
-    // the wave count moved to the wave bar
     hud.setStatus("plant food " + match.getPlantFoodCount() + nightNote() + hint());
   }
 
-  /** Pickups are collected for the player, so they have to be told. */
   private void showPickups() {
     if (match == null || match.getBoard() == null) {
       return;
@@ -424,14 +386,6 @@ public final class GameplayScreen extends BaseScreen {
     }
   }
 
-  /**
-   * Bites the player can hear.
-   *
-   * <p>Observed rather than pushed: the model has no audio channel and should not grow one, so
-   * this counts the zombies that are chewing this frame and only makes a noise when that count
-   * goes up -- a zombie that keeps eating is one bite, not one per frame. GameAudio's repeat guard
-   * then collapses a whole wave arriving at once into a single sound.
-   */
   private void listenForBites() {
     if (match == null || match.getBoard() == null || paused || intro) {
       return;
@@ -448,7 +402,6 @@ public final class GameplayScreen extends BaseScreen {
     zombiesEating = eating;
   }
 
-  /** Red banner every time the match rolls into a new wave. */
   private void watchWaves() {
     if (match == null || paused || intro || !match.isRunning()) {
       return;
@@ -461,7 +414,6 @@ public final class GameplayScreen extends BaseScreen {
     hud.alert("Wave " + (wave + 1) + " of " + match.getTotalWaves() + waveWarning());
   }
 
-  /** The two seasons that do something extra at the start of every wave say so. */
   private String waveWarning() {
     String season = seasonName().toLowerCase();
     if (season.contains("dark")) {
@@ -473,10 +425,8 @@ public final class GameplayScreen extends BaseScreen {
     return "";
   }
 
-  /** What this stage wants, for the rules the lawn doesn't explain on its own. */
   private String objectiveText() {
     if (isBonus()) {
-      // The score is the objective here, so it goes where the objective line already is.
       return "MyoPoints " + match.getScoreManager().getCurrentMatchScore()
           + "   -   survive for as long as you can";
     }
@@ -544,7 +494,6 @@ public final class GameplayScreen extends BaseScreen {
     return alive;
   }
 
-  /** What the next click will do. */
   private String hint() {
     switch (input.getTool()) {
       case SEED:
@@ -558,10 +507,6 @@ public final class GameplayScreen extends BaseScreen {
     }
   }
 
-  /**
-   * Dark Ages is at night and nothing falls out of the sky, so every sun has to come off a plant.
-   * The background says "night" on its own but not "and that is why your sun is not going up".
-   */
   private String nightNote() {
     return match.getBoard() != null && match.getBoard().getGameState().isSkySunDisabled()
         ? "   night: no sun falls from the sky"
@@ -573,7 +518,6 @@ public final class GameplayScreen extends BaseScreen {
       return;
     }
     ended = true;
-    // Same reason MatchCompletion reads it early: applying the run to the account zeroes it.
     bonusScore = match.getScoreManager().getCurrentMatchScore();
     MatchCompletion.apply(match);
     paused = false;
@@ -581,7 +525,6 @@ public final class GameplayScreen extends BaseScreen {
       return;
     }
     boolean won = match.getMatchResult() != null && match.getMatchResult().isWon();
-    // Crazy Dave gets the first word after a Zomboss goes down, then the result.
     if (won && match.getSpecialStageRule() instanceof BossStageRule) {
       Dialogue.show(hud.getStage(), game.getUiSkin().get(), Dialogue.CRAZY_DAVE,
           Dialogue.afterZomboss(seasonName()), () -> showOutcome(true));
@@ -590,15 +533,6 @@ public final class GameplayScreen extends BaseScreen {
     showOutcome(won);
   }
 
-  /**
-   * The end-of-level panel.
-   *
-   * <p>It used to be one sentence, which told the player nothing about the run they had just
-   * played and made a win look like an error dialog. The numbers here are all ones the match
-   * already kept -- the score, the coins the result banked, how far through the waves it got --
-   * so this reads them rather than computing anything, and the rewards roll up because the reward
-   * is the point of the screen.
-   */
   private void showOutcome(boolean won) {
     GameAudio.getInstance().play(won ? GameAudio.Sfx.WIN : GameAudio.Sfx.LOSE);
     Skin skin = game.getUiSkin().get();
@@ -610,7 +544,6 @@ public final class GameplayScreen extends BaseScreen {
     body.add(summary(skin, won)).padBottom(4f).row();
 
     if (isBonus()) {
-      // The run is scored either way here, so the number matters more than the verdict.
       body.add(new Label("Sent to the server; the leaderboard keeps your best.",
           skin, "secondary")).padTop(6f).row();
     }
@@ -624,14 +557,6 @@ public final class GameplayScreen extends BaseScreen {
         "Retry", this::restart, leaveLabel, this::leave);
   }
 
-  /**
-   * The verdict, with the game's own art beside it.
-   *
-   * <p>A win and a loss used to differ only in their wording. The gold cup is the same trophy the
-   * leaderboard hands its top place, and the brain is the one the HUD already draws for the thing
-   * the zombies are after -- so each result carries the object it is about, and the two screens
-   * are told apart at a glance rather than by reading.
-   */
   private Table outcomeHeadline(Skin skin, boolean won) {
     Table headline = new Table();
     TextureRegion mark = hudArt.find(won ? "cupgold" : "brain");
@@ -645,7 +570,6 @@ public final class GameplayScreen extends BaseScreen {
     return headline;
   }
 
-  /** The run, in the numbers the match already tracked. Rewards roll up; facts do not. */
   private Table summary(Skin skin, boolean won) {
     Table stats = new Table();
     stats.defaults().pad(3f);
@@ -666,7 +590,6 @@ public final class GameplayScreen extends BaseScreen {
     if (result != null) {
       stats.add(statRow(skin, "Score",
           new CountUpLabel(result.getScore(), skin, UiSkinProvider.LABEL_MEDIUM), null)).row();
-      // Only a win banks coins, so showing a zero on a loss would just be noise.
       if (won && result.getRewardCoins() > 0) {
         stats.add(statRow(skin, "Coins earned",
             new CountUpLabel(result.getRewardCoins(), skin, UiSkinProvider.LABEL_BIG_OUTLINE),
@@ -676,7 +599,6 @@ public final class GameplayScreen extends BaseScreen {
     return stats;
   }
 
-  /** "label ....... [icon] value", so the numbers line up down the right. */
   private Table statRow(Skin skin, String label, Label value, String icon) {
     Table row = new Table();
     row.add(new Label(label, skin, "secondary")).right().width(190f).padRight(14f);

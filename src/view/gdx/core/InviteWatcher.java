@@ -20,11 +20,6 @@ import view.gdx.ui.UiSkinProvider;
 /**
  * Match invites and match starts, watched for the whole run of the client rather than by whichever
  * screen happens to be open.
- *
- * <p>The server pushes MATCH_INVITE_EVENT the moment the target is online, so a listener that
- * lived on the lobby screen only ever saw an invite the recipient was already waiting for. This
- * registers once, at start-up, and asks the current screen for a stage to put the popup on, which
- * is why an invite reaches a player standing in the shop or halfway through a level.
  */
 public final class InviteWatcher {
 
@@ -32,7 +27,6 @@ public final class InviteWatcher {
   private final ClientSession session = ClientSession.getInstance();
 
   private Payloads.MatchInviteEvent pending;
-  /** The stage the pending invite is already showing on, so moving screens re-asks and stays once. */
   private Stage shownOn;
 
   public InviteWatcher(PvzGdxGame game) {
@@ -58,7 +52,6 @@ public final class InviteWatcher {
     }
   }
 
-  /** Called after every screen change: an invite that arrived with no stage up still lands. */
   public void present() {
     if (pending == null) {
       return;
@@ -95,7 +88,6 @@ public final class InviteWatcher {
   private void enterMatch(Payloads.MatchFound found) {
     pending = null;
     shownOn = null;
-    // Whatever single-player match was running is over as far as this client is concerned.
     GameSession.end();
     game.switchScreen(new NetworkIZombieScreen(game, found));
   }

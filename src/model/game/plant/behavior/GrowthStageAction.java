@@ -3,12 +3,9 @@ package model.game.plant.behavior;
 import model.game.Board;
 import model.game.plant.Plant;
 
-// گیاه‌های تگ wramp-up (Sun-shroom / Kiwibeast) بعد از کاشته شدن مرحله‌به‌مرحله قوی‌تر میشن. این
-// کلاس فقط تایمر رشد رو نگه میداره و کار واقعی رو به اکشن مرحله‌ی فعلی میسپاره، پس هر دسته‌ای
-// (تولیدکننده‌ی خورشید، ملی، شوتر و ...) بدون تغییر میتونه مرحله‌ای بشه
 public class GrowthStageAction implements PlantAction {
   private final PlantAction[] stages;
-  private final int[] stageStartTicks; // چند تیک بعد از کاشت وارد هر مرحله میشیم
+  private final int[] stageStartTicks;
 
   private int plantedTick = -1;
   private int currentStage = 0;
@@ -25,8 +22,6 @@ public class GrowthStageAction implements PlantAction {
       plant.setLastActionTick(currentTick);
     }
 
-    // اول مرحله‌ی فعلی کارش رو میکنه بعد ارتقا چک میشه: آستانه‌ی رشد و بازه‌ی عمل معمولا برابرن
-    // (Sun-shroom هر دو ۲۴ ثانیه)، و اگه اول ارتقا بدیم مرحله‌ی اول هیچ‌وقت به عمل نمیرسه
     PlantAction activeStage = stages[currentStage];
     if (activeStage != null) {
       activeStage.execute(plant, board, currentTick);

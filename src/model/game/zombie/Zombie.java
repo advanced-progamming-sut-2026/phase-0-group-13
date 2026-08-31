@@ -20,7 +20,6 @@ public class Zombie {
   private double x;
   private double y;
 
-  /** Not a cell on any board, so "no frozen tile has caught this zombie yet". */
   public static final int NO_CELL = -1;
 
   private final List<Armor> armors;
@@ -87,7 +86,7 @@ public class Zombie {
       }
 
       if (effect == StatusEffect.POISONED) {
-        takeDamage(2, true); // Fixed: Safely clamp health instead of direct modification
+        takeDamage(2, true);
       }
     }
   }
@@ -124,13 +123,6 @@ public class Zombie {
     this.activeEffects.put(effect, durationInTicks);
   }
 
-  /**
-   * The board cell whose frozen tile last caught this zombie, or {@link #NO_CELL}.
-   *
-   * <p>A frozen tile is permanent, so without remembering this the tile would renew the freeze
-   * every tick the zombie stood on it, faster than the freeze could run down, and the zombie
-   * could never step off again.
-   */
   public int getIcedOnCell() {
     return icedOnCell;
   }
@@ -139,12 +131,6 @@ public class Zombie {
     this.icedOnCell = cell;
   }
 
-  /**
-   * Marks this zombie as having just been thrown from {@code fromX}, for the renderer to arc it in.
-   *
-   * <p>Reporting only: the zombie lands where it was spawned and behaves from the first tick, so
-   * nothing on the board depends on the flight.
-   */
   public void markThrownFrom(double fromX, int ticks) {
     this.thrownFromX = fromX;
     this.thrownTicks = Math.max(0, ticks);
@@ -155,7 +141,6 @@ public class Zombie {
     return thrownFromX;
   }
 
-  /** 1 the instant it was thrown, falling to 0 as it lands; 0 for a zombie that was not thrown. */
   public float flightProgress() {
     return thrownTotal <= 0 ? 0f : thrownTicks / (float) thrownTotal;
   }
@@ -189,24 +174,17 @@ public class Zombie {
   public boolean isDead() { return this.currentHealth <= 0; }
   public double getX() { return x; }
 
-  /** برای مکانیزم‌هایی مثل گردباد مصر که زامبی را جابه‌جا می‌کنند. */
   public void setX(double x) { this.x = x; }
   public double getY() { return y; }
   public int getRow() { return row; }
   public void setRow(int row) { this.row = row; }
 
-  /** How many lanes it stands in. Only Zomboss is wider than one. */
   public int getRowSpan() { return rowSpan; }
 
   public void setRowSpan(int rowSpan) { this.rowSpan = Math.max(1, rowSpan); }
 
-  /** آخرین ردیفی که اشغال کرده (برای زامبی معمولی همان getRow است). */
   public int getBottomRow() { return row + rowSpan - 1; }
 
-  /**
-   * Whether a lane is one this zombie can be hit in. A Zomboss spans two, so plants in either of
-   * them can shoot it; everything else keeps the exact row match it had before.
-   */
   public boolean occupiesRow(double lane) {
     if (rowSpan <= 1) {
       return row == lane;
@@ -221,7 +199,6 @@ public class Zombie {
   public ZombieAction getBehavior() { return behavior; }
   public String getName() { return name; }
 
-  /** Player-facing name; falls back to the raw alias if nobody set one. */
   public String getDisplayName() { return displayName == null ? name : displayName; }
 
   public void setDisplayName(String displayName) { this.displayName = displayName; }
@@ -233,7 +210,6 @@ public class Zombie {
   public void setEating(boolean eating) { this.isEating = eating; }
   public List<Armor> getArmors() { return armors; }
 
-  /** مجموع جان باقی‌ماندهٔ لایه‌های زرهِ سالم (برای نمایش وضعیت زامبی). */
   public int getRemainingArmorHealth() {
     int total = 0;
     for (Armor armor : armors) {
@@ -244,7 +220,6 @@ public class Zombie {
     return total;
   }
 
-  /** مجموع سقف جان همهٔ لایه‌های زره (سالم و شکسته) — برای گزارش وضعیت. */
   public int getMaxArmorHealth() {
     int total = 0;
     for (Armor armor : armors) {

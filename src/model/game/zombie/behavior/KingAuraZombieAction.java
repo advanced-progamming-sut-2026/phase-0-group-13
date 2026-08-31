@@ -9,8 +9,6 @@ public class KingAuraZombieAction implements ZombieAction {
   private final double range;
   private final double eatingDamage;
 
-  // هر تیک به همه‌ی زامبی‌های هم‌ردیفِ تو شعاع range سرعت بیشتر میده (از همون setSpeedMultiplier که
-  // برای Newspaper هم استفاده شده)؛ خودش سرعتش عادیه
   public KingAuraZombieAction(double buffSpeedMultiplier, double range, double eatingDamage) {
     this.buffSpeedMultiplier = buffSpeedMultiplier;
     this.range = range;

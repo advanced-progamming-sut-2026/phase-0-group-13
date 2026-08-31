@@ -1,8 +1,6 @@
 package network.protocol;
 
-/** Responses carry the request's id back. Events are server pushes with no id. */
 public enum MessageType {
-  // requests
   REGISTER_REQUEST,
   LOGIN_REQUEST,
   TOKEN_LOGIN_REQUEST,
@@ -21,7 +19,6 @@ public enum MessageType {
   PROFILE_UPDATE,
   PING,
 
-  // responses
   REGISTER_RESPONSE,
   LOGIN_RESPONSE,
   SECURITY_QUESTION_RESPONSE,
@@ -33,7 +30,6 @@ public enum MessageType {
   PONG,
   ERROR,
 
-  // events
   MATCH_FOUND,
   MATCH_INVITE_EVENT,
   MATCH_STATE_UPDATE,

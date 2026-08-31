@@ -5,16 +5,6 @@ import model.game.TileEffects.IceTrailEffect;
 import model.game.Tile;
 import model.game.plant.Plant;
 
-/**
- * Hot Potato: در plants.json دمیجش صفر است و کارش «کاشته‌شدن روی یخ برای آب‌کردن فوری آن» است
- * (ضروری در Frostbite Caves). قبلا با ExplodeAction ساخته می‌شد و به جای آب‌کردن یخ، ۱۸۰۰ دمیج به
- * زامبی‌ها می‌زد.
- *
- * <p>از همان سازوکار یخِ موجود استفاده می‌کند: {@link IceTrailEffect} روی تایل و
- * {@link Plant#meltIce()} برای گیاهِ داخل بلوک یخ. سیستم یخ جدیدی ساخته نمی‌شود.
- *
- * <p>شعاع پیش‌فرض صفر است (فقط خانهٔ خودش)؛ Lvl 3 آن را با "Melt Area 3x3" به ۱ می‌رساند.
- */
 public class MeltIceAction implements PlantAction {
 
   private final int radius;

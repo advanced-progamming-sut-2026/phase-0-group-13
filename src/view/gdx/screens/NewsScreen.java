@@ -17,16 +17,6 @@ import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.UiSkinProvider;
 
 
-/**
- * Graphical news inbox, the two views NewsMenuController offers.
- *
- * <p>Unread does what "show unread" does, including marking the inbox read on the way out and
- * saving, because that is the Phase 1 rule for opening it. All does what "show all" does: newest
- * first regardless of read state, unread ones tagged.
- *
- * <p>Same AllNews instance the terminal build prints from, so the badge on the main menu agrees
- * with what happened here.
- */
 public final class NewsScreen extends MenuScreen {
 
   private Table list;
@@ -78,7 +68,6 @@ public final class NewsScreen extends MenuScreen {
     }
     render("Unread News (" + unread.size() + ")", unread, false);
 
-    // Opening the inbox marks everything in it as read, same as the terminal menu.
     newsBox.markAllAsRead();
     saveState();
   }

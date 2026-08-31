@@ -7,15 +7,6 @@ import model.game.Board;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
-/**
- * Caulipower: در plants.json «یک شلیک جادویی (جهت تصادفی، از موانع رد می‌شود، هدفش را هیپنوتیزم
- * می‌کند)» ثبت شده و اثر غذای گیاهش «چند زامبی تصادفی روی زمین را هیپنوتیزم می‌کند».
- *
- * <p>قبلا با HomingAction و دمیج ۱۰۰۰۰ ساخته می‌شد، یعنی دقیقا برعکسِ دیتا هدف را می‌کُشت.
- *
- * <p>برخلاف {@link HypnoShroomAction} که منتظر می‌ماند زامبی بخوردش، این یکی از راه دور و روی
- * هدف‌های تصادفی کار می‌کند (پس ردیف و مانع برایش مهم نیست).
- */
 public class HypnotiseAction implements PlantAction {
 
   private final int actionInterval;

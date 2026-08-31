@@ -9,14 +9,6 @@ import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.UiSkinProvider;
 
 
-/**
- * Graphical sign in.
- *
- * <p>Calls UserManager.loginUser, the same method SignInMenuController.handleLogin calls once it
- * has finished picking the arguments out of the typed command. The username lookup, the hash
- * comparison, the quest seeding and the stay-logged-in file all stay where they are; this screen
- * only collects the three values and turns the exception into a toast instead of a println.
- */
 public final class LoginScreen extends MenuScreen {
 
   private TextField username;
@@ -74,7 +66,6 @@ public final class LoginScreen extends MenuScreen {
         },
         ignored -> go(new MainMenuScreen(game)),
         e -> {
-          // The screen stays exactly as it was, so the username is still there to correct.
           password.setText("");
           toast(e.getMessage());
         });
