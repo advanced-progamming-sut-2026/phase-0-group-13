@@ -1,19 +1,14 @@
 package view.gdx.screens;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.utils.Scaling;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import data.persistence.UserManager;
 import model.account.AdventureMap;
 import model.account.Progress;
@@ -28,31 +23,36 @@ import model.environment.DarkAgesSeason;
 import model.environment.FrostbiteCavesSeason;
 import model.environment.Season;
 import view.gdx.core.PvzGdxGame;
+import view.gdx.ui.LevelMap;
+import view.gdx.ui.MapArt;
 import view.gdx.ui.UiSkinProvider;
+import view.gdx.ui.WorldCarousel;
 
 
 /**
- * Graphical Adventure map: pick a chapter, then a level inside it.
+ * The Adventure map: a chapter chooser, and inside a chapter the route of its levels.
  *
  * <p>Chapter and level locks come from the account (getUnlockedStages, Progress.isLevelAccessible),
  * so they match what GameMenuController enforces for the typed "enter chapter" command.
  */
 public final class AdventureScreen extends MenuScreen {
 
-  /** Thumbnail size, roughly the 16:9 of the world art it is cropped from. */
-  private static final float THUMB_WIDTH = 156f;
-  private static final float THUMB_HEIGHT = 88f;
+  private final int openChapter;
+  private static final float ARROW_WIDTH = 64f;
+  private static final float ARROW_HEIGHT = 92f;
 
-  private Table content;
-  private int openChapter;
-  /** One atlas per chapter thumbnail, opened lazily and disposed with the screen. */
-  private final Map<Integer, TextureAtlas> worldArt = new LinkedHashMap<>();
+  private final MapArt art = new MapArt();
+
+  private int chosenLevel;
+  private TextButton playButton;
+  private Runnable onChapterChanged;
+  private Runnable onLevelChanged;
 
   public AdventureScreen(PvzGdxGame game) {
     this(game, 0);
   }
 
-  /** Opens straight into a chapter's level grid, e.g. coming back from plant selection. */
+  /** Opens straight into a chapter's level map, e.g. coming back from plant selection. */
   public AdventureScreen(PvzGdxGame game, int openChapter) {
     super(game);
     this.openChapter = openChapter;
@@ -65,7 +65,7 @@ public final class AdventureScreen extends MenuScreen {
 
   @Override
   protected Screen backTarget() {
-    return new MainMenuScreen(game);
+    return openChapter == 0 ? new MainMenuScreen(game) : new AdventureScreen(game);
   }
 
   @Override
@@ -74,203 +74,240 @@ public final class AdventureScreen extends MenuScreen {
   }
 
   @Override
-  protected void buildContent(Table content) {
-    this.content = content;
-    refresh();
+  protected String backgroundImagePath() {
+    return "textures/ui/menubackground.png";
   }
 
-  private void refresh() {
-    content.clear();
+  /** The adventure backdrop is meant to be seen as it is, so nothing washes over it. */
+  @Override
+  protected boolean scrimBackground() {
+    return false;
+  }
 
+  @Override
+  protected void buildContent(Table content) {
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) {
       Table panel = panel();
       panel.add(new Label("error: no user logged in", skin, UiSkinProvider.LABEL_MEDIUM)).row();
-      panel.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget()))).width(220f);
+      panel.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(new MainMenuScreen(game))))
+          .width(220f);
       content.add(panel);
       return;
     }
-
-    Table list = panel();
-    list.top();
     if (openChapter == 0) {
-      buildChapterList(list, user);
+      buildChapterChooser(content, user);
     } else {
-      buildLevelGrid(list, user);
+      buildLevelMap(content, user);
     }
-
-    ScrollPane scroll = new ScrollPane(list, skin);
-    scroll.setFadeScrollBars(false);
-    scroll.setScrollingDisabled(true, false);
-    // maxHeight so a short level grid doesn't leave a huge empty panel.
-    content.add(scroll).growX().maxHeight(520f).row();
-
-    Table actions = new Table();
-    actions.defaults().pad(6f).width(240f);
-    actions.add(button("Travel Log", UiSkinProvider.BUTTON_GREEN, () -> go(new QuestScreen(game))));
-    actions.add(button("Back", UiSkinProvider.BUTTON_BROWN, this::back));
-    content.add(actions).padTop(8f);
   }
 
-  private void back() {
-    if (openChapter == 0) {
-      go(backTarget());
+  // ---- chapter chooser -------------------------------------------------------------------
+
+  private void buildChapterChooser(Table content, User user) {
+    Table footer = new Table();
+
+    WorldCarousel carousel = new WorldCarousel(skin, art, AdventureMap.MAX_STAGES,
+        startingChapter(user), new WorldCarousel.State() {
+          @Override
+          public boolean locked(int stage) {
+            return !isUnlocked(user, stage);
+          }
+
+          @Override
+          public String summary(int stage) {
+            if (!isUnlocked(user, stage)) {
+              return "LOCKED";
+            }
+            return clearedLevels(user.getProgress(), stage)
+                + " / " + AdventureMap.LEVELS_PER_STAGE + " levels";
+          }
+        }, new WorldCarousel.Listener() {
+          @Override
+          public void onSelected(int stage) {
+            if (onChapterChanged != null) {
+              onChapterChanged.run();
+            }
+          }
+
+          @Override
+          public void onEntered(int stage) {
+            openChapter(user, stage);
+          }
+        });
+
+    TextButton prev = button("<", UiSkinProvider.BUTTON_BROWN, () -> {});
+    TextButton next = button(">", UiSkinProvider.BUTTON_BROWN, () -> {});
+    Runnable syncArrows = () -> {
+      prev.setDisabled(!carousel.canStep(-1));
+      next.setDisabled(!carousel.canStep(1));
+    };
+    onChapterChanged = syncArrows;
+    prev.addListener(stepper(carousel, -1, syncArrows));
+    next.addListener(stepper(carousel, 1, syncArrows));
+    arrowKeys(direction -> {
+      carousel.step(direction);
+      syncArrows.run();
+    });
+    syncArrows.run();
+
+    content.add(sideBySide(prev, carousel, next)).grow().row();
+    footer.defaults().pad(6f).width(230f);
+    footer.add(button("Travel Log", UiSkinProvider.BUTTON_GREEN,
+        () -> go(new QuestScreen(game))));
+    footer.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(new MainMenuScreen(game))));
+    content.add(footer).padTop(4f);
+  }
+
+  private void openChapter(User user, int stage) {
+    if (!isUnlocked(user, stage)) {
+      toast("Chapter " + stage + " is locked. Clear the previous chapter first.");
       return;
     }
-    openChapter = 0;
-    refresh();
-  }
-
-  private void buildChapterList(Table list, User user) {
-    for (int stage = 1; stage <= AdventureMap.MAX_STAGES; stage++) {
-      boolean unlocked = user.getUnlockedStages().contains("stage_" + stage);
-      list.add(chapterRow(user, stage, unlocked)).growX().padBottom(12f).row();
-    }
+    // Same as the terminal's "enter chapter": a fresh seed bank for whichever level gets picked,
+    // so a deck chosen for a different chapter doesn't leak in.
+    user.clearDeck();
+    MatchSetup.getInstance().setTargetChapter(String.valueOf(stage));
+    go(new AdventureScreen(game, stage));
   }
 
   /**
-   * A slice of the chapter's own world art, as its thumbnail.
+   * The wide selection area with an arrow at each edge.
    *
-   * <p>The repository already has each world's background -- it is what this very screen draws
-   * behind itself -- so the four rows can show the place they lead to instead of only naming it.
-   * Cropped rather than squashed: the art is a wide lawn and letterboxing it into a small box
-   * would waste most of the thumbnail, so the cell clips and the image fills it.
-   *
-   * <p>A locked world is shown dimmed rather than hidden. Seeing where you are going is the point
-   * of a world list, and a blank row would say less than a dark one.
+   * <p>The arrows go in a layer above it so they stay clickable and visible over the artwork, and
+   * the area itself is inset by their width so nothing is ever hidden underneath one.
    */
-  private Table worldThumbnail(int stage, boolean unlocked) {
-    TextureAtlas atlas = worldArt.get(stage);
-    if (atlas == null) {
-      String path = "textures/environment/" + worldAtlas(stage);
-      if (!Gdx.files.internal(path).exists()) {
-        return null;
-      }
-      atlas = new TextureAtlas(Gdx.files.internal(path));
-      worldArt.put(stage, atlas);
-    }
-    TextureRegion region = atlas.findRegion("texture");
-    if (region == null) {
-      return null;
-    }
-    Image art = new Image(region);
-    art.setScaling(Scaling.fill);
-    if (!unlocked) {
-      art.setColor(0.42f, 0.42f, 0.48f, 1f);
-    }
+  private Stack sideBySide(TextButton prev, com.badlogic.gdx.scenes.scene2d.Actor middle,
+      TextButton next) {
+    Table inset = new Table();
+    inset.add(middle).grow().pad(0f, ARROW_WIDTH + 10f, 0f, ARROW_WIDTH + 10f);
 
-    Table frame = new Table();
-    frame.setClip(true);
-    frame.add(art).grow();
-    if (unlocked) {
-      return frame;
-    }
-    // The game's own padlock over the dimmed art, so "locked" is a symbol and not only a shade.
+    Table arrows = new Table();
+    arrows.add(prev).width(ARROW_WIDTH).height(ARROW_HEIGHT).expandX().left();
+    arrows.add(next).width(ARROW_WIDTH).height(ARROW_HEIGHT).expandX().right();
+
     Stack stack = new Stack();
-    stack.add(frame);
-    Table badge = new Table();
-    badge.add(new Image(skin.getDrawable(UiSkinProvider.LOCK_ICON))).size(30f, 39f);
-    stack.add(badge);
-    Table wrapper = new Table();
-    wrapper.add(stack).grow();
-    return wrapper;
+    stack.add(inset);
+    stack.add(arrows);
+    return stack;
   }
 
-  /**
-   * How far through a chapter the player is.
-   *
-   * <p>A locked chapter still shows the empty bar rather than nothing, so the four rows read as
-   * one progression instead of one row plus three blanks.
-   */
-  private Table chapterProgress(int cleared, boolean unlocked) {
-    Table holder = new Table();
-    holder.left();
-    ProgressBar bar = new ProgressBar(0f, AdventureMap.LEVELS_PER_STAGE, 1f, false, skin,
-        cleared >= AdventureMap.LEVELS_PER_STAGE ? "xp_green" : "xp_yellow");
-    bar.setValue(unlocked ? cleared : 0);
-    bar.setAnimateDuration(0f);
-    if (!unlocked) {
-      bar.getColor().a = 0.45f;
-    }
-    holder.add(bar).width(320f).height(18f);
-    return holder;
+  private ClickListener stepper(Object target, int direction, Runnable after) {
+    return new ClickListener() {
+      @Override
+      public void clicked(InputEvent event, float x, float y) {
+        if (target instanceof WorldCarousel carousel) {
+          carousel.step(direction);
+        } else if (target instanceof LevelMap map) {
+          map.step(direction);
+        }
+        after.run();
+      }
+    };
   }
 
-  private Table chapterRow(User user, int stage, boolean unlocked) {
-    Table row = new Table();
-    row.left();
-
-    int cleared = clearedLevels(user.getProgress(), stage);
-
-    Table thumb = worldThumbnail(stage, unlocked);
-    if (thumb != null) {
-      row.add(thumb).size(THUMB_WIDTH, THUMB_HEIGHT).padRight(18f);
-    }
-
-    // Name over a progress bar rather than a name and a "0 / 4" a long way apart: the whole point
-    // of a world list is how far through each world you are, and the row had a wide dead gap in
-    // the middle doing nothing.
-    Table title = new Table();
-    title.left();
-    title.add(new Label(stage + ".  " + chapterName(stage), skin, UiSkinProvider.LABEL_BIG))
-        .left().row();
-    title.add(chapterProgress(cleared, unlocked)).left().padTop(4f).row();
-    row.add(title).left().expandX();
-
-    String progress = cleared + " / " + AdventureMap.LEVELS_PER_STAGE + " levels";
-    row.add(new Label(unlocked ? progress : "LOCKED", skin, UiSkinProvider.LABEL_MEDIUM))
-        .right()
-        .padRight(20f);
-
-    final int target = stage;
-    if (unlocked) {
-      row.add(button("Enter", UiSkinProvider.BUTTON_GREEN, () -> {
-        // Same as the terminal's "enter chapter": a fresh seed bank for whichever level gets
-        // picked next, so a deck chosen for a different chapter doesn't leak in.
-        user.clearDeck();
-        MatchSetup.getInstance().setTargetChapter(String.valueOf(target));
-        openChapter = target;
-        refresh();
-      })).width(180f);
-    } else {
-      TextButton locked = new TextButton("Locked", skin, UiSkinProvider.BUTTON_BROWN);
-      locked.setDisabled(true);
-      row.add(locked).width(180f);
-    }
-    return row;
+  /** Left and right arrow keys drive the same selection the arrow buttons do. */
+  private void arrowKeys(java.util.function.IntConsumer step) {
+    stage.addListener(new InputListener() {
+      @Override
+      public boolean keyDown(InputEvent event, int keycode) {
+        if (keycode == Input.Keys.LEFT) {
+          step.accept(-1);
+          return true;
+        }
+        if (keycode == Input.Keys.RIGHT) {
+          step.accept(1);
+          return true;
+        }
+        return false;
+      }
+    });
   }
 
-  private void buildLevelGrid(Table list, User user) {
+  /** Opens on the chapter the player is actually playing. */
+  private static int startingChapter(User user) {
+    int stage = user.getProgress().getCurrentStage();
+    return stage < 1 || stage > AdventureMap.MAX_STAGES ? 1 : stage;
+  }
+
+  private static boolean isUnlocked(User user, int stage) {
+    return user.getUnlockedStages().contains("stage_" + stage);
+  }
+
+  // ---- level map -------------------------------------------------------------------------
+
+  private void buildLevelMap(Table content, User user) {
     Progress progress = user.getProgress();
-    list.add(new Label("Choose a level", skin, UiSkinProvider.LABEL_MEDIUM))
-        .left()
-        .padBottom(12f)
-        .row();
+    chosenLevel = firstPlayable(progress);
 
-    Table grid = new Table();
-    grid.defaults().pad(6f).width(150f);
-    for (int level = 1; level <= AdventureMap.LEVELS_PER_STAGE; level++) {
-      grid.add(levelButton(progress, level));
-      if (level % 5 == 0) {
-        grid.row();
+    LevelMap map = new LevelMap(skin, art, openChapter, AdventureMap.LEVELS_PER_STAGE,
+        new LevelMap.Source() {
+          @Override
+          public LevelMap.NodeState stateOf(int level) {
+            if (!progress.isLevelAccessible(openChapter, level)) {
+              return LevelMap.NodeState.LOCKED;
+            }
+            if (level <= clearedLevels(progress, openChapter)) {
+              return LevelMap.NodeState.COMPLETED;
+            }
+            return level == AdventureMap.LEVELS_PER_STAGE
+                ? LevelMap.NodeState.BOSS : LevelMap.NodeState.AVAILABLE;
+          }
+
+          @Override
+          public int currentLevel() {
+            return chosenLevel;
+          }
+        }, level -> {
+          if (level == chosenLevel) {
+            startLevel(level);
+            return;
+          }
+          if (onLevelChanged != null) {
+            onLevelChanged.run();
+          }
+        });
+
+    playButton = button("Play Level " + chosenLevel, UiSkinProvider.BUTTON_GREEN,
+        () -> startLevel(chosenLevel));
+
+    TextButton prev = button("<", UiSkinProvider.BUTTON_BROWN, () -> {});
+    TextButton next = button(">", UiSkinProvider.BUTTON_BROWN, () -> {});
+    Runnable syncArrows = () -> {
+      chosenLevel = map.selectedLevel();
+      prev.setDisabled(!map.canStep(-1));
+      next.setDisabled(!map.canStep(1));
+      boolean playable = progress.isLevelAccessible(openChapter, chosenLevel);
+      playButton.setText(playable ? "Play Level " + chosenLevel : "Level " + chosenLevel + " locked");
+      playButton.setDisabled(!playable);
+    };
+    onLevelChanged = syncArrows;
+    prev.addListener(stepper(map, -1, syncArrows));
+    next.addListener(stepper(map, 1, syncArrows));
+    arrowKeys(direction -> {
+      map.step(direction);
+      syncArrows.run();
+    });
+    map.select(chosenLevel);
+    syncArrows.run();
+
+    content.add(sideBySide(prev, map, next)).grow().row();
+    Table footer = new Table();
+    footer.defaults().pad(6f).width(230f);
+    footer.add(playButton);
+    footer.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(new AdventureScreen(game))));
+    content.add(footer).padTop(4f);
+  }
+
+  /** The level the map opens on: the first one not yet cleared, else the last. */
+  private int firstPlayable(Progress progress) {
+    int cleared = clearedLevels(progress, openChapter);
+    for (int level = cleared + 1; level <= AdventureMap.LEVELS_PER_STAGE; level++) {
+      if (progress.isLevelAccessible(openChapter, level)) {
+        return level;
       }
     }
-    list.add(grid).row();
-  }
-
-  private TextButton levelButton(Progress progress, int level) {
-    boolean accessible = progress.isLevelAccessible(openChapter, level);
-    boolean cleared = level <= clearedLevels(progress, openChapter);
-
-    if (!accessible) {
-      TextButton locked = new TextButton("Level " + level + "\nLocked", skin,
-              UiSkinProvider.BUTTON_BROWN);
-      locked.setDisabled(true);
-      return locked;
-    }
-    String label = cleared ? "Level " + level + "\ncleared" : "Level " + level;
-    final int target = level;
-    return button(label, UiSkinProvider.BUTTON_GREEN, () -> startLevel(target));
+    return Math.max(1, Math.min(cleared, AdventureMap.LEVELS_PER_STAGE));
   }
 
   // The chapter has to be in MatchSetup before the selection screen opens: selectionRule() reads
@@ -280,6 +317,10 @@ public final class AdventureScreen extends MenuScreen {
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) {
       toast("error: no user logged in");
+      return;
+    }
+    if (!user.getProgress().isLevelAccessible(openChapter, level)) {
+      toast("Level " + level + " is locked.");
       return;
     }
     MatchSetup.getInstance().setTargetChapter(String.valueOf(openChapter));
@@ -305,7 +346,7 @@ public final class AdventureScreen extends MenuScreen {
   }
 
   /** Levels of this chapter the player has already cleared. */
-  private int clearedLevels(Progress progress, int stage) {
+  private static int clearedLevels(Progress progress, int stage) {
     // The cursor stops on 4-4 rather than running off the map, so once the adventure is finished
     // "levels cleared" has to come from the flag or the last chapter would read 3 / 4 forever.
     if (progress.isAdventureCompleted()) {
@@ -333,10 +374,7 @@ public final class AdventureScreen extends MenuScreen {
 
   @Override
   public void dispose() {
-    for (TextureAtlas atlas : worldArt.values()) {
-      atlas.dispose();
-    }
-    worldArt.clear();
+    art.dispose();
     super.dispose();
   }
 

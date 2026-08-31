@@ -4,8 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -19,7 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import view.gdx.audio.GameAudio;
 import view.gdx.core.GdxConfig;
 import view.gdx.core.PvzGdxGame;
@@ -38,11 +41,10 @@ import view.gdx.ui.UiSkinProvider;
  * <p>A subclass only says what it is called and what goes in the middle. Everything a menu shares
  * with the other menus — including Escape going back — is handled here.
  *
- * <p>Own ScreenViewport rather than the world's letterboxed one, so a menu gets one unit per real
- * pixel and its text stays sharp at any window size. The in-match HUD used to do the same and no
- * longer can -- it has to line up with the lawn underneath it, see HudStage -- but a menu has only
- * a backdrop under it, which is drawn to fill whatever shape the window is, so nothing here can
- * fall out of alignment with anything.
+ * <p>An ExtendViewport rather than the world's letterboxed one: a menu has only a backdrop under
+ * it, so it keeps the 1280x720 design area as a minimum and spreads into whatever else the window
+ * has, instead of leaving bars down the sides of an ultrawide or a fullscreen monitor. The
+ * in-match HUD cannot do this -- it has to line up with the lawn underneath it, see HudStage.
  */
 public abstract class MenuScreen extends BaseScreen {
 
@@ -56,6 +58,8 @@ public abstract class MenuScreen extends BaseScreen {
 
   private String notice;
   private TextureAtlas backgroundAtlas;
+  private Texture backgroundTexture;
+  private SpriteBatch backdropBatch;
 
   /**
    * How far the scrim darkens the backdrop.
@@ -82,6 +86,19 @@ public abstract class MenuScreen extends BaseScreen {
    */
   protected String backgroundAtlasPath() {
     return DEFAULT_BACKGROUND;
+  }
+
+  /**
+   * A plain image under assets/ to use as the backdrop instead of {@link #backgroundAtlasPath()},
+   * or null to keep the atlas one. Drawn to fill the viewport at its own aspect ratio.
+   */
+  protected String backgroundImagePath() {
+    return null;
+  }
+
+  /** Whether the dark wash goes over the backdrop. Off for a backdrop meant to be seen as it is. */
+  protected boolean scrimBackground() {
+    return true;
   }
 
   protected MenuScreen(PvzGdxGame game) {
@@ -139,7 +156,7 @@ public abstract class MenuScreen extends BaseScreen {
   @Override
   public void show() {
     GameAudio.getInstance().playMusic(musicTrack());
-    stage = new Stage(new FitViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
+    stage = new Stage(new ExtendViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
     skin = game.getUiSkin().get();
     Gdx.input.setInputProcessor(stage);
     if (skin == null) {
@@ -199,6 +216,17 @@ public abstract class MenuScreen extends BaseScreen {
 
   /** Added before the root table so everything else draws on top. */
   private void addBackground() {
+    String image = backgroundImagePath();
+    if (image != null && Gdx.files.internal(image).exists()) {
+      backgroundTexture = new Texture(Gdx.files.internal(image));
+      backgroundTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+      // Drawn across the whole window in render() rather than as an actor, so it covers the
+      // letterbox as well and never leaves bars around itself.
+      if (scrimBackground()) {
+        addScrim();
+      }
+      return;
+    }
     String path = backgroundAtlasPath();
     if (path == null || !Gdx.files.internal(path).exists()) {
       return;
@@ -208,11 +236,18 @@ public abstract class MenuScreen extends BaseScreen {
     if (region == null) {
       return;
     }
+    addBackdrop(region);
+  }
+
+  /** Scaling.fill keeps the art's own proportions and covers the viewport, leaving no gaps. */
+  private void addBackdrop(TextureRegion region) {
     Image background = new Image(region);
     background.setFillParent(true);
     background.setScaling(Scaling.fill);
     stage.addActor(background);
-    addScrim();
+    if (scrimBackground()) {
+      addScrim();
+    }
   }
 
   /** The wash between the backdrop and the content. Its own actor, so it covers the whole stage. */
@@ -308,9 +343,32 @@ public abstract class MenuScreen extends BaseScreen {
 
   @Override
   public void render(float delta) {
+    drawFullWindowBackdrop();
     stage.act(delta);
     stage.getViewport().apply();
     stage.draw();
+  }
+
+  /** The image backdrop, scaled to cover the window at its own proportions and centred. */
+  private void drawFullWindowBackdrop() {
+    if (backgroundTexture == null) {
+      return;
+    }
+    if (backdropBatch == null) {
+      backdropBatch = new SpriteBatch();
+    }
+    float width = Gdx.graphics.getWidth();
+    float height = Gdx.graphics.getHeight();
+    float scale = Math.max(width / backgroundTexture.getWidth(),
+        height / backgroundTexture.getHeight());
+    float drawWidth = backgroundTexture.getWidth() * scale;
+    float drawHeight = backgroundTexture.getHeight() * scale;
+    HdpiUtils.glViewport(0, 0, (int) width, (int) height);
+    backdropBatch.getProjectionMatrix().setToOrtho2D(0f, 0f, width, height);
+    backdropBatch.begin();
+    backdropBatch.draw(backgroundTexture, (width - drawWidth) / 2f, (height - drawHeight) / 2f,
+        drawWidth, drawHeight);
+    backdropBatch.end();
   }
 
   @Override
@@ -333,6 +391,14 @@ public abstract class MenuScreen extends BaseScreen {
     if (backgroundAtlas != null) {
       backgroundAtlas.dispose();
       backgroundAtlas = null;
+    }
+    if (backgroundTexture != null) {
+      backgroundTexture.dispose();
+      backgroundTexture = null;
+    }
+    if (backdropBatch != null) {
+      backdropBatch.dispose();
+      backdropBatch = null;
     }
   }
 }

@@ -1,0 +1,33 @@
+worldselect.png
+size: 1536,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+egypt
+  rotate: false
+  xy: 183, 0
+  size: 446, 529
+  orig: 446, 529
+  offset: 0, 0
+  index: -1
+darkages
+  rotate: false
+  xy: 873, 4
+  size: 446, 528
+  orig: 446, 528
+  offset: 0, 0
+  index: -1
+beach
+  rotate: false
+  xy: 214, 516
+  size: 419, 505
+  orig: 419, 505
+  offset: 0, 0
+  index: -1
+frostbite
+  rotate: false
+  xy: 884, 526
+  size: 451, 496
+  orig: 451, 496
+  offset: 0, 0
+  index: -1
