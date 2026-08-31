@@ -1033,6 +1033,49 @@ public final class EntityRenderer implements WorldRenderer {
     return zombieScaleFrom(animation.width(clip), height, ZOMBIE_ANIM_UNITS);
   }
 
+  /**
+   * Where the top of a zombie's rig actually is on screen right now, in world Y, for the health
+   * bar to sit just above.
+   *
+   * <p>Not animation.height(clip) * scale: that height is the clip's bounding box aggregated
+   * across every frame of it, since {@link EntityAnimation#draw} needs a stable value to anchor a
+   * clip's feet consistently as it plays. A walk cycle's most stretched-out stride, or the
+   * Gargantuar's pole raised overhead mid-smash, are both real frames of those clips and both
+   * count toward it -- so a health bar built from that number sits at the height of the tallest
+   * moment the clip ever reaches, with a visible gap above the character for every calmer frame in
+   * between. {@link EntityAnimation#topPartBox} already solves this correctly for
+   * {@link #drawPlantHead}, reading the part that is actually highest in the exact frame on
+   * screen; this asks it the same question and reads the state {@link #drawZombieAnimation}
+   * already advanced this frame rather than advancing the clip a second time.
+   *
+   * @return world Y of the sprite's current top, or null for a zombie with no rig to measure
+   */
+  private Float zombieTopY(Zombie zombie) {
+    EntityAnimation animation = zombieAnimation(zombie);
+    if (animation == null) {
+      return null;
+    }
+    String clip = zombieClip(animation, zombie);
+    float time = playback.peek(zombie);
+    float flight = zombie.flightProgress();
+    double column = flight > 0f
+        ? zombie.getX() + (zombie.getThrownFromX() - zombie.getX()) * flight
+        : zombie.getX();
+    float x = geometry.columnCentreX(onBoard(column));
+    float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
+        + throwLift(flight);
+    float scale = zombieAnimationScale(zombie, animation, clip);
+    float[] top = animation.topPartBox(clip, time, x, y, scale, zombie.isHypnotized());
+    return top == null ? null : top[1] + top[3] / 2f;
+  }
+
+  /** Foot Y plus the whole-clip estimate, for a zombie zombieTopY could not measure. */
+  private float legacySpriteTopY(Zombie zombie) {
+    return geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
+        + zombieSpriteHeight(zombie);
+  }
+
+  /** The old, whole-clip estimate: still what a zombie with no rig (a static portrait) needs. */
   private float zombieSpriteHeight(Zombie zombie) {
     EntityAnimation animation = zombieAnimation(zombie);
     if (animation != null) {
@@ -1290,12 +1333,13 @@ public final class EntityRenderer implements WorldRenderer {
         || plantArt.find(plant.getName()) != null;
   }
 
+  private static final float HEALTH_BAR_GAP = 10f;
+
   private void healthBar(ShapeRenderer shapes, Zombie zombie) {
-    float spriteHeight = zombieSpriteHeight(zombie);
+    Float topY = zombieTopY(zombie);
+    float y = (topY != null ? topY : legacySpriteTopY(zombie)) + HEALTH_BAR_GAP;
     float width = geometry.getCellHeight() * (isBoss(zombie) ? 2.1f : 0.62f);
     float x = geometry.columnCentreX(onBoard(zombie.getX())) - width / 2f;
-    float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
-        + spriteHeight + 4f;
     // a tall zombie in the top lane would otherwise wear its bar up in the seed cards
     y = Math.min(y, geometry.rowToY(0) + geometry.getCellHeight() - 7f);
     float thickness = isBoss(zombie) ? 11f : 5f;
