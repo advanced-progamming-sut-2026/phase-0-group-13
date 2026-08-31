@@ -5,30 +5,21 @@ import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 
 public class SubmergedZombieAction implements ZombieAction {
-  private final int submergedTicks;
-  private final int surfacedTicks;
   private final double eatingDamage;
-  private int phaseStartTick = -1;
-  private boolean submerged = true;
+  private boolean submerged;
 
-  public SubmergedZombieAction(int submergedTicks, int surfacedTicks, double eatingDamage) {
-    this.submergedTicks = submergedTicks;
-    this.surfacedTicks = surfacedTicks;
+  public SubmergedZombieAction(int unusedSubmergedTicks, int unusedSurfacedTicks,
+      double eatingDamage) {
     this.eatingDamage = eatingDamage;
   }
 
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
-    if (phaseStartTick == -1) {
-      phaseStartTick = currentTick;
-    }
-
-    int phaseDuration = submerged ? submergedTicks : surfacedTicks;
-    if (currentTick - phaseStartTick >= phaseDuration) {
-      submerged = !submerged;
-      phaseStartTick = currentTick;
-    }
-
+    // The doc ties diving to the water, not to a clock: it swims where there is sea and walks
+    // everywhere else, and it surfaces whenever there is something in front of it to eat.
+    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
+    boolean overWater = board.isWaterAt(zombie.getRow(), (int) Math.round(zombie.getX()));
+    submerged = overWater && targetPlant == null;
     zombie.setSubmerged(submerged);
 
     if (submerged) {
@@ -37,7 +28,6 @@ public class SubmergedZombieAction implements ZombieAction {
       return;
     }
 
-    Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);
       if (currentTick % 10 == 0) {

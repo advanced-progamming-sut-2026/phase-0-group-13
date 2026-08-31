@@ -53,7 +53,7 @@ public class ProspectorZombieAction implements ZombieAction {
 
     detonated = true;
     board.applyAreaDamageToZombies(
-            (int) Math.round(zombie.getX()), zombie.getRow(), BLAST_RANGE, BLAST_DAMAGE);
+            (int) Math.round(zombie.getX()), zombie.getRow(), BLAST_RANGE, BLAST_DAMAGE, zombie);
     dynamiteX = board.getColumns() - 1.0;
     System.out.printf("%s's dynamite exploded and was flung to the end of row %d!%n",
             zombie.getName(), zombie.getRow() + 1);
@@ -63,7 +63,8 @@ public class ProspectorZombieAction implements ZombieAction {
     if (dynamiteX < 0 || dynamiteX >= board.getColumns()) {
       return;
     }
-    dynamiteX += DYNAMITE_SPEED;
+    // Flung to the far end, it rolls back down the row towards the house.
+    dynamiteX -= DYNAMITE_SPEED;
 
     for (Plant plant : board.getPlants()) {
       if (plant.isDead() || plant.getRow() != zombie.getRow()) {

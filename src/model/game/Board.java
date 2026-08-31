@@ -706,8 +706,14 @@ public class Board {
   }
 
   public void applyAreaDamageToZombies(int centerCol, int centerRow, int radius, int damage) {
+    applyAreaDamageToZombies(centerCol, centerRow, radius, damage, null);
+  }
+
+  /** {@code spared} walks away from its own blast, which is how the Prospector keeps rolling. */
+  public void applyAreaDamageToZombies(int centerCol, int centerRow, int radius, int damage,
+          Zombie spared) {
     for (Zombie z : zombies) {
-      if (z.isDead() || Math.abs(z.getX() - centerCol) > radius) {
+      if (z == spared || z.isDead() || Math.abs(z.getX() - centerCol) > radius) {
         continue;
       }
       if (Math.abs(z.getRow() - centerRow) <= radius
