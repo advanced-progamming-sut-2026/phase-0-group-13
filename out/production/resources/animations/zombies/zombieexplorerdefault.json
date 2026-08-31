@@ -1,0 +1,22 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "die": 3.7333,
+        "eat": 6.3333,
+        "idle": 2.1333,
+        "particles": 0.0333,
+        "walk": 2
+      },
+      "name": "ZOMBIE_EXPLORER",
+      "pam": "768/INITIAL/ZOMBIE/ZOMBIE_EXPLORER/ZOMBIE_EXPLORER.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombieexplorerdefault.atlas",
+  "entity": "ZombieExplorerDefault",
+  "source_folder": "images/768/.../zombie_explorer"
+}

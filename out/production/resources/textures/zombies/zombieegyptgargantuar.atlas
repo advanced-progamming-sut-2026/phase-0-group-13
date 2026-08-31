@@ -1,0 +1,593 @@
+zombieegyptgargantuargroup_768_00.png
+size: 512,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+egypt_gargantuar_102x79
+  rotate: false
+  xy: 118, 266
+  size: 66, 51
+  orig: 66, 51
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_105x116
+  rotate: false
+  xy: 146, 460
+  size: 67, 74
+  orig: 67, 74
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_105x120
+  rotate: false
+  xy: 77, 444
+  size: 67, 77
+  orig: 67, 77
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_105x89
+  rotate: false
+  xy: 344, 489
+  size: 67, 57
+  orig: 67, 57
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_106x58
+  rotate: false
+  xy: 402, 559
+  size: 68, 37
+  orig: 68, 37
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_109x82
+  rotate: false
+  xy: 1, 525
+  size: 70, 53
+  orig: 70, 53
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_109x84
+  rotate: false
+  xy: 413, 503
+  size: 70, 54
+  orig: 70, 54
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_10x19
+  rotate: false
+  xy: 232, 588
+  size: 7, 12
+  orig: 7, 12
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_113x63
+  rotate: false
+  xy: 273, 559
+  size: 73, 41
+  orig: 73, 41
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_116x123
+  rotate: false
+  xy: 1, 444
+  size: 74, 79
+  orig: 74, 79
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_125x126
+  rotate: false
+  xy: 417, 420
+  size: 80, 81
+  orig: 80, 81
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_12x15
+  rotate: false
+  xy: 209, 320
+  size: 8, 10
+  orig: 8, 10
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_135x8
+  rotate: false
+  xy: 389, 131
+  size: 87, 5
+  orig: 87, 5
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_13x23
+  rotate: false
+  xy: 503, 629
+  size: 9, 15
+  orig: 9, 15
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_13x24
+  rotate: false
+  xy: 61, 601
+  size: 9, 16
+  orig: 9, 16
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_13x25
+  rotate: false
+  xy: 503, 611
+  size: 9, 16
+  orig: 9, 16
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_146x134
+  rotate: false
+  xy: 373, 332
+  size: 94, 86
+  orig: 94, 86
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_14x26
+  rotate: false
+  xy: 503, 592
+  size: 9, 17
+  orig: 9, 17
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_14x29
+  rotate: false
+  xy: 61, 580
+  size: 9, 19
+  orig: 9, 19
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_14x35
+  rotate: false
+  xy: 499, 437
+  size: 9, 23
+  orig: 9, 23
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_14x39
+  rotate: false
+  xy: 358, 392
+  size: 9, 25
+  orig: 9, 25
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_153x104
+  rotate: false
+  xy: 317, 420
+  size: 98, 67
+  orig: 98, 67
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_15x32
+  rotate: false
+  xy: 499, 414
+  size: 10, 21
+  orig: 10, 21
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_161x199
+  rotate: false
+  xy: 389, 1
+  size: 103, 128
+  orig: 103, 128
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_16x29
+  rotate: false
+  xy: 499, 462
+  size: 10, 19
+  orig: 10, 19
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_17x23
+  rotate: false
+  xy: 499, 483
+  size: 11, 15
+  orig: 11, 15
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_180x77
+  rotate: false
+  xy: 1, 266
+  size: 115, 50
+  orig: 115, 50
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_187x102
+  rotate: false
+  xy: 195, 392
+  size: 120, 66
+  orig: 120, 66
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_18x13
+  rotate: false
+  xy: 478, 131
+  size: 12, 9
+  orig: 12, 9
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_18x13_2
+  rotate: false
+  xy: 195, 320
+  size: 12, 9
+  orig: 12, 9
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_18x38
+  rotate: false
+  xy: 494, 95
+  size: 12, 25
+  orig: 12, 25
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_20x40
+  rotate: false
+  xy: 494, 67
+  size: 13, 26
+  orig: 13, 26
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_21x25
+  rotate: false
+  xy: 220, 638
+  size: 14, 16
+  orig: 14, 16
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_21x25_2
+  rotate: false
+  xy: 236, 638
+  size: 14, 16
+  orig: 14, 16
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_21x28
+  rotate: false
+  xy: 204, 636
+  size: 14, 18
+  orig: 14, 18
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_21x50
+  rotate: false
+  xy: 494, 33
+  size: 14, 32
+  orig: 14, 32
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_223x118
+  rotate: false
+  xy: 1, 188
+  size: 143, 76
+  orig: 143, 76
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_230x270
+  rotate: false
+  xy: 188, 145
+  size: 147, 173
+  orig: 147, 173
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_25x25
+  rotate: false
+  xy: 494, 122
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_260x190
+  rotate: false
+  xy: 337, 145
+  size: 167, 122
+  orig: 167, 122
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_269x95
+  rotate: false
+  xy: 337, 269
+  size: 172, 61
+  orig: 172, 61
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_26x46
+  rotate: false
+  xy: 494, 1
+  size: 17, 30
+  orig: 17, 30
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_274x90
+  rotate: false
+  xy: 195, 332
+  size: 176, 58
+  orig: 176, 58
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_288x288
+  rotate: false
+  xy: 1, 1
+  size: 185, 185
+  orig: 185, 185
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_28x33
+  rotate: false
+  xy: 184, 636
+  size: 18, 21
+  orig: 18, 21
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_299x190
+  rotate: false
+  xy: 1, 320
+  size: 192, 122
+  orig: 192, 122
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_30x48
+  rotate: false
+  xy: 37, 621
+  size: 19, 31
+  orig: 19, 31
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_311x222
+  rotate: false
+  xy: 188, 1
+  size: 199, 142
+  orig: 199, 142
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_32x19
+  rotate: false
+  xy: 169, 444
+  size: 21, 12
+  orig: 21, 12
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_32x21
+  rotate: false
+  xy: 146, 444
+  size: 21, 14
+  orig: 21, 14
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_32x40
+  rotate: false
+  xy: 83, 622
+  size: 21, 26
+  orig: 21, 26
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_33x36
+  rotate: false
+  xy: 106, 626
+  size: 21, 23
+  orig: 21, 23
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_34x47
+  rotate: false
+  xy: 485, 503
+  size: 22, 30
+  orig: 22, 30
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_35x28
+  rotate: false
+  xy: 159, 626
+  size: 23, 18
+  orig: 23, 18
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_35x31
+  rotate: false
+  xy: 485, 535
+  size: 23, 20
+  orig: 23, 20
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_36x39
+  rotate: false
+  xy: 58, 622
+  size: 23, 25
+  orig: 23, 25
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_36x44
+  rotate: false
+  xy: 375, 603
+  size: 23, 28
+  orig: 23, 28
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_38x38
+  rotate: false
+  xy: 281, 460
+  size: 25, 25
+  orig: 25, 25
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_40x24
+  rotate: false
+  xy: 361, 633
+  size: 26, 16
+  orig: 26, 16
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_43x25
+  rotate: false
+  xy: 129, 626
+  size: 28, 16
+  orig: 28, 16
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_43x25_2
+  rotate: false
+  xy: 331, 626
+  size: 28, 16
+  orig: 28, 16
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_49x48
+  rotate: false
+  xy: 472, 559
+  size: 32, 31
+  orig: 32, 31
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_52x31
+  rotate: false
+  xy: 1, 621
+  size: 34, 20
+  orig: 34, 20
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_52x76
+  rotate: false
+  xy: 469, 332
+  size: 34, 49
+  orig: 34, 49
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_54x77
+  rotate: false
+  xy: 146, 188
+  size: 35, 50
+  orig: 35, 50
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_55x32
+  rotate: false
+  xy: 146, 240
+  size: 35, 21
+  orig: 35, 21
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_60x45
+  rotate: false
+  xy: 469, 383
+  size: 39, 29
+  orig: 39, 29
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_61x41
+  rotate: false
+  xy: 317, 392
+  size: 39, 26
+  orig: 39, 26
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_66x33
+  rotate: false
+  xy: 331, 603
+  size: 42, 21
+  orig: 42, 21
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_67x64
+  rotate: false
+  xy: 286, 602
+  size: 43, 41
+  orig: 43, 41
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_6x6
+  rotate: false
+  xy: 389, 138
+  size: 4, 4
+  orig: 4, 4
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_70x71
+  rotate: false
+  xy: 185, 588
+  size: 45, 46
+  orig: 45, 46
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_75x66
+  rotate: false
+  xy: 453, 598
+  size: 48, 42
+  orig: 48, 42
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_76x66
+  rotate: false
+  xy: 402, 598
+  size: 49, 42
+  orig: 49, 42
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_80x72
+  rotate: false
+  xy: 73, 574
+  size: 51, 46
+  orig: 51, 46
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_81x52
+  rotate: false
+  xy: 232, 602
+  size: 52, 34
+  orig: 52, 34
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_81x83
+  rotate: false
+  xy: 348, 548
+  size: 52, 53
+  orig: 52, 53
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_87x86
+  rotate: false
+  xy: 215, 531
+  size: 56, 55
+  orig: 56, 55
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_88x59
+  rotate: false
+  xy: 126, 586
+  size: 57, 38
+  orig: 57, 38
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_90x60
+  rotate: false
+  xy: 1, 580
+  size: 58, 39
+  orig: 58, 39
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_95x106
+  rotate: false
+  xy: 281, 489
+  size: 61, 68
+  orig: 61, 68
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_96x74
+  rotate: false
+  xy: 143, 536
+  size: 62, 48
+  orig: 62, 48
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_99x108
+  rotate: false
+  xy: 215, 460
+  size: 64, 69
+  orig: 64, 69
+  offset: 0, 0
+  index: -1
+egypt_gargantuar_99x76
+  rotate: false
+  xy: 77, 523
+  size: 64, 49
+  orig: 64, 49
+  offset: 0, 0
+  index: -1

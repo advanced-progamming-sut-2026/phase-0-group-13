@@ -1,0 +1,271 @@
+planticeburg_768_00.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+iceburg_100x99
+  rotate: false
+  xy: 430, 236
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+iceburg_106x85
+  rotate: false
+  xy: 1, 263
+  size: 68, 55
+  orig: 68, 55
+  offset: 0, 0
+  index: -1
+iceburg_108x94
+  rotate: false
+  xy: 359, 236
+  size: 69, 60
+  orig: 69, 60
+  offset: 0, 0
+  index: -1
+iceburg_111x86
+  rotate: false
+  xy: 165, 248
+  size: 71, 55
+  orig: 71, 55
+  offset: 0, 0
+  index: -1
+iceburg_114x88
+  rotate: false
+  xy: 95, 110
+  size: 73, 57
+  orig: 73, 57
+  offset: 0, 0
+  index: -1
+iceburg_116x106
+  rotate: false
+  xy: 283, 190
+  size: 74, 68
+  orig: 74, 68
+  offset: 0, 0
+  index: -1
+iceburg_120x120
+  rotate: false
+  xy: 204, 169
+  size: 77, 77
+  orig: 77, 77
+  offset: 0, 0
+  index: -1
+iceburg_123x76
+  rotate: false
+  xy: 238, 260
+  size: 79, 49
+  orig: 79, 49
+  offset: 0, 0
+  index: -1
+iceburg_144x143
+  rotate: false
+  xy: 1, 110
+  size: 92, 92
+  orig: 92, 92
+  offset: 0, 0
+  index: -1
+iceburg_149x69
+  rotate: false
+  xy: 359, 190
+  size: 96, 44
+  orig: 96, 44
+  offset: 0, 0
+  index: -1
+iceburg_14x14
+  rotate: false
+  xy: 332, 115
+  size: 9, 9
+  orig: 9, 9
+  offset: 0, 0
+  index: -1
+iceburg_161x161
+  rotate: false
+  xy: 347, 85
+  size: 103, 103
+  orig: 103, 103
+  offset: 0, 0
+  index: -1
+iceburg_167x94
+  rotate: false
+  xy: 95, 169
+  size: 107, 60
+  orig: 107, 60
+  offset: 0, 0
+  index: -1
+iceburg_16x12
+  rotate: false
+  xy: 332, 126
+  size: 10, 8
+  orig: 10, 8
+  offset: 0, 0
+  index: -1
+iceburg_16x24
+  rotate: false
+  xy: 170, 110
+  size: 10, 16
+  orig: 10, 16
+  offset: 0, 0
+  index: -1
+iceburg_193x111
+  rotate: false
+  xy: 186, 96
+  size: 124, 71
+  orig: 124, 71
+  offset: 0, 0
+  index: -1
+iceburg_1x1
+  rotate: false
+  xy: 507, 11
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+iceburg_1x1_2
+  rotate: false
+  xy: 510, 11
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+iceburg_219x127
+  rotate: false
+  xy: 347, 1
+  size: 140, 82
+  orig: 140, 82
+  offset: 0, 0
+  index: -1
+iceburg_22x36
+  rotate: false
+  xy: 489, 54
+  size: 14, 23
+  orig: 14, 23
+  offset: 0, 0
+  index: -1
+iceburg_248x145
+  rotate: false
+  xy: 186, 1
+  size: 159, 93
+  orig: 159, 93
+  offset: 0, 0
+  index: -1
+iceburg_252x47
+  rotate: false
+  xy: 1, 231
+  size: 162, 30
+  orig: 162, 30
+  offset: 0, 0
+  index: -1
+iceburg_25x40
+  rotate: false
+  xy: 489, 1
+  size: 16, 26
+  orig: 16, 26
+  offset: 0, 0
+  index: -1
+iceburg_26x10
+  rotate: false
+  xy: 312, 129
+  size: 17, 7
+  orig: 17, 7
+  offset: 0, 0
+  index: -1
+iceburg_26x35
+  rotate: false
+  xy: 489, 29
+  size: 17, 23
+  orig: 17, 23
+  offset: 0, 0
+  index: -1
+iceburg_286x167
+  rotate: false
+  xy: 1, 1
+  size: 183, 107
+  orig: 183, 107
+  offset: 0, 0
+  index: -1
+iceburg_28x18
+  rotate: false
+  xy: 312, 115
+  size: 18, 12
+  orig: 18, 12
+  offset: 0, 0
+  index: -1
+iceburg_36x26
+  rotate: false
+  xy: 312, 96
+  size: 23, 17
+  orig: 23, 17
+  offset: 0, 0
+  index: -1
+iceburg_5x5
+  rotate: false
+  xy: 507, 1
+  size: 3, 3
+  orig: 3, 3
+  offset: 0, 0
+  index: -1
+iceburg_5x5_2
+  rotate: false
+  xy: 507, 6
+  size: 3, 3
+  orig: 3, 3
+  offset: 0, 0
+  index: -1
+iceburg_67x73
+  rotate: false
+  xy: 431, 302
+  size: 43, 47
+  orig: 43, 47
+  offset: 0, 0
+  index: -1
+iceburg_77x61
+  rotate: false
+  xy: 129, 305
+  size: 50, 39
+  orig: 50, 39
+  offset: 0, 0
+  index: -1
+iceburg_83x74
+  rotate: false
+  xy: 376, 302
+  size: 53, 48
+  orig: 53, 48
+  offset: 0, 0
+  index: -1
+iceburg_83x80
+  rotate: false
+  xy: 457, 143
+  size: 53, 51
+  orig: 53, 51
+  offset: 0, 0
+  index: -1
+iceburg_84x23
+  rotate: false
+  xy: 283, 169
+  size: 54, 15
+  orig: 54, 15
+  offset: 0, 0
+  index: -1
+iceburg_85x80
+  rotate: false
+  xy: 319, 298
+  size: 55, 51
+  orig: 55, 51
+  offset: 0, 0
+  index: -1
+iceburg_87x80
+  rotate: false
+  xy: 71, 263
+  size: 56, 51
+  orig: 56, 51
+  offset: 0, 0
+  index: -1
+iceburg_89x87
+  rotate: false
+  xy: 452, 85
+  size: 57, 56
+  orig: 57, 56
+  offset: 0, 0
+  index: -1

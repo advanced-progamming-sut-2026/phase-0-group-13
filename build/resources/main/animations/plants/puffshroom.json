@@ -1,0 +1,31 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "idle2_stage1": 1,
+        "idle2_stage2": 1,
+        "idle2_stage3": 1,
+        "idle_stage1": 1,
+        "idle_stage2": 1,
+        "idle_stage3": 1,
+        "idle_stage4": 0.8,
+        "plantfood": 0.1,
+        "plantfood_off": 0.7667,
+        "plantfood_on": 0.6667,
+        "special_stage1": 0.8,
+        "special_stage2": 0.8,
+        "special_stage3": 0.8,
+        "water": 2.0333
+      },
+      "name": "PUFFSHROOM",
+      "pam": "768/INITIAL/PLANT/PUFFSHROOM/PUFFSHROOM.PAM"
+    }
+  ],
+  "atlas": "textures/plants/puffshroom.atlas",
+  "entity": "Puff-shroom",
+  "source_folder": "images/768/.../puffshroom"
+}

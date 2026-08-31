@@ -1,0 +1,24 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "attack": 1.3,
+        "charge": 7,
+        "idle": 0.9,
+        "idle2": 3.3333,
+        "plantfood": 1.3667,
+        "recovery": 1.4333,
+        "water": 1.6
+      },
+      "name": "CITRON",
+      "pam": "768/FULL/PLANT/CITRON/CITRON.PAM"
+    }
+  ],
+  "atlas": "textures/plants/citron.atlas",
+  "entity": "Citron",
+  "source_folder": "images/768/.../citron"
+}

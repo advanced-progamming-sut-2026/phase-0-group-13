@@ -1,0 +1,21 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "attack": 0.3667,
+        "attack2": 0.3667,
+        "idle": 0.3333,
+        "transition": 0.3333
+      },
+      "name": "MOWER_BEACH",
+      "pam": "768/FULL/MOWERS/MOWER_BEACH/MOWER_BEACH.PAM"
+    }
+  ],
+  "atlas": "textures/lawn/bigwavebeachseason.atlas",
+  "entity": "BigWaveBeachSeason",
+  "source_folder": "images/768/.../mower_beach"
+}

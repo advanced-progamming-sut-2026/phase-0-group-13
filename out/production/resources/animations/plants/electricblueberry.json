@@ -1,0 +1,32 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "attack": 1.6667,
+        "idle1_1": 2.6667,
+        "idle1_2": 2,
+        "idle2_1": 2.6667,
+        "idle2_2": 2.6667,
+        "idle2_3": 2.6667,
+        "idle2_4": 2.6667,
+        "idle3_1": 1.9333,
+        "idle3_2": 1.9333,
+        "idle3_3": 1.9333,
+        "idle4_1": 1.3333,
+        "idle4_2": 1.3333,
+        "idle4_3": 1.3333,
+        "plantfood": 2,
+        "water": 1.5333
+      },
+      "name": "ELECTRICBLUEBERRY",
+      "pam": "768/INITIAL/PLANT/ELECTRICBLUEBERRY/ELECTRICBLUEBERRY.PAM"
+    }
+  ],
+  "atlas": "textures/plants/electricblueberry.atlas",
+  "entity": "Electric Blueberry",
+  "source_folder": "images/768/.../electricblueberry"
+}

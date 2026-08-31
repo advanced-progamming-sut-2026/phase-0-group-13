@@ -1,0 +1,23 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "die": 3.1667,
+        "idle": 4,
+        "idle2": 2.9333,
+        "intro": 3.2333,
+        "particles": 0.0333,
+        "special": 4
+      },
+      "name": "ZOMBIE_DARK_KING",
+      "pam": "768/FULL/ZOMBIE/ZOMBIE_DARK_KING/ZOMBIE_DARK_KING.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombiedarkking.atlas",
+  "entity": "ZombieDarkKing",
+  "source_folder": "images/768/.../zombie_dark_king"
+}

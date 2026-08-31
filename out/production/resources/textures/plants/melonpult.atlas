@@ -1,0 +1,208 @@
+plantmelonpult_768_00.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+Melonpult_101x123
+  rotate: false
+  xy: 268, 273
+  size: 65, 79
+  orig: 65, 79
+  offset: 0, 0
+  index: -1
+Melonpult_101x39
+  rotate: false
+  xy: 259, 354
+  size: 65, 25
+  orig: 65, 25
+  offset: 0, 0
+  index: -1
+Melonpult_102x250
+  rotate: false
+  xy: 243, 1
+  size: 66, 160
+  orig: 66, 160
+  offset: 0, 0
+  index: -1
+Melonpult_111x105
+  rotate: false
+  xy: 186, 345
+  size: 71, 67
+  orig: 71, 67
+  offset: 0, 0
+  index: -1
+Melonpult_113x41
+  rotate: false
+  xy: 234, 163
+  size: 73, 26
+  orig: 73, 26
+  offset: 0, 0
+  index: -1
+Melonpult_117x139
+  rotate: false
+  xy: 337, 202
+  size: 75, 89
+  orig: 75, 89
+  offset: 0, 0
+  index: -1
+Melonpult_122x83
+  rotate: false
+  xy: 389, 386
+  size: 78, 53
+  orig: 78, 53
+  offset: 0, 0
+  index: -1
+Melonpult_122x83_2
+  rotate: false
+  xy: 259, 391
+  size: 78, 53
+  orig: 78, 53
+  offset: 0, 0
+  index: -1
+Melonpult_122x83_3
+  rotate: false
+  xy: 1, 402
+  size: 78, 53
+  orig: 78, 53
+  offset: 0, 0
+  index: -1
+Melonpult_124x112
+  rotate: false
+  xy: 104, 273
+  size: 80, 72
+  orig: 80, 72
+  offset: 0, 0
+  index: -1
+Melonpult_128x123
+  rotate: false
+  xy: 414, 245
+  size: 82, 79
+  orig: 82, 79
+  offset: 0, 0
+  index: -1
+Melonpult_143x136
+  rotate: false
+  xy: 417, 1
+  size: 92, 87
+  orig: 92, 87
+  offset: 0, 0
+  index: -1
+Melonpult_16x23
+  rotate: false
+  xy: 498, 280
+  size: 10, 15
+  orig: 10, 15
+  offset: 0, 0
+  index: -1
+Melonpult_1x1
+  rotate: false
+  xy: 506, 93
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+Melonpult_203x193
+  rotate: false
+  xy: 1, 1
+  size: 130, 124
+  orig: 130, 124
+  offset: 0, 0
+  index: -1
+Melonpult_20x13
+  rotate: false
+  xy: 234, 191
+  size: 13, 9
+  orig: 13, 9
+  offset: 0, 0
+  index: -1
+Melonpult_23x11
+  rotate: false
+  xy: 249, 191
+  size: 15, 7
+  orig: 15, 7
+  offset: 0, 0
+  index: -1
+Melonpult_25x22
+  rotate: false
+  xy: 113, 181
+  size: 16, 14
+  orig: 16, 14
+  offset: 0, 0
+  index: -1
+Melonpult_39x22
+  rotate: false
+  xy: 1, 384
+  size: 25, 14
+  orig: 25, 14
+  offset: 0, 0
+  index: -1
+Melonpult_44x38
+  rotate: false
+  xy: 113, 456
+  size: 28, 25
+  orig: 28, 25
+  offset: 0, 0
+  index: -1
+Melonpult_46x32
+  rotate: false
+  xy: 29, 457
+  size: 30, 21
+  orig: 30, 21
+  offset: 0, 0
+  index: -1
+Melonpult_46x32_2
+  rotate: false
+  xy: 330, 473
+  size: 30, 21
+  orig: 30, 21
+  offset: 0, 0
+  index: -1
+Melonpult_46x37
+  rotate: false
+  xy: 81, 456
+  size: 30, 24
+  orig: 30, 24
+  offset: 0, 0
+  index: -1
+Melonpult_50x53
+  rotate: false
+  xy: 339, 437
+  size: 32, 34
+  orig: 32, 34
+  offset: 0, 0
+  index: -1
+Melonpult_53x43
+  rotate: false
+  xy: 294, 446
+  size: 34, 28
+  orig: 34, 28
+  offset: 0, 0
+  index: -1
+Melonpult_59x90
+  rotate: false
+  xy: 466, 90
+  size: 38, 58
+  orig: 38, 58
+  offset: 0, 0
+  index: -1
+Melonpult_65x59
+  rotate: false
+  xy: 469, 386
+  size: 42, 38
+  orig: 42, 38
+  offset: 0, 0
+  index: -1
+Melonpult_66x42
+  rotate: false
+  xy: 469, 426
+  size: 42, 27
+  orig: 42, 27
+  offset: 0, 0
+  index: -1
+Melonpult_79x51
+  rotate: false
+  xy: 1, 349
+  size: 51, 33
+  orig: 51, 33
+  offset: 0, 0
+  index: -1

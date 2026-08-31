@@ -1,0 +1,250 @@
+zombieiceagehuntergroup_768_00.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+zombie_iceage_hunter_117x128
+  rotate: false
+  xy: 1, 1
+  size: 75, 82
+  orig: 75, 82
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_123x64
+  rotate: false
+  xy: 78, 55
+  size: 79, 41
+  orig: 79, 41
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_135x8
+  rotate: false
+  xy: 1, 171
+  size: 87, 5
+  orig: 87, 5
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_136x81
+  rotate: false
+  xy: 78, 1
+  size: 87, 52
+  orig: 87, 52
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_16x38
+  rotate: false
+  xy: 105, 181
+  size: 10, 25
+  orig: 10, 25
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_19x19
+  rotate: false
+  xy: 224, 186
+  size: 12, 12
+  orig: 12, 12
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_20x38
+  rotate: false
+  xy: 66, 178
+  size: 13, 25
+  orig: 13, 25
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_21x48
+  rotate: false
+  xy: 208, 168
+  size: 14, 31
+  orig: 14, 31
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_22x38
+  rotate: false
+  xy: 50, 178
+  size: 14, 25
+  orig: 14, 25
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_22x49
+  rotate: false
+  xy: 162, 159
+  size: 14, 32
+  orig: 14, 32
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_24x58
+  rotate: false
+  xy: 101, 142
+  size: 16, 37
+  orig: 16, 37
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_26x35
+  rotate: false
+  xy: 119, 172
+  size: 17, 23
+  orig: 17, 23
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_28x33
+  rotate: false
+  xy: 178, 177
+  size: 18, 21
+  orig: 18, 21
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_30x21
+  rotate: false
+  xy: 138, 185
+  size: 19, 14
+  orig: 19, 14
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_30x37
+  rotate: false
+  xy: 141, 159
+  size: 19, 24
+  orig: 19, 24
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_31x43
+  rotate: false
+  xy: 119, 142
+  size: 20, 28
+  orig: 20, 28
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_34x21
+  rotate: false
+  xy: 81, 181
+  size: 22, 14
+  orig: 22, 14
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_34x24
+  rotate: false
+  xy: 26, 178
+  size: 22, 16
+  orig: 22, 16
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_35x36
+  rotate: false
+  xy: 42, 146
+  size: 23, 23
+  orig: 23, 23
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_36x24
+  rotate: false
+  xy: 1, 178
+  size: 23, 16
+  orig: 23, 16
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_38x31
+  rotate: false
+  xy: 67, 146
+  size: 25, 20
+  orig: 25, 20
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_39x24
+  rotate: false
+  xy: 224, 168
+  size: 25, 16
+  orig: 25, 16
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_43x25
+  rotate: false
+  xy: 178, 159
+  size: 28, 16
+  orig: 28, 16
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_45x48
+  rotate: false
+  xy: 224, 37
+  size: 29, 31
+  orig: 29, 31
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_46x52
+  rotate: false
+  xy: 224, 1
+  size: 30, 34
+  orig: 30, 34
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_56x30
+  rotate: false
+  xy: 220, 122
+  size: 36, 19
+  orig: 36, 19
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_59x56
+  rotate: false
+  xy: 216, 84
+  size: 38, 36
+  orig: 38, 36
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_60x52
+  rotate: false
+  xy: 1, 131
+  size: 39, 34
+  orig: 39, 34
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_6x6
+  rotate: false
+  xy: 159, 62
+  size: 4, 4
+  orig: 4, 4
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_70x71
+  rotate: false
+  xy: 54, 98
+  size: 45, 46
+  orig: 45, 46
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_74x65
+  rotate: false
+  xy: 101, 98
+  size: 48, 42
+  orig: 48, 42
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_79x69
+  rotate: false
+  xy: 1, 85
+  size: 51, 44
+  orig: 51, 44
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_7x7
+  rotate: false
+  xy: 159, 55
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_85x126
+  rotate: false
+  xy: 167, 1
+  size: 55, 81
+  orig: 55, 81
+  offset: 0, 0
+  index: -1
+zombie_iceage_hunter_85x71
+  rotate: false
+  xy: 159, 84
+  size: 55, 46
+  orig: 55, 46
+  offset: 0, 0
+  index: -1

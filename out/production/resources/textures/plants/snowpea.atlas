@@ -1,0 +1,208 @@
+plantsnowpea_768_00.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+snowpea_110x71
+  rotate: false
+  xy: 277, 266
+  size: 71, 46
+  orig: 71, 46
+  offset: 0, 0
+  index: -1
+snowpea_11x11
+  rotate: false
+  xy: 499, 220
+  size: 7, 7
+  orig: 7, 7
+  offset: 0, 0
+  index: -1
+snowpea_13x13
+  rotate: false
+  xy: 499, 202
+  size: 9, 9
+  orig: 9, 9
+  offset: 0, 0
+  index: -1
+snowpea_149x69
+  rotate: false
+  xy: 179, 266
+  size: 96, 44
+  orig: 96, 44
+  offset: 0, 0
+  index: -1
+snowpea_17x7
+  rotate: false
+  xy: 499, 213
+  size: 11, 5
+  orig: 11, 5
+  offset: 0, 0
+  index: -1
+snowpea_18x20
+  rotate: false
+  xy: 499, 175
+  size: 12, 13
+  orig: 12, 13
+  offset: 0, 0
+  index: -1
+snowpea_21x17
+  rotate: false
+  xy: 362, 355
+  size: 14, 11
+  orig: 14, 11
+  offset: 0, 0
+  index: -1
+snowpea_21x20
+  rotate: false
+  xy: 196, 353
+  size: 14, 13
+  orig: 14, 13
+  offset: 0, 0
+  index: -1
+snowpea_21x23
+  rotate: false
+  xy: 267, 347
+  size: 14, 15
+  orig: 14, 15
+  offset: 0, 0
+  index: -1
+snowpea_21x39
+  rotate: false
+  xy: 421, 345
+  size: 14, 25
+  orig: 14, 25
+  offset: 0, 0
+  index: -1
+snowpea_21x39_2
+  rotate: false
+  xy: 312, 346
+  size: 14, 25
+  orig: 14, 25
+  offset: 0, 0
+  index: -1
+snowpea_23x17
+  rotate: false
+  xy: 345, 355
+  size: 15, 11
+  orig: 15, 11
+  offset: 0, 0
+  index: -1
+snowpea_23x23
+  rotate: false
+  xy: 328, 346
+  size: 15, 15
+  orig: 15, 15
+  offset: 0, 0
+  index: -1
+snowpea_23x23_2
+  rotate: false
+  xy: 250, 347
+  size: 15, 15
+  orig: 15, 15
+  offset: 0, 0
+  index: -1
+snowpea_24x19
+  rotate: false
+  xy: 178, 353
+  size: 16, 12
+  orig: 16, 12
+  offset: 0, 0
+  index: -1
+snowpea_26x36
+  rotate: false
+  xy: 489, 310
+  size: 17, 23
+  orig: 17, 23
+  offset: 0, 0
+  index: -1
+snowpea_32x23
+  rotate: false
+  xy: 227, 347
+  size: 21, 15
+  orig: 21, 15
+  offset: 0, 0
+  index: -1
+snowpea_33x35
+  rotate: false
+  xy: 489, 285
+  size: 21, 23
+  orig: 21, 23
+  offset: 0, 0
+  index: -1
+snowpea_36x45
+  rotate: false
+  xy: 483, 254
+  size: 23, 29
+  orig: 23, 29
+  offset: 0, 0
+  index: -1
+snowpea_38x24
+  rotate: false
+  xy: 394, 345
+  size: 25, 16
+  orig: 25, 16
+  offset: 0, 0
+  index: -1
+snowpea_38x24_2
+  rotate: false
+  xy: 285, 346
+  size: 25, 16
+  orig: 25, 16
+  offset: 0, 0
+  index: -1
+snowpea_46x120
+  rotate: false
+  xy: 467, 175
+  size: 30, 77
+  orig: 30, 77
+  offset: 0, 0
+  index: -1
+snowpea_49x52
+  rotate: false
+  xy: 144, 334
+  size: 32, 34
+  orig: 32, 34
+  offset: 0, 0
+  index: -1
+snowpea_51x45
+  rotate: false
+  xy: 443, 337
+  size: 33, 29
+  orig: 33, 29
+  offset: 0, 0
+  index: -1
+snowpea_62x62
+  rotate: false
+  xy: 1, 334
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+snowpea_65x63
+  rotate: false
+  xy: 350, 312
+  size: 42, 41
+  orig: 42, 41
+  offset: 0, 0
+  index: -1
+snowpea_69x63
+  rotate: false
+  xy: 443, 294
+  size: 44, 41
+  orig: 44, 41
+  offset: 0, 0
+  index: -1
+snowpea_72x60
+  rotate: false
+  xy: 179, 312
+  size: 46, 39
+  orig: 46, 39
+  offset: 0, 0
+  index: -1
+snowpea_8x16
+  rotate: false
+  xy: 506, 1
+  size: 5, 10
+  orig: 5, 10
+  offset: 0, 0
+  index: -1

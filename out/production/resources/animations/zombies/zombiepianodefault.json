@@ -1,0 +1,21 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "die": 1,
+        "idle": 2,
+        "particles": 0.0333,
+        "play": 1
+      },
+      "name": "ZOMBIE_PIANO",
+      "pam": "768/FULL/ZOMBIE/ZOMBIE_PIANO/ZOMBIE_PIANO.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombiepianodefault.atlas",
+  "entity": "ZombiePianoDefault",
+  "source_folder": "images/768/.../zombie_piano"
+}

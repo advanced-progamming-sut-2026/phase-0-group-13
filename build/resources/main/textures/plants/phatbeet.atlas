@@ -1,0 +1,152 @@
+plantphatbeet_768_00.png
+size: 256,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+phatbeets_105x123
+  rotate: false
+  xy: 121, 212
+  size: 67, 79
+  orig: 67, 79
+  offset: 0, 0
+  index: -1
+phatbeets_134x64
+  rotate: false
+  xy: 1, 241
+  size: 86, 41
+  orig: 86, 41
+  offset: 0, 0
+  index: -1
+phatbeets_14x14
+  rotate: false
+  xy: 242, 157
+  size: 9, 9
+  orig: 9, 9
+  offset: 0, 0
+  index: -1
+phatbeets_15x14
+  rotate: false
+  xy: 241, 102
+  size: 10, 9
+  orig: 10, 9
+  offset: 0, 0
+  index: -1
+phatbeets_16x16
+  rotate: false
+  xy: 241, 90
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+phatbeets_17x18
+  rotate: false
+  xy: 241, 33
+  size: 11, 12
+  orig: 11, 12
+  offset: 0, 0
+  index: -1
+phatbeets_18x17
+  rotate: false
+  xy: 241, 47
+  size: 12, 11
+  orig: 12, 11
+  offset: 0, 0
+  index: -1
+phatbeets_24x21
+  rotate: false
+  xy: 101, 277
+  size: 16, 14
+  orig: 16, 14
+  offset: 0, 0
+  index: -1
+phatbeets_26x27
+  rotate: false
+  xy: 238, 267
+  size: 17, 18
+  orig: 17, 18
+  offset: 0, 0
+  index: -1
+phatbeets_31x25
+  rotate: false
+  xy: 52, 311
+  size: 20, 16
+  orig: 20, 16
+  offset: 0, 0
+  index: -1
+phatbeets_33x20
+  rotate: false
+  xy: 74, 311
+  size: 21, 13
+  orig: 21, 13
+  offset: 0, 0
+  index: -1
+phatbeets_34x24
+  rotate: false
+  xy: 28, 311
+  size: 22, 16
+  orig: 22, 16
+  offset: 0, 0
+  index: -1
+phatbeets_37x52
+  rotate: false
+  xy: 89, 241
+  size: 24, 34
+  orig: 24, 34
+  offset: 0, 0
+  index: -1
+phatbeets_38x28
+  rotate: false
+  xy: 1, 311
+  size: 25, 18
+  orig: 25, 18
+  offset: 0, 0
+  index: -1
+phatbeets_43x20
+  rotate: false
+  xy: 212, 197
+  size: 28, 13
+  orig: 28, 13
+  offset: 0, 0
+  index: -1
+phatbeets_44x59
+  rotate: false
+  xy: 212, 157
+  size: 28, 38
+  orig: 28, 38
+  offset: 0, 0
+  index: -1
+phatbeets_46x14
+  rotate: false
+  xy: 201, 312
+  size: 30, 9
+  orig: 30, 9
+  offset: 0, 0
+  index: -1
+phatbeets_51x52
+  rotate: false
+  xy: 212, 121
+  size: 33, 34
+  orig: 33, 34
+  offset: 0, 0
+  index: -1
+phatbeets_54x40
+  rotate: false
+  xy: 201, 267
+  size: 35, 26
+  orig: 35, 26
+  offset: 0, 0
+  index: -1
+phatbeets_69x23
+  rotate: false
+  xy: 201, 295
+  size: 44, 15
+  orig: 44, 15
+  offset: 0, 0
+  index: -1
+phatbeets_96x83
+  rotate: false
+  xy: 190, 212
+  size: 62, 53
+  orig: 62, 53
+  offset: 0, 0
+  index: -1

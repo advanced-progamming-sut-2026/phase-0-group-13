@@ -1,0 +1,327 @@
+zombiebeachfishermangroup_768_00.png
+size: 512,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+zombie_beach_fisherman_102x102
+  rotate: false
+  xy: 353, 415
+  size: 66, 66
+  orig: 66, 66
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_104x73
+  rotate: false
+  xy: 224, 469
+  size: 67, 47
+  orig: 67, 47
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_111x109
+  rotate: false
+  xy: 396, 343
+  size: 71, 70
+  orig: 71, 70
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_121x53
+  rotate: false
+  xy: 293, 483
+  size: 78, 34
+  orig: 78, 34
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_13x16
+  rotate: false
+  xy: 503, 393
+  size: 9, 10
+  orig: 9, 10
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_144x66
+  rotate: false
+  xy: 130, 469
+  size: 92, 42
+  orig: 92, 42
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_14x14
+  rotate: false
+  xy: 503, 405
+  size: 9, 9
+  orig: 9, 9
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_152x68
+  rotate: false
+  xy: 214, 423
+  size: 98, 44
+  orig: 98, 44
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_15x15
+  rotate: false
+  xy: 338, 449
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_15x38
+  rotate: false
+  xy: 501, 420
+  size: 10, 25
+  orig: 10, 25
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_16x16
+  rotate: false
+  xy: 130, 457
+  size: 10, 10
+  orig: 10, 10
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_16x37
+  rotate: false
+  xy: 338, 423
+  size: 10, 24
+  orig: 10, 24
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_20x24
+  rotate: false
+  xy: 326, 244
+  size: 13, 16
+  orig: 13, 16
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_21x46
+  rotate: false
+  xy: 491, 107
+  size: 14, 30
+  orig: 14, 30
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_228x414
+  rotate: false
+  xy: 343, 1
+  size: 146, 265
+  orig: 146, 265
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_23x32
+  rotate: false
+  xy: 491, 448
+  size: 15, 21
+  orig: 15, 21
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_23x33
+  rotate: false
+  xy: 314, 450
+  size: 15, 21
+  orig: 15, 21
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_23x42
+  rotate: false
+  xy: 491, 168
+  size: 15, 27
+  orig: 15, 27
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_25x32
+  rotate: false
+  xy: 473, 448
+  size: 16, 21
+  orig: 16, 21
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_264x376
+  rotate: false
+  xy: 172, 1
+  size: 169, 241
+  orig: 169, 241
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_264x412
+  rotate: false
+  xy: 1, 1
+  size: 169, 264
+  orig: 169, 264
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_26x52
+  rotate: false
+  xy: 491, 40
+  size: 17, 34
+  orig: 17, 34
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_26x58
+  rotate: false
+  xy: 491, 1
+  size: 17, 37
+  orig: 17, 37
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_27x45
+  rotate: false
+  xy: 491, 76
+  size: 18, 29
+  orig: 18, 29
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_281x140
+  rotate: false
+  xy: 214, 268
+  size: 180, 90
+  orig: 180, 90
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_28x33
+  rotate: false
+  xy: 491, 197
+  size: 18, 21
+  orig: 18, 21
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_31x28
+  rotate: false
+  xy: 491, 220
+  size: 20, 18
+  orig: 20, 18
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_329x278
+  rotate: false
+  xy: 1, 267
+  size: 211, 178
+  orig: 211, 178
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_34x39
+  rotate: false
+  xy: 314, 423
+  size: 22, 25
+  orig: 22, 25
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_35x113
+  rotate: false
+  xy: 485, 268
+  size: 23, 73
+  orig: 23, 73
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_43x39
+  rotate: false
+  xy: 473, 393
+  size: 28, 25
+  orig: 28, 25
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_48x51
+  rotate: false
+  xy: 353, 360
+  size: 31, 33
+  orig: 31, 33
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_52x31
+  rotate: false
+  xy: 290, 244
+  size: 34, 20
+  orig: 34, 20
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_54x33
+  rotate: false
+  xy: 172, 244
+  size: 35, 21
+  orig: 35, 21
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_55x34
+  rotate: false
+  xy: 253, 244
+  size: 35, 22
+  orig: 35, 22
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_57x34
+  rotate: false
+  xy: 214, 244
+  size: 37, 22
+  orig: 37, 22
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_61x74
+  rotate: false
+  xy: 469, 343
+  size: 39, 48
+  orig: 39, 48
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_6x24
+  rotate: false
+  xy: 507, 107
+  size: 4, 16
+  orig: 4, 16
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_70x71
+  rotate: false
+  xy: 130, 513
+  size: 45, 46
+  orig: 45, 46
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_71x87
+  rotate: false
+  xy: 373, 504
+  size: 46, 56
+  orig: 46, 56
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_77x135
+  rotate: false
+  xy: 421, 415
+  size: 50, 87
+  orig: 50, 87
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_79x69
+  rotate: false
+  xy: 1, 506
+  size: 51, 44
+  orig: 51, 44
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_7x7
+  rotate: false
+  xy: 386, 378
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_85x111
+  rotate: false
+  xy: 73, 447
+  size: 55, 71
+  orig: 55, 71
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_96x63
+  rotate: false
+  xy: 421, 504
+  size: 62, 41
+  orig: 62, 41
+  offset: 0, 0
+  index: -1
+zombie_beach_fisherman_9x24
+  rotate: false
+  xy: 386, 360
+  size: 6, 16
+  orig: 6, 16
+  offset: 0, 0
+  index: -1

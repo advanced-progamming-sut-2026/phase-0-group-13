@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.game.minigame.arcade.IZombiePlantPlacementTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-08-28T21:31:44.516Z" hostname="MacBook-Pro-4.local" time="0.004">
+  <properties/>
+  <testcase name="theRedLineIsTheEdgeOfTheDefendersHalf()" classname="model.game.minigame.arcade.IZombiePlantPlacementTest" time="0.001"/>
+  <testcase name="aTileOnlyHoldsOnePlant()" classname="model.game.minigame.arcade.IZombiePlantPlacementTest" time="0.0"/>
+  <testcase name="theSeededCutoutsKnowWhatTheyAre()" classname="model.game.minigame.arcade.IZombiePlantPlacementTest" time="0.0"/>
+  <testcase name="aPlantIsRefusedWhenThereIsNoSunForIt()" classname="model.game.minigame.arcade.IZombiePlantPlacementTest" time="0.0"/>
+  <testcase name="theRosterIsPricedOutOfTheGamesOwnCatalogue()" classname="model.game.minigame.arcade.IZombiePlantPlacementTest" time="0.0"/>
+  <testcase name="aPlantGoesDownOnAFreeTileLeftOfTheRedLine()" classname="model.game.minigame.arcade.IZombiePlantPlacementTest" time="0.0"/>
+  <testcase name="aSunflowerPaysOutOnTheCatalogueCadence()" classname="model.game.minigame.arcade.IZombiePlantPlacementTest" time="0.001"/>
+  <testcase name="aTypeHasToRechargeBeforeItIsPlacedAgain()" classname="model.game.minigame.arcade.IZombiePlantPlacementTest" time="0.0"/>
+  <testcase name="aZombieOnTheTileBlocksThePlanting()" classname="model.game.minigame.arcade.IZombiePlantPlacementTest" time="0.001"/>
+  <testcase name="anUnknownPlantIsRefusedByName()" classname="model.game.minigame.arcade.IZombiePlantPlacementTest" time="0.0"/>
+  <system-out><![CDATA[A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+zombie sun-imp produced a sun at (9, 1); you now have 175 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 200 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 225 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 250 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 275 sun.
+zombie sun-imp produced a sun at (9, 1); you now have 300 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 325 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 350 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 375 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 400 sun.
+zombie sun-imp produced a sun at (9, 1); you now have 425 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 450 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 475 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 500 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 525 sun.
+zombie sun-imp produced a sun at (9, 1); you now have 550 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 575 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 600 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 625 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 650 sun.
+zombie sun-imp produced a sun at (9, 1); you now have 675 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 700 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 725 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 750 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 775 sun.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+zombie sun-imp produced a sun at (9, 1); you now have 175 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 200 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 225 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 250 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 275 sun.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+zombie sun-imp produced a sun at (9, 1); you now have 125 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 150 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 175 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 200 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 225 sun.
+Zombie of type basic is dead at (5, 1).
+zombie sun-imp produced a sun at (9, 1); you now have 250 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 275 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 300 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 325 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 350 sun.
+zombie sun-imp produced a sun at (9, 1); you now have 375 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 400 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 425 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 450 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 475 sun.
+zombie sun-imp produced a sun at (9, 1); you now have 500 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 525 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 550 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 575 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 600 sun.
+zombie sun-imp produced a sun at (9, 1); you now have 625 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 650 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 675 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 700 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 725 sun.
+zombie sun-imp produced a sun at (9, 1); you now have 750 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 775 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 800 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 825 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 850 sun.
+zombie sun-imp produced a sun at (9, 1); you now have 875 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 900 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 925 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 950 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 975 sun.
+zombie sun-imp produced a sun at (9, 1); you now have 1000 sun.
+zombie sun-imp produced a sun at (9, 2); you now have 1025 sun.
+zombie sun-imp produced a sun at (9, 3); you now have 1050 sun.
+zombie sun-imp produced a sun at (9, 4); you now have 1075 sun.
+zombie sun-imp produced a sun at (9, 5); you now have 1100 sun.
+A sun-imp takes its place in lane 1.
+A sun-imp takes its place in lane 2.
+A sun-imp takes its place in lane 3.
+A sun-imp takes its place in lane 4.
+A sun-imp takes its place in lane 5.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

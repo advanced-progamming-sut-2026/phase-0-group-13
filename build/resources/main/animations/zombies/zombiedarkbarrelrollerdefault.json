@@ -1,0 +1,26 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "die": 2,
+        "die2": 2,
+        "eat": 4.1,
+        "eat2": 4.1,
+        "idle": 3.6,
+        "idle2": 2.2667,
+        "particles": 0.0333,
+        "walk": 2.9667,
+        "walk2": 2.9667
+      },
+      "name": "ZOMBIE_PIRATE_BARREL_PUSHER",
+      "pam": "768/FULL/ZOMBIE/ZOMBIE_PIRATE_BARREL_PUSHER/ZOMBIE_PIRATE_BARREL_PUSHER.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombiedarkbarrelrollerdefault.atlas",
+  "entity": "ZombieDarkBarrelRollerDefault",
+  "source_folder": "images/768/.../zombie_pirate_barrel_pusher"
+}

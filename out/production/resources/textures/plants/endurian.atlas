@@ -1,0 +1,320 @@
+plantendurian_768_00.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+endurian_118x124
+  rotate: false
+  xy: 317, 216
+  size: 76, 80
+  orig: 76, 80
+  offset: 0, 0
+  index: -1
+endurian_119x125
+  rotate: false
+  xy: 395, 216
+  size: 76, 80
+  orig: 76, 80
+  offset: 0, 0
+  index: -1
+endurian_119x128
+  rotate: false
+  xy: 239, 205
+  size: 76, 82
+  orig: 76, 82
+  offset: 0, 0
+  index: -1
+endurian_119x133
+  rotate: false
+  xy: 1, 159
+  size: 76, 85
+  orig: 76, 85
+  offset: 0, 0
+  index: -1
+endurian_128x53
+  rotate: false
+  xy: 88, 269
+  size: 82, 34
+  orig: 82, 34
+  offset: 0, 0
+  index: -1
+endurian_133x129
+  rotate: false
+  xy: 152, 133
+  size: 85, 83
+  orig: 85, 83
+  offset: 0, 0
+  index: -1
+endurian_133x182
+  rotate: false
+  xy: 390, 1
+  size: 85, 117
+  orig: 85, 117
+  offset: 0, 0
+  index: -1
+endurian_133x76
+  rotate: false
+  xy: 1, 269
+  size: 85, 49
+  orig: 85, 49
+  offset: 0, 0
+  index: -1
+endurian_137x146
+  rotate: false
+  xy: 390, 120
+  size: 88, 94
+  orig: 88, 94
+  offset: 0, 0
+  index: -1
+endurian_164x76
+  rotate: false
+  xy: 79, 218
+  size: 105, 49
+  orig: 105, 49
+  offset: 0, 0
+  index: -1
+endurian_172x129
+  rotate: false
+  xy: 278, 120
+  size: 110, 83
+  orig: 110, 83
+  offset: 0, 0
+  index: -1
+endurian_172x182
+  rotate: false
+  xy: 278, 1
+  size: 110, 117
+  orig: 110, 117
+  offset: 0, 0
+  index: -1
+endurian_18x31
+  rotate: false
+  xy: 263, 179
+  size: 12, 20
+  orig: 12, 20
+  offset: 0, 0
+  index: -1
+endurian_193x203
+  rotate: false
+  xy: 152, 1
+  size: 124, 130
+  orig: 124, 130
+  offset: 0, 0
+  index: -1
+endurian_21x16
+  rotate: false
+  xy: 498, 222
+  size: 14, 10
+  orig: 14, 10
+  offset: 0, 0
+  index: -1
+endurian_232x243
+  rotate: false
+  xy: 1, 1
+  size: 149, 156
+  orig: 149, 156
+  offset: 0, 0
+  index: -1
+endurian_23x23
+  rotate: false
+  xy: 493, 256
+  size: 15, 15
+  orig: 15, 15
+  offset: 0, 0
+  index: -1
+endurian_23x26
+  rotate: false
+  xy: 133, 193
+  size: 15, 17
+  orig: 15, 17
+  offset: 0, 0
+  index: -1
+endurian_24x21
+  rotate: false
+  xy: 197, 273
+  size: 16, 14
+  orig: 16, 14
+  offset: 0, 0
+  index: -1
+endurian_27x25
+  rotate: false
+  xy: 473, 256
+  size: 18, 16
+  orig: 18, 16
+  offset: 0, 0
+  index: -1
+endurian_27x29
+  rotate: false
+  xy: 1, 246
+  size: 18, 19
+  orig: 18, 19
+  offset: 0, 0
+  index: -1
+endurian_28x30
+  rotate: false
+  xy: 21, 246
+  size: 18, 19
+  orig: 18, 19
+  offset: 0, 0
+  index: -1
+endurian_33x43
+  rotate: false
+  xy: 477, 80
+  size: 21, 28
+  orig: 21, 28
+  offset: 0, 0
+  index: -1
+endurian_34x34
+  rotate: false
+  xy: 480, 158
+  size: 22, 22
+  orig: 22, 22
+  offset: 0, 0
+  index: -1
+endurian_34x34_2
+  rotate: false
+  xy: 239, 179
+  size: 22, 22
+  orig: 22, 22
+  offset: 0, 0
+  index: -1
+endurian_35x26
+  rotate: false
+  xy: 480, 203
+  size: 23, 17
+  orig: 23, 17
+  offset: 0, 0
+  index: -1
+endurian_36x19
+  rotate: false
+  xy: 172, 273
+  size: 23, 12
+  orig: 23, 12
+  offset: 0, 0
+  index: -1
+endurian_36x24
+  rotate: false
+  xy: 473, 222
+  size: 23, 16
+  orig: 23, 16
+  offset: 0, 0
+  index: -1
+endurian_37x26
+  rotate: false
+  xy: 107, 193
+  size: 24, 17
+  orig: 24, 17
+  offset: 0, 0
+  index: -1
+endurian_38x29
+  rotate: false
+  xy: 480, 182
+  size: 25, 19
+  orig: 25, 19
+  offset: 0, 0
+  index: -1
+endurian_39x19
+  rotate: false
+  xy: 41, 246
+  size: 25, 12
+  orig: 25, 12
+  offset: 0, 0
+  index: -1
+endurian_39x22
+  rotate: false
+  xy: 473, 240
+  size: 25, 14
+  orig: 25, 14
+  offset: 0, 0
+  index: -1
+endurian_39x35
+  rotate: false
+  xy: 480, 133
+  size: 25, 23
+  orig: 25, 23
+  offset: 0, 0
+  index: -1
+endurian_41x27
+  rotate: false
+  xy: 79, 193
+  size: 26, 18
+  orig: 26, 18
+  offset: 0, 0
+  index: -1
+endurian_42x33
+  rotate: false
+  xy: 239, 156
+  size: 27, 21
+  orig: 27, 21
+  offset: 0, 0
+  index: -1
+endurian_43x33
+  rotate: false
+  xy: 480, 110
+  size: 28, 21
+  orig: 28, 21
+  offset: 0, 0
+  index: -1
+endurian_43x33_2
+  rotate: false
+  xy: 239, 133
+  size: 28, 21
+  orig: 28, 21
+  offset: 0, 0
+  index: -1
+endurian_43x35
+  rotate: false
+  xy: 477, 55
+  size: 28, 23
+  orig: 28, 23
+  offset: 0, 0
+  index: -1
+endurian_46x39
+  rotate: false
+  xy: 477, 1
+  size: 30, 25
+  orig: 30, 25
+  offset: 0, 0
+  index: -1
+endurian_46x39_2
+  rotate: false
+  xy: 477, 28
+  size: 30, 25
+  orig: 30, 25
+  offset: 0, 0
+  index: -1
+endurian_63x38
+  rotate: false
+  xy: 186, 246
+  size: 41, 25
+  orig: 41, 25
+  offset: 0, 0
+  index: -1
+endurian_63x40
+  rotate: false
+  xy: 186, 218
+  size: 41, 26
+  orig: 41, 26
+  offset: 0, 0
+  index: -1
+endurian_8x7
+  rotate: false
+  xy: 500, 80
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+endurian_8x8
+  rotate: false
+  xy: 500, 87
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+endurian_95x49
+  rotate: false
+  xy: 79, 159
+  size: 61, 32
+  orig: 61, 32
+  offset: 0, 0
+  index: -1

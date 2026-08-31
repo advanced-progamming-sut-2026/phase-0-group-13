@@ -1,0 +1,124 @@
+plantpuffshroom_768_00.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+puffshroom_10x16
+  rotate: false
+  xy: 504, 72
+  size: 7, 10
+  orig: 7, 10
+  offset: 0, 0
+  index: -1
+puffshroom_113x86
+  rotate: false
+  xy: 1, 172
+  size: 73, 55
+  orig: 73, 55
+  offset: 0, 0
+  index: -1
+puffshroom_11x14
+  rotate: false
+  xy: 287, 108
+  size: 7, 9
+  orig: 7, 9
+  offset: 0, 0
+  index: -1
+puffshroom_125x106
+  rotate: false
+  xy: 298, 86
+  size: 80, 68
+  orig: 80, 68
+  offset: 0, 0
+  index: -1
+puffshroom_12x8
+  rotate: false
+  xy: 287, 119
+  size: 8, 5
+  orig: 8, 5
+  offset: 0, 0
+  index: -1
+puffshroom_13x16
+  rotate: false
+  xy: 179, 188
+  size: 9, 10
+  orig: 9, 10
+  offset: 0, 0
+  index: -1
+puffshroom_23x25
+  rotate: false
+  xy: 492, 22
+  size: 15, 16
+  orig: 15, 16
+  offset: 0, 0
+  index: -1
+puffshroom_36x30
+  rotate: false
+  xy: 250, 200
+  size: 23, 19
+  orig: 23, 19
+  offset: 0, 0
+  index: -1
+puffshroom_47x48
+  rotate: false
+  xy: 479, 119
+  size: 30, 31
+  orig: 30, 31
+  offset: 0, 0
+  index: -1
+puffshroom_50x48
+  rotate: false
+  xy: 479, 86
+  size: 32, 31
+  orig: 32, 31
+  offset: 0, 0
+  index: -1
+puffshroom_53x52
+  rotate: false
+  xy: 250, 164
+  size: 34, 34
+  orig: 34, 34
+  offset: 0, 0
+  index: -1
+puffshroom_69x52
+  rotate: false
+  xy: 467, 182
+  size: 44, 34
+  orig: 44, 34
+  offset: 0, 0
+  index: -1
+puffshroom_74x53
+  rotate: false
+  xy: 376, 241
+  size: 48, 34
+  orig: 48, 34
+  offset: 0, 0
+  index: -1
+puffshroom_75x55
+  rotate: false
+  xy: 135, 201
+  size: 48, 35
+  orig: 48, 35
+  offset: 0, 0
+  index: -1
+puffshroom_75x55_2
+  rotate: false
+  xy: 1, 229
+  size: 48, 35
+  orig: 48, 35
+  offset: 0, 0
+  index: -1
+puffshroom_75x55_3
+  rotate: false
+  xy: 135, 238
+  size: 48, 35
+  orig: 48, 35
+  offset: 0, 0
+  index: -1
+puffshroom_8x11
+  rotate: false
+  xy: 287, 126
+  size: 5, 7
+  orig: 5, 7
+  offset: 0, 0
+  index: -1

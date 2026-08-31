@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="model.game.BoardPlantingRulesTest" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-08-28T21:31:44.420Z" hostname="MacBook-Pro-4.local" time="0.01">
+  <properties/>
+  <testcase name="placingDeductsTheSunCost()" classname="model.game.BoardPlantingRulesTest" time="0.002"/>
+  <testcase name="anAquaticPlantCanBePlacedOnWater()" classname="model.game.BoardPlantingRulesTest" time="0.0"/>
+  <testcase name="aLandPlantCannotBePlacedDirectlyOnOpenWater()" classname="model.game.BoardPlantingRulesTest" time="0.0"/>
+  <testcase name="aSecondShieldIsRefusedOnceOneIsAlreadyThere()" classname="model.game.BoardPlantingRulesTest" time="0.002"/>
+  <testcase name="aNonStackTaggedPlantCannotStackOnAnything()" classname="model.game.BoardPlantingRulesTest" time="0.0"/>
+  <testcase name="freePlantingBypassesTheSunCostEntirely()" classname="model.game.BoardPlantingRulesTest" time="0.001"/>
+  <testcase name="aWallNutTaggedStackPlantShieldsADifferentPlantThatHasNoShieldYet()" classname="model.game.BoardPlantingRulesTest" time="0.0"/>
+  <testcase name="placingOutOfBoundsIsRefused()" classname="model.game.BoardPlantingRulesTest" time="0.0"/>
+  <testcase name="anAquaticPlantCannotBePlacedOnDryLand()" classname="model.game.BoardPlantingRulesTest" time="0.0"/>
+  <testcase name="aLandPlantCanBePlacedOnWaterOnceALilyPadIsThere()" classname="model.game.BoardPlantingRulesTest" time="0.001"/>
+  <testcase name="stackingStopsAtTheCap()" classname="model.game.BoardPlantingRulesTest" time="0.0"/>
+  <testcase name="aTileThatBlocksPlantingRefusesEvenAnEmptyTile()" classname="model.game.BoardPlantingRulesTest" time="0.0"/>
+  <testcase name="aTileAlreadyHoldingAnOrdinaryPlantRefusesAnotherOne()" classname="model.game.BoardPlantingRulesTest" time="0.0"/>
+  <testcase name="twoOfTheSameStackTaggedPlantCombineIntoOneStack()" classname="model.game.BoardPlantingRulesTest" time="0.001"/>
+  <testcase name="placingWithoutEnoughSunIsRefusedAndNothingIsDeducted()" classname="model.game.BoardPlantingRulesTest" time="0.001"/>
+  <testcase name="placingBeforeTheMatchStartsIsRefused()" classname="model.game.BoardPlantingRulesTest" time="0.001"/>
+  <system-out><![CDATA[pumpkin now shields bonk-choy at (4, 3).
+pumpkin now shields bonk-choy at (4, 3).
+pea-pod now has 2 heads stacked at (4, 3).
+pea-pod now has 3 heads stacked at (4, 3).
+pea-pod now has 4 heads stacked at (4, 3).
+pea-pod now has 5 heads stacked at (4, 3).
+pea-pod now has 2 heads stacked at (4, 3).
+Error: Not enough sun!
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

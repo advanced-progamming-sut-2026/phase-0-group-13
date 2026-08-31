@@ -1,0 +1,26 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "die": 5.7,
+        "eat": 3.3667,
+        "fly_end": 1.5,
+        "fly_loop": 2.6667,
+        "fly_start": 0.9667,
+        "idle": 1.6667,
+        "idle2": 1.6667,
+        "idle3": 2.8667,
+        "walk": 3
+      },
+      "name": "ZOMBIE_ICEAGE_DODORIDER",
+      "pam": "768/FULL/ZOMBIE/ZOMBIE_ICEAGE_DODORIDER/ZOMBIE_ICEAGE_DODORIDER.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombieiceagedodo.atlas",
+  "entity": "ZombieIceAgeDodo",
+  "source_folder": "images/768/.../zombie_iceage_dodorider"
+}

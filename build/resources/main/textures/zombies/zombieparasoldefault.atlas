@@ -1,0 +1,271 @@
+zombiebeachbasicgroup_768_00.png
+size: 256,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+zombie_beach_basic_101x108
+  rotate: false
+  xy: 89, 1
+  size: 65, 69
+  orig: 65, 69
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_135x8
+  rotate: false
+  xy: 135, 302
+  size: 87, 5
+  orig: 87, 5
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_14x35
+  rotate: false
+  xy: 144, 72
+  size: 9, 23
+  orig: 9, 23
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_15x38
+  rotate: false
+  xy: 243, 54
+  size: 10, 25
+  orig: 10, 25
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_16x37
+  rotate: false
+  xy: 245, 203
+  size: 10, 24
+  orig: 10, 24
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_18x38
+  rotate: false
+  xy: 243, 1
+  size: 12, 25
+  orig: 12, 25
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_24x34
+  rotate: false
+  xy: 196, 309
+  size: 16, 22
+  orig: 16, 22
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_24x45
+  rotate: false
+  xy: 77, 250
+  size: 16, 29
+  orig: 16, 29
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_26x41
+  rotate: false
+  xy: 116, 283
+  size: 17, 26
+  orig: 17, 26
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_26x52
+  rotate: false
+  xy: 39, 250
+  size: 17, 34
+  orig: 17, 34
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_26x58
+  rotate: false
+  xy: 121, 244
+  size: 17, 37
+  orig: 17, 37
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_27x26
+  rotate: false
+  xy: 114, 311
+  size: 18, 17
+  orig: 18, 17
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_28x33
+  rotate: false
+  xy: 156, 309
+  size: 18, 21
+  orig: 18, 21
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_30x24
+  rotate: false
+  xy: 1, 315
+  size: 19, 16
+  orig: 19, 16
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_30x37
+  rotate: false
+  xy: 95, 275
+  size: 19, 24
+  orig: 19, 24
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_34x28
+  rotate: false
+  xy: 90, 301
+  size: 22, 18
+  orig: 22, 18
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_35x57
+  rotate: false
+  xy: 119, 72
+  size: 23, 37
+  orig: 23, 37
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_36x29
+  rotate: false
+  xy: 55, 286
+  size: 23, 19
+  orig: 23, 19
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_36x39
+  rotate: false
+  xy: 160, 253
+  size: 23, 25
+  orig: 23, 25
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_36x45
+  rotate: false
+  xy: 143, 173
+  size: 23, 29
+  orig: 23, 29
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_37x46
+  rotate: false
+  xy: 232, 117
+  size: 24, 30
+  orig: 24, 30
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_39x19
+  rotate: false
+  xy: 43, 315
+  size: 25, 12
+  orig: 25, 12
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_43x25
+  rotate: false
+  xy: 160, 280
+  size: 28, 16
+  orig: 28, 16
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_43x25_2
+  rotate: false
+  xy: 190, 284
+  size: 28, 16
+  orig: 28, 16
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_52x31
+  rotate: false
+  xy: 219, 181
+  size: 34, 20
+  orig: 34, 20
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_62x76
+  rotate: false
+  xy: 1, 173
+  size: 40, 49
+  orig: 40, 49
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_63x30
+  rotate: false
+  xy: 96, 223
+  size: 41, 19
+  orig: 41, 19
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_6x6
+  rotate: false
+  xy: 72, 63
+  size: 4, 4
+  orig: 4, 4
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_70x71
+  rotate: false
+  xy: 172, 164
+  size: 45, 46
+  orig: 45, 46
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_76x61
+  rotate: false
+  xy: 143, 212
+  size: 49, 39
+  orig: 49, 39
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_7x7
+  rotate: false
+  xy: 58, 63
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_80x83
+  rotate: false
+  xy: 1, 118
+  size: 51, 53
+  orig: 51, 53
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_80x83_2
+  rotate: false
+  xy: 119, 118
+  size: 51, 53
+  orig: 51, 53
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_85x82
+  rotate: false
+  xy: 1, 63
+  size: 55, 53
+  orig: 55, 53
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_85x82_2
+  rotate: false
+  xy: 156, 63
+  size: 55, 53
+  orig: 55, 53
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_91x69
+  rotate: false
+  xy: 172, 118
+  size: 58, 44
+  orig: 58, 44
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_92x71
+  rotate: false
+  xy: 58, 72
+  size: 59, 46
+  orig: 59, 46
+  offset: 0, 0
+  index: -1
+zombie_beach_basic_95x93
+  rotate: false
+  xy: 156, 1
+  size: 61, 60
+  orig: 61, 60
+  offset: 0, 0
+  index: -1

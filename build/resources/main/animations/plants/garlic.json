@@ -1,0 +1,25 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "idle": 1.6667,
+        "idle2": 3.2333,
+        "idle2_damage": 2.3333,
+        "idle2_damage2": 1.6333,
+        "idle_damage": 1.1333,
+        "idle_damage2": 1,
+        "plantfood": 3.0333,
+        "water": 1.7
+      },
+      "name": "GARLIC",
+      "pam": "768/FULL/PLANT/GARLIC/GARLIC.PAM"
+    }
+  ],
+  "atlas": "textures/plants/garlic.atlas",
+  "entity": "Garlic",
+  "source_folder": "images/768/.../garlic"
+}

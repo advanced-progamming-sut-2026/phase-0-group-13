@@ -1,0 +1,23 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "attack": 1.4333,
+        "idle": 1,
+        "plantfood": 0.4333,
+        "plantfood_off": 0.3,
+        "plantfood_on": 1.1,
+        "water": 1.7
+      },
+      "name": "SNOWPEA",
+      "pam": "768/INITIAL/PLANT/SNOWPEA/SNOWPEA.PAM"
+    }
+  ],
+  "atlas": "textures/plants/snowpea.atlas",
+  "entity": "Snow Pea",
+  "source_folder": "images/768/.../snowpea"
+}

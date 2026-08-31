@@ -1,0 +1,187 @@
+iceagemowergroup_768_00.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+mower_iceage_11x11
+  rotate: false
+  xy: 228, 43
+  size: 7, 7
+  orig: 7, 7
+  offset: 0, 0
+  index: -1
+mower_iceage_13x10
+  rotate: false
+  xy: 217, 43
+  size: 9, 7
+  orig: 9, 7
+  offset: 0, 0
+  index: -1
+mower_iceage_147x160
+  rotate: false
+  xy: 1, 1
+  size: 94, 103
+  orig: 94, 103
+  offset: 0, 0
+  index: -1
+mower_iceage_24x24
+  rotate: false
+  xy: 179, 137
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+mower_iceage_24x25
+  rotate: false
+  xy: 53, 138
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+mower_iceage_25x21
+  rotate: false
+  xy: 71, 138
+  size: 16, 14
+  orig: 16, 14
+  offset: 0, 0
+  index: -1
+mower_iceage_27x27
+  rotate: false
+  xy: 33, 126
+  size: 18, 18
+  orig: 18, 18
+  offset: 0, 0
+  index: -1
+mower_iceage_28x28
+  rotate: false
+  xy: 231, 133
+  size: 18, 18
+  orig: 18, 18
+  offset: 0, 0
+  index: -1
+mower_iceage_28x28_2
+  rotate: false
+  xy: 159, 137
+  size: 18, 18
+  orig: 18, 18
+  offset: 0, 0
+  index: -1
+mower_iceage_38x44
+  rotate: false
+  xy: 231, 103
+  size: 25, 28
+  orig: 25, 28
+  offset: 0, 0
+  index: -1
+mower_iceage_39x87
+  rotate: false
+  xy: 144, 65
+  size: 25, 56
+  orig: 25, 56
+  offset: 0, 0
+  index: -1
+mower_iceage_40x62
+  rotate: false
+  xy: 203, 98
+  size: 26, 40
+  orig: 26, 40
+  offset: 0, 0
+  index: -1
+mower_iceage_43x36
+  rotate: false
+  xy: 129, 123
+  size: 28, 23
+  orig: 28, 23
+  offset: 0, 0
+  index: -1
+mower_iceage_43x43
+  rotate: false
+  xy: 171, 107
+  size: 28, 28
+  orig: 28, 28
+  offset: 0, 0
+  index: -1
+mower_iceage_44x47
+  rotate: false
+  xy: 65, 106
+  size: 28, 30
+  orig: 28, 30
+  offset: 0, 0
+  index: -1
+mower_iceage_46x25
+  rotate: false
+  xy: 95, 135
+  size: 30, 16
+  orig: 30, 16
+  offset: 0, 0
+  index: -1
+mower_iceage_46x46
+  rotate: false
+  xy: 97, 103
+  size: 30, 30
+  orig: 30, 30
+  offset: 0, 0
+  index: -1
+mower_iceage_46x62
+  rotate: false
+  xy: 171, 65
+  size: 30, 40
+  orig: 30, 40
+  offset: 0, 0
+  index: -1
+mower_iceage_47x32
+  rotate: false
+  xy: 1, 126
+  size: 30, 21
+  orig: 30, 21
+  offset: 0, 0
+  index: -1
+mower_iceage_56x62
+  rotate: false
+  xy: 217, 1
+  size: 36, 40
+  orig: 36, 40
+  offset: 0, 0
+  index: -1
+mower_iceage_61x59
+  rotate: false
+  xy: 217, 58
+  size: 39, 38
+  orig: 39, 38
+  offset: 0, 0
+  index: -1
+mower_iceage_70x67
+  rotate: false
+  xy: 97, 58
+  size: 45, 43
+  orig: 45, 43
+  offset: 0, 0
+  index: -1
+mower_iceage_81x97
+  rotate: false
+  xy: 163, 1
+  size: 52, 62
+  orig: 52, 62
+  offset: 0, 0
+  index: -1
+mower_iceage_8x8
+  rotate: false
+  xy: 237, 43
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+mower_iceage_97x28
+  rotate: false
+  xy: 1, 106
+  size: 62, 18
+  orig: 62, 18
+  offset: 0, 0
+  index: -1
+mower_iceage_99x85
+  rotate: false
+  xy: 97, 1
+  size: 64, 55
+  orig: 64, 55
+  offset: 0, 0
+  index: -1

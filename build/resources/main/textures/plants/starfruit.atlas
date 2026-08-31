@@ -1,0 +1,131 @@
+plantstarfruit_768_00.png
+size: 256,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+starfruit_109x95
+  rotate: false
+  xy: 150, 139
+  size: 70, 61
+  orig: 70, 61
+  offset: 0, 0
+  index: -1
+starfruit_112x94
+  rotate: false
+  xy: 1, 83
+  size: 72, 60
+  orig: 72, 60
+  offset: 0, 0
+  index: -1
+starfruit_113x37
+  rotate: false
+  xy: 121, 250
+  size: 73, 24
+  orig: 73, 24
+  offset: 0, 0
+  index: -1
+starfruit_113x37_2
+  rotate: false
+  xy: 1, 259
+  size: 73, 24
+  orig: 73, 24
+  offset: 0, 0
+  index: -1
+starfruit_113x37_3
+  rotate: false
+  xy: 76, 276
+  size: 73, 24
+  orig: 73, 24
+  offset: 0, 0
+  index: -1
+starfruit_113x37_4
+  rotate: false
+  xy: 151, 276
+  size: 73, 24
+  orig: 73, 24
+  offset: 0, 0
+  index: -1
+starfruit_113x92
+  rotate: false
+  xy: 75, 139
+  size: 73, 59
+  orig: 73, 59
+  offset: 0, 0
+  index: -1
+starfruit_13x15
+  rotate: false
+  xy: 210, 88
+  size: 9, 10
+  orig: 9, 10
+  offset: 0, 0
+  index: -1
+starfruit_13x16
+  rotate: false
+  xy: 221, 93
+  size: 9, 10
+  orig: 9, 10
+  offset: 0, 0
+  index: -1
+starfruit_13x21
+  rotate: false
+  xy: 242, 42
+  size: 9, 14
+  orig: 9, 14
+  offset: 0, 0
+  index: -1
+starfruit_1x1
+  rotate: false
+  xy: 254, 1
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+starfruit_23x30
+  rotate: false
+  xy: 210, 67
+  size: 15, 19
+  orig: 15, 19
+  offset: 0, 0
+  index: -1
+starfruit_32x14
+  rotate: false
+  xy: 227, 82
+  size: 21, 9
+  orig: 21, 9
+  offset: 0, 0
+  index: -1
+starfruit_32x20
+  rotate: false
+  xy: 227, 67
+  size: 21, 13
+  orig: 21, 13
+  offset: 0, 0
+  index: -1
+starfruit_46x35
+  rotate: false
+  xy: 210, 42
+  size: 30, 23
+  orig: 30, 23
+  offset: 0, 0
+  index: -1
+starfruit_92x102
+  rotate: false
+  xy: 1, 145
+  size: 59, 66
+  orig: 59, 66
+  offset: 0, 0
+  index: -1
+starfruit_92x150
+  rotate: false
+  xy: 81, 1
+  size: 59, 96
+  orig: 59, 96
+  offset: 0, 0
+  index: -1
+starfruit_96x68
+  rotate: false
+  xy: 121, 202
+  size: 62, 44
+  orig: 62, 44
+  offset: 0, 0
+  index: -1

@@ -1,0 +1,292 @@
+zombietutorialgroup_768_00.png
+size: 256,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+zombie_tutorial_108x113
+  rotate: false
+  xy: 77, 1
+  size: 69, 73
+  orig: 69, 73
+  offset: 0, 0
+  index: -1
+zombie_tutorial_115x115
+  rotate: false
+  xy: 1, 1
+  size: 74, 74
+  orig: 74, 74
+  offset: 0, 0
+  index: -1
+zombie_tutorial_135x8
+  rotate: false
+  xy: 1, 359
+  size: 87, 5
+  orig: 87, 5
+  offset: 0, 0
+  index: -1
+zombie_tutorial_14x35
+  rotate: false
+  xy: 245, 121
+  size: 9, 23
+  orig: 9, 23
+  offset: 0, 0
+  index: -1
+zombie_tutorial_20x40
+  rotate: false
+  xy: 93, 277
+  size: 13, 26
+  orig: 13, 26
+  offset: 0, 0
+  index: -1
+zombie_tutorial_21x48
+  rotate: false
+  xy: 230, 333
+  size: 14, 31
+  orig: 14, 31
+  offset: 0, 0
+  index: -1
+zombie_tutorial_22x40
+  rotate: false
+  xy: 21, 373
+  size: 14, 26
+  orig: 14, 26
+  offset: 0, 0
+  index: -1
+zombie_tutorial_22x49
+  rotate: false
+  xy: 131, 318
+  size: 14, 32
+  orig: 14, 32
+  offset: 0, 0
+  index: -1
+zombie_tutorial_23x41
+  rotate: false
+  xy: 118, 352
+  size: 15, 26
+  orig: 15, 26
+  offset: 0, 0
+  index: -1
+zombie_tutorial_24x58
+  rotate: false
+  xy: 52, 77
+  size: 16, 37
+  orig: 16, 37
+  offset: 0, 0
+  index: -1
+zombie_tutorial_28x33
+  rotate: false
+  xy: 196, 369
+  size: 18, 21
+  orig: 18, 21
+  offset: 0, 0
+  index: -1
+zombie_tutorial_28x46
+  rotate: false
+  xy: 81, 195
+  size: 18, 30
+  orig: 18, 30
+  offset: 0, 0
+  index: -1
+zombie_tutorial_30x21
+  rotate: false
+  xy: 136, 380
+  size: 19, 14
+  orig: 19, 14
+  offset: 0, 0
+  index: -1
+zombie_tutorial_30x37
+  rotate: false
+  xy: 89, 318
+  size: 19, 24
+  orig: 19, 24
+  offset: 0, 0
+  index: -1
+zombie_tutorial_36x23
+  rotate: false
+  xy: 53, 373
+  size: 23, 15
+  orig: 23, 15
+  offset: 0, 0
+  index: -1
+zombie_tutorial_36x39
+  rotate: false
+  xy: 64, 298
+  size: 23, 25
+  orig: 23, 25
+  offset: 0, 0
+  index: -1
+zombie_tutorial_36x45
+  rotate: false
+  xy: 229, 33
+  size: 23, 29
+  orig: 23, 29
+  offset: 0, 0
+  index: -1
+zombie_tutorial_36x47
+  rotate: false
+  xy: 56, 195
+  size: 23, 30
+  orig: 23, 30
+  offset: 0, 0
+  index: -1
+zombie_tutorial_37x32
+  rotate: false
+  xy: 200, 310
+  size: 24, 21
+  orig: 24, 21
+  offset: 0, 0
+  index: -1
+zombie_tutorial_37x46
+  rotate: false
+  xy: 229, 1
+  size: 24, 30
+  orig: 24, 30
+  offset: 0, 0
+  index: -1
+zombie_tutorial_40x25
+  rotate: false
+  xy: 90, 344
+  size: 26, 16
+  orig: 26, 16
+  offset: 0, 0
+  index: -1
+zombie_tutorial_43x25
+  rotate: false
+  xy: 26, 329
+  size: 28, 16
+  orig: 28, 16
+  offset: 0, 0
+  index: -1
+zombie_tutorial_52x31
+  rotate: false
+  xy: 180, 288
+  size: 34, 20
+  orig: 34, 20
+  offset: 0, 0
+  index: -1
+zombie_tutorial_56x30
+  rotate: false
+  xy: 55, 277
+  size: 36, 19
+  orig: 36, 19
+  offset: 0, 0
+  index: -1
+zombie_tutorial_60x86
+  rotate: false
+  xy: 212, 64
+  size: 39, 55
+  orig: 39, 55
+  offset: 0, 0
+  index: -1
+zombie_tutorial_6x6
+  rotate: false
+  xy: 70, 77
+  size: 4, 4
+  orig: 4, 4
+  offset: 0, 0
+  index: -1
+zombie_tutorial_70x71
+  rotate: false
+  xy: 1, 142
+  size: 45, 46
+  orig: 45, 46
+  offset: 0, 0
+  index: -1
+zombie_tutorial_76x98
+  rotate: false
+  xy: 1, 77
+  size: 49, 63
+  orig: 49, 63
+  offset: 0, 0
+  index: -1
+zombie_tutorial_79x69
+  rotate: false
+  xy: 158, 229
+  size: 51, 44
+  orig: 51, 44
+  offset: 0, 0
+  index: -1
+zombie_tutorial_7x7
+  rotate: false
+  xy: 137, 76
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+zombie_tutorial_7x7_2
+  rotate: false
+  xy: 137, 83
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+zombie_tutorial_80x72
+  rotate: false
+  xy: 105, 183
+  size: 51, 46
+  orig: 51, 46
+  offset: 0, 0
+  index: -1
+zombie_tutorial_80x83
+  rotate: false
+  xy: 192, 128
+  size: 51, 53
+  orig: 51, 53
+  offset: 0, 0
+  index: -1
+zombie_tutorial_80x83_2
+  rotate: false
+  xy: 52, 140
+  size: 51, 53
+  orig: 51, 53
+  offset: 0, 0
+  index: -1
+zombie_tutorial_81x64
+  rotate: false
+  xy: 1, 241
+  size: 52, 41
+  orig: 52, 41
+  offset: 0, 0
+  index: -1
+zombie_tutorial_81x64_2
+  rotate: false
+  xy: 109, 275
+  size: 52, 41
+  orig: 52, 41
+  offset: 0, 0
+  index: -1
+zombie_tutorial_82x69
+  rotate: false
+  xy: 158, 183
+  size: 53, 44
+  orig: 53, 44
+  offset: 0, 0
+  index: -1
+zombie_tutorial_82x82
+  rotate: false
+  xy: 137, 128
+  size: 53, 53
+  orig: 53, 53
+  offset: 0, 0
+  index: -1
+zombie_tutorial_8x7
+  rotate: false
+  xy: 137, 90
+  size: 5, 5
+  orig: 5, 5
+  offset: 0, 0
+  index: -1
+zombie_tutorial_91x97
+  rotate: false
+  xy: 77, 76
+  size: 58, 62
+  orig: 58, 62
+  offset: 0, 0
+  index: -1
+zombie_tutorial_96x97
+  rotate: false
+  xy: 148, 64
+  size: 62, 62
+  orig: 62, 62
+  offset: 0, 0
+  index: -1

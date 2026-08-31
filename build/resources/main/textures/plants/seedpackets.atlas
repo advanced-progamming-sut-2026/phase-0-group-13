@@ -1,0 +1,460 @@
+ui_seedpackets_768_00.png
+size: 1024,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+appeasemint
+  rotate: false
+  xy: 833, 310
+  size: 103, 61
+  orig: 103, 61
+  offset: 0, 0
+  index: -1
+armamint
+  rotate: false
+  xy: 405, 381
+  size: 85, 71
+  orig: 85, 71
+  offset: 0, 0
+  index: -1
+bombardmint
+  rotate: false
+  xy: 599, 424
+  size: 97, 61
+  orig: 97, 61
+  offset: 0, 0
+  index: -1
+bonkchoy
+  rotate: false
+  xy: 742, 310
+  size: 89, 71
+  orig: 89, 71
+  offset: 0, 0
+  index: -1
+bowlingbulb
+  rotate: false
+  xy: 853, 660
+  size: 77, 70
+  orig: 77, 70
+  offset: 0, 0
+  index: -1
+cabbagepult
+  rotate: false
+  xy: 828, 1159
+  size: 72, 61
+  orig: 72, 61
+  offset: 0, 0
+  index: -1
+cactus
+  rotate: false
+  xy: 448, 235
+  size: 101, 71
+  orig: 101, 71
+  offset: 0, 0
+  index: -1
+caulipower
+  rotate: false
+  xy: 960, 446
+  size: 64, 70
+  orig: 64, 70
+  offset: 0, 0
+  index: -1
+cherrybomb
+  rotate: false
+  xy: 1, 674
+  size: 75, 71
+  orig: 75, 71
+  offset: 0, 0
+  index: -1
+chomper
+  rotate: false
+  xy: 858, 735
+  size: 75, 70
+  orig: 75, 70
+  offset: 0, 0
+  index: -1
+citron
+  rotate: false
+  xy: 463, 881
+  size: 73, 69
+  orig: 73, 69
+  offset: 0, 0
+  index: -1
+doomshroom
+  rotate: false
+  xy: 688, 1207
+  size: 72, 60
+  orig: 72, 60
+  offset: 0, 0
+  index: -1
+electricblueberry
+  rotate: false
+  xy: 395, 803
+  size: 75, 69
+  orig: 75, 69
+  offset: 0, 0
+  index: -1
+enchantmint
+  rotate: false
+  xy: 452, 508
+  size: 81, 70
+  orig: 81, 70
+  offset: 0, 0
+  index: -1
+endurian
+  rotate: false
+  xy: 390, 874
+  size: 71, 71
+  orig: 71, 71
+  offset: 0, 0
+  index: -1
+enforcemint
+  rotate: false
+  xy: 551, 235
+  size: 101, 71
+  orig: 101, 71
+  offset: 0, 0
+  index: -1
+enlightenmint
+  rotate: false
+  xy: 654, 235
+  size: 96, 71
+  orig: 96, 71
+  offset: 0, 0
+  index: -1
+explodeonut
+  rotate: false
+  xy: 937, 591
+  size: 77, 71
+  orig: 77, 71
+  offset: 0, 0
+  index: -1
+firepeashooter
+  rotate: false
+  xy: 453, 1083
+  size: 73, 63
+  orig: 73, 63
+  offset: 0, 0
+  index: -1
+fumeshroom
+  rotate: false
+  xy: 623, 601
+  size: 78, 70
+  orig: 78, 70
+  offset: 0, 0
+  index: -1
+garlic
+  rotate: false
+  xy: 538, 948
+  size: 77, 63
+  orig: 77, 63
+  offset: 0, 0
+  index: -1
+goldbloom
+  rotate: false
+  xy: 500, 374
+  size: 97, 63
+  orig: 97, 63
+  offset: 0, 0
+  index: -1
+goopeashooter
+  rotate: false
+  xy: 262, 1353
+  size: 66, 57
+  orig: 66, 57
+  offset: 0, 0
+  index: -1
+grapeshot
+  rotate: false
+  xy: 354, 454
+  size: 96, 61
+  orig: 96, 61
+  offset: 0, 0
+  index: -1
+gravebuster
+  rotate: false
+  xy: 788, 445
+  size: 84, 70
+  orig: 84, 70
+  offset: 0, 0
+  index: -1
+hotpotato
+  rotate: false
+  xy: 492, 439
+  size: 88, 67
+  orig: 88, 67
+  offset: 0, 0
+  index: -1
+hypnoshroom
+  rotate: false
+  xy: 124, 1279
+  size: 59, 70
+  orig: 59, 70
+  offset: 0, 0
+  index: -1
+iceshroom
+  rotate: false
+  xy: 312, 868
+  size: 76, 67
+  orig: 76, 67
+  offset: 0, 0
+  index: -1
+iceberglettuce
+  rotate: false
+  xy: 1, 997
+  size: 71, 68
+  orig: 71, 68
+  offset: 0, 0
+  index: -1
+imitater
+  rotate: false
+  xy: 82, 892
+  size: 70, 71
+  orig: 70, 71
+  offset: 0, 0
+  index: -1
+jalapeno
+  rotate: false
+  xy: 980, 1
+  size: 42, 71
+  orig: 42, 71
+  offset: 0, 0
+  index: -1
+kernelpult
+  rotate: false
+  xy: 932, 664
+  size: 78, 69
+  orig: 78, 69
+  offset: 0, 0
+  index: -1
+kiwibeast
+  rotate: false
+  xy: 337, 947
+  size: 69, 71
+  orig: 69, 71
+  offset: 0, 0
+  index: -1
+lilypad
+  rotate: false
+  xy: 582, 1279
+  size: 78, 53
+  orig: 78, 53
+  offset: 0, 0
+  index: -1
+magnetshroom
+  rotate: false
+  xy: 63, 1254
+  size: 59, 71
+  orig: 59, 71
+  offset: 0, 0
+  index: -1
+megagatlingpea
+  rotate: false
+  xy: 332, 1280
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+melonpult
+  rotate: false
+  xy: 938, 310
+  size: 84, 61
+  orig: 84, 61
+  offset: 0, 0
+  index: -1
+peapod
+  rotate: false
+  xy: 78, 725
+  size: 77, 69
+  orig: 77, 69
+  offset: 0, 0
+  index: -1
+peashooter
+  rotate: false
+  xy: 157, 751
+  size: 79, 66
+  orig: 79, 66
+  offset: 0, 0
+  index: -1
+pepperpult
+  rotate: false
+  xy: 617, 949
+  size: 77, 63
+  orig: 77, 63
+  offset: 0, 0
+  index: -1
+phatbeet
+  rotate: false
+  xy: 268, 389
+  size: 84, 71
+  orig: 84, 71
+  offset: 0, 0
+  index: -1
+potatomine
+  rotate: false
+  xy: 179, 455
+  size: 82, 71
+  orig: 82, 71
+  offset: 0, 0
+  index: -1
+primalpotatomine
+  rotate: false
+  xy: 874, 446
+  size: 84, 70
+  orig: 84, 70
+  offset: 0, 0
+  index: -1
+primalsunflower
+  rotate: false
+  xy: 170, 607
+  size: 78, 70
+  orig: 78, 70
+  offset: 0, 0
+  index: -1
+puffshroom
+  rotate: false
+  xy: 953, 1402
+  size: 55, 61
+  orig: 55, 61
+  offset: 0, 0
+  index: -1
+pumpkin
+  rotate: false
+  xy: 916, 1087
+  size: 80, 57
+  orig: 80, 57
+  offset: 0, 0
+  index: -1
+reinforcemint
+  rotate: false
+  xy: 154, 945
+  size: 76, 65
+  orig: 76, 65
+  offset: 0, 0
+  index: -1
+repeater
+  rotate: false
+  xy: 758, 805
+  size: 75, 69
+  orig: 75, 69
+  offset: 0, 0
+  index: -1
+seashroom
+  rotate: false
+  xy: 390, 1355
+  size: 57, 65
+  orig: 57, 65
+  offset: 0, 0
+  index: -1
+snowpea
+  rotate: false
+  xy: 80, 656
+  size: 81, 67
+  orig: 81, 67
+  offset: 0, 0
+  index: -1
+splitpea
+  rotate: false
+  xy: 604, 357
+  size: 96, 65
+  orig: 96, 65
+  offset: 0, 0
+  index: -1
+squash
+  rotate: false
+  xy: 74, 1038
+  size: 66, 70
+  orig: 66, 70
+  offset: 0, 0
+  index: -1
+starfruit
+  rotate: false
+  xy: 88, 452
+  size: 89, 66
+  orig: 89, 66
+  offset: 0, 0
+  index: -1
+sunbean
+  rotate: false
+  xy: 60, 1327
+  size: 58, 67
+  orig: 58, 67
+  offset: 0, 0
+  index: -1
+sunshroom
+  rotate: false
+  xy: 59, 1488
+  size: 51, 54
+  orig: 51, 54
+  offset: 0, 0
+  index: -1
+sunflower
+  rotate: false
+  xy: 480, 1013
+  size: 69, 68
+  orig: 69, 68
+  offset: 0, 0
+  index: -1
+sweetpotato
+  rotate: false
+  xy: 1, 1067
+  size: 65, 71
+  orig: 65, 71
+  offset: 0, 0
+  index: -1
+tallnut
+  rotate: false
+  xy: 227, 1064
+  size: 66, 70
+  orig: 66, 70
+  offset: 0, 0
+  index: -1
+tanglekelp
+  rotate: false
+  xy: 942, 518
+  size: 79, 71
+  orig: 79, 71
+  offset: 0, 0
+  index: -1
+threepeater
+  rotate: false
+  xy: 122, 308
+  size: 97, 70
+  orig: 97, 70
+  offset: 0, 0
+  index: -1
+torchwood
+  rotate: false
+  xy: 510, 611
+  size: 88, 62
+  orig: 88, 62
+  offset: 0, 0
+  index: -1
+twinsunflower
+  rotate: false
+  xy: 833, 373
+  size: 89, 70
+  orig: 89, 70
+  offset: 0, 0
+  index: -1
+wallnut
+  rotate: false
+  xy: 557, 1198
+  size: 66, 66
+  orig: 66, 66
+  offset: 0, 0
+  index: -1
+wasabiwhip
+  rotate: false
+  xy: 924, 874
+  size: 71, 71
+  orig: 71, 71
+  offset: 0, 0
+  index: -1
+wintermelon
+  rotate: false
+  xy: 472, 818
+  size: 84, 61
+  orig: 84, 61
+  offset: 0, 0
+  index: -1

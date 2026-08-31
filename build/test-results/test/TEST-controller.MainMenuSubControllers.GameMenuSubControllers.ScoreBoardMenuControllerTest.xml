@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="controller.MainMenuSubControllers.GameMenuSubControllers.ScoreBoardMenuControllerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-08-28T21:31:44.361Z" hostname="MacBook-Pro-4.local" time="0.013">
+  <properties/>
+  <testcase name="progressShowsSeasonAndStageAndDashesAnAccountThatClearedNothing()" classname="controller.MainMenuSubControllers.GameMenuSubControllers.ScoreBoardMenuControllerTest" time="0.007"/>
+  <testcase name="aPlayerWhoNeverFinishedABonusRunRanksBelowOneWhoScoredZero()" classname="controller.MainMenuSubControllers.GameMenuSubControllers.ScoreBoardMenuControllerTest" time="0.002"/>
+  <testcase name="questsColumnAddsDailyAndOther()" classname="controller.MainMenuSubControllers.GameMenuSubControllers.ScoreBoardMenuControllerTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

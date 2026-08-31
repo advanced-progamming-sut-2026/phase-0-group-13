@@ -1,0 +1,236 @@
+ui_zombiepackets_768_00.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+ZombieBeachFisherman
+  rotate: false
+  xy: 722, 650
+  size: 92, 110
+  orig: 92, 110
+  offset: 0, 0
+  index: -1
+ZombieBeachOctopus
+  rotate: false
+  xy: 1895, 274
+  size: 90, 133
+  orig: 90, 133
+  offset: 0, 0
+  index: -1
+ZombieBeachSnorkel
+  rotate: false
+  xy: 1, 160
+  size: 90, 136
+  orig: 90, 136
+  offset: 0, 0
+  index: -1
+ZombieDarkArmor3Default
+  rotate: false
+  xy: 69, 1024
+  size: 66, 115
+  orig: 66, 115
+  offset: 0, 0
+  index: -1
+ZombieDarkBarrelRollerDefault
+  rotate: false
+  xy: 528, 769
+  size: 92, 101
+  orig: 92, 101
+  offset: 0, 0
+  index: -1
+ZombieDarkImpDragonDefault
+  rotate: false
+  xy: 1617, 1147
+  size: 71, 87
+  orig: 71, 87
+  offset: 0, 0
+  index: -1
+ZombieDarkJugglerDefault
+  rotate: false
+  xy: 164, 910
+  size: 72, 116
+  orig: 72, 116
+  offset: 0, 0
+  index: -1
+ZombieDarkKing
+  rotate: false
+  xy: 1086, 538
+  size: 91, 114
+  orig: 91, 114
+  offset: 0, 0
+  index: -1
+ZombieEgyptGargantuar
+  rotate: false
+  xy: 845, 1
+  size: 94, 138
+  orig: 94, 138
+  offset: 0, 0
+  index: -1
+ZombieEgyptImpDefault
+  rotate: false
+  xy: 881, 1164
+  size: 79, 76
+  orig: 79, 76
+  offset: 0, 0
+  index: -1
+ZombieIceAgeDodo
+  rotate: false
+  xy: 1801, 276
+  size: 88, 134
+  orig: 88, 134
+  offset: 0, 0
+  index: -1
+ZombieIceAgeHunter
+  rotate: false
+  xy: 1253, 657
+  size: 93, 107
+  orig: 93, 107
+  offset: 0, 0
+  index: -1
+ZombieIceAgeTroglobite
+  rotate: false
+  xy: 836, 141
+  size: 91, 135
+  orig: 91, 135
+  offset: 0, 0
+  index: -1
+ZombieMummyArmor1Default
+  rotate: false
+  xy: 441, 995
+  size: 64, 128
+  orig: 64, 128
+  offset: 0, 0
+  index: -1
+ZombieMummyArmor2Default
+  rotate: false
+  xy: 574, 1017
+  size: 64, 120
+  orig: 64, 120
+  offset: 0, 0
+  index: -1
+ZombieMummyArmor4Default
+  rotate: false
+  xy: 772, 891
+  size: 70, 123
+  orig: 70, 123
+  offset: 0, 0
+  index: -1
+ZombieMummyDefault
+  rotate: false
+  xy: 440, 1125
+  size: 64, 104
+  orig: 64, 104
+  offset: 0, 0
+  index: -1
+ZombiePianoDefault
+  rotate: false
+  xy: 1222, 277
+  size: 92, 128
+  orig: 92, 128
+  offset: 0, 0
+  index: -1
+ZombieRaDefault
+  rotate: false
+  xy: 1638, 767
+  size: 90, 104
+  orig: 90, 104
+  offset: 0, 0
+  index: -1
+ZombieTombRaiserDefault
+  rotate: false
+  xy: 836, 1037
+  size: 73, 103
+  orig: 73, 103
+  offset: 0, 0
+  index: -1
+ZombieWizardDefault
+  rotate: false
+  xy: 1454, 642
+  size: 87, 117
+  orig: 87, 117
+  offset: 0, 0
+  index: -1
+ZombieZombossMechCowboy
+  rotate: false
+  xy: 1614, 139
+  size: 92, 136
+  orig: 92, 136
+  offset: 0, 0
+  index: -1
+ZombieZombossMechDark
+  rotate: false
+  xy: 929, 277
+  size: 88, 134
+  orig: 88, 134
+  offset: 0, 0
+  index: -1
+ZombieZombossMechEgypt
+  rotate: false
+  xy: 1225, 140
+  size: 92, 135
+  orig: 92, 135
+  offset: 0, 0
+  index: -1
+ZombieZombossMechPirate
+  rotate: false
+  xy: 341, 1
+  size: 99, 142
+  orig: 99, 142
+  offset: 0, 0
+  index: -1
+basic
+  rotate: false
+  xy: 62, 1141
+  size: 61, 102
+  orig: 61, 102
+  offset: 0, 0
+  index: -1
+buckethead
+  rotate: false
+  xy: 1383, 965
+  size: 70, 118
+  orig: 70, 118
+  offset: 0, 0
+  index: -1
+conehead
+  rotate: false
+  xy: 1717, 1025
+  size: 61, 123
+  orig: 61, 123
+  offset: 0, 0
+  index: -1
+football
+  rotate: false
+  xy: 369, 533
+  size: 91, 117
+  orig: 91, 117
+  offset: 0, 0
+  index: -1
+gargantuar
+  rotate: false
+  xy: 1801, 140
+  size: 92, 134
+  orig: 92, 134
+  offset: 0, 0
+  index: -1
+newspaper
+  rotate: false
+  xy: 1496, 877
+  size: 82, 107
+  orig: 82, 107
+  offset: 0, 0
+  index: -1
+screen-door
+  rotate: false
+  xy: 1358, 1085
+  size: 67, 111
+  orig: 67, 111
+  offset: 0, 0
+  index: -1
+sun-imp
+  rotate: false
+  xy: 1119, 1207
+  size: 53, 70
+  orig: 53, 70
+  offset: 0, 0
+  index: -1

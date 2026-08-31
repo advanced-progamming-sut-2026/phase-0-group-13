@@ -1,0 +1,36 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "attack_end": 0.5333,
+        "attack_end_damage": 0.5333,
+        "attack_end_damage2": 0.5333,
+        "attack_end_damage3": 0.5333,
+        "attack_loop": 0.3333,
+        "attack_loop_damage": 0.3333,
+        "attack_loop_damage2": 0.3333,
+        "attack_loop_damage3": 0.3333,
+        "attack_start": 0.5,
+        "attack_start_damage": 0.5,
+        "attack_start_damage2": 0.5,
+        "attack_start_damage3": 0.5,
+        "damage": 3.3333,
+        "damage2": 3.3333,
+        "damage3": 6.6667,
+        "idle": 9,
+        "idle2": 10,
+        "plantfood_on": 0.5667,
+        "water": 1.4667
+      },
+      "name": "ENDURIAN",
+      "pam": "768/FULL/PLANT/ENDURIAN/ENDURIAN.PAM"
+    }
+  ],
+  "atlas": "textures/plants/endurian.atlas",
+  "entity": "Endurian",
+  "source_folder": "images/768/.../endurian"
+}

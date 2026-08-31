@@ -1,0 +1,31 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "attack": 1.0333,
+        "attack 2": 1,
+        "attack 3": 1,
+        "attack 4": 1,
+        "attack 5": 1,
+        "idle": 1,
+        "idle2": 1,
+        "idle3": 1,
+        "idle4": 1,
+        "idle5": 1,
+        "plantfood": 5.2667,
+        "plantfood_off": 0.8,
+        "plantfood_on": 1.5,
+        "water": 2.4
+      },
+      "name": "PEAPOD",
+      "pam": "768/FULL/PLANT/PEAPOD/PEAPOD.PAM"
+    }
+  ],
+  "atlas": "textures/plants/peapod.atlas",
+  "entity": "Pea Pod",
+  "source_folder": "images/768/.../peapod"
+}

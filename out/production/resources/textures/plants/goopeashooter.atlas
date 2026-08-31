@@ -1,0 +1,208 @@
+plantpoisonpeashooter_768_00.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+goopeashooter_10x8
+  rotate: false
+  xy: 494, 95
+  size: 7, 5
+  orig: 7, 5
+  offset: 0, 0
+  index: -1
+goopeashooter_119x119
+  rotate: false
+  xy: 79, 135
+  size: 76, 76
+  orig: 76, 76
+  offset: 0, 0
+  index: -1
+goopeashooter_14x11
+  rotate: false
+  xy: 157, 204
+  size: 9, 7
+  orig: 9, 7
+  offset: 0, 0
+  index: -1
+goopeashooter_18x20
+  rotate: false
+  xy: 329, 277
+  size: 12, 13
+  orig: 12, 13
+  offset: 0, 0
+  index: -1
+goopeashooter_206x206
+  rotate: false
+  xy: 135, 1
+  size: 132, 132
+  orig: 132, 132
+  offset: 0, 0
+  index: -1
+goopeashooter_21x17
+  rotate: false
+  xy: 343, 277
+  size: 14, 11
+  orig: 14, 11
+  offset: 0, 0
+  index: -1
+goopeashooter_21x20
+  rotate: false
+  xy: 313, 277
+  size: 14, 13
+  orig: 14, 13
+  offset: 0, 0
+  index: -1
+goopeashooter_21x23
+  rotate: false
+  xy: 495, 275
+  size: 14, 15
+  orig: 14, 15
+  offset: 0, 0
+  index: -1
+goopeashooter_22x14
+  rotate: false
+  xy: 491, 190
+  size: 14, 9
+  orig: 14, 9
+  offset: 0, 0
+  index: -1
+goopeashooter_23x17
+  rotate: false
+  xy: 170, 249
+  size: 15, 11
+  orig: 15, 11
+  offset: 0, 0
+  index: -1
+goopeashooter_25x18
+  rotate: false
+  xy: 285, 227
+  size: 16, 12
+  orig: 16, 12
+  offset: 0, 0
+  index: -1
+goopeashooter_26x36
+  rotate: false
+  xy: 451, 275
+  size: 17, 23
+  orig: 17, 23
+  offset: 0, 0
+  index: -1
+goopeashooter_27x39
+  rotate: false
+  xy: 251, 263
+  size: 18, 25
+  orig: 18, 25
+  offset: 0, 0
+  index: -1
+goopeashooter_30x24
+  rotate: false
+  xy: 271, 277
+  size: 19, 16
+  orig: 19, 16
+  offset: 0, 0
+  index: -1
+goopeashooter_30x24_2
+  rotate: false
+  xy: 292, 277
+  size: 19, 16
+  orig: 19, 16
+  offset: 0, 0
+  index: -1
+goopeashooter_31x18
+  rotate: false
+  xy: 318, 188
+  size: 20, 12
+  orig: 20, 12
+  offset: 0, 0
+  index: -1
+goopeashooter_31x33
+  rotate: false
+  xy: 376, 266
+  size: 20, 21
+  orig: 20, 21
+  offset: 0, 0
+  index: -1
+goopeashooter_35x26
+  rotate: false
+  xy: 470, 275
+  size: 23, 17
+  orig: 23, 17
+  offset: 0, 0
+  index: -1
+goopeashooter_36x27
+  rotate: false
+  xy: 426, 275
+  size: 23, 18
+  orig: 23, 18
+  offset: 0, 0
+  index: -1
+goopeashooter_36x45
+  rotate: false
+  xy: 344, 139
+  size: 23, 29
+  orig: 23, 29
+  offset: 0, 0
+  index: -1
+goopeashooter_40x25
+  rotate: false
+  xy: 398, 275
+  size: 26, 16
+  orig: 26, 16
+  offset: 0, 0
+  index: -1
+goopeashooter_40x53
+  rotate: false
+  xy: 344, 103
+  size: 26, 34
+  orig: 26, 34
+  offset: 0, 0
+  index: -1
+goopeashooter_44x25
+  rotate: false
+  xy: 191, 204
+  size: 28, 16
+  orig: 28, 16
+  offset: 0, 0
+  index: -1
+goopeashooter_50x62
+  rotate: false
+  xy: 457, 160
+  size: 32, 40
+  orig: 32, 40
+  offset: 0, 0
+  index: -1
+goopeashooter_53x51
+  rotate: false
+  xy: 59, 250
+  size: 34, 33
+  orig: 34, 33
+  offset: 0, 0
+  index: -1
+goopeashooter_53x65
+  rotate: false
+  xy: 225, 135
+  size: 34, 42
+  orig: 34, 42
+  offset: 0, 0
+  index: -1
+goopeashooter_69x63
+  rotate: false
+  xy: 464, 1
+  size: 44, 41
+  orig: 44, 41
+  offset: 0, 0
+  index: -1
+goopeashooter_87x73
+  rotate: false
+  xy: 1, 250
+  size: 56, 47
+  orig: 56, 47
+  offset: 0, 0
+  index: -1
+goopeashooter_8x16
+  rotate: false
+  xy: 261, 135
+  size: 5, 10
+  orig: 5, 10
+  offset: 0, 0
+  index: -1

@@ -9,7 +9,7 @@ a known map.
 | Tier | Path | Purpose | Shipped? |
 |---|---|---|---|
 | Source library | `resources/` | Raw upstream data, kept verbatim. Read by tools and humans. | No — gitignored |
-| Runtime root | `assets/` | Curated, game-facing assets. On the classpath. | Yes |
+ | Runtime root | `assets/` | Curated, game-facing assets. On the classpath. | Yes |
 
 `assets/` is registered as a resources source dir in `build.gradle`, so anything under it is
 reachable at runtime via `Gdx.files.internal("textures/plants/...")`. `resources/` is not on the

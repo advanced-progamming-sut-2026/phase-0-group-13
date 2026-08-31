@@ -1,0 +1,187 @@
+plantfumeshroom_768_00.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+fumeshroom_105x76
+  rotate: false
+  xy: 152, 46
+  size: 67, 49
+  orig: 67, 49
+  offset: 0, 0
+  index: -1
+fumeshroom_111x53
+  rotate: false
+  xy: 62, 60
+  size: 71, 34
+  orig: 71, 34
+  offset: 0, 0
+  index: -1
+fumeshroom_114x88
+  rotate: false
+  xy: 77, 1
+  size: 73, 57
+  orig: 73, 57
+  offset: 0, 0
+  index: -1
+fumeshroom_116x89
+  rotate: false
+  xy: 1, 1
+  size: 74, 57
+  orig: 74, 57
+  offset: 0, 0
+  index: -1
+fumeshroom_119x48
+  rotate: false
+  xy: 62, 96
+  size: 76, 31
+  orig: 76, 31
+  offset: 0, 0
+  index: -1
+fumeshroom_11x16
+  rotate: false
+  xy: 109, 129
+  size: 7, 10
+  orig: 7, 10
+  offset: 0, 0
+  index: -1
+fumeshroom_11x8
+  rotate: false
+  xy: 118, 129
+  size: 7, 5
+  orig: 7, 5
+  offset: 0, 0
+  index: -1
+fumeshroom_129x67
+  rotate: false
+  xy: 152, 1
+  size: 83, 43
+  orig: 83, 43
+  offset: 0, 0
+  index: -1
+fumeshroom_14x30
+  rotate: false
+  xy: 135, 60
+  size: 9, 19
+  orig: 9, 19
+  offset: 0, 0
+  index: -1
+fumeshroom_15x14
+  rotate: false
+  xy: 85, 129
+  size: 10, 9
+  orig: 10, 9
+  offset: 0, 0
+  index: -1
+fumeshroom_15x14_2
+  rotate: false
+  xy: 97, 129
+  size: 10, 9
+  orig: 10, 9
+  offset: 0, 0
+  index: -1
+fumeshroom_17x14
+  rotate: false
+  xy: 72, 129
+  size: 11, 9
+  orig: 11, 9
+  offset: 0, 0
+  index: -1
+fumeshroom_17x15
+  rotate: false
+  xy: 59, 129
+  size: 11, 10
+  orig: 11, 10
+  offset: 0, 0
+  index: -1
+fumeshroom_18x22
+  rotate: false
+  xy: 157, 123
+  size: 12, 14
+  orig: 12, 14
+  offset: 0, 0
+  index: -1
+fumeshroom_20x15
+  rotate: false
+  xy: 22, 129
+  size: 13, 10
+  orig: 13, 10
+  offset: 0, 0
+  index: -1
+fumeshroom_23x25
+  rotate: false
+  xy: 140, 123
+  size: 15, 16
+  orig: 15, 16
+  offset: 0, 0
+  index: -1
+fumeshroom_24x26
+  rotate: false
+  xy: 43, 106
+  size: 16, 17
+  orig: 16, 17
+  offset: 0, 0
+  index: -1
+fumeshroom_25x13
+  rotate: false
+  xy: 199, 128
+  size: 16, 9
+  orig: 16, 9
+  offset: 0, 0
+  index: -1
+fumeshroom_29x33
+  rotate: false
+  xy: 22, 106
+  size: 19, 21
+  orig: 19, 21
+  offset: 0, 0
+  index: -1
+fumeshroom_30x44
+  rotate: false
+  xy: 1, 106
+  size: 19, 28
+  orig: 19, 28
+  offset: 0, 0
+  index: -1
+fumeshroom_40x22
+  rotate: false
+  xy: 207, 112
+  size: 26, 14
+  orig: 26, 14
+  offset: 0, 0
+  index: -1
+fumeshroom_42x40
+  rotate: false
+  xy: 178, 97
+  size: 27, 26
+  orig: 27, 26
+  offset: 0, 0
+  index: -1
+fumeshroom_48x44
+  rotate: false
+  xy: 221, 82
+  size: 31, 28
+  orig: 31, 28
+  offset: 0, 0
+  index: -1
+fumeshroom_56x37
+  rotate: false
+  xy: 140, 97
+  size: 36, 24
+  orig: 36, 24
+  offset: 0, 0
+  index: -1
+fumeshroom_8x11
+  rotate: false
+  xy: 127, 129
+  size: 5, 7
+  orig: 5, 7
+  offset: 0, 0
+  index: -1
+fumeshroom_92x69
+  rotate: false
+  xy: 1, 60
+  size: 59, 44
+  orig: 59, 44
+  offset: 0, 0
+  index: -1

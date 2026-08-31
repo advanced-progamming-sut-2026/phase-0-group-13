@@ -1,0 +1,24 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "idle": 0.6667,
+        "idle2": 0.6667,
+        "idle3": 0.6667,
+        "idle_plantfood": 0.6667,
+        "idle_plantfood2": 0.6667,
+        "idle_plantfood3": 0.6667,
+        "idle_plantfood4": 0.6667
+      },
+      "name": "PUMPKIN",
+      "pam": "768/INITIAL/PLANT/PUMPKIN/PUMPKIN.PAM"
+    }
+  ],
+  "atlas": "textures/plants/pumpkin.atlas",
+  "entity": "Pumpkin",
+  "source_folder": "images/768/.../pumpkin"
+}

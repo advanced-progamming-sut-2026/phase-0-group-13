@@ -1,0 +1,194 @@
+plantsweetpotato_768_00.png
+size: 128,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+sweetpotato_101x100
+  rotate: false
+  xy: 1, 1
+  size: 65, 64
+  orig: 65, 64
+  offset: 0, 0
+  index: -1
+sweetpotato_101x100_2
+  rotate: false
+  xy: 1, 67
+  size: 65, 64
+  orig: 65, 64
+  offset: 0, 0
+  index: -1
+sweetpotato_101x92
+  rotate: false
+  xy: 1, 197
+  size: 65, 59
+  orig: 65, 59
+  offset: 0, 0
+  index: -1
+sweetpotato_14x14
+  rotate: false
+  xy: 117, 102
+  size: 9, 9
+  orig: 9, 9
+  offset: 0, 0
+  index: -1
+sweetpotato_14x17
+  rotate: false
+  xy: 115, 56
+  size: 9, 11
+  orig: 9, 11
+  offset: 0, 0
+  index: -1
+sweetpotato_15x17
+  rotate: false
+  xy: 115, 43
+  size: 10, 11
+  orig: 10, 11
+  offset: 0, 0
+  index: -1
+sweetpotato_16x12
+  rotate: false
+  xy: 114, 113
+  size: 10, 8
+  orig: 10, 8
+  offset: 0, 0
+  index: -1
+sweetpotato_17x29
+  rotate: false
+  xy: 115, 22
+  size: 11, 19
+  orig: 11, 19
+  offset: 0, 0
+  index: -1
+sweetpotato_18x29
+  rotate: false
+  xy: 114, 1
+  size: 12, 19
+  orig: 12, 19
+  offset: 0, 0
+  index: -1
+sweetpotato_21x12
+  rotate: false
+  xy: 104, 187
+  size: 14, 8
+  orig: 14, 8
+  offset: 0, 0
+  index: -1
+sweetpotato_23x21
+  rotate: false
+  xy: 102, 171
+  size: 15, 14
+  orig: 15, 14
+  offset: 0, 0
+  index: -1
+sweetpotato_24x29
+  rotate: false
+  xy: 65, 153
+  size: 16, 19
+  orig: 16, 19
+  offset: 0, 0
+  index: -1
+sweetpotato_24x38
+  rotate: false
+  xy: 91, 130
+  size: 16, 25
+  orig: 16, 25
+  offset: 0, 0
+  index: -1
+sweetpotato_25x17
+  rotate: false
+  xy: 86, 187
+  size: 16, 11
+  orig: 16, 11
+  offset: 0, 0
+  index: -1
+sweetpotato_25x20
+  rotate: false
+  xy: 68, 187
+  size: 16, 13
+  orig: 16, 13
+  offset: 0, 0
+  index: -1
+sweetpotato_26x21
+  rotate: false
+  xy: 83, 157
+  size: 17, 14
+  orig: 17, 14
+  offset: 0, 0
+  index: -1
+sweetpotato_29x17
+  rotate: false
+  xy: 65, 174
+  size: 19, 11
+  orig: 19, 11
+  offset: 0, 0
+  index: -1
+sweetpotato_29x20
+  rotate: false
+  xy: 109, 156
+  size: 19, 13
+  orig: 19, 13
+  offset: 0, 0
+  index: -1
+sweetpotato_30x32
+  rotate: false
+  xy: 109, 133
+  size: 19, 21
+  orig: 19, 21
+  offset: 0, 0
+  index: -1
+sweetpotato_31x13
+  rotate: false
+  xy: 95, 102
+  size: 20, 9
+  orig: 20, 9
+  offset: 0, 0
+  index: -1
+sweetpotato_33x33
+  rotate: false
+  xy: 68, 130
+  size: 21, 21
+  orig: 21, 21
+  offset: 0, 0
+  index: -1
+sweetpotato_38x54
+  rotate: false
+  xy: 68, 76
+  size: 25, 35
+  orig: 25, 35
+  offset: 0, 0
+  index: -1
+sweetpotato_39x37
+  rotate: false
+  xy: 95, 76
+  size: 25, 24
+  orig: 25, 24
+  offset: 0, 0
+  index: -1
+sweetpotato_69x23
+  rotate: false
+  xy: 68, 113
+  size: 44, 15
+  orig: 44, 15
+  offset: 0, 0
+  index: -1
+sweetpotato_69x61
+  rotate: false
+  xy: 68, 1
+  size: 44, 39
+  orig: 44, 39
+  offset: 0, 0
+  index: -1
+sweetpotato_70x49
+  rotate: false
+  xy: 68, 42
+  size: 45, 32
+  orig: 45, 32
+  offset: 0, 0
+  index: -1
+sweetpotato_96x96
+  rotate: false
+  xy: 1, 133
+  size: 62, 62
+  orig: 62, 62
+  offset: 0, 0
+  index: -1

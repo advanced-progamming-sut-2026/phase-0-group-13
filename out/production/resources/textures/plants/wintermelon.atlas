@@ -1,0 +1,194 @@
+plantwintermelon_768_00.png
+size: 512,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+wintermelon_101x123
+  rotate: false
+  xy: 390, 509
+  size: 65, 79
+  orig: 65, 79
+  offset: 0, 0
+  index: -1
+wintermelon_101x39
+  rotate: false
+  xy: 1, 615
+  size: 65, 25
+  orig: 65, 25
+  offset: 0, 0
+  index: -1
+wintermelon_102x250
+  rotate: false
+  xy: 69, 317
+  size: 66, 160
+  orig: 66, 160
+  offset: 0, 0
+  index: -1
+wintermelon_111x105
+  rotate: false
+  xy: 1, 546
+  size: 71, 67
+  orig: 71, 67
+  offset: 0, 0
+  index: -1
+wintermelon_117x139
+  rotate: false
+  xy: 433, 337
+  size: 75, 89
+  orig: 75, 89
+  offset: 0, 0
+  index: -1
+wintermelon_122x83
+  rotate: false
+  xy: 234, 576
+  size: 78, 53
+  orig: 78, 53
+  offset: 0, 0
+  index: -1
+wintermelon_122x83_2
+  rotate: false
+  xy: 314, 590
+  size: 78, 53
+  orig: 78, 53
+  offset: 0, 0
+  index: -1
+wintermelon_124x112
+  rotate: false
+  xy: 95, 479
+  size: 80, 72
+  orig: 80, 72
+  offset: 0, 0
+  index: -1
+wintermelon_128x123
+  rotate: false
+  xy: 390, 428
+  size: 82, 79
+  orig: 82, 79
+  offset: 0, 0
+  index: -1
+wintermelon_143x136
+  rotate: false
+  xy: 296, 427
+  size: 92, 87
+  orig: 92, 87
+  offset: 0, 0
+  index: -1
+wintermelon_16x23
+  rotate: false
+  xy: 501, 164
+  size: 10, 15
+  orig: 10, 15
+  offset: 0, 0
+  index: -1
+wintermelon_203x193
+  rotate: false
+  xy: 301, 301
+  size: 130, 124
+  orig: 130, 124
+  offset: 0, 0
+  index: -1
+wintermelon_20x13
+  rotate: false
+  xy: 154, 553
+  size: 13, 9
+  orig: 13, 9
+  offset: 0, 0
+  index: -1
+wintermelon_23x11
+  rotate: false
+  xy: 234, 564
+  size: 15, 7
+  orig: 15, 7
+  offset: 0, 0
+  index: -1
+wintermelon_25x22
+  rotate: false
+  xy: 491, 148
+  size: 16, 14
+  orig: 16, 14
+  offset: 0, 0
+  index: -1
+wintermelon_39x22
+  rotate: false
+  xy: 351, 569
+  size: 25, 14
+  orig: 25, 14
+  offset: 0, 0
+  index: -1
+wintermelon_44x38
+  rotate: false
+  xy: 351, 542
+  size: 28, 25
+  orig: 28, 25
+  offset: 0, 0
+  index: -1
+wintermelon_46x32
+  rotate: false
+  xy: 264, 631
+  size: 30, 21
+  orig: 30, 21
+  offset: 0, 0
+  index: -1
+wintermelon_46x32_2
+  rotate: false
+  xy: 452, 631
+  size: 30, 21
+  orig: 30, 21
+  offset: 0, 0
+  index: -1
+wintermelon_46x37
+  rotate: false
+  xy: 351, 516
+  size: 30, 24
+  orig: 30, 24
+  offset: 0, 0
+  index: -1
+wintermelon_50x53
+  rotate: false
+  xy: 474, 428
+  size: 32, 34
+  orig: 32, 34
+  offset: 0, 0
+  index: -1
+wintermelon_65x54
+  rotate: false
+  xy: 177, 619
+  size: 42, 35
+  orig: 42, 35
+  offset: 0, 0
+  index: -1
+wintermelon_65x59
+  rotate: false
+  xy: 133, 619
+  size: 42, 38
+  orig: 42, 38
+  offset: 0, 0
+  index: -1
+wintermelon_76x99
+  rotate: false
+  xy: 460, 1
+  size: 49, 64
+  orig: 49, 64
+  offset: 0, 0
+  index: -1
+wintermelon_79x51
+  rotate: false
+  xy: 460, 113
+  size: 51, 33
+  orig: 51, 33
+  offset: 0, 0
+  index: -1
+wintermelon_86x59
+  rotate: false
+  xy: 457, 549
+  size: 55, 38
+  orig: 55, 38
+  offset: 0, 0
+  index: -1
+wintermelon_88x59
+  rotate: false
+  xy: 74, 608
+  size: 57, 38
+  orig: 57, 38
+  offset: 0, 0
+  index: -1

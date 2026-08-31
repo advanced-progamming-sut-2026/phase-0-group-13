@@ -1,0 +1,24 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "attack": 1,
+        "idle": 1.0333,
+        "idle2": 1,
+        "plantfood": 0.3333,
+        "plantfood_off": 0.3,
+        "plantfood_on": 0.4,
+        "water": 2.0333
+      },
+      "name": "STARFRUIT",
+      "pam": "768/INITIAL/PLANT/STARFRUIT/STARFRUIT.PAM"
+    }
+  ],
+  "atlas": "textures/plants/starfruit.atlas",
+  "entity": "Starfruit",
+  "source_folder": "images/768/.../starfruit"
+}

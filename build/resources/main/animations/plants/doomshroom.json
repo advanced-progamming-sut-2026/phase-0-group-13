@@ -1,0 +1,30 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "stage1_explode": 2,
+        "stage1_idle": 2,
+        "stage1_spawn": 1,
+        "stage1_transform": 2,
+        "stage2_explode": 2,
+        "stage2_idle": 2,
+        "stage2_idle2": 2,
+        "stage2_transform": 2,
+        "stage3_explode": 3.3333,
+        "stage3_explode_short": 3.3333,
+        "stage3_idle": 2,
+        "stage3_idle2": 2,
+        "water": 2
+      },
+      "name": "DOOMSHROOM",
+      "pam": "768/FULL/PLANT/DOOMSHROOM/DOOMSHROOM.PAM"
+    }
+  ],
+  "atlas": "textures/plants/doomshroom.atlas",
+  "entity": "Doom-shroom",
+  "source_folder": "images/768/.../doomshroom"
+}

@@ -1,0 +1,25 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "cannon_fire": 0.5667,
+        "die": 2.6333,
+        "eat": 1.2667,
+        "fire": 0.9667,
+        "idle": 2.0333,
+        "particles": 0.0333,
+        "smash_left": 1.7667,
+        "walk": 2.3667
+      },
+      "name": "EGYPT_GARGANTUAR",
+      "pam": "768/INITIAL/ZOMBIE/EGYPT_GARGANTUAR/EGYPT_GARGANTUAR.PAM"
+    }
+  ],
+  "atlas": "textures/zombies/zombieegyptgargantuar.atlas",
+  "entity": "ZombieEgyptGargantuar",
+  "source_folder": "images/768/.../egypt_gargantuar"
+}

@@ -1,0 +1,32 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "growth_stage1": 1.3333,
+        "growth_stage2": 1.3333,
+        "idle2_stage1": 0.6667,
+        "idle2_stage2": 1.3333,
+        "idle2_stage3": 1.7,
+        "idle_stage1": 0.6667,
+        "idle_stage2": 1.3333,
+        "idle_stage3": 1.7,
+        "plantfood_stage1": 2.2,
+        "plantfood_stage2": 2.2,
+        "plantfood_stage3": 2.5333,
+        "special_stage1": 1.8333,
+        "special_stage2": 1.8333,
+        "special_stage3": 1.9333,
+        "water": 2.9333
+      },
+      "name": "SUNSHROOM",
+      "pam": "768/FULL/PLANT/SUNSHROOM/SUNSHROOM.PAM"
+    }
+  ],
+  "atlas": "textures/plants/sunshroom.atlas",
+  "entity": "Sun-shroom",
+  "source_folder": "images/768/.../sunshroom"
+}
