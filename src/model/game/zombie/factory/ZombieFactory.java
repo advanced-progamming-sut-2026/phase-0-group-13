@@ -12,6 +12,9 @@ import model.game.zombie.ZombieParts.ZombieTypeResolver;
 import model.game.zombie.behavior.*;
 
 public class ZombieFactory {
+  /** The All-Star crawls after it flattens its first plant. */
+  private static final double FOOTBALLER_SLOWDOWN = 0.35;
+
   private static final double SHINY_CHANCE = 0.05;
   private static final double TICKS_PER_SECOND = 10.0;
 
@@ -41,6 +44,7 @@ public class ZombieFactory {
     );
 
     zombie.setDisplayName(type.getDisplayName());
+    zombie.setFireImmune(type == ZombieType.IMP_DRAGON);
     if (isZomboss(type)) {
       zombie.setBoss(true);
       zombie.setRowSpan(ZombossAction.ROW_SPAN);
@@ -85,7 +89,9 @@ public class ZombieFactory {
       case HUNTER -> new HunterZombieAction(60, eatDamage);
       case ZOMBOTANY_JALAPENO -> new ZombotanyJalapenoAction(100);
       case ZOMBOTANY_SQUASH -> new TacklerZombieAction(true);
-      case FOOTBALLER, IMP_DRAGON, ARCADE -> new TacklerZombieAction();
+      case IMP_DRAGON -> new StandardZombieAction(eatDamage);
+      case FOOTBALLER -> new TacklerZombieAction(false, FOOTBALLER_SLOWDOWN);
+      case ARCADE -> new TacklerZombieAction();
       case PARASOL -> new ParasolZombieAction(200, eatDamage);
       case PROSPECTOR -> new ProspectorZombieAction(100, eatDamage);
       case NEWSPAPER -> new EnrageOnArmorBreakZombieAction(eatDamage, 2.0);

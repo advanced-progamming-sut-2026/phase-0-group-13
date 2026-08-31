@@ -10,7 +10,9 @@ import model.game.zombie.Zombie;
 
 
 public class JesterZombieAction implements ZombieAction {
-  private static final double CATCH_RANGE = 0.6;
+  /** Must exceed the 0.5 hit radius plus one projectile step, or shots land before it catches. */
+  /** Must clear the 0.5 hit radius plus one 0.5 projectile step, or shots land before the catch. */
+  private static final double CATCH_RANGE = 1.1;
   private static final int SPIN_DURATION_TICKS = 30;
   private static final double SPIN_SPEED_MULTIPLIER = 2.0;
 

@@ -36,6 +36,7 @@ public class Zombie {
   private boolean submerged;
   private int rowSpan = 1;
   private boolean boss;
+  private boolean fireImmune;
   private int icedOnCell = NO_CELL;
   private double thrownFromX;
   private int thrownTicks;
@@ -196,6 +197,11 @@ public class Zombie {
   public boolean isBoss() { return boss; }
 
   public void setBoss(boolean boss) { this.boss = boss; }
+
+  /** The Imp Dragon: fire shots do nothing to it. */
+  public boolean isFireImmune() { return fireImmune; }
+
+  public void setFireImmune(boolean fireImmune) { this.fireImmune = fireImmune; }
   public ZombieAction getBehavior() { return behavior; }
   public String getName() { return name; }
 

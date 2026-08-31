@@ -201,6 +201,9 @@ public class Projectile {
   }
 
   private void applyHit(Zombie zombie) {
+    if (effect == ProjectileEffect.FIRE && zombie.isFireImmune()) {
+      return;
+    }
     int finalDamage = (effect == ProjectileEffect.FIRE) ? damage * 2 : damage;
     boolean ignoresArmor = (effect == ProjectileEffect.POISON);
 

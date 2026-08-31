@@ -77,10 +77,25 @@ class EveryZombieWorksTest {
     assertTrue(broken.isEmpty(), "zombies that will not build: " + broken);
   }
 
+  /**
+   * These hold the column they land in instead of walking the row, so a lone wall-nut eight tiles
+   * away is not something they can be expected to reach: the King only knights the zombies beside
+   * him, and a Zomboss fires at cells it picks at random, which made this sweep flaky. Both are
+   * covered directly -- see {@link model.game.zombie.behavior.ZombieSpecAuditTest} and
+   * {@link model.game.zombie.behavior.ZombossChapterAttacksTest}.
+   */
+  private static boolean holdsStation(String name) {
+    String n = name == null ? "" : name.toLowerCase();
+    return n.contains("king") || n.contains("zomboss");
+  }
+
   @Test
   void everyZombieAffectsTheWallOrItself() {
     List<String> inert = new ArrayList<>();
     for (ZombieTemplate template : roster) {
+      if (holdsStation(template.getName())) {
+        continue;
+      }
       if (!actsWithinBudget(template.getName())) {
         inert.add(template.getName());
       }
