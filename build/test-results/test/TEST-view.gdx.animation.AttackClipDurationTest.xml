@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="view.gdx.animation.AttackClipDurationTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-08-31T06:57:57.158Z" hostname="MacBook-Pro-4.local" time="0.017">
-  <properties/>
-  <testcase name="theRepeaterHasAnAttackClipLongerThanTheOldFixedHold()" classname="view.gdx.animation.AttackClipDurationTest" time="0.012"/>
-  <testcase name="mostAttackClipsAreLongerThanTheOldFixedHold()" classname="view.gdx.animation.AttackClipDurationTest" time="0.003"/>
-  <testcase name="everyAttackClipHasAPlausibleDuration()" classname="view.gdx.animation.AttackClipDurationTest" time="0.002"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
