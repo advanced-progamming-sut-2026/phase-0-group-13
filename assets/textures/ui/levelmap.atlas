@@ -1,0 +1,285 @@
+levelmap.png
+size: 1536,1024
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+egypt_hub
+  rotate: false
+  xy: 11, 5
+  size: 308, 345
+  orig: 308, 345
+  offset: 0, 0
+  index: -1
+egypt_node_open
+  rotate: false
+  xy: 19, 810
+  size: 83, 75
+  orig: 83, 75
+  offset: 0, 0
+  index: -1
+egypt_node_done
+  rotate: false
+  xy: 108, 811
+  size: 82, 75
+  orig: 82, 75
+  offset: 0, 0
+  index: -1
+egypt_node_locked
+  rotate: false
+  xy: 196, 810
+  size: 83, 73
+  orig: 83, 73
+  offset: 0, 0
+  index: -1
+egypt_node_boss
+  rotate: false
+  xy: 286, 808
+  size: 83, 76
+  orig: 83, 76
+  offset: 0, 0
+  index: -1
+egypt_link
+  rotate: false
+  xy: 16, 927
+  size: 178, 23
+  orig: 178, 23
+  offset: 0, 0
+  index: -1
+egypt_portal
+  rotate: false
+  xy: 191, 885
+  size: 100, 83
+  orig: 100, 83
+  offset: 0, 0
+  index: -1
+egypt_spark
+  rotate: false
+  xy: 329, 963
+  size: 44, 46
+  orig: 44, 46
+  offset: 0, 0
+  index: -1
+egypt_decor1
+  rotate: false
+  xy: 20, 710
+  size: 64, 90
+  orig: 64, 90
+  offset: 0, 0
+  index: -1
+egypt_decor2
+  rotate: false
+  xy: 287, 625
+  size: 72, 70
+  orig: 72, 70
+  offset: 0, 0
+  index: -1
+darkages_hub
+  rotate: false
+  xy: 386, 11
+  size: 326, 339
+  orig: 326, 339
+  offset: 0, 0
+  index: -1
+darkages_node_open
+  rotate: false
+  xy: 399, 808
+  size: 82, 76
+  orig: 82, 76
+  offset: 0, 0
+  index: -1
+darkages_node_done
+  rotate: false
+  xy: 489, 810
+  size: 83, 77
+  orig: 83, 77
+  offset: 0, 0
+  index: -1
+darkages_node_locked
+  rotate: false
+  xy: 581, 810
+  size: 80, 73
+  orig: 80, 73
+  offset: 0, 0
+  index: -1
+darkages_node_boss
+  rotate: false
+  xy: 670, 809
+  size: 79, 74
+  orig: 79, 74
+  offset: 0, 0
+  index: -1
+darkages_link
+  rotate: false
+  xy: 405, 929
+  size: 167, 23
+  orig: 167, 23
+  offset: 0, 0
+  index: -1
+darkages_portal
+  rotate: false
+  xy: 584, 892
+  size: 86, 79
+  orig: 86, 79
+  offset: 0, 0
+  index: -1
+darkages_spark
+  rotate: false
+  xy: 700, 966
+  size: 40, 43
+  orig: 40, 43
+  offset: 0, 0
+  index: -1
+darkages_decor1
+  rotate: false
+  xy: 402, 723
+  size: 66, 58
+  orig: 66, 58
+  offset: 0, 0
+  index: -1
+darkages_decor2
+  rotate: false
+  xy: 678, 626
+  size: 74, 78
+  orig: 74, 78
+  offset: 0, 0
+  index: -1
+beach_hub
+  rotate: false
+  xy: 759, 4
+  size: 379, 346
+  orig: 379, 346
+  offset: 0, 0
+  index: -1
+beach_node_open
+  rotate: false
+  xy: 780, 811
+  size: 83, 73
+  orig: 83, 73
+  offset: 0, 0
+  index: -1
+beach_node_done
+  rotate: false
+  xy: 868, 811
+  size: 82, 73
+  orig: 82, 73
+  offset: 0, 0
+  index: -1
+beach_node_locked
+  rotate: false
+  xy: 956, 811
+  size: 83, 73
+  orig: 83, 73
+  offset: 0, 0
+  index: -1
+beach_node_boss
+  rotate: false
+  xy: 1048, 810
+  size: 81, 74
+  orig: 81, 74
+  offset: 0, 0
+  index: -1
+beach_link
+  rotate: false
+  xy: 785, 929
+  size: 178, 23
+  orig: 178, 23
+  offset: 0, 0
+  index: -1
+beach_portal
+  rotate: false
+  xy: 976, 887
+  size: 81, 79
+  orig: 81, 79
+  offset: 0, 0
+  index: -1
+beach_spark
+  rotate: false
+  xy: 1086, 968
+  size: 39, 41
+  orig: 39, 41
+  offset: 0, 0
+  index: -1
+beach_decor1
+  rotate: false
+  xy: 843, 720
+  size: 61, 78
+  orig: 61, 78
+  offset: 0, 0
+  index: -1
+beach_decor2
+  rotate: false
+  xy: 1051, 626
+  size: 77, 77
+  orig: 77, 77
+  offset: 0, 0
+  index: -1
+frostbite_hub
+  rotate: false
+  xy: 1163, 13
+  size: 362, 337
+  orig: 362, 337
+  offset: 0, 0
+  index: -1
+frostbite_node_open
+  rotate: false
+  xy: 1163, 810
+  size: 85, 76
+  orig: 85, 76
+  offset: 0, 0
+  index: -1
+frostbite_node_done
+  rotate: false
+  xy: 1256, 811
+  size: 83, 75
+  orig: 83, 75
+  offset: 0, 0
+  index: -1
+frostbite_node_locked
+  rotate: false
+  xy: 1346, 810
+  size: 84, 75
+  orig: 84, 75
+  offset: 0, 0
+  index: -1
+frostbite_node_boss
+  rotate: false
+  xy: 1437, 809
+  size: 84, 77
+  orig: 84, 77
+  offset: 0, 0
+  index: -1
+frostbite_link
+  rotate: false
+  xy: 1170, 928
+  size: 180, 24
+  orig: 180, 24
+  offset: 0, 0
+  index: -1
+frostbite_portal
+  rotate: false
+  xy: 1361, 887
+  size: 86, 80
+  orig: 86, 80
+  offset: 0, 0
+  index: -1
+frostbite_spark
+  rotate: false
+  xy: 1469, 963
+  size: 40, 43
+  orig: 40, 43
+  offset: 0, 0
+  index: -1
+frostbite_decor1
+  rotate: false
+  xy: 1157, 712
+  size: 74, 86
+  orig: 74, 86
+  offset: 0, 0
+  index: -1
+frostbite_decor2
+  rotate: false
+  xy: 1448, 626
+  size: 71, 72
+  orig: 71, 72
+  offset: 0, 0
+  index: -1
