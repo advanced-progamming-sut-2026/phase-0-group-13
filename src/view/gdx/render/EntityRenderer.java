@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import model.core.GameManager;
 import model.enums.StatusEffect;
 import model.enums.SunType;
@@ -153,11 +154,43 @@ public final class EntityRenderer implements WorldRenderer {
   private boolean octopusChecked;
   private final Map<Plant, Boolean> knownPlants = new java.util.IdentityHashMap<>();
   private final Map<Plant, Boolean> seenPlants = new java.util.IdentityHashMap<>();
+  /**
+   * Zombies that died this frame, kept only by the view so their death clip can finish.
+   *
+   * <p>The board drops a dead zombie inside the same tick it dies -- Board.cleanupEntities runs
+   * removeIf(Zombie::isDead) before the frame is ever drawn -- so by the time anything renders,
+   * the zombie is already gone from getZombies(). Nothing that reads the board can therefore show
+   * a death: the corpse has to be caught as it disappears and held here for the length of its own
+   * die clip. Same reason HitEffects watches projectiles by disappearance rather than by state.
+   */
+  private final List<DyingZombie> dying = new java.util.ArrayList<>();
+  private final Map<Zombie, Boolean> zombiesLastFrame = new java.util.IdentityHashMap<>();
+  private final Map<Zombie, Boolean> zombiesThisFrame = new java.util.IdentityHashMap<>();
   private final Map<Sun, double[]> knownSuns = new java.util.IdentityHashMap<>();
   private final Map<Sun, double[]> seenSuns = new java.util.IdentityHashMap<>();
   /** Muzzle of each plant drawn this frame, filled in as the lawn is drawn. See muzzleOf. */
   private final Map<Plant, float[]> muzzles = new java.util.IdentityHashMap<>();
   private boolean seenABoard;
+
+  /**
+   * One zombie mid-collapse: the entity itself, where it fell, and how long it has been falling.
+   *
+   * <p>Holds the Zombie rather than a copy of its numbers because the rig, the armour it was still
+   * wearing and its facing all decide how the death is drawn, and the object stays perfectly
+   * readable after the board lets go of it.
+   */
+  private static final class DyingZombie {
+    private final Zombie zombie;
+    private final double column;
+    private final int row;
+    private float age;
+
+    private DyingZombie(Zombie zombie, double column, int row) {
+      this.zombie = zombie;
+      this.column = column;
+      this.row = row;
+    }
+  }
 
   public EntityRenderer(LawnGeometry geometry) {
     this.geometry = geometry;
@@ -190,6 +223,9 @@ public final class EntityRenderer implements WorldRenderer {
     hits.advance(delta);
     spawnLootPickups(board);
     observeForEffects(board);
+    // After observeForEffects, which is what notices the fallen in the first place, and before the
+    // shake reads the death count so a death still shakes the frame it happened on.
+    advanceTheFallen(delta);
     applyShake(context, delta, hits.drainFreshDeaths());
     drawSprites(context, board, delta);
     drawShapes(context, board);
@@ -313,6 +349,9 @@ public final class EntityRenderer implements WorldRenderer {
           drawZombie(context, zombie, delta);
         }
       }
+      // In the row pass with the living, so a collapsing zombie sorts against its neighbours
+      // instead of being painted over the whole lawn afterwards.
+      drawTheFallen(context, row, delta);
       context.getBatch().setColor(Color.WHITE);
     }
     drawProjectiles(context, board);
@@ -458,7 +497,9 @@ public final class EntityRenderer implements WorldRenderer {
     seenPlants.clear();
     hits.forgetCounts(entity -> entity instanceof Zombie zombie && zombie.isDead());
     seenABoard = true;
+    zombiesThisFrame.clear();
     for (Zombie zombie : board.getZombies()) {
+      zombiesThisFrame.put(zombie, Boolean.TRUE);
       hits.observeZombieState(zombie, zombie.isDead(), zombie.getX(), footRow(zombie));
       if (!zombie.isDead()) {
         hits.observe(zombie, zombie.getCurrentHealth());
@@ -466,11 +507,78 @@ public final class EntityRenderer implements WorldRenderer {
             onBoard(zombie.getX()), footRow(zombie));
       }
     }
+    collectTheFallen();
     for (Projectile projectile : board.getProjectiles()) {
       hits.observeProjectile(projectile, projectile.getXCoordinate(),
           Math.round(projectile.getYCoordinate()));
     }
     noteCollectedSuns(board);
+  }
+
+  /**
+   * Notices zombies that were on the board last frame and are not on it now.
+   *
+   * <p>Disappearing is the only signal there is, since the board never shows a dead zombie to a
+   * renderer. Whether it died or simply left is then read straight off the object: a killed zombie
+   * still says isDead(), while a hypnotised one that walked out the right-hand side does not, and
+   * that one gets no death.
+   */
+  private void collectTheFallen() {
+    for (Zombie zombie : zombiesLastFrame.keySet()) {
+      if (zombiesThisFrame.containsKey(zombie) || !zombie.isDead()) {
+        continue;
+      }
+      dying.add(new DyingZombie(zombie, onBoard(zombie.getX()), footRow(zombie)));
+      // The puff, the shake and the death sound all hang off this count, and none of them were
+      // ever firing: the transition they waited on happens where nothing can see it.
+      hits.spawnDeathPuff(onBoard(zombie.getX()), footRow(zombie));
+    }
+    zombiesLastFrame.clear();
+    zombiesLastFrame.putAll(zombiesThisFrame);
+  }
+
+  /** Ages the fallen and drops the ones whose clip has played out. */
+  private void advanceTheFallen(float delta) {
+    for (java.util.Iterator<DyingZombie> it = dying.iterator(); it.hasNext(); ) {
+      DyingZombie fallen = it.next();
+      fallen.age += delta;
+      if (fallen.age >= deathClipSeconds(fallen)) {
+        // AnimationStates sweeps anything it was not asked to advance this frame, so dropping the
+        // corpse here is enough to let its playback entry go too.
+        it.remove();
+      }
+    }
+  }
+
+  /** How long this zombie's own die clip runs, or a short default when its rig has none. */
+  private float deathClipSeconds(DyingZombie fallen) {
+    EntityAnimation animation = zombieAnimation(fallen.zombie);
+    if (animation == null) {
+      return HitEffects.DEATH_SECONDS;
+    }
+    String clip = animation.pickClip("die", "die2");
+    float duration = clip == null ? 0f : animation.duration(clip);
+    return duration > 0f ? duration : HitEffects.DEATH_SECONDS;
+  }
+
+  /** Draws the zombies that are still collapsing in this row. */
+  private void drawTheFallen(RenderContext context, int row, float delta) {
+    for (DyingZombie fallen : dying) {
+      if (fallen.row != row) {
+        continue;
+      }
+      EntityAnimation animation = zombieAnimation(fallen.zombie);
+      String clip = animation == null ? null : animation.pickClip("die", "die2");
+      if (clip == null) {
+        continue;
+      }
+      context.getBatch().setColor(Color.WHITE);
+      animation.draw(context.getBatch(), clip, playback.advance(fallen, clip, delta),
+          geometry.columnCentreX(fallen.column),
+          geometry.rowToY(fallen.row) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET,
+          zombieAnimationScale(fallen.zombie, animation, clip),
+          fallen.zombie.isHypnotized(), armourVisibility(animation, fallen.zombie));
+    }
   }
 
   private static int intactArmour(Zombie zombie) {
@@ -611,17 +719,70 @@ public final class EntityRenderer implements WorldRenderer {
       "Fume-shroom", new String[] {"special"},
       "Sun-shroom", new String[] {"special"});
 
+  /**
+   * Which clip a plant is showing this frame, in priority order: plant food, then the arming pose
+   * of a mine, then its attack while that is still running, then its idle -- damage-staged for the
+   * plants whose rigs wear down as they are eaten.
+   */
   private String plantClip(EntityAnimation animation, Plant plant) {
     int stage = growthStage(plant);
+
+    // Plant food outranks everything: it is a one-off dose and the clip is the whole point of it.
+    if (plant.isPlantFoodActive()) {
+      String food = animation.pickClip(withStage(PLANT_FOOD_CLIPS, stage));
+      if (food != null) {
+        return food;
+      }
+    }
+
     String[] names = ACTION_CLIP_NAMES.getOrDefault(plant.getName(), new String[] {"attack"});
     String attack = animation.pickClip(withStage(names, stage));
     if (attack != null && justActed(plant, animation.duration(attack))) {
       return attack;
     }
+
+    // An armed mine is buried and waiting, which is a different pose from a plant standing about.
+    if (isArmedMine(plant)) {
+      String armed = animation.pickClip("plant_idle", "plant");
+      if (armed != null) {
+        return armed;
+      }
+    }
+
     String[] idleNames = stage > 0
         ? new String[] {"idle_stage" + stage, "idle"}
         : new String[] {"idle"};
-    return animation.pickClip(concat(idleNames, names));
+    return animation.pickClip(concat(damageStageClips(plant), concat(idleNames, names)));
+  }
+
+  /** Clip names for a plant-food dose, most specific first. */
+  private static final String[] PLANT_FOOD_CLIPS = {"plantfood", "plantfood_on", "plantfood_loop"};
+
+  /**
+   * The wear-down clips for a defensive plant, worst damage first, or nothing for a plant whose
+   * rig has none.
+   *
+   * <p>Wall-nut ships damage/damage2/damage3 and Garlic idle_damage/idle_damage2; both are the
+   * same idea, that a nut being eaten should look chewed rather than pristine right up to the
+   * moment it disappears. Thirds of max health, so the two- and three-stage rigs both read.
+   */
+  private static String[] damageStageClips(Plant plant) {
+    if (!DAMAGE_STAGE_PLANTS.contains(plant.getName()) || plant.getMaxHealth() <= 0) {
+      return new String[0];
+    }
+    float left = plant.getCurrentHealth() / (float) plant.getMaxHealth();
+    if (left > 0.66f) {
+      return new String[0];
+    }
+    return left > 0.33f
+        ? new String[] {"damage", "idle_damage"}
+        : new String[] {"damage3", "damage2", "idle_damage2", "damage", "idle_damage"};
+  }
+
+  /** True for a mine that is buried and waiting rather than still burrowing in. */
+  private static boolean isArmedMine(Plant plant) {
+    return plant.getBehavior() instanceof model.game.plant.behavior.ExplodeAction armed
+        && armed.isArmed();
   }
 
   private static int growthStage(Plant plant) {
@@ -777,8 +938,15 @@ public final class EntityRenderer implements WorldRenderer {
       case MOVING:
         return animation.pickClip("walk_forward", "walk", "idle");
       case ATTACKING:
-        return animation.pickClip("missile_start", "fire_attack", "suction_loop",
+        // fire_bomb is the Dark Ages dragon's, and it was the one attack with no clip of its own.
+        return animation.pickClip("missile_start", "fire_attack", "fire_bomb", "suction_loop",
             "slingshot", "rocket_launch", "idle");
+      case SUMMONING:
+        // Each chapter's rig calls it something different: Egypt tears open a portal, the pirate
+        // has a plain spawn, and the mammoth raises a column of ice and the wind that comes with
+        // it. All of them were sitting unused while the boss summoned in its idle pose.
+        return animation.pickClip("zombie_portal_start", "zombie_portal_loop", "spawn",
+            "glacier_column_1", "wind_1", "idle");
       default:
         return animation.pickClip("idle");
     }
@@ -795,7 +963,12 @@ public final class EntityRenderer implements WorldRenderer {
     }
     String suffix = propSuffix(zombie);
     if (zombie.isEating()) {
-      String eat = animation.pickClip("eat" + suffix, "eat");
+      // A Gargantuar has no bite. It stops at a plant and brings the pole down on it, and its rig
+      // ships smash_left for that; playing "eat" had it gumming the plant instead.
+      String[] eatNames = zombie.getBehavior() instanceof GargantuarAction
+          ? new String[] {"smash_left", "eat" + suffix, "eat"}
+          : new String[] {"eat" + suffix, "eat"};
+      String eat = animation.pickClip(eatNames);
       if (eat != null) {
         return eat;
       }
@@ -816,7 +989,9 @@ public final class EntityRenderer implements WorldRenderer {
     if (zombie.getBehavior() instanceof GargantuarAction gargantuar
         && gargantuar.getThrowTick() >= 0
         && currentTick - gargantuar.getThrowTick() < ACTION_POSE_TICKS) {
-      String throwing = animation.pickClip("smash_left", "fire", "cannon_fire");
+      // Not smash_left: that is the pole coming down, and letting the throw take it left the
+      // Gargantuar with one pose for two different things and no smash of its own.
+      String throwing = animation.pickClip("fire", "cannon_fire", "particles");
       if (throwing != null) {
         return throwing;
       }

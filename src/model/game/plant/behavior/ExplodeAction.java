@@ -33,6 +33,16 @@ public class ExplodeAction implements PlantAction {
     this(15, 1800, 1);
   }
 
+  /**
+   * True once the fuse has burnt down and this plant is buried and waiting for something to step
+   * on it. Only ever true for the contact plants -- a mine, a squash, a tangle kelp -- because the
+   * timed ones detonate the moment their fuse ends rather than waiting. For the renderer's armed
+   * pose, which is a different rig clip from a plant standing about.
+   */
+  public boolean isArmed() {
+    return armedMessageShown;
+  }
+
   @Override
   public void execute(Plant plant, Board board, int currentTick) {
     if (!isInitialized) {
