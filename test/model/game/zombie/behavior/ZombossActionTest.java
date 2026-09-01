@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import model.enums.StatusEffect;
 import model.enums.ZombieType;
 import model.game.Board;
 import model.game.zombie.Zombie;
@@ -192,12 +193,20 @@ class ZombossActionTest {
   }
 
   @Test
-  void theFrostbiteMammothSpawnsNoZombies() {
+  void theFrostbiteMammothSendsNoRoamingMinions() {
     Board board = board();
     Zombie zomboss = boss(ZombieType.ZOMBOSS_COWBOY, board);
     run(zomboss, board, 1, 900);
-    assertEquals(1, board.getZombies().size(),
-        "the doc says the mammoth does not spawn zombies");
+    // The doc excludes the mammoth from the summoning every other boss does ("گاهی اوقات، زامباس
+    // (جز ماموت) تعدادی زامبی ظاهر می‌کند"), and then gives its own column freeze the job of
+    // planting frozen zombies down the iced column. Both hold at once: nothing walks on under its
+    // own steam, and anything it does put on the lawn is stuck in the ice it just made.
+    List<Zombie> loose = board.getZombies().stream()
+        .filter(z -> z != zomboss)
+        .filter(z -> !z.getActiveEffects().containsKey(StatusEffect.FROZEN))
+        .toList();
+    assertTrue(loose.isEmpty(),
+        "the mammoth summoned " + loose.size() + " zombies that were not frozen in its column");
   }
 
   // ---- holding station ------------------------------------------------------------------

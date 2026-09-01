@@ -107,10 +107,12 @@ public final class EntityRenderer implements WorldRenderer {
    */
   private static final String ICE_BLOCK_RIG = "iceberglettuce";
   private static final String ICE_BLOCK_REGION = "iceburg_85x80";
-  private static final String ICE_RIM_REGION = "iceburg_144x143";
   private static final float ICE_RIM_FILL = 1.06f;
   private static final float ICE_BLOCK_FILL = 1.18f;
   private static final float ICE_BLOCK_SINK = 0.08f;
+
+  /** A plant sits in its tile rather than standing over it, so its block is a lane-sized one. */
+  private static final float PLANT_ICE_BLOCK_FILL = 1.06f;
 
   private static final String OCTOPUS_RIG = "zombiebeachoctopus";
   private static final String OCTOPUS_REGION = "zombie_beach_octopus_66x76";
@@ -207,10 +209,11 @@ public final class EntityRenderer implements WorldRenderer {
   private TextureRegion octopus;
   private boolean octopusChecked;
   private TextureRegion iceBlockRegion;
-  private TextureRegion iceRimRegion;
   private boolean iceBlockChecked;
   private final Map<Plant, Boolean> knownPlants = new java.util.IdentityHashMap<>();
   private final Map<Plant, Boolean> seenPlants = new java.util.IdentityHashMap<>();
+  /** The tick each plant was first seen on, for the clips that play once when one goes down. */
+  private final Map<Plant, Integer> plantedAt = new java.util.IdentityHashMap<>();
   /**
    * Zombies that died this frame, kept only by the view so their death clip can finish.
    *
@@ -413,6 +416,31 @@ public final class EntityRenderer implements WorldRenderer {
     batch.setColor(Color.WHITE);
   }
 
+  /**
+   * The block of ice a frozen plant is held in, drawn over the plant so it reads as being inside.
+   *
+   * <p>The doc asks for a frozen plant to be shown inside a block, the way a frozen zombie already
+   * was. Tinting it blue was all that happened, which reads as "cold" rather than as "held until
+   * this ice is broken" -- and the ice is a 600-health thing the player has to shoot, so it has to
+   * be on screen to be aimed at.
+   */
+  private void drawPlantIceBlock(RenderContext context, Plant plant) {
+    if (plant.getIceHealth() <= 0) {
+      return;
+    }
+    loadIceBlock();
+    if (iceBlockRegion == null) {
+      return;
+    }
+    float height = geometry.getCellHeight() * PLANT_ICE_BLOCK_FILL;
+    Batch batch = context.getBatch();
+    batch.setColor(iceBlockTint);
+    stamp(batch, iceBlockRegion, geometry.columnCentreX(plant.getCol()),
+        geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * PLANT_FOOT_INSET
+            - height * ICE_BLOCK_SINK, height);
+    batch.setColor(Color.WHITE);
+  }
+
   /** Draws a region standing on a baseline, centred, scaled to a height. */
   private static void stamp(Batch batch, TextureRegion region, float centreX, float bottom,
       float height) {
@@ -426,7 +454,6 @@ public final class EntityRenderer implements WorldRenderer {
     }
     iceBlockChecked = true;
     iceBlockRegion = plantArt.findPart(ICE_BLOCK_RIG, ICE_BLOCK_REGION);
-    iceRimRegion = plantArt.findPart(ICE_BLOCK_RIG, ICE_RIM_REGION);
   }
 
   /**
@@ -504,10 +531,12 @@ public final class EntityRenderer implements WorldRenderer {
           drawPlant(context, plant, sheep, delta);
         }
       }
-      // Its own pass over the row, so an octopus is never hidden under the neighbour drawn next.
+      // Its own pass over the row, so neither an octopus nor a block of ice is hidden under the
+      // neighbouring plant drawn next, and both sit over the plant they have hold of.
       context.getBatch().setColor(Color.WHITE);
       for (Plant plant : board.getPlants()) {
         if (plant.getRow() == row) {
+          drawPlantIceBlock(context, plant);
           drawOctopusHold(context, plant);
         }
       }
@@ -528,7 +557,8 @@ public final class EntityRenderer implements WorldRenderer {
     if (sun != null) {
       for (Sun s : board.getSuns()) {
         // the doc wants the sun kinds told apart; a big one is bigger and a radioactive one glows
-        context.getBatch().setColor(s.getType() == SunType.RADIOACTIVE ? radioactiveSun : Color.WHITE);
+        context.getBatch().setColor(
+            s.getType() == SunType.RADIOACTIVE ? radioactiveSun : Color.WHITE);
         drawCentred(context, sun, s.getX(), lerp(s.getPreviousY(), s.getY(), tickAlpha),
             geometry.getCellHeight() * (s.getType() == SunType.LARGE ? 0.58f : 0.42f));
       }
@@ -722,6 +752,8 @@ public final class EntityRenderer implements WorldRenderer {
     }
     knownPlants.clear();
     knownPlants.putAll(seenPlants);
+    // Dropped with the plant, so a long match does not keep a tick per plant ever planted.
+    plantedAt.keySet().retainAll(seenPlants.keySet());
     seenPlants.clear();
     hits.forgetCounts(entity -> entity instanceof Zombie zombie && zombie.isDead());
     seenABoard = true;
@@ -908,7 +940,13 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   private void noteNewPlant(Plant plant) {
-    if (!knownPlants.containsKey(plant) && seenABoard) {
+    if (knownPlants.containsKey(plant)) {
+      return;
+    }
+    // Remembered whether or not the spark is drawn, because the mints' intro clip is timed off
+    // it: Plant only stamps its own plantedTick for the few plants that expire on a timer.
+    plantedAt.putIfAbsent(plant, currentTick);
+    if (seenABoard) {
       hits.spawnSpark(SPARK_PLANTED, plant.getCol(), plant.getRow());
     }
   }
@@ -985,7 +1023,9 @@ public final class EntityRenderer implements WorldRenderer {
       return false;
     }
     float fuse = fuseTime(plant, animation, clip);
-    float time = fuse >= 0f ? playback.hold(plant, clip, fuse) : playback.advance(plant, clip, delta);
+    float time = fuse >= 0f
+        ? playback.hold(plant, clip, fuse)
+        : playback.advance(plant, clip, delta);
     float x = geometry.columnCentreX(plant.getCol());
     float y = geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * PLANT_FOOT_INSET;
     float scale = scaleFor(animation.width(clip), PLANT_ANIM_UNITS, PLANT_ROW_FILL);
@@ -1045,7 +1085,7 @@ public final class EntityRenderer implements WorldRenderer {
     return value < low ? low : Math.min(value, high);
   }
 
-  /** Where to draw a zombie: between the tile it stood on last tick and the one it stands on now. */
+  /** Where to draw a zombie: between the tile it stood on last tick and the one it is on now. */
   private double drawColumn(Zombie zombie) {
     return onBoard(lerp(zombie.getPreviousX(), zombie.getX(), tickAlpha));
   }
@@ -1093,6 +1133,14 @@ public final class EntityRenderer implements WorldRenderer {
       }
     }
 
+    // The mints' entry animation. Their rigs are intro/loop/outro with no idle at all, and the
+    // doc asks for the intro on top of the idle, so it runs once for its own length from the tick
+    // the plant went down and then hands over to the loop below.
+    String intro = introClip(animation, plant);
+    if (intro != null) {
+      return intro;
+    }
+
     String[] names = ACTION_CLIP_NAMES.getOrDefault(plant.getName(), new String[] {"attack"});
     String attack = animation.pickClip(withStage(names, stage));
     if (attack != null && justActed(plant, animation.duration(attack))) {
@@ -1107,10 +1155,30 @@ public final class EntityRenderer implements WorldRenderer {
       }
     }
 
+    // "loop" last, for the mints: their standing-about clip is the only one they have and it is
+    // not called idle, so without it they resolved to no clip at all and fell back to a still.
     String[] idleNames = stage > 0
-        ? new String[] {"idle_stage" + stage, "idle"}
-        : new String[] {"idle"};
+        ? new String[] {"idle_stage" + stage, "idle", "loop"}
+        : new String[] {"idle", "loop"};
     return animation.pickClip(concat(damageStageClips(plant), concat(idleNames, names)));
+  }
+
+  /**
+   * The one-shot clip a plant plays as it goes down, while it is still running, or null.
+   *
+   * <p>Only asked for by name: a rig without an {@code intro} gets nothing, so this cannot pull a
+   * plant off the clip it should be showing.
+   */
+  private String introClip(EntityAnimation animation, Plant plant) {
+    if (!animation.hasClip(PLANT_INTRO_CLIP)) {
+      return null;
+    }
+    Integer planted = plantedAt.get(plant);
+    if (planted == null) {
+      return null;
+    }
+    float ticks = animation.duration(PLANT_INTRO_CLIP) * GdxConfig.TICKS_PER_SECOND;
+    return currentTick - planted < ticks ? PLANT_INTRO_CLIP : null;
   }
 
   /** The clip a plant with a lit fuse plays, most specific first. */
@@ -1118,7 +1186,14 @@ public final class EntityRenderer implements WorldRenderer {
       {"attack", "explode", "stage3_explode", "stage2_explode", "stage1_explode"};
 
   /** Clip names for a plant-food dose, most specific first. */
-  private static final String[] PLANT_FOOD_CLIPS = {"plantfood", "plantfood_on", "plantfood_loop"};
+  // "pf" last, and it is the Sea-shroom's: its rig is the one that abbreviates the name, so its
+  // plant-food dose was the only one in the roster playing no animation at all. Checked against
+  // every plant rig -- no other clip name anywhere contains "pf", so the loose match cannot stray.
+  private static final String[] PLANT_FOOD_CLIPS =
+      {"plantfood", "plantfood_on", "plantfood_loop", "pf"};
+
+  /** The mints' entry animation, and the only rigs in the library that carry one. */
+  private static final String PLANT_INTRO_CLIP = "intro";
 
   /** Plants whose rigs carry a wear-down sequence instead of only one idle. */
   private static final Set<String> DAMAGE_STAGE_PLANTS =

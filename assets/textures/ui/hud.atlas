@@ -1,5 +1,5 @@
 hud.png
-size: 3681,333
+size: 3804,333
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
@@ -178,65 +178,79 @@ sheep
   orig: 75, 94
   offset: 0, 0
   index: -1
-snowgust
+slipicedown
   rotate: false
   xy: 2777, 2
+  size: 58, 54
+  orig: 58, 54
+  offset: 0, 0
+  index: -1
+slipiceup
+  rotate: false
+  xy: 2837, 2
+  size: 61, 59
+  orig: 61, 59
+  offset: 0, 0
+  index: -1
+snowgust
+  rotate: false
+  xy: 2900, 2
   size: 55, 42
   orig: 55, 42
   offset: 0, 0
   index: -1
 splatpea
   rotate: false
-  xy: 2834, 2
+  xy: 2957, 2
   size: 96, 57
   orig: 96, 57
   offset: 0, 0
   index: -1
 sun
   rotate: false
-  xy: 2932, 2
+  xy: 3055, 2
   size: 70, 71
   orig: 70, 71
   offset: 0, 0
   index: -1
 vasegargantuar
   rotate: false
-  xy: 3004, 2
+  xy: 3127, 2
   size: 74, 96
   orig: 74, 96
   offset: 0, 0
   index: -1
 vaseplant
   rotate: false
-  xy: 3080, 2
+  xy: 3203, 2
   size: 74, 96
   orig: 74, 96
   offset: 0, 0
   index: -1
 vasesmash
   rotate: false
-  xy: 3156, 2
+  xy: 3279, 2
   size: 188, 169
   orig: 188, 169
   offset: 0, 0
   index: -1
 vaseunknown
   rotate: false
-  xy: 3346, 2
+  xy: 3469, 2
   size: 74, 96
   orig: 74, 96
   offset: 0, 0
   index: -1
 whiteburst
   rotate: false
-  xy: 3422, 2
+  xy: 3545, 2
   size: 188, 169
   orig: 188, 169
   offset: 0, 0
   index: -1
 zombieash
   rotate: false
-  xy: 3612, 2
+  xy: 3735, 2
   size: 67, 61
   orig: 67, 61
   offset: 0, 0

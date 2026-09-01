@@ -83,15 +83,27 @@ def load_resources():
     return sprites, pages
 
 
+# The mints are the one roster the library does not file as images/<res>/full/<category>/<folder>.
+# They ship as a pack: images/<res>/initial/empowermints/plant/<folder>, one level deeper, which
+# collapsed all nine of them onto the single key ("empowermints", "plant") and left every mint in
+# plants.json with no atlas and no clip table. Naming the pack folder here is enough to file them
+# under "plant" beside every other plant; nothing else about the layout differs.
+PACK_FOLDERS = {"empowermints"}
+
+
 def index_folders(sprites):
     """category -> folder -> {'pages': set, 'regions': [sprite, ...]}"""
     tree = collections.defaultdict(lambda: collections.defaultdict(
         lambda: {"pages": set(), "regions": []}))
     for sprite in sprites:
         parts = sprite["path"].split("\\")
-        if len(parts) <= 4:
+        if len(parts) > 5 and parts[3] in PACK_FOLDERS:
+            category, folder = parts[4], parts[5]
+        elif len(parts) > 4:
+            category, folder = parts[3], parts[4]
+        else:
             continue
-        entry = tree[parts[3]][parts[4]]
+        entry = tree[category][folder]
         entry["pages"].add(sprite["parent"])
         entry["regions"].append(sprite)
     return tree
@@ -118,6 +130,15 @@ PLANT_ART_ALIASES = {
     # upstream drops the trailing word
     "Mega Gatling Pea": "megagatling",
     "Phat Beet": "phatbeets",
+    # The mints. Seven of the nine normalise straight onto their upstream folder under
+    # empowermints/plant/ once PACK_FOLDERS files them there. These two do not, because the
+    # roster names them after the plant family they boost rather than after the upstream mint,
+    # so both are substitutions rather than spelling differences -- flagged the same way the
+    # Parasol is above. Each is the closest remaining rig by what it does: a spear is the
+    # strike-through weapon, and Ail-mint is the only unused mint left for the homing family.
+    # Swap either line if the art is ever authored under the roster's own name.
+    "Pierce-mint": "spearmint",
+    "catTail-mint": "ailmint",
 }
 
 # Same idea for Zombies.json. The aliases are the project's own names for zombies the upstream
@@ -298,7 +319,10 @@ def load_animations():
     index = collections.defaultdict(list)
     for anim in data["animations"]:
         parts = anim["path"].split("/")
-        if len(parts) > 3:
+        # Same pack layout as index_folders: the mints sit a level deeper than every other rig.
+        if len(parts) > 4 and norm(parts[2]) in PACK_FOLDERS:
+            index[(norm(parts[3]), norm(parts[4]))].append(anim)
+        elif len(parts) > 3:
             index[(norm(parts[2]), norm(parts[3]))].append(anim)
     return index
 
@@ -749,6 +773,15 @@ HUD_PIECES = {
     "sandstreak": ("ATLASIMAGE_ATLAS_SANDSTORMGROUP_768_00", "sandstorm_rear",
                    "sandstorm_speedline_filtered"),
     "snowgust": ("ATLASIMAGE_ATLAS_SNOWSTORMGROUP_768_00", "snowstorm_top", "snowstorm_top_86x66"),
+    # Frostbite's slippery tiles. The doc asks for the slippery-ground image on the tile rather
+    # than a flat colour, and the world ships the slider pieces in both directions -- which is
+    # what the tile needs, since a slippery tile shunts the zombie one lane up or down and the
+    # art says which way. Cropped and looked at: these two are the ice slab itself, not the
+    # dark recess it sits in and not the white spray thrown up crossing it.
+    "slipiceup": ("ATLASIMAGE_ATLAS_SLIDER_ICEAGE_768_00", "tileslider_iceage_up",
+                  "tileslider_iceage_up_95x92"),
+    "slipicedown": ("ATLASIMAGE_ATLAS_SLIDER_ICEAGE_768_00", "tileslider_iceage_down",
+                    "tileslider_iceage_down_90x84"),
     # ------------------------------------------------------------------ in-match feedback
     # EntityRenderer used to say, in two separate comments, that the library had no impact art and
     # no death art, so both were drawn as ShapeRenderer rings. It does have them: the level-common

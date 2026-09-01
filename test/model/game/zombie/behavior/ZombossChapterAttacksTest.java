@@ -7,6 +7,7 @@ import java.util.EnumSet;
 import java.util.List;
 import model.enums.PlantCategory;
 import model.enums.PlantTag;
+import model.enums.StatusEffect;
 import model.enums.ZombieType;
 import model.game.Board;
 import model.game.TileEffects.FireEffect;
@@ -218,8 +219,13 @@ class ZombossChapterAttacksTest {
 
     assertEquals(startRow, boss.getRow(),
         "the doc gives the mammoth no movement between rows");
-    assertEquals(1, board.getZombies().size(),
-        "the doc gives the mammoth no zombie spawning");
+    // No roaming minions -- the doc excludes the mammoth from that -- but its column freeze does
+    // plant frozen zombies down the column it ices, which is a move of its own and scored as one.
+    long loose = board.getZombies().stream()
+        .filter(z -> z != boss)
+        .filter(z -> !z.getActiveEffects().containsKey(StatusEffect.FROZEN))
+        .count();
+    assertEquals(0, loose, "the mammoth summoned zombies that were not frozen in its column");
   }
 
   // ---- Big Wave Beach: the octopus -------------------------------------------------------

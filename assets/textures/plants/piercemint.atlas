@@ -1,0 +1,180 @@
+plantspearmint_768_00.png
+size: 256,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+spearmint_111x116
+  rotate: false
+  xy: 1, 136
+  size: 71, 74
+  orig: 71, 74
+  offset: 0, 0
+  index: -1
+spearmint_149x173
+  rotate: false
+  xy: 116, 1
+  size: 96, 111
+  orig: 96, 111
+  offset: 0, 0
+  index: -1
+spearmint_15x11
+  rotate: false
+  xy: 239, 69
+  size: 10, 7
+  orig: 10, 7
+  offset: 0, 0
+  index: -1
+spearmint_168x108
+  rotate: false
+  xy: 116, 114
+  size: 108, 69
+  orig: 108, 69
+  offset: 0, 0
+  index: -1
+spearmint_16x18
+  rotate: false
+  xy: 245, 41
+  size: 10, 12
+  orig: 10, 12
+  offset: 0, 0
+  index: -1
+spearmint_16x18_2
+  rotate: false
+  xy: 239, 55
+  size: 10, 12
+  orig: 10, 12
+  offset: 0, 0
+  index: -1
+spearmint_16x23
+  rotate: false
+  xy: 245, 24
+  size: 10, 15
+  orig: 10, 15
+  offset: 0, 0
+  index: -1
+spearmint_176x207
+  rotate: false
+  xy: 1, 1
+  size: 113, 133
+  orig: 113, 133
+  offset: 0, 0
+  index: -1
+spearmint_32x43
+  rotate: false
+  xy: 214, 76
+  size: 21, 28
+  orig: 21, 28
+  offset: 0, 0
+  index: -1
+spearmint_35x41
+  rotate: false
+  xy: 214, 48
+  size: 23, 26
+  orig: 23, 26
+  offset: 0, 0
+  index: -1
+spearmint_41x24
+  rotate: false
+  xy: 226, 106
+  size: 26, 16
+  orig: 26, 16
+  offset: 0, 0
+  index: -1
+spearmint_41x24_2
+  rotate: false
+  xy: 226, 124
+  size: 26, 16
+  orig: 26, 16
+  offset: 0, 0
+  index: -1
+spearmint_45x34
+  rotate: false
+  xy: 214, 24
+  size: 29, 22
+  orig: 29, 22
+  offset: 0, 0
+  index: -1
+spearmint_48x33
+  rotate: false
+  xy: 214, 1
+  size: 31, 21
+  orig: 31, 21
+  offset: 0, 0
+  index: -1
+spearmint_50x18
+  rotate: false
+  xy: 74, 164
+  size: 32, 12
+  orig: 32, 12
+  offset: 0, 0
+  index: -1
+spearmint_50x18_2
+  rotate: false
+  xy: 179, 250
+  size: 32, 12
+  orig: 32, 12
+  offset: 0, 0
+  index: -1
+spearmint_51x19
+  rotate: false
+  xy: 74, 136
+  size: 33, 12
+  orig: 33, 12
+  offset: 0, 0
+  index: -1
+spearmint_51x19_2
+  rotate: false
+  xy: 74, 150
+  size: 33, 12
+  orig: 33, 12
+  offset: 0, 0
+  index: -1
+spearmint_74x41
+  rotate: false
+  xy: 129, 233
+  size: 48, 26
+  orig: 48, 26
+  offset: 0, 0
+  index: -1
+spearmint_74x51
+  rotate: false
+  xy: 182, 185
+  size: 48, 33
+  orig: 48, 33
+  offset: 0, 0
+  index: -1
+spearmint_77x34
+  rotate: false
+  xy: 1, 242
+  size: 50, 22
+  orig: 50, 22
+  offset: 0, 0
+  index: -1
+spearmint_77x44
+  rotate: false
+  xy: 182, 220
+  size: 50, 28
+  orig: 50, 28
+  offset: 0, 0
+  index: -1
+spearmint_79x71
+  rotate: false
+  xy: 129, 185
+  size: 51, 46
+  orig: 51, 46
+  offset: 0, 0
+  index: -1
+spearmint_81x43
+  rotate: false
+  xy: 1, 212
+  size: 52, 28
+  orig: 52, 28
+  offset: 0, 0
+  index: -1
+spearmint_83x128
+  rotate: false
+  xy: 74, 185
+  size: 53, 82
+  orig: 53, 82
+  offset: 0, 0
+  index: -1

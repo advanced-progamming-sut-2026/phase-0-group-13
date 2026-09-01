@@ -1,0 +1,159 @@
+plantenlightenmint_768_00.png
+size: 512,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+enlightenmint_115x96
+  rotate: false
+  xy: 400, 70
+  size: 74, 62
+  orig: 74, 62
+  offset: 0, 0
+  index: -1
+enlightenmint_122x105
+  rotate: false
+  xy: 400, 1
+  size: 78, 67
+  orig: 78, 67
+  offset: 0, 0
+  index: -1
+enlightenmint_123x609
+  rotate: false
+  xy: 1, 1
+  size: 79, 390
+  orig: 79, 390
+  offset: 0, 0
+  index: -1
+enlightenmint_12x13
+  rotate: false
+  xy: 498, 97
+  size: 8, 9
+  orig: 8, 9
+  offset: 0, 0
+  index: -1
+enlightenmint_12x13_2
+  rotate: false
+  xy: 498, 108
+  size: 8, 9
+  orig: 8, 9
+  offset: 0, 0
+  index: -1
+enlightenmint_13x13
+  rotate: false
+  xy: 498, 86
+  size: 9, 9
+  orig: 9, 9
+  offset: 0, 0
+  index: -1
+enlightenmint_14x11
+  rotate: false
+  xy: 498, 119
+  size: 9, 7
+  orig: 9, 7
+  offset: 0, 0
+  index: -1
+enlightenmint_162x332
+  rotate: false
+  xy: 82, 1
+  size: 104, 213
+  orig: 104, 213
+  offset: 0, 0
+  index: -1
+enlightenmint_162x332_2
+  rotate: false
+  xy: 188, 1
+  size: 104, 213
+  orig: 104, 213
+  offset: 0, 0
+  index: -1
+enlightenmint_162x332_3
+  rotate: false
+  xy: 294, 1
+  size: 104, 213
+  orig: 104, 213
+  offset: 0, 0
+  index: -1
+enlightenmint_213x213
+  rotate: false
+  xy: 82, 216
+  size: 137, 137
+  orig: 137, 137
+  offset: 0, 0
+  index: -1
+enlightenmint_21x21
+  rotate: false
+  xy: 498, 70
+  size: 14, 14
+  orig: 14, 14
+  offset: 0, 0
+  index: -1
+enlightenmint_25x98
+  rotate: false
+  xy: 480, 66
+  size: 16, 63
+  orig: 16, 63
+  offset: 0, 0
+  index: -1
+enlightenmint_31x30
+  rotate: false
+  xy: 478, 205
+  size: 20, 19
+  orig: 20, 19
+  offset: 0, 0
+  index: -1
+enlightenmint_31x30_2
+  rotate: false
+  xy: 221, 216
+  size: 20, 19
+  orig: 20, 19
+  offset: 0, 0
+  index: -1
+enlightenmint_44x98
+  rotate: false
+  xy: 480, 1
+  size: 28, 63
+  orig: 28, 63
+  offset: 0, 0
+  index: -1
+enlightenmint_53x29
+  rotate: false
+  xy: 442, 205
+  size: 34, 19
+  orig: 34, 19
+  offset: 0, 0
+  index: -1
+enlightenmint_62x27
+  rotate: false
+  xy: 400, 199
+  size: 40, 18
+  orig: 40, 18
+  offset: 0, 0
+  index: -1
+enlightenmint_63x27
+  rotate: false
+  xy: 454, 185
+  size: 41, 18
+  orig: 41, 18
+  offset: 0, 0
+  index: -1
+enlightenmint_66x76
+  rotate: false
+  xy: 460, 134
+  size: 42, 49
+  orig: 42, 49
+  offset: 0, 0
+  index: -1
+enlightenmint_81x39
+  rotate: false
+  xy: 400, 172
+  size: 52, 25
+  orig: 52, 25
+  offset: 0, 0
+  index: -1
+enlightenmint_91x56
+  rotate: false
+  xy: 400, 134
+  size: 58, 36
+  orig: 58, 36
+  offset: 0, 0
+  index: -1

@@ -1,0 +1,208 @@
+plantarmamint_768_00.png
+size: 256,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+armamint_104x99
+  rotate: false
+  xy: 186, 88
+  size: 67, 64
+  orig: 67, 64
+  offset: 0, 0
+  index: -1
+armamint_17x15
+  rotate: false
+  xy: 108, 158
+  size: 11, 10
+  orig: 11, 10
+  offset: 0, 0
+  index: -1
+armamint_17x15_2
+  rotate: false
+  xy: 105, 195
+  size: 11, 10
+  orig: 11, 10
+  offset: 0, 0
+  index: -1
+armamint_1x1
+  rotate: false
+  xy: 250, 37
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+armamint_1x1_2
+  rotate: false
+  xy: 253, 37
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+armamint_24x14
+  rotate: false
+  xy: 108, 133
+  size: 16, 9
+  orig: 16, 9
+  offset: 0, 0
+  index: -1
+armamint_25x18
+  rotate: false
+  xy: 108, 119
+  size: 16, 12
+  orig: 16, 12
+  offset: 0, 0
+  index: -1
+armamint_27x23
+  rotate: false
+  xy: 105, 279
+  size: 18, 15
+  orig: 18, 15
+  offset: 0, 0
+  index: -1
+armamint_28x24
+  rotate: false
+  xy: 63, 270
+  size: 18, 16
+  orig: 18, 16
+  offset: 0, 0
+  index: -1
+armamint_30x29
+  rotate: false
+  xy: 105, 174
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
+armamint_30x30
+  rotate: false
+  xy: 226, 237
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
+armamint_30x30_2
+  rotate: false
+  xy: 102, 240
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
+armamint_30x30_3
+  rotate: false
+  xy: 1, 241
+  size: 19, 19
+  orig: 19, 19
+  offset: 0, 0
+  index: -1
+armamint_31x21
+  rotate: false
+  xy: 1, 275
+  size: 20, 14
+  orig: 20, 14
+  offset: 0, 0
+  index: -1
+armamint_31x21_2
+  rotate: false
+  xy: 83, 278
+  size: 20, 14
+  orig: 20, 14
+  offset: 0, 0
+  index: -1
+armamint_37x41
+  rotate: false
+  xy: 132, 209
+  size: 24, 26
+  orig: 24, 26
+  offset: 0, 0
+  index: -1
+armamint_37x41_2
+  rotate: false
+  xy: 158, 209
+  size: 24, 26
+  orig: 24, 26
+  offset: 0, 0
+  index: -1
+armamint_38x27
+  rotate: false
+  xy: 218, 67
+  size: 25, 18
+  orig: 25, 18
+  offset: 0, 0
+  index: -1
+armamint_39x45
+  rotate: false
+  xy: 226, 206
+  size: 25, 29
+  orig: 25, 29
+  offset: 0, 0
+  index: -1
+armamint_39x45_2
+  rotate: false
+  xy: 105, 209
+  size: 25, 29
+  orig: 25, 29
+  offset: 0, 0
+  index: -1
+armamint_40x17
+  rotate: false
+  xy: 31, 272
+  size: 26, 11
+  orig: 26, 11
+  offset: 0, 0
+  index: -1
+armamint_41x17
+  rotate: false
+  xy: 143, 272
+  size: 26, 11
+  orig: 26, 11
+  offset: 0, 0
+  index: -1
+armamint_43x17
+  rotate: false
+  xy: 1, 262
+  size: 28, 11
+  orig: 28, 11
+  offset: 0, 0
+  index: -1
+armamint_43x17_2
+  rotate: false
+  xy: 180, 266
+  size: 28, 11
+  orig: 28, 11
+  offset: 0, 0
+  index: -1
+armamint_55x53
+  rotate: false
+  xy: 218, 1
+  size: 35, 34
+  orig: 35, 34
+  offset: 0, 0
+  index: -1
+armamint_74x114
+  rotate: false
+  xy: 1, 119
+  size: 48, 73
+  orig: 48, 73
+  offset: 0, 0
+  index: -1
+armamint_81x81
+  rotate: false
+  xy: 51, 174
+  size: 52, 52
+  orig: 52, 52
+  offset: 0, 0
+  index: -1
+armamint_86x82
+  rotate: false
+  xy: 51, 119
+  size: 55, 53
+  orig: 55, 53
+  offset: 0, 0
+  index: -1
+armamint_90x78
+  rotate: false
+  xy: 186, 154
+  size: 58, 50
+  orig: 58, 50
+  offset: 0, 0
+  index: -1

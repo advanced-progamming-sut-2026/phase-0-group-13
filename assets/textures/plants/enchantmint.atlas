@@ -1,0 +1,131 @@
+plantenchantmint_768_00.png
+size: 1024,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+enchantmint_114x83
+  rotate: false
+  xy: 871, 130
+  size: 73, 53
+  orig: 73, 53
+  offset: 0, 0
+  index: -1
+enchantmint_126x126
+  rotate: false
+  xy: 871, 1
+  size: 81, 81
+  orig: 81, 81
+  offset: 0, 0
+  index: -1
+enchantmint_1356x216
+  rotate: false
+  xy: 1, 1
+  size: 868, 138
+  orig: 868, 138
+  offset: 0, 0
+  index: -1
+enchantmint_13x13
+  rotate: false
+  xy: 1009, 25
+  size: 9, 9
+  orig: 9, 9
+  offset: 0, 0
+  index: -1
+enchantmint_14x14
+  rotate: false
+  xy: 1009, 36
+  size: 9, 9
+  orig: 9, 9
+  offset: 0, 0
+  index: -1
+enchantmint_176x69
+  rotate: false
+  xy: 871, 84
+  size: 113, 44
+  orig: 113, 44
+  offset: 0, 0
+  index: -1
+enchantmint_1x1
+  rotate: false
+  xy: 1020, 25
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+enchantmint_22x34
+  rotate: false
+  xy: 1009, 1
+  size: 14, 22
+  orig: 14, 22
+  offset: 0, 0
+  index: -1
+enchantmint_26x15
+  rotate: false
+  xy: 986, 107
+  size: 17, 10
+  orig: 17, 10
+  offset: 0, 0
+  index: -1
+enchantmint_26x15_2
+  rotate: false
+  xy: 1005, 107
+  size: 17, 10
+  orig: 17, 10
+  offset: 0, 0
+  index: -1
+enchantmint_44x23
+  rotate: false
+  xy: 986, 73
+  size: 28, 15
+  orig: 28, 15
+  offset: 0, 0
+  index: -1
+enchantmint_44x23_2
+  rotate: false
+  xy: 986, 90
+  size: 28, 15
+  orig: 28, 15
+  offset: 0, 0
+  index: -1
+enchantmint_44x26
+  rotate: false
+  xy: 985, 54
+  size: 28, 17
+  orig: 28, 17
+  offset: 0, 0
+  index: -1
+enchantmint_45x26
+  rotate: false
+  xy: 954, 54
+  size: 29, 17
+  orig: 29, 17
+  offset: 0, 0
+  index: -1
+enchantmint_59x72
+  rotate: false
+  xy: 1, 141
+  size: 38, 46
+  orig: 38, 46
+  offset: 0, 0
+  index: -1
+enchantmint_66x66
+  rotate: false
+  xy: 946, 130
+  size: 42, 42
+  orig: 42, 42
+  offset: 0, 0
+  index: -1
+enchantmint_71x53
+  rotate: false
+  xy: 41, 141
+  size: 46, 34
+  orig: 46, 34
+  offset: 0, 0
+  index: -1
+enchantmint_83x79
+  rotate: false
+  xy: 954, 1
+  size: 53, 51
+  orig: 53, 51
+  offset: 0, 0
+  index: -1

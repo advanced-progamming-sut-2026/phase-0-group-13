@@ -28,6 +28,11 @@ public final class LawnRenderer implements WorldRenderer {
   private static final float GRAVE_WEAR_FLOOR = 0.45f;
   private final Color graveWear = new Color();
   private final HitEffects graveHits = new HitEffects();
+  /** Frostbite's slippery slabs, one piece per direction the tile shunts a zombie. */
+  private static final String SLIP_UP_REGION = "slipiceup";
+  private static final String SLIP_DOWN_REGION = "slipicedown";
+  private static final float SLIP_TILE_FILL = 0.86f;
+
   private final Color waterTile = new Color(0.16f, 0.55f, 0.72f, 0.45f);
   private final Color frozenTile = new Color(0.75f, 0.93f, 1f, 0.55f);
   private final Color slipTile = new Color(0.6f, 0.88f, 1f, 0.3f);
@@ -230,7 +235,7 @@ public final class LawnRenderer implements WorldRenderer {
   private void drawProps(RenderContext context, Board board) {
     EntityAnimation mowerRig = animations.find(MOWER_KIND, mowerKeyForSeason(season));
     TextureRegion mowerArt = mowerRig == null ? hudArt.find("lawnmower") : null;
-    if (mowerRig == null && mowerArt == null && !hasGraveArt()
+    if (mowerRig == null && mowerArt == null && !hasGraveArt() && !hasSlipArt()
         && hudArt.find(MOWER_FLASH_REGION) == null) {
       return;
     }
@@ -250,6 +255,7 @@ public final class LawnRenderer implements WorldRenderer {
       }
       context.getBatch().setColor(1f, 1f, 1f, 1f);
     }
+    drawSlipTiles(context, board);
     for (int row = 0; row < board.getRows(); row++) {
       for (int col = 0; col < board.getColumns(); col++) {
         if (board.getTile(row, col) == null) {
@@ -334,6 +340,46 @@ public final class LawnRenderer implements WorldRenderer {
     return hudArt.find("dark".equals(season) ? "darkgrave" : "gravestone") != null;
   }
 
+  /**
+   * The slippery-ground slab, in the direction the tile shunts a zombie.
+   *
+   * <p>The world authored one piece per direction, which is what the tile needs: a slippery tile
+   * moves whatever crosses it one lane up or down, and the art says which way without an arrow
+   * drawn over it.
+   */
+  private TextureRegion slipArt(IceTrailEffect ice) {
+    return hudArt.find(ice.getLaneShift() > 0 ? SLIP_UP_REGION : SLIP_DOWN_REGION);
+  }
+
+  private boolean hasSlipArt() {
+    return hudArt.find(SLIP_UP_REGION) != null && hudArt.find(SLIP_DOWN_REGION) != null;
+  }
+
+  private void drawSlipTiles(RenderContext context, Board board) {
+    if (!hasSlipArt()) {
+      return;
+    }
+    for (int row = 0; row < board.getRows(); row++) {
+      for (int col = 0; col < board.getColumns(); col++) {
+        if (board.getTile(row, col) == null) {
+          continue;
+        }
+        if (!(board.getTile(row, col).getEffect() instanceof IceTrailEffect ice)
+            || !ice.isActive() || !ice.isSlippery()) {
+          continue;
+        }
+        TextureRegion art = slipArt(ice);
+        if (art == null) {
+          continue;
+        }
+        float height = geometry.getCellHeight() * SLIP_TILE_FILL;
+        float width = art.getRegionWidth() * height / art.getRegionHeight();
+        context.getBatch().draw(art, geometry.columnCentreX(col) - width / 2f,
+            geometry.rowCentreY(row) - height / 2f, width, height);
+      }
+    }
+  }
+
   private TextureRegion graveArt(TombStoneEffect grave) {
     if (!"dark".equals(season)) {
       return hudArt.find("gravestone");
@@ -382,7 +428,9 @@ public final class LawnRenderer implements WorldRenderer {
     float h = geometry.getCellHeight() - 2f;
     shapes.setColor(ice.isSlippery() ? slipTile : frozenTile);
     shapes.rect(x + 1f, y + 1f, w, h);
-    if (!ice.isSlippery()) {
+    if (!ice.isSlippery() || hasSlipArt()) {
+      // With the art on hand the slab is drawn in drawProps instead, and it carries the direction
+      // in the piece itself; the flat colour and its arrow are the fallback for a missing atlas.
       return;
     }
     float cx = geometry.columnCentreX(col);

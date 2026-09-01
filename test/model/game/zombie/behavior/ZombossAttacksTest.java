@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import data.GameDataManager;
 import java.util.List;
+import java.util.Set;
 import model.enums.StatusEffect;
 import model.enums.ZombieType;
 import model.game.Board;
@@ -159,7 +160,7 @@ class ZombossAttacksTest {
    * The frozen zombies are the ones the player was already fighting.
    */
   @Test
-  void theDeepFreezeCatchesTheZombiesAlreadyOnTheLawnAndBringsNoneOfItsOwn() {
+  void theDeepFreezeCatchesTheLawnAndPlantsItsOwnFrozenZombies() {
     Board board = new Board(ROWS, COLUMNS);
     fillLawn(board);
     Zombie zomboss = boss(board, ZombieType.ZOMBOSS_COWBOY);
@@ -168,15 +169,22 @@ class ZombossAttacksTest {
     for (int col = 0; col < COLUMNS; col++) {
       board.spawnZombie(new Zombie("Walker", 200, 0.0, 0, col, null));
     }
-    int before = board.getZombies().size();
+    Set<Zombie> before = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+    before.addAll(board.getZombies());
 
     driveBoss(zomboss, board, LONG_ENOUGH);
 
-    assertEquals(before, board.getZombies().size(),
-        "the mammoth summoned something, and the doc gives it no zombie spawning at all");
     assertTrue(board.getZombies().stream()
             .anyMatch(z -> z.getActiveEffects().containsKey(StatusEffect.FROZEN)),
         "the deep freeze caught nobody");
+    // "یکی از ستون‌ها را ... یخ می‌زند و زامبی یخ‌زده در خانه‌های آن ستون می‌کارد": the move plants
+    // zombies as well as icing the tiles, and every one it plants arrives frozen. The mammoth
+    // still sends no roaming minions, which is what the doc's summoning exemption is about.
+    List<Zombie> arrived = board.getZombies().stream().filter(z -> !before.contains(z)).toList();
+    assertFalse(arrived.isEmpty(), "the column freeze planted no frozen zombies");
+    assertTrue(arrived.stream()
+            .allMatch(z -> z.getActiveEffects().containsKey(StatusEffect.FROZEN)),
+        "the mammoth put a zombie on the lawn that was not frozen");
   }
 
   /** A charging boss goes through its own zombies, not only through the plants. */

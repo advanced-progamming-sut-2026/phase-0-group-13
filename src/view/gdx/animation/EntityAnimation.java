@@ -99,6 +99,11 @@ public final class EntityAnimation {
     return (found.end - found.start + 1) / found.fps;
   }
 
+  /** True only for a clip of exactly this name; unlike pickClip, nothing is matched loosely. */
+  public boolean hasClip(String clip) {
+    return clips.containsKey(clip);
+  }
+
   public float height(String clip) {
     Bounds bounds = boundsOf(clip);
     return bounds == null ? 0f : bounds.maxY - bounds.minY;

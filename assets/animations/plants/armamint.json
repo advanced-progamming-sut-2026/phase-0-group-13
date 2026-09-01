@@ -1,0 +1,20 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "intro": 2.9667,
+        "loop": 3.3333,
+        "outro": 1.4
+      },
+      "name": "ARMAMINT",
+      "pam": "768/INITIAL/EMPOWERMINTS/PLANT/ARMAMINT/ARMAMINT.PAM"
+    }
+  ],
+  "atlas": "textures/plants/armamint.atlas",
+  "entity": "Arma-mint",
+  "source_folder": "images/768/.../armamint"
+}

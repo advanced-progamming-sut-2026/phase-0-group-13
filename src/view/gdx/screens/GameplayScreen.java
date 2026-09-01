@@ -13,6 +13,7 @@ import data.persistence.UserManager;
 import java.util.ArrayList;
 import java.util.List;
 import model.account.User;
+import model.environment.BigWaveBeachSeason;
 import model.game.MatchResult;
 import model.game.minigame.BossStageRule;
 import model.game.minigame.ConveyorRule;
@@ -550,13 +551,23 @@ public final class GameplayScreen extends BaseScreen {
     hud.alert("Wave " + (wave + 1) + " of " + match.getTotalWaves() + waveWarning());
   }
 
+  /**
+   * The red line under a wave alert, for the two chapters the doc asks to be warned about.
+   *
+   * <p>The beach one is read off the tide rather than printed on every wave: the doc wants the
+   * warning before zombies come in over the low shores, and those are only uncovered on the waves
+   * the tide goes out on. Saying it every wave meant it was never actually a warning -- half the
+   * time the sea was coming in over the same tiles instead.
+   */
   private String waveWarning() {
     String season = seasonName().toLowerCase();
     if (season.contains("dark")) {
       return "   -   graves are rising, necromancy incoming!";
     }
-    if (season.contains("beach") || season.contains("wave")) {
-      return "   -   the tide is turning, zombies from the back coast!";
+    if (match != null && match.getSeason() instanceof BigWaveBeachSeason beach) {
+      return beach.isTideHigh()
+          ? "   -   the tide is coming in, mind the water line!"
+          : "   -   the tide is out, zombies are coming over the low shores!";
     }
     return "";
   }
