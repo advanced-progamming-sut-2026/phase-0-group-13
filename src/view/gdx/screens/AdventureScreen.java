@@ -16,6 +16,8 @@ import model.account.User;
 import model.core.GameManager;
 import model.core.GameSession;
 import model.core.MatchLauncher;
+import model.core.MatchSave;
+import model.core.MatchSaveManager;
 import model.core.MatchSetup;
 import model.environment.AncientEgyptSeason;
 import model.environment.BigWaveBeachSeason;
@@ -146,10 +148,30 @@ public final class AdventureScreen extends MenuScreen {
 
     content.add(sideBySide(prev, carousel, next)).grow().row();
     footer.defaults().pad(6f).width(230f);
+    MatchSave saved = MatchSaveManager.load();
+    if (saved != null) {
+      footer.add(button("Resume  " + saved.describe(), UiSkinProvider.BUTTON_PURPLE,
+          this::resumeSavedMatch));
+    }
     footer.add(button("Travel Log", UiSkinProvider.BUTTON_GREEN,
         () -> go(new QuestScreen(game))));
     footer.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(new MainMenuScreen(game))));
     content.add(footer).padTop(4f);
+  }
+
+  /**
+   * Picks a saved match back up where it was left.
+   *
+   * <p>Only offered when {@link MatchSaveManager} actually holds one for this account; resuming
+   * consumes the save, so backing out of the resumed match does not leave it on offer twice.
+   */
+  private void resumeSavedMatch() {
+    GameManager resumed = MatchSaveManager.resume();
+    if (resumed == null) {
+      toast("error: that saved match could not be restored");
+      return;
+    }
+    go(new GameplayScreen(game, resumed));
   }
 
   private void openChapter(User user, int stage) {

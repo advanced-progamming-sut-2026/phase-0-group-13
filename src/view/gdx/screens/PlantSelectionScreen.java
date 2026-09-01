@@ -273,6 +273,8 @@ public final class PlantSelectionScreen extends MenuScreen {
     if (bonus) {
       BonusGameLauncher.launch();
     } else {
+      // Starting a level replaces whatever was saved; two matches cannot be in flight at once.
+      model.core.MatchSaveManager.clear();
       MatchLauncher.launch();
     }
     GameManager started = GameSession.getActiveGame();

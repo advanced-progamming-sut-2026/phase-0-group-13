@@ -14,10 +14,12 @@ import model.account.User;
 import model.environment.greenhouse.GreenHouse;
 import model.environment.greenhouse.Pot;
 import model.game.shop.Shop;
+import view.gdx.animation.AnimationLibrary;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
 import view.gdx.ui.Popup;
+import view.gdx.ui.RigActor;
 import view.gdx.ui.UiSkinProvider;
 
 
@@ -37,6 +39,7 @@ public final class GreenhouseScreen extends MenuScreen {
 
   private final PlantArt art = new PlantArt();
   private final HudArt hudArt = new HudArt();
+  private final AnimationLibrary animations = new AnimationLibrary();
   private final Shop shop = new Shop();
   private Table content;
 
@@ -141,9 +144,16 @@ public final class GreenhouseScreen extends MenuScreen {
     stack.add(bottomAligned(hudArt.find("potshadow"), POT_WIDTH * 0.70f, 16f, 0f, 0.55f));
 
     if (!locked && pot != null && !pot.isEmpty()) {
-      TextureRegion sprite = art.find(pot.getPlantedSeedId());
-      if (sprite != null) {
-        stack.add(bottomAligned(sprite, 52f, 46f, PLANT_LIFT, 1f));
+      // The doc asks for the potted plant's idle animation; the still packet is the fallback for
+      // the handful of plants with no rig.
+      RigActor rig = RigActor.idle(animations, AnimationLibrary.PLANTS, pot.getPlantedSeedId());
+      if (rig != null) {
+        stack.add(bottomAligned(rig, 52f, 46f, PLANT_LIFT));
+      } else {
+        TextureRegion sprite = art.find(pot.getPlantedSeedId());
+        if (sprite != null) {
+          stack.add(bottomAligned(sprite, 52f, 46f, PLANT_LIFT, 1f));
+        }
       }
     }
 
@@ -156,6 +166,15 @@ public final class GreenhouseScreen extends MenuScreen {
       stack.add(bottomAligned(hudArt.find("potwater"), 17f, 26f, 38f, 1f));
     }
     return stack;
+  }
+
+  /** Same placement, for an actor that draws itself (the potted plant's rig). */
+  private Table bottomAligned(com.badlogic.gdx.scenes.scene2d.Actor actor, float width,
+      float height, float lift) {
+    Table holder = new Table();
+    holder.bottom();
+    holder.add(actor).size(width, height).padBottom(lift);
+    return holder;
   }
 
   private Table bottomAligned(TextureRegion region, float width, float height, float lift,
@@ -193,11 +212,16 @@ public final class GreenhouseScreen extends MenuScreen {
 
     Table body = new Table();
     body.defaults().pad(4f);
-    TextureRegion sprite = art.find(pot.getPlantedSeedId());
-    if (sprite != null) {
-      Image image = new Image(sprite);
-      image.setScaling(Scaling.fit);
-      body.add(image).size(220f, 160f).padBottom(10f).row();
+    RigActor rig = RigActor.idle(animations, AnimationLibrary.PLANTS, pot.getPlantedSeedId());
+    if (rig != null) {
+      body.add(rig).size(220f, 160f).padBottom(10f).row();
+    } else {
+      TextureRegion sprite = art.find(pot.getPlantedSeedId());
+      if (sprite != null) {
+        Image image = new Image(sprite);
+        image.setScaling(Scaling.fit);
+        body.add(image).size(220f, 160f).padBottom(10f).row();
+      }
     }
     body.add(new Label(pot.getPlantedSeedId(), skin, UiSkinProvider.LABEL_MEDIUM)).row();
     body.add(new Label(pot.isFullyGrown()
@@ -290,6 +314,7 @@ public final class GreenhouseScreen extends MenuScreen {
   public void dispose() {
     super.dispose();
     art.dispose();
+    animations.dispose();
     hudArt.dispose();
   }
 }

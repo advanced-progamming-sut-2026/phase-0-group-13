@@ -30,6 +30,10 @@ public final class IZombieScreen extends ArcadeBoardScreen {
   private final List<SeedCard> cards = new ArrayList<>();
   private final List<ZombieSpec> offered = new ArrayList<>();
 
+  /** The held-zombie preview: faint, and keyed apart from any real zombie's playback clock. */
+  private static final float GHOST_ALPHA = 0.55f;
+  private static final Object GHOST_KEY = new Object();
+
   private String chosen;
 
   public IZombieScreen(PvzGdxGame game, int level) {
@@ -146,6 +150,28 @@ public final class IZombieScreen extends ArcadeBoardScreen {
       art.drawZombie(batch, zombie, zombie.getName(), Math.max(0.0, zombie.getColumn()),
           zombie.getRow(), zombie.isEating());
     }
+    drawPlacementGhost(batch);
+  }
+
+  /**
+   * The zombie waiting to be placed, drawn faded on the tile under the pointer.
+   *
+   * <p>The doc asks for the held zombie's idle animation to follow the cursor while placing; the
+   * seed row showed which card was picked but the lawn gave no sign of it, so a player choosing a
+   * zombie and then looking at the board had nothing to tell them what they were about to drop.
+   */
+  private void drawPlacementGhost(Batch batch) {
+    if (chosen == null || hoverRow() < 0 || hoverColumn() < 0) {
+      return;
+    }
+    batch.setColor(1f, 1f, 1f, GHOST_ALPHA);
+    art.drawZombie(batch, GHOST_KEY, chosen, hoverColumn(), hoverRow(), false);
+    batch.setColor(1f, 1f, 1f, 1f);
+  }
+
+  @Override
+  protected boolean highlightsWholeRow() {
+    return true;
   }
 
   @Override

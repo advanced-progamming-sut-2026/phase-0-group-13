@@ -163,7 +163,7 @@ public class ExplodeAction implements PlantAction {
     int burned = 0;
     for (Zombie zombie : board.getZombies()) {
       if (!zombie.isDead() && zombie.getRow() == plant.getRow()) {
-        zombie.takeDamage(damage, false);
+        zombie.takeBlastDamage(damage);
         burned++;
       }
     }

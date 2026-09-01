@@ -64,6 +64,16 @@ public class GameManager {
   }
 
   public void startGame() { running = true; }
+  /**
+   * Jumps a freshly built match to the wave a saved game left off at.
+   *
+   * <p>Only for {@link MatchSave} restore. The waves themselves are regenerated for the level, so
+   * this skips the ones already survived rather than reproducing their exact contents.
+   */
+  public void resumeAtWave(int waveIndex) {
+    this.currentWaveIndex = Math.max(0, Math.min(waveIndex, waves.size()));
+  }
+
   public void startZombieWaves() { this.zombieWavesStarted = true; }
   public boolean isZombieWavesStarted() { return zombieWavesStarted; }
   public void pauseZombieWaves() { this.zombieWavesStarted = false; }

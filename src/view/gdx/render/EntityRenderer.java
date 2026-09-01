@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,6 +121,14 @@ public final class EntityRenderer implements WorldRenderer {
   private static final String DIRT_REGION = "dirtclods";
   private static final String PLANT_PUFF_REGION = "plantpuff";
   private static final String ARMOUR_BREAK_REGION = "armourbreak";
+
+  /** Where each piece leaves the body and how big it is drawn, both as a share of a lane. */
+  private static final float HEAD_GIB_LIFT = 0.62f;
+  private static final float HEAD_GIB_SIZE = 0.30f;
+  private static final float ARM_GIB_LIFT = 0.45f;
+  private static final float ARM_GIB_SIZE = 0.26f;
+  private static final float ARMOUR_GIB_LIFT = 0.72f;
+  private static final float ARMOUR_GIB_SIZE = 0.34f;
   static final String SPARK_ARMOUR = "armour";
   static final String SPARK_PLANTED = "planted";
   static final String SPARK_SUN = "sun";
@@ -128,6 +137,8 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float ASH_SIZE_LANES = 0.5f;
   private static final float SPARK_SIZE_LANES = 0.8f;
 
+  /** How big the plant-food marker over a glowing zombie is, as a fraction of a lane. */
+  private static final float PLANT_FOOD_MARK_FRACTION = 0.3f;
   private static final float LOOT_ICON_FRACTION = 0.34f;
   private static final float LOOT_LIFT_FRACTION = 0.7f;
 
@@ -198,6 +209,10 @@ public final class EntityRenderer implements WorldRenderer {
    * die clip. Same reason HitEffects watches projectiles by disappearance rather than by state.
    */
   private final List<DyingZombie> dying = new java.util.ArrayList<>();
+  /** Heads, arms and armour in the air. See {@link DetachedParts}. */
+  private final DetachedParts debris = new DetachedParts();
+  /** Armour each zombie was still wearing last frame, so a piece can be thrown when one goes. */
+  private final Map<Zombie, Set<String>> wornArmourGroups = new java.util.IdentityHashMap<>();
   private final Map<Zombie, Boolean> zombiesLastFrame = new java.util.IdentityHashMap<>();
   private final Map<Zombie, Boolean> zombiesThisFrame = new java.util.IdentityHashMap<>();
   private final Map<Sun, double[]> knownSuns = new java.util.IdentityHashMap<>();
@@ -218,6 +233,9 @@ public final class EntityRenderer implements WorldRenderer {
     private final double column;
     private final int row;
     private float age;
+    /** Set when the gib was thrown, so the corpse is drawn without the piece that came off. */
+    private boolean headOff;
+    private boolean armOff;
 
     private DyingZombie(Zombie zombie, double column, int row) {
       this.zombie = zombie;
@@ -255,6 +273,7 @@ public final class EntityRenderer implements WorldRenderer {
     tickAlpha = context.getTickAlpha();
     clock += delta;
     hits.advance(delta);
+    debris.advance(delta);
     spawnLootPickups(board);
     observeForEffects(board);
     // After observeForEffects, which is what notices the fallen in the first place, and before the
@@ -321,6 +340,8 @@ public final class EntityRenderer implements WorldRenderer {
     }
     drawHitFlash(context, zombie, rigged);
     drawIceBlock(context, zombie);
+    // Last, so the carried icon sits above both the body and the ice it may be stuck in.
+    drawPlantFoodCarrier(context, zombie);
   }
 
   /**
@@ -394,6 +415,31 @@ public final class EntityRenderer implements WorldRenderer {
     iceBlockChecked = true;
     iceBlockRegion = plantArt.findPart(ICE_BLOCK_RIG, ICE_BLOCK_REGION);
     iceRimRegion = plantArt.findPart(ICE_BLOCK_RIG, ICE_RIM_REGION);
+  }
+
+  /**
+   * The plant food a glowing zombie is carrying, drawn bobbing over its head.
+   *
+   * <p>Killing one is the only way to get plant food in most levels, so which zombie is holding it
+   * has to be readable at a glance: the terminal build says "glowing" in its status line and the
+   * graphical build said nothing at all. Drawn after the body so it is never hidden behind it.
+   */
+  private void drawPlantFoodCarrier(RenderContext context, Zombie zombie) {
+    if (!zombie.isShiny()) {
+      return;
+    }
+    TextureRegion icon = hudArt.find("plantfood");
+    if (icon == null) {
+      return;
+    }
+    float size = geometry.getCellHeight() * PLANT_FOOD_MARK_FRACTION;
+    float bob = geometry.getCellHeight() * 0.04f * (float) Math.sin(clock * 3.2f);
+    float x = geometry.columnCentreX(drawColumn(zombie)) - size / 2f;
+    float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
+        + zombieSpriteHeight(zombie) + bob;
+    context.getBatch().setColor(1f, 1f, 1f, 0.95f);
+    context.getBatch().draw(icon, x, y, size, size);
+    context.getBatch().setColor(Color.WHITE);
   }
 
   private static float zombieAlpha(Zombie zombie) {
@@ -489,6 +535,7 @@ public final class EntityRenderer implements WorldRenderer {
     context.getBatch().setColor(Color.WHITE);
     drawImpacts(context);
     drawDeaths(context);
+    drawDebris(context);
     drawSparks(context);
     context.getBatch().setColor(Color.WHITE);
     context.getBatch().end();
@@ -515,7 +562,8 @@ public final class EntityRenderer implements WorldRenderer {
     for (HitEffects.DeathPuff puff : hits.getDeathPuffs()) {
       float lane = geometry.getCellHeight();
       double column = onBoard(puff.column());
-      if (ash != null) {
+      // Ash is what is left of a zombie an explosion killed. One shot to pieces leaves dust.
+      if (ash != null && puff.explosive()) {
         context.getBatch().setColor(1f, 1f, 1f, Math.min(1f, puff.alpha() * 1.4f));
         drawCentred(context, ash, column, puff.row(),
             lane * ASH_SIZE_LANES * (0.7f + 0.3f * puff.progress()),
@@ -526,6 +574,18 @@ public final class EntityRenderer implements WorldRenderer {
           lane * DUST_SIZE_LANES * (0.45f + 0.55f * puff.progress()),
           lane * (0.1f + 0.25f * puff.progress()), 0f);
     }
+  }
+
+  /** The pieces that came off, drawn over the corpses they came from. */
+  private void drawDebris(RenderContext context) {
+    float lane = geometry.getCellHeight();
+    for (DetachedParts.Piece piece : debris.all()) {
+      context.getBatch().setColor(1f, 1f, 1f, piece.alpha());
+      piece.draw(context.getBatch(), geometry.columnCentreX(piece.column()),
+          geometry.rowToY(piece.row()) + lane * (ZOMBIE_FOOT_INSET + piece.lift()),
+          lane * piece.heightLanes());
+    }
+    context.getBatch().setColor(Color.WHITE);
   }
 
   private void drawSparks(RenderContext context) {
@@ -616,8 +676,12 @@ public final class EntityRenderer implements WorldRenderer {
         hits.observe(zombie, zombie.getCurrentHealth());
         hits.observeCount(zombie, intactArmour(zombie), SPARK_ARMOUR,
             onBoard(zombie.getX()), footRow(zombie));
+        throwOffBrokenArmour(zombie);
       }
     }
+    // What each zombie was wearing is remembered for exactly as long as the zombie is on the
+    // board; anything not seen this frame has died or walked off and cannot break armour again.
+    wornArmourGroups.keySet().removeIf(zombie -> !zombiesThisFrame.containsKey(zombie));
     collectTheFallen();
     for (Projectile projectile : board.getProjectiles()) {
       hits.observeProjectile(projectile, projectile.getXCoordinate(),
@@ -639,13 +703,97 @@ public final class EntityRenderer implements WorldRenderer {
       if (zombiesThisFrame.containsKey(zombie) || !zombie.isDead()) {
         continue;
       }
-      dying.add(new DyingZombie(zombie, onBoard(zombie.getX()), footRow(zombie)));
+      DyingZombie fallen = new DyingZombie(zombie, onBoard(zombie.getX()), footRow(zombie));
+      dying.add(fallen);
       // The puff, the shake and the death sound all hang off this count, and none of them were
       // ever firing: the transition they waited on happens where nothing can see it.
-      hits.spawnDeathPuff(onBoard(zombie.getX()), footRow(zombie));
+      hits.spawnDeathPuff(fallen.column, fallen.row, zombie.wasKilledByBlast());
+      throwOffBodyParts(fallen);
     }
     zombiesLastFrame.clear();
     zombiesLastFrame.putAll(zombiesThisFrame);
+  }
+
+  /**
+   * Sends this zombie's head and one arm flying, and takes them off the corpse.
+   *
+   * <p>Both halves matter: throwing the gib without hiding the body's own head leaves the zombie
+   * collapsing with two of them. Rigs with no gib -- the Zombosses, the Gargantuars, the Dodo --
+   * keep their heads, which is how they are authored and how the game plays them.
+   */
+  private void throwOffBodyParts(DyingZombie fallen) {
+    Zombie zombie = fallen.zombie;
+    EntityAnimation rig = zombieAnimation(zombie);
+    if (rig == null || zombie.isBoss()) {
+      return;
+    }
+    boolean flip = zombie.isHypnotized();
+    if (rig.hasPart(BodyParts.HEAD_GIB)) {
+      debris.spawn(rig, fallen.column, fallen.row, HEAD_GIB_LIFT, HEAD_GIB_SIZE, flip, true,
+          BodyParts.HEAD_GIB);
+      fallen.headOff = true;
+    }
+    if (rig.hasPart(BodyParts.ARM_GIB)) {
+      debris.spawn(rig, fallen.column, fallen.row, ARM_GIB_LIFT, ARM_GIB_SIZE, flip, false,
+          BodyParts.ARM_GIB);
+      fallen.armOff = true;
+    }
+  }
+
+  /**
+   * Throws off any armour this zombie has lost since the last frame.
+   *
+   * <p>The break itself was already being spotted -- it is what fires the armour spark -- but a
+   * spark is a puff of dust where the doc asks for the piece itself to come off, and the rigs
+   * carry every armour in each of its damage states. The piece thrown is the most damaged state
+   * the rig has, since that is what the player was looking at when it gave way.
+   */
+  private void throwOffBrokenArmour(Zombie zombie) {
+    if (zombie.getArmors().isEmpty()) {
+      // Armour is fitted when the zombie is built and only ever destroyed, so a zombie with an
+      // empty list never had any and never will. Skipping keeps the map to the few that do.
+      return;
+    }
+    Set<String> worn = intactArmourGroups(zombie);
+    Set<String> before = wornArmourGroups.put(zombie, worn);
+    if (before == null || worn.containsAll(before)) {
+      return;
+    }
+    EntityAnimation rig = zombieAnimation(zombie);
+    if (rig == null) {
+      return;
+    }
+    for (String group : before) {
+      if (worn.contains(group)) {
+        continue;
+      }
+      String[] states = BodyParts.armourStateParts(rig.partNames(), group);
+      if (states.length > 0) {
+        debris.spawn(rig, onBoard(zombie.getX()), footRow(zombie), ARMOUR_GIB_LIFT,
+            ARMOUR_GIB_SIZE, zombie.isHypnotized(), true, states);
+      }
+    }
+  }
+
+  private static Set<String> intactArmourGroups(Zombie zombie) {
+    Set<String> groups = new java.util.LinkedHashSet<>();
+    for (Armor armor : zombie.getArmors()) {
+      if (armor == null || armor.isDestroyed() || armor.getType() == null) {
+        continue;
+      }
+      String group = switch (armor.getType()) {
+        case CONE -> ArmourParts.CONE;
+        case BUCKET -> ArmourParts.BUCKET;
+        case BLOCK -> ArmourParts.BRICK;
+        case HELMET -> ArmourParts.CROWN;
+        case SHOULDER_ARMOR -> ArmourParts.SHOULDER;
+        default -> null;
+      };
+      if (group != null) {
+        groups.add(group);
+      }
+    }
+    return groups;
   }
 
   /** Ages the fallen and drops the ones whose clip has played out. */
@@ -688,7 +836,7 @@ public final class EntityRenderer implements WorldRenderer {
           geometry.columnCentreX(fallen.column),
           geometry.rowToY(fallen.row) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET,
           zombieAnimationScale(fallen.zombie, animation, clip),
-          fallen.zombie.isHypnotized(), armourVisibility(animation, fallen.zombie));
+          fallen.zombie.isHypnotized(), corpseVisibility(animation, fallen));
     }
   }
 
@@ -845,12 +993,22 @@ public final class EntityRenderer implements WorldRenderer {
     return onBoard(lerp(zombie.getPreviousX(), zombie.getX(), tickAlpha));
   }
 
-  private static final Map<String, String[]> ACTION_CLIP_NAMES = Map.of(
-      "Chomper", new String[] {"bite"},
-      "Magnet-shroom", new String[] {"catch", "busy"},
-      "Squash", new String[] {"jump_down_left", "jump_down_right", "jump_up_left", "jump_up_right"},
-      "Fume-shroom", new String[] {"special"},
-      "Sun-shroom", new String[] {"special"});
+  private static final Map<String, String[]> ACTION_CLIP_NAMES = Map.ofEntries(
+      Map.entry("Chomper", new String[] {"bite"}),
+      Map.entry("Magnet-shroom", new String[] {"catch", "busy"}),
+      Map.entry("Squash",
+          new String[] {"jump_down_left", "jump_down_right", "jump_up_left", "jump_up_right"}),
+      Map.entry("Fume-shroom", new String[] {"special"}),
+      Map.entry("Sun-shroom", new String[] {"special"}),
+      // The sun producers: their rigs call the "here is a sun" bob "special", not "attack", so
+      // without naming it they fell through to idle and never visibly produced anything.
+      Map.entry("Sunflower", new String[] {"special"}),
+      Map.entry("Twin Sunflower", new String[] {"special"}),
+      Map.entry("Primal Sunflower", new String[] {"special"}),
+      // Potato Mine arms rather than attacks: "plant" is it burying in, "plant_idle" the armed
+      // wait, and "attack" only happens when something finally steps on it.
+      Map.entry("Potato Mine", new String[] {"attack"}),
+      Map.entry("Primal Potato Mine", new String[] {"attack"}));
 
   /**
    * Which clip a plant is showing this frame, in priority order: plant food, then the arming pose
@@ -1019,6 +1177,29 @@ public final class EntityRenderer implements WorldRenderer {
     }
     rig.draw(context.getBatch(), idle, time, head[0], head[1] - span / 2f,
         span / headHeight, !zombie.isHypnotized());
+  }
+
+  /**
+   * The dying zombie's armour, minus whatever came off it.
+   *
+   * <p>A part forced false takes its children with it, which is exactly right here: hiding the
+   * skull hides the jaw and the eyes hanging off it.
+   */
+  private static Map<String, Boolean> corpseVisibility(EntityAnimation animation,
+      DyingZombie fallen) {
+    Map<String, Boolean> armour = armourVisibility(animation, fallen.zombie);
+    if (!fallen.headOff && !fallen.armOff) {
+      return armour;
+    }
+    Map<String, Boolean> visibility = armour == null ? new HashMap<>() : new HashMap<>(armour);
+    for (String part : animation.partNames()) {
+      String lower = part.toLowerCase();
+      if ((fallen.headOff && BodyParts.isHeadPart(lower))
+          || (fallen.armOff && BodyParts.isOuterArmPart(lower))) {
+        visibility.put(part, false);
+      }
+    }
+    return visibility;
   }
 
   private static Map<String, Boolean> armourVisibility(EntityAnimation animation, Zombie zombie) {
@@ -1233,6 +1414,49 @@ public final class EntityRenderer implements WorldRenderer {
     return zombieScaleFrom(animation.width(clip), height, ZOMBIE_ANIM_UNITS);
   }
 
+  /**
+   * Where the top of a zombie's rig actually is on screen right now, in world Y, for the health
+   * bar to sit just above.
+   *
+   * <p>Not animation.height(clip) * scale: that height is the clip's bounding box aggregated
+   * across every frame of it, since {@link EntityAnimation#draw} needs a stable value to anchor a
+   * clip's feet consistently as it plays. A walk cycle's most stretched-out stride, or the
+   * Gargantuar's pole raised overhead mid-smash, are both real frames of those clips and both
+   * count toward it -- so a health bar built from that number sits at the height of the tallest
+   * moment the clip ever reaches, with a visible gap above the character for every calmer frame in
+   * between. {@link EntityAnimation#topPartBox} already solves this correctly for
+   * {@link #drawPlantHead}, reading the part that is actually highest in the exact frame on
+   * screen; this asks it the same question and reads the state {@link #drawZombieAnimation}
+   * already advanced this frame rather than advancing the clip a second time.
+   *
+   * @return world Y of the sprite's current top, or null for a zombie with no rig to measure
+   */
+  private Float zombieTopY(Zombie zombie) {
+    EntityAnimation animation = zombieAnimation(zombie);
+    if (animation == null) {
+      return null;
+    }
+    String clip = zombieClip(animation, zombie);
+    float time = playback.peek(zombie);
+    float flight = zombie.flightProgress();
+    double column = flight > 0f
+        ? zombie.getX() + (zombie.getThrownFromX() - zombie.getX()) * flight
+        : zombie.getX();
+    float x = geometry.columnCentreX(onBoard(column));
+    float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
+        + throwLift(flight);
+    float scale = zombieAnimationScale(zombie, animation, clip);
+    float[] top = animation.topPartBox(clip, time, x, y, scale, zombie.isHypnotized());
+    return top == null ? null : top[1] + top[3] / 2f;
+  }
+
+  /** Foot Y plus the whole-clip estimate, for a zombie zombieTopY could not measure. */
+  private float legacySpriteTopY(Zombie zombie) {
+    return geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
+        + zombieSpriteHeight(zombie);
+  }
+
+  /** The old, whole-clip estimate: still what a zombie with no rig (a static portrait) needs. */
   private float zombieSpriteHeight(Zombie zombie) {
     EntityAnimation animation = zombieAnimation(zombie);
     if (animation != null) {
@@ -1589,12 +1813,17 @@ public final class EntityRenderer implements WorldRenderer {
         || plantArt.find(plant.getName()) != null;
   }
 
+  private static final float HEALTH_BAR_GAP = 10f;
+
   private void healthBar(ShapeRenderer shapes, Zombie zombie) {
-    float spriteHeight = zombieSpriteHeight(zombie);
+    Float topY = zombieTopY(zombie);
+    float y = (topY != null ? topY : legacySpriteTopY(zombie)) + HEALTH_BAR_GAP;
     float width = geometry.getCellHeight() * (isBoss(zombie) ? 2.1f : 0.62f);
-    float x = geometry.columnCentreX(drawColumn(zombie)) - width / 2f;
-    float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
-        + spriteHeight + 4f;
+    float flight = zombie.flightProgress();
+    double column = flight > 0f
+        ? onBoard(zombie.getX() + (zombie.getThrownFromX() - zombie.getX()) * flight)
+        : drawColumn(zombie);
+    float x = geometry.columnCentreX(column) - width / 2f;
     // a tall zombie in the top lane would otherwise wear its bar up in the seed cards
     y = Math.min(y, geometry.rowToY(0) + geometry.getCellHeight() - 7f);
     float thickness = isBoss(zombie) ? 11f : 5f;

@@ -20,6 +20,8 @@ public class Zombie {
   private double x;
   private double y;
   private double previousX;
+  /** What did the last damage, so a death can be drawn as a blast or as a plain collapse. */
+  private boolean lastHitWasBlast;
 
   public static final int NO_CELL = -1;
 
@@ -95,10 +97,13 @@ public class Zombie {
   }
 
   public void move() {
+    // Unconditionally, even on a tick this zombie does not travel: the renderer interpolates from
+    // previousX to x across the frames between ticks, so leaving it a step behind while the zombie
+    // eats or stands frozen makes it shuffle back and forth on the spot instead of holding still.
+    this.previousX = x;
     if (!isEating && !activeEffects.containsKey(StatusEffect.FROZEN)) {
       double actualSpeed = activeEffects.containsKey(StatusEffect.CHILLED) ? speed / 2.0 : speed;
       double direction = hypnotized ? 1.0 : -1.0;
-      this.previousX = x;
       this.x += direction * actualSpeed * speedMultiplier;
     }
   }
@@ -135,6 +140,27 @@ public class Zombie {
   }
 
   public void takeDamage(int damage, boolean ignoresArmor) {
+    applyDamage(damage, ignoresArmor, false);
+  }
+
+  /**
+   * Damage from a blast rather than a bite or a pea.
+   *
+   * <p>Kept apart from {@link #takeDamage} only so the view can tell the two deaths apart: the doc
+   * asks for ash on a zombie an explosion killed, and ash was being drawn for every death because
+   * nothing anywhere recorded what had done the killing.
+   */
+  public void takeBlastDamage(int damage) {
+    applyDamage(damage, false, true);
+  }
+
+  /** True for a zombie an explosion finished off, and false for one that merely felt a blast. */
+  public boolean wasKilledByBlast() {
+    return lastHitWasBlast && isDead();
+  }
+
+  private void applyDamage(int damage, boolean ignoresArmor, boolean blast) {
+    this.lastHitWasBlast = blast;
     if (ignoresArmor) {
       this.currentHealth -= damage;
     } else {
@@ -247,7 +273,17 @@ public class Zombie {
   public int getMaxHealth() { return maxHealth; }
   public boolean isEating() { return isEating; }
   public double getSpeed() { return speed; }
-  public void setEating(boolean eating) { this.isEating = eating; }
+  /**
+   * Starting to eat also parks the interpolation: the renderer tweens previousX -> x between
+   * ticks, and a zombie that stops walking mid-step would otherwise keep being drawn sliding
+   * between its last two positions for as long as it stood there chewing.
+   */
+  public void setEating(boolean eating) {
+    if (eating && !this.isEating) {
+      this.previousX = x;
+    }
+    this.isEating = eating;
+  }
   public List<Armor> getArmors() { return armors; }
 
   public int getRemainingArmorHealth() {

@@ -52,6 +52,19 @@ public final class AnimationStates {
     return state.time;
   }
 
+  /**
+   * The current playback time for an entity that has already been advanced this frame, without
+   * moving it. For a caller that needs to know exactly what pose is on screen right now -- the
+   * health bar reading where a mid-frame limb actually is -- without itself driving the clip
+   * forward, which advance() always does and calling it twice in one frame would double.
+   *
+   * @return the stored time, or 0 if this entity has not been advanced yet this frame
+   */
+  public float peek(Object entity) {
+    State state = states.get(entity);
+    return state == null ? 0f : state.time;
+  }
+
   public void endFrame() {
     Iterator<State> it = states.values().iterator();
     while (it.hasNext()) {
