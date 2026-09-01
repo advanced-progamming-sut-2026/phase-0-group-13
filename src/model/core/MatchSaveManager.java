@@ -53,7 +53,17 @@ public final class MatchSaveManager {
     return load() != null;
   }
 
+  /**
+   * Drops the saved match, but only when it belongs to the player who is signed in.
+   *
+   * <p>Called whenever a level starts or ends, which two different accounts on one machine both
+   * do: without the ownership test, simply playing a level on account B would delete account A's
+   * saved match.
+   */
   public static void clear() {
+    if (load() == null) {
+      return;
+    }
     java.io.File file = new java.io.File(path());
     if (file.exists()) {
       file.delete();
@@ -77,6 +87,12 @@ public final class MatchSaveManager {
     if (match.isBonusMatch() || setup.getCurrentMiniGame() != model.enums.MiniGameType.NONE) {
       return false;
     }
+    // Once every wave has been dispatched the match is in its endgame, and since a save does not
+    // carry the zombies still walking, resuming from here would find an empty lawn with no waves
+    // left to send and hand out a free win. Finish the level instead.
+    if (match.getCurrentWaveIndex() >= match.getTotalWaves()) {
+      return false;
+    }
 
     MatchSave saved = new MatchSave();
     saved.username = user.getUsername();
@@ -90,6 +106,9 @@ public final class MatchSaveManager {
     saved.waveIndex = match.getCurrentWaveIndex();
     saved.wavesStarted = match.isZombieWavesStarted();
     saved.savedAt = System.currentTimeMillis();
+    for (model.game.Lawnmower mower : match.getBoard().getLawnmowers()) {
+      saved.mowersAvailable.add(mower.isAvailable());
+    }
 
     for (Plant plant : match.getBoard().getPlants()) {
       if (plant != null && !plant.isDead()) {
@@ -137,28 +156,62 @@ public final class MatchSaveManager {
     if (!saved.wavesStarted) {
       match.pauseZombieWaves();
     }
-    // The launcher hands out a starting sun float; the save is the authority on both counters.
+    // Plants first, counters second: replanting must not be able to move the numbers the save is
+    // the authority on.
+    replantAll(match, saved.plants);
+    restoreMowers(board, saved);
     board.getGameState().setSun(saved.sun);
     board.getGameState().setPlantFood(saved.plantFood);
-    replantAll(match, saved.plants);
   }
 
+  /**
+   * Burns back the mowers that had already been spent.
+   *
+   * <p>A fresh board builds a full set, so without this a player could bank three used mowers by
+   * saving and resuming.
+   */
+  private static void restoreMowers(Board board, MatchSave saved) {
+    if (saved.mowersAvailable == null) {
+      return;
+    }
+    List<model.game.Lawnmower> mowers = board.getLawnmowers();
+    for (int row = 0; row < mowers.size() && row < saved.mowersAvailable.size(); row++) {
+      if (!Boolean.TRUE.equals(saved.mowersAvailable.get(row))) {
+        mowers.get(row).setActive(false);
+      }
+    }
+  }
+
+  /**
+   * Puts the saved lawn back.
+   *
+   * <p>Deliberately {@link Board#placePlant} and not {@link GameManager#placePlant}: the latter is
+   * the *placement* path, and running it here would charge the player for plants they had already
+   * bought, re-check the stage's plant rules (a locked-plants level rejects its own saved lawn
+   * outright, which silently restored nothing at all), and fire onPlantPlaced again, inflating the
+   * quest and statistics counters. A restore is not a placement -- these plants were legal when
+   * they went down, so they simply go back where they were.
+   */
   private static void replantAll(GameManager match, List<MatchSave.SavedPlant> plants) {
-    if (GameDataManager.plantRepository == null) {
+    Board board = match.getBoard();
+    if (board == null || GameDataManager.plantRepository == null) {
       return;
     }
     PlantFactory factory = new PlantFactory(GameDataManager.plantRepository);
     for (MatchSave.SavedPlant entry : plants) {
-      Plant plant = factory.createPlant(entry.name, entry.row, entry.col, entry.level);
-      if (plant == null) {
+      if (entry == null || entry.row < 0 || entry.row >= board.getRows()
+          || entry.col < 0 || entry.col >= board.getColumns()) {
         continue;
       }
-      if (match.placePlant(plant, entry.row, entry.col)) {
-        // Put the wear back on: a plant that was nearly eaten should not come back untouched.
-        int damage = plant.getCurrentHealth() - entry.health;
-        if (damage > 0) {
-          plant.takeDamage(damage);
-        }
+      Plant plant = factory.createPlant(entry.name, entry.row, entry.col, entry.level);
+      if (plant == null || board.getPlantAt(entry.row, entry.col) != null) {
+        continue;
+      }
+      board.placePlant(plant);
+      // Put the wear back on: a plant that was nearly eaten should not come back untouched.
+      int damage = plant.getCurrentHealth() - entry.health;
+      if (damage > 0) {
+        plant.takeDamage(damage);
       }
     }
   }

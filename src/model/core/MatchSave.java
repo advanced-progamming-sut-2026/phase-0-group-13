@@ -48,6 +48,8 @@ public class MatchSave {
   public int plantFood;
   public int waveIndex;
   public boolean wavesStarted;
+  /** One flag per lane: whether that row's mower was still unused when the match was saved. */
+  public List<Boolean> mowersAvailable = new ArrayList<>();
   public long savedAt;
 
   public MatchSave() {

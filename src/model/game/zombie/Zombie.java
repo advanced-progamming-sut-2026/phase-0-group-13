@@ -95,10 +95,13 @@ public class Zombie {
   }
 
   public void move() {
+    // Unconditionally, even on a tick this zombie does not travel: the renderer interpolates from
+    // previousX to x across the frames between ticks, so leaving it a step behind while the zombie
+    // eats or stands frozen makes it shuffle back and forth on the spot instead of holding still.
+    this.previousX = x;
     if (!isEating && !activeEffects.containsKey(StatusEffect.FROZEN)) {
       double actualSpeed = activeEffects.containsKey(StatusEffect.CHILLED) ? speed / 2.0 : speed;
       double direction = hypnotized ? 1.0 : -1.0;
-      this.previousX = x;
       this.x += direction * actualSpeed * speedMultiplier;
     }
   }
@@ -234,7 +237,17 @@ public class Zombie {
   public int getMaxHealth() { return maxHealth; }
   public boolean isEating() { return isEating; }
   public double getSpeed() { return speed; }
-  public void setEating(boolean eating) { this.isEating = eating; }
+  /**
+   * Starting to eat also parks the interpolation: the renderer tweens previousX -> x between
+   * ticks, and a zombie that stops walking mid-step would otherwise keep being drawn sliding
+   * between its last two positions for as long as it stood there chewing.
+   */
+  public void setEating(boolean eating) {
+    if (eating && !this.isEating) {
+      this.previousX = x;
+    }
+    this.isEating = eating;
+  }
   public List<Armor> getArmors() { return armors; }
 
   public int getRemainingArmorHealth() {

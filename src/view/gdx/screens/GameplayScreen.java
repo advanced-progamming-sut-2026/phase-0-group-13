@@ -221,9 +221,11 @@ public final class GameplayScreen extends BaseScreen {
     // The lawn itself goes to Games.json; the account (coins, quests, progress) goes to the
     // server as it always did. A mini-game or bonus run declines the first part on its own.
     boolean stored = MatchSaveManager.save(match);
-    if (stored) {
-      hud.toast("Match saved -- resume it from the adventure map.");
-    }
+    // Saying so either way: a silent refusal looks exactly like a save that worked, and the player
+    // would only find out when no Resume button appeared on the map.
+    hud.toast(stored
+        ? "Match saved -- resume it from the adventure map."
+        : "This one cannot be saved; your progress is kept, the lawn is not.");
     runAsync(
         () -> {
           UserManager.getInstance().updateCurrentUserGameState();
