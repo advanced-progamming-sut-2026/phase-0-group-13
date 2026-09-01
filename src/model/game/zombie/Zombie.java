@@ -109,16 +109,29 @@ public class Zombie {
   }
 
   /**
-   * How far this zombie walked on the last tick, as a share of its own unhindered pace. The
-   * renderer drives the walk cycle with it so the feet keep up with a buffed zombie and slow down
-   * with a chilled one instead of scuffing along at a fixed rate.
+   * The pace the walk cycles were authored against: a plain zombie's. Everything on the lawn walks
+   * somewhere between half and one and a half times this.
+   */
+  public static final double REFERENCE_SPEED = 0.0185;
+
+  /**
+   * How fast this zombie is actually crossing the lawn right now, measured against the pace a
+   * plain zombie walks at.
+   *
+   * <p>The renderer runs the walk cycle at exactly this rate, which is what keeps the feet on the
+   * ground. Speed varies more than three to one across the roster -- a Dodo covers 0.0300 of a
+   * tile a tick where a Hunter covers 0.0120 -- so a cycle that ran at one fixed rate for all of
+   * them had most of the lawn skating. Everything that changes the pace is in here: the chill that
+   * halves it, the multiplier an enrage or a slowdown sets, and the freeze that stops it dead.
    */
   public double getStrideFraction() {
     if (activeEffects.containsKey(StatusEffect.FROZEN)) {
       return 0.0;
     }
     double chill = activeEffects.containsKey(StatusEffect.CHILLED) ? 0.5 : 1.0;
-    return chill * speedMultiplier;
+    double ground = speed * speedMultiplier * chill;
+    // A zombie that holds station has no pace to borrow, so its rig keeps its authored one.
+    return ground <= 0 ? 1.0 : ground / REFERENCE_SPEED;
   }
 
   /** Where this zombie stood at the previous tick, for drawing between the two. */

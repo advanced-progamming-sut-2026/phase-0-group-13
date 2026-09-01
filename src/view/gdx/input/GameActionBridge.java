@@ -11,6 +11,8 @@ public interface GameActionBridge {
 
   boolean collectSunByHover(int row, int column);
 
+  boolean collectPlantFoodAt(int row, int column);
+
   boolean feedPlantAt(int row, int column);
 
   void requestExit();

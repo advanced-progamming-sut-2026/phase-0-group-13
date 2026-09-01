@@ -21,6 +21,7 @@ public class Board {
   private Tile[][] tiles;
   private final List<Zombie> zombies;
   private final List<Plant> plants;
+  private final List<PlantFoodDrop> plantFoodDrops = new ArrayList<>();
   private final SunManager sunManager;
   private final List<Projectile> projectiles;
   /** Missiles, boulders and sharks a Zomboss has sent but that have not arrived yet. */
@@ -98,6 +99,7 @@ public class Board {
     handleLawnmowers();
     triggerDeathExplosions();
     handleGlowingZombieDrops();
+    agePlantFoodDrops();
     handleDeathDrops();
     cleanupEntities();
   }
@@ -129,10 +131,11 @@ public class Board {
     if ("SUN".equals(reward)) {
       gameState.addSun(50);
       System.out.printf("The grave at (%d, %d) held 50 sun!%n", col + 1, row + 1);
-    } else if (gameState.addPlantFood()) {
+    } else {
+      dropPlantFood(col, row);
       notify(String.format(
-              "The grave at (%d, %d) held a plant food; you have %d plant foods now.",
-              col + 1, row + 1, gameState.getPlantFoodCount()));
+              "The grave at (%d, %d) held a plant food; pick it up before it fades.",
+              col + 1, row + 1));
     }
   }
 
@@ -228,11 +231,17 @@ public class Board {
           new model.game.plant.behavior.ExplodeAction(0, 1800, 1);
   private void triggerDeathExplosions() {
     for (Plant plant : plants) {
-      if (plant.isDead()
-              && !plant.hasDeathHookFired()
-              && plant.getTags().contains(PlantTag.EXPLOSIVE)) {
+      if (!plant.isDead() || plant.hasDeathHookFired()) {
+        continue;
+      }
+      if (plant.getTags().contains(PlantTag.EXPLOSIVE)) {
         plant.markDeathHookFired();
         deathExplodeAction.detonateNow(plant, this);
+      } else if (plant.getBehavior()
+              instanceof model.game.plant.behavior.ExplodeAction fusing && fusing.isFuseLit()) {
+        // Bitten apart mid-fuse: it goes off anyway, with its own blast rather than the stock one.
+        plant.markDeathHookFired();
+        fusing.detonateNow(plant, this);
       }
     }
   }
@@ -249,13 +258,54 @@ public class Board {
     for (Zombie zombie : zombies) {
       if (zombie.isDead() && zombie.isShiny() && !zombie.hasDroppedPlantFood()) {
         zombie.markPlantFoodDropped();
-        if (gameState.addPlantFood()) {
-          notify(String.format(
-                  "The glowing zombie dropped a plant food; you have %d plant foods now.",
-                  gameState.getPlantFoodCount()));
-        }
+        dropPlantFood(zombie.getX(), zombie.getRow());
+        notify(String.format(
+                "The glowing zombie dropped a plant food at (%d, %d); pick it up before it fades.",
+                (int) Math.round(zombie.getX()) + 1, zombie.getRow() + 1));
       }
     }
+  }
+
+  /** Leaves a dose of plant food on the lawn for the player to collect. */
+  public void dropPlantFood(double column, int row) {
+    plantFoodDrops.add(new PlantFoodDrop(Math.max(0, Math.min(columns - 1.0, column)), row));
+  }
+
+  public List<PlantFoodDrop> getPlantFoodDrops() {
+    return plantFoodDrops;
+  }
+
+  /**
+   * Picks up the plant food on a tile.
+   *
+   * <p>A dose is only taken off the lawn when it is actually banked, so a player who is already
+   * holding the maximum leaves it lying there rather than losing it -- the cap in
+   * {@link GameState#addPlantFood()} is unchanged, it just applies at pickup now instead of at
+   * the moment something dropped it.
+   *
+   * @return true when a dose was picked up
+   */
+  public boolean collectPlantFoodAt(int row, int col) {
+    for (PlantFoodDrop drop : plantFoodDrops) {
+      if (drop.isGone() || !drop.occupiesTile(col, row)) {
+        continue;
+      }
+      if (!gameState.addPlantFood()) {
+        return false;
+      }
+      drop.markCollected();
+      notify(String.format("You picked up a plant food; you have %d now.",
+              gameState.getPlantFoodCount()));
+      return true;
+    }
+    return false;
+  }
+
+  private void agePlantFoodDrops() {
+    for (PlantFoodDrop drop : plantFoodDrops) {
+      drop.tick();
+    }
+    plantFoodDrops.removeIf(PlantFoodDrop::isGone);
   }
   private void handleDeathDrops() {
     for (Zombie zombie : zombies) {

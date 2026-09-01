@@ -136,6 +136,13 @@ public final class GdxGameActions implements GameActionBridge {
     return match.collectSunAt(column, row) != null;
   }
 
+  /** Picks up a dose of plant food lying on that tile; it is never credited until you do. */
+  @Override
+  public boolean collectPlantFoodAt(int row, int column) {
+    Board board = board();
+    return board != null && board.collectPlantFoodAt(row, column);
+  }
+
   @Override
   public boolean collectSunByHover(int row, int column) {
     Board board = board();

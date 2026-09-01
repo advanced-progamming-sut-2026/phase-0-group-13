@@ -36,6 +36,23 @@ public final class AnimationStates {
   }
 
   /**
+   * Puts this entity at an exact point in its clip instead of letting the frame clock carry it,
+   * for anything whose animation has to line up with a moment the simulation decides -- a fuse
+   * that must reach its last frame on the tick the plant goes off.
+   */
+  public float hold(Object entity, String clip, float time) {
+    State state = states.get(entity);
+    if (state == null) {
+      state = new State();
+      states.put(entity, state);
+    }
+    state.clip = clip;
+    state.time = Math.max(0f, time);
+    state.seenOn = frame;
+    return state.time;
+  }
+
+  /**
    * The current playback time for an entity that has already been advanced this frame, without
    * moving it. For a caller that needs to know exactly what pose is on screen right now -- the
    * health bar reading where a mid-frame limb actually is -- without itself driving the clip
