@@ -33,6 +33,8 @@ public final class ShopScreen extends MenuScreen {
 
   private final Shop shop = new Shop();
   private Table content;
+  /** Ribbon labels that show how long is left on the daily deals; refreshed every frame. */
+  private final java.util.List<Label> countdowns = new java.util.ArrayList<>();
 
   public ShopScreen(PvzGdxGame game) {
     super(game);
@@ -61,6 +63,7 @@ public final class ShopScreen extends MenuScreen {
 
   private void refresh() {
     content.clear();
+    countdowns.clear();
 
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) {
@@ -164,10 +167,33 @@ public final class ShopScreen extends MenuScreen {
     }
     Stack stack = new Stack();
     stack.add(card);
-    stack.add(ribbon("TODAY ONLY"));
+    stack.add(ribbon(dailyCountdown()));
     Table wrapper = new Table();
     wrapper.add(stack).grow();
     return wrapper;
+  }
+
+  /**
+   * How long the daily deals still have, as "TODAY ONLY - 5h 12m".
+   *
+   * <p>The doc asks for the remaining time on the daily item, and a static "TODAY ONLY" ribbon does
+   * not say whether that means ten hours or ten minutes.
+   */
+  private String dailyCountdown() {
+    long millis = shop.getMillisUntilDailyRefresh();
+    long minutes = Math.max(0, millis / 60000L);
+    String left = minutes >= 60
+        ? (minutes / 60) + "h " + (minutes % 60) + "m"
+        : minutes + "m";
+    return "TODAY ONLY - " + left;
+  }
+
+  @Override
+  public void render(float delta) {
+    for (Label label : countdowns) {
+      label.setText(dailyCountdown());
+    }
+    super.render(delta);
   }
 
   private Table ribbon(String text) {
@@ -175,8 +201,11 @@ public final class ShopScreen extends MenuScreen {
     holder.top().padTop(2f);
     Table banner = new Table();
     banner.setBackground(skin.getDrawable(UiSkinProvider.PROMO_RIBBON));
-    banner.add(new Label(text, skin, "promo_ribbon"));
-    holder.add(banner).width(150f).height(38f);
+    Label label = new Label(text, skin, "promo_ribbon");
+    // Registered so render() can tick it; the shelf is only rebuilt on a purchase.
+    countdowns.add(label);
+    banner.add(label);
+    holder.add(banner).width(206f).height(38f);
     return holder;
   }
 

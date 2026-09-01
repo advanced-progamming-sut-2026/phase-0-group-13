@@ -53,6 +53,17 @@ public class Shop {
     return userDailyDeals.getOrDefault(user.getUsername(), new ArrayList<>());
   }
 
+  /**
+   * Milliseconds until the current daily deals roll over.
+   *
+   * <p>The deals are keyed on {@code now / MILLIS_PER_DAY}, so they last until the next multiple
+   * of a day; that boundary is what the shop counts down to.
+   */
+  public long getMillisUntilDailyRefresh() {
+    long now = System.currentTimeMillis();
+    return (now / MILLIS_PER_DAY + 1) * MILLIS_PER_DAY - now;
+  }
+
   public void refreshDailyDealsIfNeeded(User user) {
     if (user == null) return;
 

@@ -24,6 +24,20 @@ public class GameState {
     this.elapsedTime++;
   }
 
+  /**
+   * Puts both counters back to exactly what a saved match held.
+   *
+   * <p>Only for restoring a save: everything in play goes through addSun/deductSun so the normal
+   * economy rules still apply.
+   */
+  public void setSun(int amount) {
+    this.currentSun = Math.max(0, amount);
+  }
+
+  public void setPlantFood(int count) {
+    this.plantFoodCount = Math.max(0, Math.min(MAX_PLANT_FOOD, count));
+  }
+
   public void addSun(int amount) {
     if (amount > 0) {
       this.currentSun += amount;

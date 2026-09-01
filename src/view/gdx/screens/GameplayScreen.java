@@ -23,6 +23,7 @@ import model.game.minigame.SaveOurSeedsRule;
 import model.game.minigame.SpecialStageRule;
 import model.game.minigame.TimedWarRule;
 import model.game.plant.Plant;
+import model.game.quest.Quest;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.game.zombie.Zombie;
 import model.core.BonusGameLauncher;
@@ -30,6 +31,7 @@ import model.core.GameManager;
 import model.core.GameSession;
 import model.core.MatchCompletion;
 import model.core.MatchLauncher;
+import model.core.MatchSaveManager;
 import model.core.MatchSetup;
 import model.core.MiniGameLauncher;
 import model.enums.MiniGameType;
@@ -53,6 +55,9 @@ import view.gdx.ui.Popup;
 import view.gdx.ui.UiSkinProvider;
 
 public final class GameplayScreen extends BaseScreen {
+
+  /** How many open quests the level-start briefing lists before it gets too long to read. */
+  private static final int MAX_BRIEFING_QUESTS = 4;
 
   private final GameManager match;
   private final FixedStepClock clock = new FixedStepClock(GdxConfig.SECONDS_PER_TICK);
@@ -213,6 +218,12 @@ public final class GameplayScreen extends BaseScreen {
   }
 
   private void saveAndLeave() {
+    // The lawn itself goes to Games.json; the account (coins, quests, progress) goes to the
+    // server as it always did. A mini-game or bonus run declines the first part on its own.
+    boolean stored = MatchSaveManager.save(match);
+    if (stored) {
+      hud.toast("Match saved -- resume it from the adventure map.");
+    }
     runAsync(
         () -> {
           UserManager.getInstance().updateCurrentUserGameState();
@@ -273,8 +284,8 @@ public final class GameplayScreen extends BaseScreen {
   }
 
   private void showStageDialogue() {
-    Dialogue.show(hud.getStage(), game.getUiSkin().get(), Dialogue.PENNY,
-        Dialogue.stageStart(seasonName(), playerName()), this::beginPlaying);
+    Dialogue.showConversation(hud.getStage(), game.getUiSkin().get(),
+        Dialogue.stageConversation(seasonName(), playerName()), this::beginPlaying);
   }
 
   private static String playerName() {
@@ -333,10 +344,71 @@ public final class GameplayScreen extends BaseScreen {
       return text.toString();
     }
     if (rule != null) {
-      text.append(rule.getClass().getSimpleName()).append(" is active this level.\n");
+      text.append(ruleName(rule)).append('\n');
     }
     text.append("Defend your lawn -- don't let the zombies reach the house!");
+    appendQuests(text);
     return text.toString();
+  }
+
+  /**
+   * What this level's special rule is, in words.
+   *
+   * <p>The briefing used to print the rule's Java class name, so a player was told
+   * "LoveYourPlantsRule is active this level".
+   */
+  private static String ruleName(SpecialStageRule rule) {
+    if (rule instanceof ConveyorRule) {
+      return "Conveyor belt: plants arrive on the belt, there is no seed bank.";
+    }
+    if (rule instanceof SaveOurSeedsRule) {
+      return "Save Our Seeds: the marked plants must survive to the end.";
+    }
+    if (rule instanceof DeadLineRule) {
+      return "Deadline: no zombie may cross the red line.";
+    }
+    if (rule instanceof TimedWarRule) {
+      return "Timed battle: finish the objective before the clock runs out.";
+    }
+    if (rule instanceof LoveYourPlantsRule) {
+      return "Don't lose your plants: lose too many and the level is over.";
+    }
+    if (rule instanceof PlantWhatYouGetRule) {
+      return "Plant what you get: plant freely, then start the waves yourself.";
+    }
+    return "A special rule is active this level.";
+  }
+
+  /**
+   * The quests this level counts towards, with their progress.
+   *
+   * <p>The doc wants the level's missions shown before it starts; the quest menu had them but the
+   * level-start screen did not, so the player had to leave the map to find out what to aim for.
+   */
+  private static void appendQuests(StringBuilder text) {
+    User user = UserManager.getInstance().getCurrentUser();
+    if (user == null || user.getQuests() == null) {
+      return;
+    }
+    List<Quest> open = new ArrayList<>();
+    for (Quest quest : user.getQuests()) {
+      if (!quest.isRewardClaimed() && open.size() < MAX_BRIEFING_QUESTS) {
+        open.add(quest);
+      }
+    }
+    if (open.isEmpty()) {
+      return;
+    }
+    text.append("\n\nQuests in progress:");
+    for (Quest quest : open) {
+      text.append("\n  - ").append(quest.getTitle());
+      if (quest.isCompleted()) {
+        text.append("  (done -- claim it in the quest menu)");
+      } else if (quest.getQuestTarget() > 0) {
+        text.append(String.format("  (%d/%d)",
+            (int) quest.getProgressOfQuest(), (int) quest.getQuestTarget()));
+      }
+    }
   }
 
   private void layout() {
@@ -369,6 +441,7 @@ public final class GameplayScreen extends BaseScreen {
 
     watchWaves();
     showPickups();
+    showScoreNotices();
     listenForBites();
     listenForShots();
     updateStatus();
@@ -399,6 +472,21 @@ public final class GameplayScreen extends BaseScreen {
       return;
     }
     hud.setStatus("plant food " + match.getPlantFoodCount() + nightNote() + hint());
+  }
+
+  /**
+   * The bonus-game scoring patterns, as an on-screen alert.
+   *
+   * <p>They used to be a console println only, so the player earned MyoPoints for a multi-kill and
+   * was never told it had happened.
+   */
+  private void showScoreNotices() {
+    if (match == null || match.getScoreManager() == null) {
+      return;
+    }
+    for (String notice : match.getScoreManager().drainPendingNotices()) {
+      hud.alert(notice);
+    }
   }
 
   private void showPickups() {
@@ -478,10 +566,14 @@ public final class GameplayScreen extends BaseScreen {
     }
     SpecialStageRule rule = match.getSpecialStageRule();
     if (rule instanceof TimedWarRule timed) {
-      int survived = timed.getTimeLimitTicks() - timed.remainingTicks();
-      return String.format("hold out %.1fs more   -   %d zombies left   -   %d%% survived",
-          timed.remainingTicks() / 10.0, countZombies(),
-          Math.round(100f * survived / Math.max(1, timed.getTimeLimitTicks())));
+      // Both halves of the win condition, each marked done or not: the doc wants the state of a
+      // timed stage's objectives visible, and a bare countdown does not say what still has to
+      // happen for the level to be won.
+      boolean clockDone = timed.remainingTicks() <= 0;
+      boolean lawnClear = countZombies() == 0;
+      return String.format("%s outlast the clock (%.1fs)      %s clear the lawn (%d left)",
+          clockDone ? "[DONE]" : "[    ]", timed.remainingTicks() / 10.0,
+          lawnClear ? "[DONE]" : "[    ]", countZombies());
     }
     if (rule instanceof LoveYourPlantsRule love) {
       int left = love.getLossBudget() - match.getMatchContext().getPlantsLost();
@@ -565,6 +657,8 @@ public final class GameplayScreen extends BaseScreen {
     }
     ended = true;
     bonusScore = match.getScoreManager().getCurrentMatchScore();
+    // Won or lost, this match is over: the resume button must not offer it again.
+    MatchSaveManager.clear();
     MatchCompletion.apply(match);
     paused = false;
     if (game.getUiSkin().get() == null) {

@@ -146,7 +146,11 @@ public final class LawnRenderer implements WorldRenderer {
     }
     if (hudArt.find("lawnmower") == null) {
       for (Lawnmower mower : board.getLawnmowers()) {
-        shapes.setColor(mower.isActive() ? mowerReady : mowerUsed);
+        // A spent mower has driven off the lawn; the doc wants it gone, not left as a ghost.
+        if (!mower.isActive()) {
+          continue;
+        }
+        shapes.setColor(mower.isAvailable() ? mowerReady : mowerUsed);
         float size = geometry.getCellHeight() * 0.32f;
         shapes.rect(geometry.columnCentreX(mower.getX()) - size / 2f,
             geometry.rowCentreY(mower.getRow()) - size / 2f, size, size);
@@ -237,7 +241,10 @@ public final class LawnRenderer implements WorldRenderer {
       float height = geometry.getCellHeight() * MOWER_HEIGHT_FRACTION;
       float width = mowerArt.getRegionWidth() * height / mowerArt.getRegionHeight();
       for (Lawnmower mower : board.getLawnmowers()) {
-        context.getBatch().setColor(1f, 1f, 1f, mower.isActive() ? 1f : 0.35f);
+        if (!mower.isActive()) {
+          continue;
+        }
+        context.getBatch().setColor(1f, 1f, 1f, 1f);
         context.getBatch().draw(mowerArt, geometry.columnCentreX(mower.getX()) - width / 2f,
             geometry.rowToY(mower.getRow()) + geometry.getCellHeight() * 0.12f, width, height);
       }
@@ -270,8 +277,11 @@ public final class LawnRenderer implements WorldRenderer {
     }
     float scale = geometry.getCellHeight() * MOWER_HEIGHT_FRACTION / reference;
     for (Lawnmower mower : board.getLawnmowers()) {
+      if (!mower.isActive()) {
+        continue;
+      }
       String clip = mower.isAvailable() ? idle : fired;
-      context.getBatch().setColor(1f, 1f, 1f, mower.isActive() ? 1f : 0.35f);
+      context.getBatch().setColor(1f, 1f, 1f, 1f);
       rig.draw(context.getBatch(), clip, playback.advance(mower, clip, frameDelta),
           geometry.columnCentreX(mower.getX()),
           geometry.rowToY(mower.getRow()) + geometry.getCellHeight() * 0.12f, scale, false);

@@ -47,6 +47,8 @@ public final class HudStage implements Disposable {
 
   private Skin skin;
   private Label sunCount;
+  /** Kept so the debug "+" beside each counter can act on the running match. */
+  private GameManager match;
   private Label status;
   private Label objective;
 
@@ -84,6 +86,7 @@ public final class HudStage implements Disposable {
       return;
     }
     this.skin = skinProvider.get();
+    this.match = match;
 
     Table root = new Table();
     root.setFillParent(true);
@@ -173,6 +176,10 @@ public final class HudStage implements Disposable {
     box.pad(6f, 16f, 6f, 18f);
     box.add(new CurrencyHud(skin)).left().padRight(20f);
     box.add(sunCounter(skin)).left();
+    if (DebugPanel.isEnabled()) {
+      box.add(DebugPanel.counterCheat(skin, match, this::toast, false))
+          .left().padLeft(6f).width(40f).height(34f);
+    }
     return box;
   }
 
@@ -303,6 +310,10 @@ public final class HudStage implements Disposable {
     countCorner.bottom().right().pad(0f, 0f, 6f, 8f);
     countCorner.add(plantFoodCount);
     tools.add(new Stack(plantFoodButton, countCorner));
+    if (DebugPanel.isEnabled()) {
+      tools.add(DebugPanel.counterCheat(skin, match, this::toast, true))
+          .width(40f).height(34f);
+    }
     tools.add(iconTool(skin, HudPlates.PAUSE, HudPlates.PAUSE_DOWN, "Pause", onPause));
     return tools;
   }

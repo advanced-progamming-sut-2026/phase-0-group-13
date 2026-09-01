@@ -106,6 +106,14 @@ public final class ConveyorBar extends WidgetGroup implements Disposable {
       String plant = plants.get(i % plants.size());
       SeedCard card = new SeedCard(skin, SeedCard.Size.COMPACT, plant, plant,
           plantArt.find(plant), hudArt, onPick);
+      // The belt's cards carry the same sun cost the seed bank's do; the doc asks for the belt to
+      // have the same capabilities as the normal seed list.
+      model.game.plant.PlantParts.PlantTemplate template =
+          data.GameDataManager.plantRepository == null
+              ? null : data.GameDataManager.plantRepository.find(plant);
+      if (template != null) {
+        card.withCost(template.cost);
+      }
       card.setSize(SeedBar.CARD_WIDTH, SeedBar.CARD_HEIGHT);
       addActor(card);
       riding.add(new Riding(card, plant, slotX(i), i));

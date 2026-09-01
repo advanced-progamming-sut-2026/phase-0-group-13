@@ -56,6 +56,47 @@ public final class DebugPanel extends Table {
             : "1 plant food added.")).padLeft(8f);
   }
 
+  /**
+   * A small "+" the HUD parks directly beside the sun and plant-food counters.
+   *
+   * <p>The doc asks for the in-match cheats to sit next to the number each one changes, rather than
+   * in the corner panel with the coin and diamond ones: the panel is a menu-wide thing, and during
+   * a match the player is looking at the counters, not at the corner. Both buttons run exactly the
+   * same commands the panel's own do.
+   *
+   * @param plantFood true for the plant-food button, false for the sun one
+   */
+  public static TextButton counterCheat(Skin skin, GameManager match, Consumer<String> notifier,
+      boolean plantFood) {
+    GamePlayController cheats = new GamePlayController();
+    TextButton button = new TextButton("+", skin, UiSkinProvider.BUTTON_PURPLE);
+    button.addListener(
+        new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+            if (plantFood) {
+              boolean full = match != null
+                  && match.getPlantFoodCount() >= model.game.GameState.MAX_PLANT_FOOD;
+              cheats.handleinput("cheat add-plant-food");
+              send(notifier, full
+                  ? "error: you cannot hold more than " + model.game.GameState.MAX_PLANT_FOOD
+                    + " plant foods"
+                  : "1 plant food added.");
+              return;
+            }
+            cheats.handleinput("cheat add -n " + SUN_PER_CLICK + " suns");
+            send(notifier, "Added " + SUN_PER_CLICK + " sun.");
+          }
+        });
+    return button;
+  }
+
+  private static void send(Consumer<String> notifier, String message) {
+    if (notifier != null) {
+      notifier.accept(message);
+    }
+  }
+
   private TextButton button(Skin skin, String text, int count, String currency) {
     TextButton button = new TextButton(text, skin, UiSkinProvider.BUTTON_PURPLE);
     button.addListener(

@@ -190,6 +190,11 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     return level;
   }
 
+  /** Whether hovering marks the whole lane rather than one tile. See drawLanes(). */
+  protected boolean highlightsWholeRow() {
+    return false;
+  }
+
   protected final int hoverRow() {
     return hoverRow;
   }
@@ -252,7 +257,11 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     shapes.begin(ShapeRenderer.ShapeType.Filled);
     for (int row = 0; row < ROWS; row++) {
       for (int col = 0; col < COLUMNS; col++) {
-        boolean hovered = row == hoverRow && col == hoverColumn;
+        // A screen where you place into a lane (I, Zombie) marks the whole row, since that is
+        // the choice the player is actually making; the rest mark the single cell under the mouse.
+        boolean hovered = highlightsWholeRow()
+            ? row == hoverRow
+            : row == hoverRow && col == hoverColumn;
         if (!hovered && !GameSettings.isGridVisible()) {
           continue;
         }

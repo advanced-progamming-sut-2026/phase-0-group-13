@@ -339,6 +339,12 @@ public final class NetworkIZombieScreen extends SnapshotIZombieScreen {
     game.switchScreen(new MultiplayerScreen(game));
   }
 
+  /** Only the zombie side places into a lane; the plant side plants into single tiles. */
+  @Override
+  protected boolean highlightsWholeRow() {
+    return role == MatchRole.ZOMBIES;
+  }
+
   @Override
   protected String onCellClicked(int row, int column) {
     if (chosen == null) {

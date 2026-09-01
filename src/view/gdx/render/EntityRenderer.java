@@ -102,6 +102,8 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float ASH_SIZE_LANES = 0.5f;
   private static final float SPARK_SIZE_LANES = 0.8f;
 
+  /** How big the plant-food marker over a glowing zombie is, as a fraction of a lane. */
+  private static final float PLANT_FOOD_MARK_FRACTION = 0.3f;
   private static final float LOOT_ICON_FRACTION = 0.34f;
   private static final float LOOT_LIFT_FRACTION = 0.7f;
 
@@ -276,14 +278,39 @@ public final class EntityRenderer implements WorldRenderer {
     drawHealAura(context, zombie);
     Color tint = flashed(zombieTint(zombie), zombie);
     context.getBatch().setColor(tint.r, tint.g, tint.b, tint.a * zombieAlpha(zombie));
-    if (drawZombieAnimation(context, zombie, delta)) {
+    if (!drawZombieAnimation(context, zombie, delta)) {
+      TextureRegion art = zombieArt.find(zombie.getName());
+      if (art != null) {
+        drawStanding(context, art, drawColumn(zombie), footRow(zombie),
+            zombieScale(zombie, art), ZOMBIE_FOOT_INSET, spinAngle(zombie));
+      }
+    }
+    drawPlantFoodCarrier(context, zombie);
+  }
+
+  /**
+   * The plant food a glowing zombie is carrying, drawn bobbing over its head.
+   *
+   * <p>Killing one is the only way to get plant food in most levels, so which zombie is holding it
+   * has to be readable at a glance: the terminal build says "glowing" in its status line and the
+   * graphical build said nothing at all. Drawn after the body so it is never hidden behind it.
+   */
+  private void drawPlantFoodCarrier(RenderContext context, Zombie zombie) {
+    if (!zombie.isShiny()) {
       return;
     }
-    TextureRegion art = zombieArt.find(zombie.getName());
-    if (art != null) {
-      drawStanding(context, art, drawColumn(zombie), footRow(zombie),
-          zombieScale(zombie, art), ZOMBIE_FOOT_INSET, spinAngle(zombie));
+    TextureRegion icon = hudArt.find("plantfood");
+    if (icon == null) {
+      return;
     }
+    float size = geometry.getCellHeight() * PLANT_FOOD_MARK_FRACTION;
+    float bob = geometry.getCellHeight() * 0.04f * (float) Math.sin(clock * 3.2f);
+    float x = geometry.columnCentreX(drawColumn(zombie)) - size / 2f;
+    float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
+        + zombieSpriteHeight(zombie) + bob;
+    context.getBatch().setColor(1f, 1f, 1f, 0.95f);
+    context.getBatch().draw(icon, x, y, size, size);
+    context.getBatch().setColor(Color.WHITE);
   }
 
   private static float zombieAlpha(Zombie zombie) {

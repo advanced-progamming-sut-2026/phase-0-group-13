@@ -19,10 +19,12 @@ import model.account.User;
 import model.game.plant.PlantParts.PlantTemplate;
 import model.game.zombie.ZombieParts.ZombieTemplate;
 import model.game.zombie.ZombieParts.ZombieTypeResolver;
+import view.gdx.animation.AnimationLibrary;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
 import view.gdx.ui.SeedCard;
+import view.gdx.ui.RigActor;
 import view.gdx.ui.UiSkinProvider;
 import view.gdx.ui.ZombieArt;
 
@@ -43,6 +45,7 @@ public final class CollectionScreen extends MenuScreen {
 
   private final PlantArt plantArt = new PlantArt();
   private final ZombieArt zombieArt = new ZombieArt();
+  private final AnimationLibrary animations = new AnimationLibrary();
   private final HudArt hudArt = new HudArt();
   private final CollectionMenuController collection = new CollectionMenuController();
   private Table content;
@@ -387,8 +390,16 @@ public final class CollectionScreen extends MenuScreen {
   }
 
   private void addSprite(Table details, String section, String name, String dir) {
-    TextureRegion region =
-        "plants".equals(section) ? plantArt.find(name) : zombieArt.find(name);
+    // The doc asks for the entity's idle animation on its almanac page, not a still packet, so the
+    // rig is tried first and the portrait is only the fallback for the few that have none.
+    boolean plant = "plants".equals(section);
+    RigActor rig = RigActor.idle(animations,
+        plant ? AnimationLibrary.PLANTS : AnimationLibrary.ZOMBIES, name);
+    if (rig != null) {
+      details.add(rig).size(300f, 200f).padBottom(14f).row();
+      return;
+    }
+    TextureRegion region = plant ? plantArt.find(name) : zombieArt.find(name);
 
     if (region == null) {
       details.add(new Label("no verified artwork", skin, "secondary")).left().padBottom(10f).row();
@@ -418,6 +429,7 @@ public final class CollectionScreen extends MenuScreen {
     super.dispose();
     plantArt.dispose();
     zombieArt.dispose();
+    animations.dispose();
     hudArt.dispose();
   }
 }
