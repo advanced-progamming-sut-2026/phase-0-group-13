@@ -525,10 +525,11 @@ public class PlantFactory {
     int range = mentions(template.baseAbility, "lawn") ? 9 : (mentions(template.baseAbility, "3x3") ? 1 : 0);
 
     if (mentions(template.baseAbility, "in one lane")) {
-      return new ExplodeAction(0, blastDamage, range).asLaneWide();
+      return new ExplodeAction(EXPLOSIVE_FUSE_TICKS, blastDamage, range, false).asLaneWide();
     }
     if (mentions(template.baseAbility, "crater")) {
-      return new ExplodeAction(0, blastDamage, Math.max(range, 1)).leavingCrater();
+      return new ExplodeAction(EXPLOSIVE_FUSE_TICKS, blastDamage, Math.max(range, 1), false)
+              .leavingCrater();
     }
 
     if (tags.contains(PlantTag.TRAP)) {
@@ -536,7 +537,8 @@ public class PlantFactory {
       return new ExplodeAction(armSeconds * TICKS_PER_SECOND, blastDamage, Math.max(range, 1), true);
     }
 
-    ExplodeAction explode = new ExplodeAction(0, blastDamage, Math.max(range, 1));
+    ExplodeAction explode =
+            new ExplodeAction(EXPLOSIVE_FUSE_TICKS, blastDamage, Math.max(range, 1), false);
     if (mentions(template.baseAbility, "ricochet")) {
       explode.withScatteringGrapes(
               GRAPE_COUNT, parseVanishSeconds(template.baseAbility) * TICKS_PER_SECOND,
@@ -553,6 +555,16 @@ public class PlantFactory {
   }
 
   private static final int GRAPE_COUNT = 6;
+
+  /**
+   * How long a thrown explosive burns before it goes off.
+   *
+   * <p>These used to detonate on the very tick they were planted, which left their rigs no chance
+   * to play the explode clip they ship -- a cherry bomb was gone before a single frame of it had
+   * been drawn. Seven ticks is the length of that clip, so the fuse and the animation are the same
+   * length by construction. Nothing about the blast itself changed: same damage, same radius.
+   */
+  private static final int EXPLOSIVE_FUSE_TICKS = 7;
   private static final int DEFAULT_GRAPE_LIFE_SECONDS = 5;
 
   private int parseVanishSeconds(String abilityText) {

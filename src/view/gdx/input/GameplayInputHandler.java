@@ -159,6 +159,11 @@ public final class GameplayInputHandler extends InputAdapter {
       GameAudio.getInstance().play(GameAudio.Sfx.SUN);
       return true;
     }
+    // Before the tool, so picking a dose up off the lawn never plants on top of it by mistake.
+    if (actions.collectPlantFoodAt(row, column)) {
+      GameAudio.getInstance().play(GameAudio.Sfx.SUN);
+      return true;
+    }
     switch (tool) {
       case SEED:
         if (actions.plantAt(row, column, selectedPlantType)) {

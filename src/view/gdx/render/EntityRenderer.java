@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import model.enums.StatusEffect;
 import model.enums.SunType;
 import model.game.Board;
 import model.game.LootDropper;
+import model.game.PlantFoodDrop;
 import model.game.Projectile;
 import model.game.Sun;
 import model.game.plant.Plant;
@@ -85,6 +87,30 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float MUZZLE_MAX_FORWARD = 0.5f;
   private static final float MUZZLE_MAX_LIFT_LANES = 0.4f;
   private static final float FREEZE_LEVELS = Plant.MAX_FREEZE_LEVEL;
+  /** How much white a full-strength hit adds on top of the sprite. */
+  private static final float HIT_FLASH_LIFT = 0.4f;
+
+  private static final String PLANT_FOOD_GLOW_REGION = "whiteburst";
+  private static final float PLANT_FOOD_GLOW_LANES = 1.5f;
+  private static final float PLANT_FOOD_GLOW_SPEED = 7f;
+  /** The plant food itself, lying on the lawn waiting to be picked up. */
+  private static final String PLANT_FOOD_REGION = "plantfood";
+  private static final float PLANT_FOOD_DROP_LANES = 0.5f;
+  private static final float PLANT_FOOD_BOB_LANES = 0.06f;
+  /** Ticks of fading left before a dose disappears. */
+  private static final int PLANT_FOOD_FADE_TICKS = 25;
+
+  /**
+   * The ice a frozen zombie sits in, borrowed from the Iceberg Lettuce's own rig: it is the frozen
+   * mass that plant is drawn inside, and the only block of ice the game ships.
+   */
+  private static final String ICE_BLOCK_RIG = "iceberglettuce";
+  private static final String ICE_BLOCK_REGION = "iceburg_85x80";
+  private static final String ICE_RIM_REGION = "iceburg_144x143";
+  private static final float ICE_RIM_FILL = 1.06f;
+  private static final float ICE_BLOCK_FILL = 1.18f;
+  private static final float ICE_BLOCK_SINK = 0.08f;
+
   private static final String OCTOPUS_RIG = "zombiebeachoctopus";
   private static final String OCTOPUS_REGION = "zombie_beach_octopus_66x76";
   private static final float OCTOPUS_ROW_FILL = 0.44f;
@@ -143,6 +169,11 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color hypnoTint = new Color(0.85f, 0.6f, 1f, 1f);
   private final Color shieldTint = new Color(0.6f, 0.8f, 0.98f, 1f);
   private final Color icedTint = new Color(0.55f, 0.8f, 1f, 1f);
+  /** Pale blue and see-through, so the zombie still reads through the ice it is stuck in. */
+  private final Color iceBlockTint = new Color(0.55f, 0.83f, 1f, 0.82f);
+  private final Color iceRimTint = new Color(0.5f, 0.8f, 1f, 0.7f);
+  /** The green a plant-food dose glows, and the colour of the food itself lying on the lawn. */
+  private final Color plantFoodGlow = new Color(0.45f, 1f, 0.35f, 1f);
   private final Color frostStep = new Color();
   /** Purple, which is the colour the doc names for a radioactive sun; it used to be green. */
   private final Color radioactiveSun = new Color(0.78f, 0.42f, 1f, 1f);
@@ -163,6 +194,9 @@ public final class EntityRenderer implements WorldRenderer {
   private float tickAlpha;
   private TextureRegion octopus;
   private boolean octopusChecked;
+  private TextureRegion iceBlockRegion;
+  private TextureRegion iceRimRegion;
+  private boolean iceBlockChecked;
   private final Map<Plant, Boolean> knownPlants = new java.util.IdentityHashMap<>();
   private final Map<Plant, Boolean> seenPlants = new java.util.IdentityHashMap<>();
   /**
@@ -275,6 +309,7 @@ public final class EntityRenderer implements WorldRenderer {
 
   private void drawPlant(RenderContext context, Plant plant, TextureRegion sheep, float delta) {
     boolean cursed = plant.isCursed() && sheep != null;
+    drawPlantFoodGlow(context, plant);
     context.getBatch().setColor(flashed(plantTint(plant), plant));
     if (!cursed && drawPlantAnimation(context, plant, delta)) {
       return;
@@ -295,14 +330,91 @@ public final class EntityRenderer implements WorldRenderer {
     drawHealAura(context, zombie);
     Color tint = flashed(zombieTint(zombie), zombie);
     context.getBatch().setColor(tint.r, tint.g, tint.b, tint.a * zombieAlpha(zombie));
-    if (!drawZombieAnimation(context, zombie, delta)) {
+    boolean rigged = drawZombieAnimation(context, zombie, delta);
+    if (!rigged) {
       TextureRegion art = zombieArt.find(zombie.getName());
       if (art != null) {
         drawStanding(context, art, drawColumn(zombie), footRow(zombie),
             zombieScale(zombie, art), ZOMBIE_FOOT_INSET, spinAngle(zombie));
       }
     }
+    drawHitFlash(context, zombie, rigged);
+    drawIceBlock(context, zombie);
+    // Last, so the carried icon sits above both the body and the ice it may be stuck in.
     drawPlantFoodCarrier(context, zombie);
+  }
+
+  /**
+   * The white kick a zombie takes when it is hit.
+   *
+   * <p>A batch colour multiplies, so tinting alone can only ever make a sprite darker -- which is
+   * why the flash was invisible on everything, the Octopus included. This lays the same frame down
+   * a second time with additive blending instead, so the sprite really does brighten, and fades
+   * out on its own as {@link HitEffects} lets the flash decay.
+   *
+   * @param rigged whether the zombie drew from its rig, so the second pass matches the first
+   */
+  private void drawHitFlash(RenderContext context, Zombie zombie, boolean rigged) {
+    float strength = hits.flashStrength(zombie);
+    if (strength <= 0f) {
+      return;
+    }
+    float lift = strength * HIT_FLASH_LIFT;
+    Batch batch = context.getBatch();
+    batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+    batch.setColor(lift, lift, lift, 1f);
+    if (rigged) {
+      // Zero delta: the same frame the zombie was just drawn on, not the next one.
+      drawZombieAnimation(context, zombie, 0f);
+    } else {
+      TextureRegion art = zombieArt.find(zombie.getName());
+      if (art != null) {
+        drawStanding(context, art, drawColumn(zombie), footRow(zombie),
+            zombieScale(zombie, art), ZOMBIE_FOOT_INSET, spinAngle(zombie));
+      }
+    }
+    batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    batch.setColor(Color.WHITE);
+  }
+
+  /**
+   * The block of ice a frozen zombie is stuck in. It is on screen for exactly as long as the
+   * {@link StatusEffect#FROZEN} effect lasts, because that is the only thing it is asking about.
+   */
+  private void drawIceBlock(RenderContext context, Zombie zombie) {
+    if (!zombie.getActiveEffects().containsKey(StatusEffect.FROZEN)) {
+      return;
+    }
+    loadIceBlock();
+    if (iceBlockRegion == null) {
+      return;
+    }
+    float height = Math.max(zombieSpriteHeight(zombie), geometry.getCellHeight() * 0.6f)
+        * ICE_BLOCK_FILL;
+    float centreX = geometry.columnCentreX(drawColumn(zombie));
+    float bottom = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
+        - height * ICE_BLOCK_SINK;
+    Batch batch = context.getBatch();
+
+    batch.setColor(iceBlockTint);
+    stamp(batch, iceBlockRegion, centreX, bottom, height);
+    batch.setColor(Color.WHITE);
+  }
+
+  /** Draws a region standing on a baseline, centred, scaled to a height. */
+  private static void stamp(Batch batch, TextureRegion region, float centreX, float bottom,
+      float height) {
+    float width = region.getRegionWidth() * height / region.getRegionHeight();
+    batch.draw(region, centreX - width / 2f, bottom, width, height);
+  }
+
+  private void loadIceBlock() {
+    if (iceBlockChecked) {
+      return;
+    }
+    iceBlockChecked = true;
+    iceBlockRegion = plantArt.findPart(ICE_BLOCK_RIG, ICE_BLOCK_REGION);
+    iceRimRegion = plantArt.findPart(ICE_BLOCK_RIG, ICE_RIM_REGION);
   }
 
   /**
@@ -409,6 +521,7 @@ public final class EntityRenderer implements WorldRenderer {
       }
       context.getBatch().setColor(Color.WHITE);
     }
+    drawPlantFoodDrops(context, board);
     for (HitEffects.LootPickup pickup : hits.getPickups()) {
       TextureRegion art = lootIcon(pickup.kind());
       if (art == null) {
@@ -814,13 +927,35 @@ public final class EntityRenderer implements WorldRenderer {
     if (clip == null) {
       return false;
     }
-    float time = playback.advance(plant, clip, delta);
+    float fuse = fuseTime(plant, animation, clip);
+    float time = fuse >= 0f ? playback.hold(plant, clip, fuse) : playback.advance(plant, clip, delta);
     float x = geometry.columnCentreX(plant.getCol());
     float y = geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * PLANT_FOOT_INSET;
     float scale = scaleFor(animation.width(clip), PLANT_ANIM_UNITS, PLANT_ROW_FILL);
     animation.draw(context.getBatch(), clip, time, x, y, scale, false);
     noteMuzzle(plant, animation, clip, time, x, y, scale);
     return true;
+  }
+
+  /**
+   * Where in its explode clip a plant with a burning fuse should be drawn, or -1 for a plant that
+   * is not one.
+   *
+   * <p>Stretched so the clip runs once across the whole fuse: the first frame lands on the tick
+   * the plant went in and the last on the tick it detonates, whatever the rig's own clip length
+   * happens to be. Driven off the fuse rather than the frame clock, so it cannot drift out of step
+   * with the blast the model schedules.
+   */
+  private float fuseTime(Plant plant, EntityAnimation animation, String clip) {
+    if (!(plant.getBehavior() instanceof model.game.plant.behavior.ExplodeAction fusing)) {
+      return -1f;
+    }
+    double burnt = fusing.fuseProgress(plant, currentTick);
+    if (burnt < 0) {
+      return -1f;
+    }
+    float length = animation.duration(clip);
+    return length <= 0f ? -1f : (float) burnt * length;
   }
 
   /**
@@ -875,10 +1010,6 @@ public final class EntityRenderer implements WorldRenderer {
       Map.entry("Potato Mine", new String[] {"attack"}),
       Map.entry("Primal Potato Mine", new String[] {"attack"}));
 
-  /** Plants whose rigs carry a wear-down sequence instead of only one idle. */
-  private static final Set<String> DAMAGE_STAGE_PLANTS =
-      Set.of("Wall-nut", "Tall-nut", "Garlic", "Explode-o-nut", "Endurian");
-
   /**
    * Which clip a plant is showing this frame, in priority order: plant food, then the arming pose
    * of a mine, then its attack while that is still running, then its idle -- damage-staged for the
@@ -886,6 +1017,16 @@ public final class EntityRenderer implements WorldRenderer {
    */
   private String plantClip(EntityAnimation animation, Plant plant) {
     int stage = growthStage(plant);
+
+    // A lit fuse outranks everything else: whatever else the plant might be showing, it is about
+    // to go off, and the clip for that has to be running from the tick it went in.
+    if (plant.getBehavior() instanceof model.game.plant.behavior.ExplodeAction fusing
+        && fusing.fuseProgress(plant, currentTick) >= 0) {
+      String blast = animation.pickClip(EXPLODE_CLIPS);
+      if (blast != null) {
+        return blast;
+      }
+    }
 
     // Plant food outranks everything: it is a one-off dose and the clip is the whole point of it.
     if (plant.isPlantFoodActive()) {
@@ -915,8 +1056,16 @@ public final class EntityRenderer implements WorldRenderer {
     return animation.pickClip(concat(damageStageClips(plant), concat(idleNames, names)));
   }
 
+  /** The clip a plant with a lit fuse plays, most specific first. */
+  private static final String[] EXPLODE_CLIPS =
+      {"attack", "explode", "stage3_explode", "stage2_explode", "stage1_explode"};
+
   /** Clip names for a plant-food dose, most specific first. */
   private static final String[] PLANT_FOOD_CLIPS = {"plantfood", "plantfood_on", "plantfood_loop"};
+
+  /** Plants whose rigs carry a wear-down sequence instead of only one idle. */
+  private static final Set<String> DAMAGE_STAGE_PLANTS =
+      Set.of("Wall-nut", "Tall-nut", "Garlic", "Explode-o-nut", "Endurian");
 
   /**
    * The wear-down clips for a defensive plant, worst damage first, or nothing for a plant whose
@@ -1395,6 +1544,54 @@ public final class EntityRenderer implements WorldRenderer {
    * The King never moves and never eats; what he does is speed up everything in his lane. That is
    * invisible unless the reach is drawn, so his own knighting burst marks it out.
    */
+  /**
+   * The plant food waiting on the lawn to be picked up. It bobs so it reads as a thing to click
+   * rather than scenery, and fades over its last couple of seconds as a warning it is about to go.
+   */
+  private void drawPlantFoodDrops(RenderContext context, Board board) {
+    TextureRegion art = hudArt.find(PLANT_FOOD_REGION);
+    if (art == null) {
+      return;
+    }
+    float lane = geometry.getCellHeight();
+    for (PlantFoodDrop drop : board.getPlantFoodDrops()) {
+      if (drop.isGone()) {
+        continue;
+      }
+      float fade = Math.min(1f, drop.getTicksLeft() / (float) PLANT_FOOD_FADE_TICKS);
+      float bob = lane * PLANT_FOOD_BOB_LANES
+          * (float) Math.sin(clock * 3.4f + drop.getColumn());
+      context.getBatch().setColor(1f, 1f, 1f, fade);
+      drawCentred(context, art, drop.getColumn(), drop.getRow(), lane * PLANT_FOOD_DROP_LANES,
+          bob, 0f);
+    }
+    context.getBatch().setColor(Color.WHITE);
+  }
+
+  /**
+   * The green burst behind a plant working off a dose of plant food. Same aura treatment the King
+   * and Ra already get, drawn before the plant so it sits behind it and never covers the artwork,
+   * and it is on screen for exactly as long as the dose is active.
+   */
+  private void drawPlantFoodGlow(RenderContext context, Plant plant) {
+    if (!plant.isPlantFoodActive()) {
+      return;
+    }
+    TextureRegion glow = hudArt.find(PLANT_FOOD_GLOW_REGION);
+    if (glow == null) {
+      return;
+    }
+    float size = geometry.getCellHeight() * PLANT_FOOD_GLOW_LANES;
+    float pulse = 0.5f + 0.28f * (float) Math.sin(clock * PLANT_FOOD_GLOW_SPEED);
+    Batch batch = context.getBatch();
+    batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+    batch.setColor(plantFoodGlow.r, plantFoodGlow.g, plantFoodGlow.b, pulse);
+    batch.draw(glow, geometry.columnCentreX(plant.getCol()) - size / 2f,
+        geometry.rowCentreY(plant.getRow()) - size / 2f, size, size);
+    batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    batch.setColor(Color.WHITE);
+  }
+
   private void drawKingAura(RenderContext context, Zombie zombie) {
     TextureRegion aura = hudArt.find("kingaura");
     if (aura == null || !(zombie.getBehavior() instanceof KingAuraZombieAction)) {
