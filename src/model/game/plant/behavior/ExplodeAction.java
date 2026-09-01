@@ -12,6 +12,7 @@ public class ExplodeAction implements PlantAction {
   private final boolean requiresContact;
   private boolean isInitialized;
   private boolean armedMessageShown;
+  private boolean detonated;
   private int scatterGrapes;
   private int scatterLifeTicks;
   private int scatterDamage;
@@ -41,6 +42,38 @@ public class ExplodeAction implements PlantAction {
    */
   public boolean isArmed() {
     return armedMessageShown;
+  }
+
+  /** How long this plant burns before it goes off, in ticks; zero for one that never waits. */
+  public int getFuseTicks() {
+    return fuseTime;
+  }
+
+  /**
+   * True while a thrown explosive is counting down and has not gone off yet.
+   *
+   * <p>These plants have a single hit point, so a zombie already standing on the tile can bite one
+   * apart during the fuse. It still goes off when that happens -- see
+   * {@code Board.triggerDeathExplosions} -- so the blast is never simply lost.
+   */
+  public boolean isFuseLit() {
+    return fuseTime > 0 && isInitialized && !requiresContact && !detonated;
+  }
+
+  /**
+   * How far through its fuse a timed explosive is, from 0 the tick it was planted to 1 the tick it
+   * detonates, or -1 when there is no fuse running.
+   *
+   * <p>The renderer plays the plant's explode clip against this rather than against the wall
+   * clock, so however long that clip happens to be it finishes exactly on the blast instead of
+   * running out early and dropping the plant back to an idle pose while the fuse is still burning.
+   */
+  public double fuseProgress(Plant plant, int currentTick) {
+    if (fuseTime <= 0 || !isInitialized || requiresContact || detonated) {
+      return -1;
+    }
+    double burnt = (currentTick - plant.getLastActionTick()) / (double) fuseTime;
+    return Math.max(0.0, Math.min(1.0, burnt));
   }
 
   @Override
@@ -106,6 +139,7 @@ public class ExplodeAction implements PlantAction {
   private boolean leavesCrater;
 
   public void detonateNow(Plant plant, Board board) {
+    detonated = true;
     System.out.printf(
             "BOOM! %s exploded at (%d, %d)%n",
             plant.getName(), plant.getCol() + 1, plant.getRow() + 1);

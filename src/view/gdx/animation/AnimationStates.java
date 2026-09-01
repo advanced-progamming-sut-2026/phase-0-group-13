@@ -35,6 +35,23 @@ public final class AnimationStates {
     return state.time;
   }
 
+  /**
+   * Puts this entity at an exact point in its clip instead of letting the frame clock carry it,
+   * for anything whose animation has to line up with a moment the simulation decides -- a fuse
+   * that must reach its last frame on the tick the plant goes off.
+   */
+  public float hold(Object entity, String clip, float time) {
+    State state = states.get(entity);
+    if (state == null) {
+      state = new State();
+      states.put(entity, state);
+    }
+    state.clip = clip;
+    state.time = Math.max(0f, time);
+    state.seenOn = frame;
+    return state.time;
+  }
+
   public void endFrame() {
     Iterator<State> it = states.values().iterator();
     while (it.hasNext()) {
