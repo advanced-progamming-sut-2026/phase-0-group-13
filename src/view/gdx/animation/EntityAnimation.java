@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -27,6 +28,7 @@ public final class EntityAnimation {
   private final float[] topBox = new float[4];
   private final Color scratch = new Color();
   private boolean[] defaultVisible;
+  private final Map<String, Loose> looseParts = new LinkedHashMap<>();
 
   EntityAnimation(PamFile pam, TextureAtlas atlas, Map<String, Float> durations) {
     Bake bake = new Bake(pam, atlas);
@@ -209,6 +211,176 @@ public final class EntityAnimation {
     }
     return any ? topBox : null;
   }
+
+
+  /**
+   * True when this rig carries one of these parts, tried in order.
+   *
+   * <p>The gibs are not universal -- the Zombosses and the Gargantuars have no {@code
+   * particle_head} -- so a caller asks first and skips the effect entirely rather than drawing a
+   * head that was never authored.
+   */
+  public boolean hasPart(String... preferred) {
+    return findPart(preferred) != null;
+  }
+
+  /**
+   * Draws one part of the rig on its own, turned about its middle: a piece that has come off.
+   *
+   * <p>Every zombie rig ships PopCap's own gibs -- {@code particle_head}, {@code particle_arm} --
+   * and its armour in each damage state, and no clip the lawn ever asks for draws any of them, so
+   * the art for a head flying off has been sitting unused. This lifts one part's quads out of the
+   * frame that poses it best and puts them down somewhere else, rotated; the rest of the rig is
+   * not drawn, and nothing here touches the clip the body itself is playing.
+   *
+   * @param height how tall to draw the piece in world units, its width following from that
+   * @param radians how far the piece has turned since it came off
+   * @return false when the rig has no such part, so the caller can drop the piece
+   */
+  public boolean drawLoosePart(Batch batch, float centreX, float centreY, float height,
+      boolean flip, float radians, String... partNames) {
+    Loose piece = loose(partNames);
+    if (piece == null || height <= 0f) {
+      return false;
+    }
+    Frame frame = frames[piece.frame];
+    float scale = height / piece.height;
+    float sx = flip ? -scale : scale;
+    float cos = MathUtils.cos(radians);
+    float sin = MathUtils.sin(radians);
+    Color batchColor = batch.getColor();
+    for (int entry : piece.entries) {
+      Part part = parts[frame.partIds[entry]];
+      float packed = tint(frame.colors[entry], batchColor);
+      int corner = entry * 8;
+      for (int c = 0; c < 4; c++) {
+        // The rig's y grows downwards, which is why draw() subtracts it; the same flip has to
+        // happen here before the turn, or the piece spins the wrong way round.
+        float dx = sx * (frame.corners[corner + c * 2] - piece.centreX);
+        float dy = -scale * (frame.corners[corner + c * 2 + 1] - piece.centreY);
+        set(vertices, CORNERS[c], centreX + dx * cos - dy * sin,
+            centreY + dx * sin + dy * cos, packed, UVS[c][0] == 0 ? part.u : part.u2,
+            UVS[c][1] == 0 ? part.v : part.v2);
+      }
+      batch.draw(part.texture, vertices, 0, 20);
+    }
+    return true;
+  }
+
+  /** Vertex slots in the order draw() writes them, so the winding matches. */
+  private static final int[] CORNERS = {Batch.X1, Batch.X2, Batch.X3, Batch.X4};
+
+  /** Which of (u, u2) and (v, v2) each of those corners takes, again matching draw(). */
+  private static final int[][] UVS = {{0, 0}, {0, 1}, {1, 1}, {1, 0}};
+
+  private Part findPart(String... preferred) {
+    for (String wanted : preferred) {
+      for (Part part : parts) {
+        if (wanted != null && part.name != null && part.name.equalsIgnoreCase(wanted)) {
+          return part;
+        }
+      }
+    }
+    // Same shape as pickClip's fallback: an exact name wins, then the shortest that contains it.
+    for (String wanted : preferred) {
+      if (wanted == null) {
+        continue;
+      }
+      String needle = wanted.toLowerCase();
+      Part best = null;
+      for (Part part : parts) {
+        if (part.name != null && part.name.toLowerCase().contains(needle)
+            && (best == null || part.name.length() < best.name.length())) {
+          best = part;
+        }
+      }
+      if (best != null) {
+        return best;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * The frame that poses a part best, with the part's quads and its middle in that frame.
+   *
+   * <p>"Best" is the frame drawing the most of the part, since a gib is authored across a handful
+   * of frames and the early ones can hold only a sliver of it. Worked out once per part.
+   */
+  private Loose loose(String... preferred) {
+    Part found = findPart(preferred);
+    if (found == null) {
+      return null;
+    }
+    Loose cached = looseParts.get(found.name);
+    if (cached != null || looseParts.containsKey(found.name)) {
+      return cached;
+    }
+    boolean[] wanted = subtree(found);
+    int bestFrame = -1;
+    int bestCount = 0;
+    float bestArea = 0f;
+    float[] bestBounds = null;
+    for (int f = 0; f < frames.length; f++) {
+      Frame frame = frames[f];
+      int count = 0;
+      float minX = Float.MAX_VALUE;
+      float minY = Float.MAX_VALUE;
+      float maxX = -Float.MAX_VALUE;
+      float maxY = -Float.MAX_VALUE;
+      for (int i = 0; i < frame.count; i++) {
+        Part part = parts[frame.partIds[i]];
+        if (!wanted[part.id] || part.texture == null) {
+          continue;
+        }
+        count++;
+        for (int c = i * 8; c < i * 8 + 8; c += 2) {
+          minX = Math.min(minX, frame.corners[c]);
+          maxX = Math.max(maxX, frame.corners[c]);
+          minY = Math.min(minY, frame.corners[c + 1]);
+          maxY = Math.max(maxY, frame.corners[c + 1]);
+        }
+      }
+      float area = count == 0 ? 0f : (maxX - minX) * (maxY - minY);
+      if (count > bestCount || (count == bestCount && area > bestArea)) {
+        bestFrame = f;
+        bestCount = count;
+        bestArea = area;
+        bestBounds = new float[] {minX, minY, maxX, maxY};
+      }
+    }
+    Loose piece = null;
+    if (bestFrame >= 0 && bestCount > 0 && bestBounds[3] > bestBounds[1]) {
+      Frame frame = frames[bestFrame];
+      int[] entries = new int[bestCount];
+      int at = 0;
+      for (int i = 0; i < frame.count; i++) {
+        Part part = parts[frame.partIds[i]];
+        if (wanted[part.id] && part.texture != null) {
+          entries[at++] = i;
+        }
+      }
+      piece = new Loose(bestFrame, entries, (bestBounds[0] + bestBounds[2]) / 2f,
+          (bestBounds[1] + bestBounds[3]) / 2f, bestBounds[3] - bestBounds[1]);
+    }
+    looseParts.put(found.name, piece);
+    return piece;
+  }
+
+  /** A part and everything hanging off it, since a gib is a little tree and not one image. */
+  private boolean[] subtree(Part root) {
+    boolean[] in = new boolean[parts.length];
+    List<Part> queue = new ArrayList<>();
+    queue.add(root);
+    for (int i = 0; i < queue.size(); i++) {
+      Part part = queue.get(i);
+      in[part.id] = true;
+      queue.addAll(part.children);
+    }
+    return in;
+  }
+
+  private record Loose(int frame, int[] entries, float centreX, float centreY, float height) {}
 
   private static void set(float[] vertices, int offset, float x, float y, float color, float u,
       float v) {

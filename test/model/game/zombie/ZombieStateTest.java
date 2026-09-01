@@ -29,6 +29,40 @@ class ZombieStateTest {
     assertEquals(50, z.getRemainingArmorHealth(), "the armor itself is untouched");
   }
 
+  // ---- how it died ------------------------------------------------------------------------
+
+  @Test
+  void aZombieAnExplosionKilledSaysSo() {
+    Zombie z = zombie(100, 0.1);
+    z.takeBlastDamage(100);
+    assertTrue(z.wasKilledByBlast(), "a blast that finished it off is a blast kill");
+  }
+
+  @Test
+  void aZombieShotToDeathIsNotABlastKill() {
+    Zombie z = zombie(100, 0.1);
+    z.takeDamage(100, false);
+    assertTrue(z.isDead(), "the shot killed it");
+    assertFalse(z.wasKilledByBlast(), "a pea is not an explosion, so it leaves no ash");
+  }
+
+  @Test
+  void survivingABlastIsNotABlastKill() {
+    Zombie z = zombie(100, 0.1);
+    z.takeBlastDamage(30);
+    assertFalse(z.wasKilledByBlast(), "it walked away from the blast; nothing died");
+  }
+
+  /** The flag is about the killing blow, not about ever having been near an explosion. */
+  @Test
+  void aBlastFollowedByABulletIsNotABlastKill() {
+    Zombie z = zombie(100, 0.1);
+    z.takeBlastDamage(60);
+    z.takeDamage(40, false);
+    assertTrue(z.isDead(), "the two together killed it");
+    assertFalse(z.wasKilledByBlast(), "the last hit was a shot, so the death is a plain one");
+  }
+
   @Test
   void armorAbsorbsDamageBeforeHealthDoes() {
     Zombie z = zombie(100, 0.1);

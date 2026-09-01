@@ -718,7 +718,7 @@ public class Board {
       }
       if (Math.abs(z.getRow() - centerRow) <= radius
               || Math.abs(z.getBottomRow() - centerRow) <= radius) {
-        z.takeDamage(damage, false);
+        z.takeBlastDamage(damage);
       }
     }
   }

@@ -40,7 +40,11 @@ public final class HitEffects {
     }
   }
 
-  public record DeathPuff(double column, int row, float age) {
+  /**
+   * @param explosive true when a blast did the killing, which is the only death the doc wants ash
+   *     on -- a zombie that was simply shot to pieces leaves dust and nothing more
+   */
+  public record DeathPuff(double column, int row, float age, boolean explosive) {
 
     public float progress() {
       return Math.min(1f, age / DEATH_SECONDS);
@@ -114,7 +118,7 @@ public final class HitEffects {
       if (age >= DEATH_SECONDS) {
         deathPuffs.remove(i);
       } else {
-        deathPuffs.set(i, new DeathPuff(puff.column(), puff.row(), age));
+        deathPuffs.set(i, new DeathPuff(puff.column(), puff.row(), age, puff.explosive()));
       }
     }
 
@@ -163,7 +167,7 @@ public final class HitEffects {
     }
     Boolean wasAlive = aliveState.get(zombie);
     if (Boolean.TRUE.equals(wasAlive) && isDead) {
-      deathPuffs.add(new DeathPuff(column, row, 0f));
+      deathPuffs.add(new DeathPuff(column, row, 0f, false));
       freshDeaths++;
     }
     seenAliveState.put(zombie, !isDead);
@@ -177,8 +181,8 @@ public final class HitEffects {
    * transition happens entirely between frames. The renderer is the one that can tell -- it keeps
    * last frame's zombies -- so it reports the death here instead.
    */
-  public void spawnDeathPuff(double column, int row) {
-    deathPuffs.add(new DeathPuff(column, row, 0f));
+  public void spawnDeathPuff(double column, int row, boolean explosive) {
+    deathPuffs.add(new DeathPuff(column, row, 0f, explosive));
     freshDeaths++;
   }
 

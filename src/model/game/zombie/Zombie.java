@@ -20,6 +20,8 @@ public class Zombie {
   private double x;
   private double y;
   private double previousX;
+  /** What did the last damage, so a death can be drawn as a blast or as a plain collapse. */
+  private boolean lastHitWasBlast;
 
   public static final int NO_CELL = -1;
 
@@ -125,6 +127,27 @@ public class Zombie {
   }
 
   public void takeDamage(int damage, boolean ignoresArmor) {
+    applyDamage(damage, ignoresArmor, false);
+  }
+
+  /**
+   * Damage from a blast rather than a bite or a pea.
+   *
+   * <p>Kept apart from {@link #takeDamage} only so the view can tell the two deaths apart: the doc
+   * asks for ash on a zombie an explosion killed, and ash was being drawn for every death because
+   * nothing anywhere recorded what had done the killing.
+   */
+  public void takeBlastDamage(int damage) {
+    applyDamage(damage, false, true);
+  }
+
+  /** True for a zombie an explosion finished off, and false for one that merely felt a blast. */
+  public boolean wasKilledByBlast() {
+    return lastHitWasBlast && isDead();
+  }
+
+  private void applyDamage(int damage, boolean ignoresArmor, boolean blast) {
+    this.lastHitWasBlast = blast;
     if (ignoresArmor) {
       this.currentHealth -= damage;
     } else {
