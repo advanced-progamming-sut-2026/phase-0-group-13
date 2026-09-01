@@ -468,6 +468,15 @@ public class ZombossAction implements ZombieAction {
     }
     plantFrozenZombiesInColumn(zombie, board, column);
     System.out.printf("Column %d froze solid, zombies and all.%n", column + 1);
+
+    // The column freeze is the mammoth putting zombies on the lawn, so it holds the summoning pose
+    // rather than the attacking one: its rig's glacier_column clips are exactly this move, and
+    // under ATTACKING the boss played its slingshot -- the missile throw -- while icing a column.
+    // attackPoseLeft is cleared because unleashUltimate arms it before dispatching here, and
+    // otherwise it would take the pose straight back the tick the summon ran out.
+    attackPoseLeft = 0;
+    summonPoseLeft = SUMMON_POSE_TICKS;
+    pose = Pose.SUMMONING;
   }
 
   /**

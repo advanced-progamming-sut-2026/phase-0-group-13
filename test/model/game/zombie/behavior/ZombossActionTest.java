@@ -209,6 +209,25 @@ class ZombossActionTest {
         "the mammoth summoned " + loose.size() + " zombies that were not frozen in its column");
   }
 
+  /**
+   * The column freeze is the mammoth putting zombies on the lawn, and its rig's glacier_column
+   * clips are that move. Under the attacking pose the renderer played its slingshot -- the missile
+   * throw -- so icing a column looked exactly like firing at one.
+   */
+  @Test
+  void theColumnFreezeHoldsTheSummoningPose() {
+    Board board = board();
+    Zombie zomboss = boss(ZombieType.ZOMBOSS_COWBOY, board);
+    ZombossAction action = (ZombossAction) zomboss.getBehavior();
+
+    boolean summoned = false;
+    for (int tick = 1; tick <= 900 && !summoned; tick++) {
+      action.execute(zomboss, board, tick);
+      summoned = action.getPose() == ZombossAction.Pose.SUMMONING;
+    }
+    assertTrue(summoned, "the mammoth never took the summoning pose in 900 ticks");
+  }
+
   // ---- holding station ------------------------------------------------------------------
 
   @Test
