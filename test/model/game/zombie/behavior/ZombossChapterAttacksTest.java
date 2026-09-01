@@ -77,6 +77,13 @@ class ZombossChapterAttacksTest {
     return boss;
   }
 
+  /** Ticks the board on until nothing the boss fired is still on its way. */
+  private static void landHazardsInFlight(Board board) {
+    for (int tick = 0; tick < 60 && !board.getBossHazards().isEmpty(); tick++) {
+      board.updateAll(tick);
+    }
+  }
+
   private static void run(Zombie boss, Board board, int ticks) {
     for (int tick = 0; tick < ticks; tick++) {
       boss.getBehavior().execute(boss, board, tick);
@@ -119,6 +126,10 @@ class ZombossChapterAttacksTest {
     Zombie boss = zomboss(board, ZombieType.ZOMBOSS_EGYPT);
 
     run(boss, board, LONG_ENOUGH);
+    // The missile is now a thing in the air rather than an instant kill, and it does its damage
+    // when it arrives. run() drives the boss alone, so the board has to be advanced for the
+    // hazards already in flight to land; what the missile then does is unchanged.
+    landHazardsInFlight(board);
 
     assertTrue(tilesOfType(board, TombStoneEffect.class) > 0,
         "the doc has the missile creating graves in two cells");

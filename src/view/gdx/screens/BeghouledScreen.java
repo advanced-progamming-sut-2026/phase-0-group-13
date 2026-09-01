@@ -14,6 +14,7 @@ import model.game.minigame.arcade.BeghouledEngine;
 import model.game.minigame.arcade.BeghouledEngine.PlantKind;
 import model.game.minigame.arcade.BeghouledEngine.Upgrade;
 import view.gdx.core.PvzGdxGame;
+import view.gdx.ui.GridMotion;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.SeedCard;
 
@@ -29,6 +30,8 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
 
   private final BeghouledEngine engine;
   private final HudArt hudArt = new HudArt();
+  /** What has just fallen, so the board is drawn settling rather than snapping. See GridMotion. */
+  private final GridMotion motion = new GridMotion(ROWS, COLUMNS);
   private final List<SeedCard> upgradeCards = new ArrayList<>();
   private final List<Upgrade> upgradeOrder = new ArrayList<>();
   private final Object[] zombieKeys = new Object[ROWS];
@@ -146,10 +149,24 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
       armedColumn = column;
       return null;
     }
+    String[][] before = snapshot();
     String result = engine.swap(armedRow, armedColumn, row, column);
+    motion.observe(before, snapshot());
     disarm();
     paintUpgrades();
     return result;
+  }
+
+  /** The grid as labels, which is all {@link GridMotion} needs to work out what moved. */
+  private String[][] snapshot() {
+    String[][] cells = new String[ROWS][COLUMNS];
+    for (int row = 0; row < ROWS; row++) {
+      for (int col = 0; col < COLUMNS; col++) {
+        PlantKind kind = engine.isCraterAt(row, col) ? null : engine.getPlantAt(row, col);
+        cells[row][col] = kind == null ? null : kind.label;
+      }
+    }
+    return cells;
   }
 
   private boolean isNeighbour(int row, int column) {
@@ -172,7 +189,9 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
 
   @Override
   protected void tickEngine() {
+    String[][] before = snapshot();
     engine.tick();
+    motion.observe(before, snapshot());
     if (armedRow >= 0 && engine.getPlantAt(armedRow, armedColumn) == null) {
       disarm();
     }
@@ -180,6 +199,7 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
 
   @Override
   protected void drawWorld(float delta) {
+    motion.advance(delta);
     Batch batch = context().getBatch();
     for (int row = 0; row < ROWS; row++) {
       for (int col = 0; col < COLUMNS; col++) {
@@ -189,7 +209,10 @@ public final class BeghouledScreen extends ArcadeBoardScreen {
         }
         PlantKind kind = engine.getPlantAt(row, col);
         if (kind != null) {
-          art.drawProp(batch, portraits[kind.ordinal()], col, row, PLANT_ROW_FILL);
+          // Drawn above its own square while it is still coming down. A row index further up the
+          // grid is further up the screen, so subtracting the lift is the fall.
+          art.drawProp(batch, portraits[kind.ordinal()], col, row - motion.liftOf(row, col),
+              PLANT_ROW_FILL);
         }
       }
     }

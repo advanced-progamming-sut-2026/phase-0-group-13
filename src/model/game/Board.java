@@ -23,6 +23,8 @@ public class Board {
   private final List<Plant> plants;
   private final SunManager sunManager;
   private final List<Projectile> projectiles;
+  /** Missiles, boulders and sharks a Zomboss has sent but that have not arrived yet. */
+  private final List<BossHazard> bossHazards = new ArrayList<>();
   private final List<Lawnmower> lawnmowers;
   private final LootDropper lootDropper;
   private static final int MAX_PENDING_NOTICES = 8;
@@ -92,6 +94,7 @@ public class Board {
     }
     retireDepartedHypnotizedZombies();
     handleProjectiles(currentTick);
+    handleBossHazards();
     handleLawnmowers();
     triggerDeathExplosions();
     handleGlowingZombieDrops();
@@ -613,6 +616,53 @@ public class Board {
     }
     return null;
   }
+  /**
+   * Advances everything a boss has in flight and lets each one act when it arrives.
+   *
+   * <p>The board does not need to know what any of them are: a hazard carries its own landing.
+   */
+  private void handleBossHazards() {
+    ListIterator<BossHazard> iterator = bossHazards.listIterator();
+    while (iterator.hasNext()) {
+      BossHazard hazard = iterator.next();
+      hazard.advance();
+      if (hazard.hasLanded()) {
+        hazard.land(this);
+        iterator.remove();
+        continue;
+      }
+      if (hazard.hasLeftTheLawn()) {
+        iterator.remove();
+        continue;
+      }
+      if (!hazard.isFalling()) {
+        // A shark eats the first thing it swims into rather than a tile it was aimed at.
+        int col = (int) Math.round(hazard.getColumn());
+        if (col >= 0 && col < columns) {
+          Plant prey = getPlantAt(hazard.getRow(), col);
+          if (prey != null && !prey.isDead()) {
+            hazard.land(this);
+            iterator.remove();
+            continue;
+          }
+        }
+      }
+      if (!hazard.isActive()) {
+        iterator.remove();
+      }
+    }
+  }
+
+  public void addBossHazard(BossHazard hazard) {
+    if (hazard != null) {
+      bossHazards.add(hazard);
+    }
+  }
+
+  public List<BossHazard> getBossHazards() {
+    return bossHazards;
+  }
+
   public void addProjectile(Projectile p) {
     projectiles.add(p);
   }

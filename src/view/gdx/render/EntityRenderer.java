@@ -15,6 +15,7 @@ import model.core.GameManager;
 import model.enums.StatusEffect;
 import model.enums.SunType;
 import model.game.Board;
+import model.game.BossHazard;
 import model.game.LootDropper;
 import model.game.Projectile;
 import model.game.Sun;
@@ -90,11 +91,19 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float OCTOPUS_ROW_FILL = 0.44f;
 
   private static final String SPLAT_REGION = "splatpea";
+  private static final String PEA_REGION = "pea";
+  private static final String SNOW_REGION = "snowgust";
   private static final String DUST_REGION = "dustpuff";
   private static final String ASH_REGION = "zombieash";
   private static final String DIRT_REGION = "dirtclods";
   private static final String PLANT_PUFF_REGION = "plantpuff";
   private static final String ARMOUR_BREAK_REGION = "armourbreak";
+
+  /** The rig the little sharks are cut from: they are the beach boss's own mech jaws. */
+  private static final String SHARK_RIG = "zombiezombossmechpirate";
+  private static final String SHARK_PART = "Zomboss_shark_jaw";
+  private static final float HAZARD_SIZE_LANES = 0.44f;
+  private static final float SHARK_SIZE_LANES = 0.5f;
 
   /** Where each piece leaves the body and how big it is drawn, both as a share of a lane. */
   private static final float HEAD_GIB_LIFT = 0.62f;
@@ -135,6 +144,9 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color healthLow = new Color(0.9f, 0.5f, 0.15f, 0.95f);
   /** The armour strip: a cold grey-blue, so it never reads as more health. */
   private final Color armourTint = new Color(0.72f, 0.78f, 0.88f, 0.95f);
+  /** A rocket is not a pea: dark and metallic, so the two are never confused mid-flight. */
+  private final Color missileTint = new Color(0.42f, 0.40f, 0.44f, 1f);
+  private final Color hazardTarget = new Color(0.95f, 0.35f, 0.25f, 1f);
   private final Color peaColor = new Color(0.55f, 0.9f, 0.3f, 1f);
   private final Color sunColor = new Color(1f, 0.85f, 0.2f, 1f);
   private final Color noArt = new Color(1f, 1f, 1f, 0.85f);
@@ -399,6 +411,7 @@ public final class EntityRenderer implements WorldRenderer {
       context.getBatch().setColor(Color.WHITE);
     }
     drawProjectiles(context, board);
+    drawBossHazards(context, board);
     TextureRegion sun = hudArt.find("sun");
     if (sun != null) {
       for (Sun s : board.getSuns()) {
@@ -426,6 +439,50 @@ public final class EntityRenderer implements WorldRenderer {
     drawSparks(context);
     context.getBatch().setColor(Color.WHITE);
     context.getBatch().end();
+  }
+
+  /**
+   * Missiles and boulders on their way down, and sharks on their way in.
+   *
+   * <p>A falling one is drawn above the tile it is aimed at and comes down onto it; the ring that
+   * marks where it will land is a shape, and goes in with the other shapes.
+   */
+  private void drawBossHazards(RenderContext context, Board board) {
+    float lane = geometry.getCellHeight();
+    for (BossHazard hazard : board.getBossHazards()) {
+      if (hazard.isFalling()) {
+        TextureRegion art = hudArt.find(
+            hazard.getKind() == BossHazard.Kind.ICE_BOULDER ? SNOW_REGION : PEA_REGION);
+        if (art == null) {
+          continue;
+        }
+        float lift = (float) (hazard.fallFraction() * BossHazard.FALL_HEIGHT_LANES) * lane;
+        context.getBatch().setColor(hazard.getKind() == BossHazard.Kind.ICE_BOULDER
+            ? Color.WHITE : missileTint);
+        drawCentred(context, art, hazard.getColumn(), hazard.getRow(),
+            lane * HAZARD_SIZE_LANES, lift, clock * -520f % 360f);
+        context.getBatch().setColor(Color.WHITE);
+        continue;
+      }
+      drawShark(context, hazard, lane);
+    }
+  }
+
+  private void drawShark(RenderContext context, BossHazard hazard, float lane) {
+    double column = lerp(hazard.getPreviousColumn(), hazard.getColumn(), tickAlpha);
+    EntityAnimation rig = animations.find(AnimationLibrary.ZOMBIES, SHARK_RIG);
+    float x = geometry.columnCentreX(column);
+    float y = geometry.rowCentreY(hazard.getRow());
+    // A little bob, so a shark reads as swimming rather than sliding along the tile.
+    float bob = lane * 0.05f * (float) Math.sin(clock * 6.5f + hazard.getRow());
+    if (rig != null && rig.drawLoosePart(context.getBatch(), x, y + bob,
+        lane * SHARK_SIZE_LANES, true, 0f, SHARK_PART)) {
+      return;
+    }
+    TextureRegion fallback = hudArt.find(SPLAT_REGION);
+    if (fallback != null) {
+      drawCentred(context, fallback, column, hazard.getRow(), lane * SHARK_SIZE_LANES);
+    }
   }
 
   private void drawImpacts(RenderContext context) {
@@ -1519,6 +1576,26 @@ public final class EntityRenderer implements WorldRenderer {
         width / 2f, targetHeight / 2f, width, targetHeight, 1f, 1f, angle);
   }
 
+  /**
+   * Where a falling hazard is going to land, drawn on the ground and closing as it comes down.
+   *
+   * <p>Without it the player has no way to move out of the way, which is the difference between an
+   * attack that can be played around and one that simply happens to them.
+   */
+  private void drawHazardTargets(ShapeRenderer shapes, Board board) {
+    float lane = geometry.getCellHeight();
+    for (BossHazard hazard : board.getBossHazards()) {
+      if (!hazard.isFalling()) {
+        continue;
+      }
+      float closing = 1f - (float) hazard.fallFraction();
+      shapes.setColor(hazardTarget.r, hazardTarget.g, hazardTarget.b, 0.25f + 0.5f * closing);
+      float radius = lane * (0.44f - 0.2f * closing);
+      shapes.circle(geometry.columnCentreX(hazard.getColumn()),
+          geometry.rowCentreY(hazard.getRow()), radius, 24);
+    }
+  }
+
   private void drawShapes(RenderContext context, Board board) {
     ShapeRenderer shapes = context.getShapes();
     Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -1546,6 +1623,7 @@ public final class EntityRenderer implements WorldRenderer {
         healthBar(shapes, zombie);
       }
     }
+    drawHazardTargets(shapes, board);
     drawHitBursts(shapes);
     drawDeathPuffs(shapes);
     shapes.end();

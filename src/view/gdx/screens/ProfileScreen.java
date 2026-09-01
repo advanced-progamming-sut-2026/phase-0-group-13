@@ -47,7 +47,8 @@ public final class ProfileScreen extends MenuScreen {
     info(panel, "Difficulty", String.valueOf(user.getDifficultyLevel()));
     info(panel, "Games played", String.valueOf(user.getRecentGames().size()));
     info(panel, "Stages completed", String.valueOf(completedStages(user)));
-    info(panel, "Highest My-Point", String.valueOf(user.getMeowPoints()));
+    info(panel, "Highest My-Point", String.valueOf(user.getHighestMeowPoints()));
+    info(panel, "Total My-Points", String.valueOf(user.getMeowPoints()));
 
     TextField newUsername = field(panel, "New Username", false);
     panel.add(button("Change Username", UiSkinProvider.BUTTON_GREEN,

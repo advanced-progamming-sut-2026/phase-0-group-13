@@ -48,6 +48,8 @@ public class User {
   private long lastShopRefreshTime;
   private long lastDailyDealPurchaseTime;
   private int meowPoints;
+  /** The best single result. Accounts saved before this existed start it at zero. */
+  private int highestMeowPoints;
   private int winStreakAtMaxDifficulty;
   public static final int MAX_DIFFICULTY_LEVEL = 5;
 
@@ -263,8 +265,24 @@ public class User {
     this.lastDailyDealPurchaseTime = lastDailyDealPurchaseTime; }
   public int getMeowPoints() { return meowPoints; }
 
+  /**
+   * The best single result, which is what the profile calls "Highest My-Point".
+   *
+   * <p>Not the running total: the profile was showing everything the player had ever earned added
+   * together, so the number only ever went up and said nothing about how well any one game went.
+   */
+  public int getHighestMeowPoints() { return highestMeowPoints; }
+
+  /**
+   * Records one result: a finished match's score, or a minigame win.
+   *
+   * @param amount what this one result was worth, which is what the high score is measured against
+   */
   public void addMeowPoints(int amount) {
     this.meowPoints += amount;
+    if (amount > highestMeowPoints) {
+      this.highestMeowPoints = amount;
+    }
   }
 
   public boolean hasUnlockedPlant(String plantName) {

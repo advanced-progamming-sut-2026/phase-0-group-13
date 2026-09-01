@@ -67,8 +67,6 @@ idle, or accept the static portrait fallback that is already in place. Neither i
 |---|---|---|
 | **EI — frozen zombies** | 25 | Frozen zombies get `frozenTint` (a blue wash) and nothing else. No ice block is drawn anywhere — there is no ice region in the HUD atlas lookup at all. |
 | **EO — necromancy cells** | 15 | The necromancy disc is drawn on graves that already exist (`LawnRenderer:306`). Cells that *will* raise a zombie are not marked ahead of time. |
-| **DP — timed-battle objectives** | 20 | `HudStage` carries one `objective` label set from a single string. No per-objective done/not-done state. |
-| **N — "Highest My-Point"** | 10 | `ProfileScreen:50` prints `user.getMeowPoints()`, which is the **cumulative** total. The rubric asks for the highest single result; `User` never records a max. |
 
 ### Polish (زیبایی)
 
@@ -82,15 +80,23 @@ idle, or accept the static portrait fallback that is already in place. Neither i
 
 ### Bonus (امتیازی)
 
-| Item | Pts | Finding |
-|---|---|---|
-| **HX / HY — beach Zomboss sharks & turbine** | 45 | Absent entirely. `grep -rn "shark\|turbine" model/` returns nothing. |
-| **HK / HQ — Egypt missile, mammoth ice chunk** | ~40 | `fireMissile` / `fireIceMissile` call `destroyPlantAt` instantly and `printf` the result. Nothing falls, nothing is drawn. |
-| **HS — mammoth spawns frozen zombies** | 25 | It freezes zombies **already on the lawn** in that column (`ZombossAction:403`); it does not spawn new frozen ones. |
-| **GS — Beghouled tweening** | 30 | `BeghouledScreen.drawWorld` reads the engine grid and draws it directly. Swaps and collapses are instant; no motion. |
-| **HL — Egypt charge** | 20 | `advanceCharge` damages `board.getPlants()` only. It never touches other zombies. |
+Nothing outstanding — see Person C's section below.
+
 
 ---
+
+### Two things this re-audit got wrong
+
+Both were caught by tests, not by reading:
+
+- **DP (20) was already done.** `GameplayScreen.objectiveText()` has rendered `[DONE]` / `[    ]`
+  per objective for `TimedWarRule` all along. The re-audit only grepped `HudStage` for the label
+  and never looked at the string being handed to it.
+- **HS (25) was never a gap.** "زامبی‌های یخ‌زده" under the ice-caves boss means the zombies the
+  player is *already* fighting get frozen, which the deep freeze already did. Making the mammoth
+  spawn frozen zombies was implemented, and then reverted: `ZombossActionTest` and
+  `ZombossChapterAttacksTest` both state that the doc gives the mammoth **no zombie spawning**.
+  The existing tests were right and the re-audit's reading was wrong.
 
 ### Done since this re-audit — Person A's share (~330 pts)
 
@@ -106,17 +112,38 @@ Verified against a real GL context, not just compiled: all 37 rigs load, **28 he
 24 armour pieces actually draw**. `DetachablePartCoverageTest` pins the part names, since a name
 that stops matching throws no piece and reports no error.
 
+### Done since this re-audit — Person C's share (~185 pts)
+
+`HK` Egypt missile (25) · `HY` turbine (30) · `HQ` mammoth boulder (15) · `HL` charge (20) ·
+`HX` sharks (15) · `GS` Beghouled settle (30) · `N` highest My-Point (10).
+
+- **A boss attack is now a thing on the lawn, not a `printf`.** New `BossHazard`: Egypt's missile
+  and the mammoth's boulder are launched, fall onto the tile they are aimed at over ~1.4s behind a
+  closing target ring, and do their damage on arrival; the beach boss's sharks swim up their rows
+  and eat the first plant they reach. The board advances them without knowing what any of them are.
+- **`HY`** — the turbine used to flatten both rows on the tick it switched on, so nothing was ever
+  seen being pulled in. It now takes the row apart from the boss's end inwards while the suction
+  runs, and drags its own zombies in bodily.
+- **`HL`** — the charge used `setX`, which drags `previousX` along with it and left the renderer
+  nothing to tween: a fast forward charge was drawn as ten 0.12-column jumps a second. New
+  `Zombie.moveTo` keeps last tick's place. The charge now also tramples the boss's own zombies.
+- **`GS`** — `GridMotion` compares two pictures of the Beghouled grid, works out how far each tile
+  fell, and the board is drawn settling instead of snapping between frames.
+- **`N`** — "Highest My-Point" showed the running total, so it only ever went up. `User` now
+  records the best single result; the total is shown on its own line beside it.
+
+Verified with 14 new tests, plus the shark art confirmed drawing against a real GL context.
+
 ## Totals
 
 | Bucket | Points still open |
 |---|---|
-| Mandatory | ~70 |
-| Polish (زیبایی) | ~130 |
-| Bonus (امتیازی) | ~160 |
+| Mandatory | ~40 — `EI` ice blocks (25), `EO` necromancy cells (15) |
+| Polish (زیبایی) | ~130 — all of it Person B's lane |
+| Bonus (امتیازی) | 0 |
 | Blocked on art | ~50 + part of CB |
 
-With the body parts done, the largest single item left is `GN` (50), and everything else is
-small and independent.
+Everything still open is Person B's share plus the two small mandatory items, `EI` and `EO`.
 
 ---
 
@@ -125,7 +152,5 @@ small and independent.
 1. ~~**Body parts — ET + EU + EV (300).**~~ Done, see above.
 2. **GN (50)** — drive the walk clip's phase from distance travelled instead of wall-clock
    delta. Localised to `EntityRenderer` + `AnimationStates`.
-3. **The four mandatory leftovers (70)** — EI, EO, DP, N. All small and independent.
-4. **FL (25), FF (25), EP (15), FB (15)** — small polish, one file each.
-5. **Bonus (160)** — HX/HY is a new entity; HK/HQ/HS/HL/GS are each a contained change to one
-   `ZombossAction` method or one screen.
+3. **The two mandatory leftovers (40)** — `EI` and `EO`. Small and independent.
+4. **`FL` (25), `FF` (25), `EP` (15), `FB` (15)** — small polish, one file each.

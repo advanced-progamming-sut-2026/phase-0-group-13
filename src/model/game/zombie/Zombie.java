@@ -222,7 +222,22 @@ public class Zombie {
   public boolean isDead() { return this.currentHealth <= 0; }
   public double getX() { return x; }
 
+  /**
+   * Puts this zombie somewhere, with no travel between here and there.
+   *
+   * <p>previousX is dragged along deliberately: the renderer tweens previousX -> x across the
+   * frames between ticks, and a zombie that has been picked up and put down did not walk, so
+   * leaving the two apart would have it slide across the lawn to its new place.
+   */
   public void setX(double x) { this.x = x; this.previousX = x; }
+
+  /**
+   * Moves this zombie under its own power, keeping the tween.
+   *
+   * <p>The opposite of {@link #setX}: last tick's place is left in previousX so the view draws the
+   * steps in between. A boss charging with setX moved in 0.12-column jumps ten times a second.
+   */
+  public void moveTo(double x) { this.previousX = this.x; this.x = x; }
   public double getY() { return y; }
   public int getRow() { return row; }
   public void setRow(int row) { this.row = row; }

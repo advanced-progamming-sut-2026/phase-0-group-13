@@ -8,9 +8,9 @@ import model.enums.PlantTag;
 import model.enums.StatusEffect;
 import model.enums.ZombieType;
 import model.game.Board;
+import model.game.BossHazard;
 import model.game.TileEffects.FireEffect;
 import model.game.TileEffects.IceTrailEffect;
-import model.game.TileEffects.TombStoneEffect;
 import model.game.plant.Plant;
 import model.game.zombie.Zombie;
 import model.game.zombie.ZombieParts.ZombieTemplate;
@@ -44,8 +44,6 @@ public class ZombossAction implements ZombieAction {
 
   private static final int FIRE_TICKS = 180;
   private static final int FREEZE_TICKS = 200;
-  private static final int GRAVE_HEALTH = 500;
-  private static final int MISSILE_GRAVES = 2;
 
   private static final int SUCK_TICKS = 25;
   private static final double SUCK_SPEED = 0.35;
@@ -56,6 +54,11 @@ public class ZombossAction implements ZombieAction {
   private static final double CRUSH_REACH = 0.7;
 
   private static final int DESTROY_DAMAGE = 100000;
+
+  /** How long a missile or a boulder is in the air, in ticks: long enough to be seen coming. */
+  private static final int HAZARD_FLIGHT_TICKS = 14;
+  private static final int SHARK_COUNT = 2;
+  private static final double SHARK_SPEED = 0.06;
 
   private final ZombieType chapter;
   private final ZombossHealth health;
@@ -72,6 +75,8 @@ public class ZombossAction implements ZombieAction {
   private boolean started;
 
   private boolean charging;
+  /** The beach boss alternates its two attacks, so both are seen rather than one at random. */
+  private boolean sharkTurn;
   private int suckTicksLeft;
   private int suckTopRow = -1;
   private double station = -1;
@@ -272,7 +277,7 @@ public class ZombossAction implements ZombieAction {
       pose = Pose.IDLE;
       return;
     }
-    zombie.setX(zombie.getX() + Math.signum(gap) * step);
+    zombie.moveTo(zombie.getX() + Math.signum(gap) * step);
     pose = Pose.MOVING;
   }
 
@@ -292,24 +297,23 @@ public class ZombossAction implements ZombieAction {
     switch (chapter) {
       case ZOMBOSS_DARK -> breatheFireball(zombie, board);
       case ZOMBOSS_COWBOY -> fireIceMissile(zombie, board);
-      case ZOMBOSS_PIRATE -> sendLittleOctopus(zombie, board);
+      case ZOMBOSS_PIRATE -> attackFromTheSea(zombie, board);
       default -> fireMissile(zombie, board);
     }
   }
 
+  /**
+   * Egypt's rocket, which is now fired rather than simply landed.
+   *
+   * <p>The plant used to die on the tick the boss chose it, so the whole attack was a line of
+   * text. The missile is put in the air instead and does its damage -- the flattened tile and the
+   * graves the blast throws up -- when it arrives, which is {@link BossHazard}'s job.
+   */
   private void fireMissile(Zombie zombie, Board board) {
     int[] cell = randomCell(board);
     System.out.printf("%s fired a missile at (%d, %d)!%n",
             zombie.getDisplayName(), cell[1] + 1, cell[0] + 1);
-    destroyPlantAt(board, cell[0], cell[1]);
-    for (int i = 0; i < MISSILE_GRAVES; i++) {
-      int[] grave = randomCell(board);
-      if (board.getPlantAt(grave[0], grave[1]) != null) {
-        continue;
-      }
-      board.placeTileEffect(grave[0], grave[1], new TombStoneEffect(GRAVE_HEALTH, true));
-      System.out.printf("The blast threw up a grave at (%d, %d).%n", grave[1] + 1, grave[0] + 1);
-    }
+    board.addBossHazard(BossHazard.missile(cell[0], cell[1], HAZARD_FLIGHT_TICKS));
   }
 
   private void breatheFireball(Zombie zombie, Board board) {
@@ -321,11 +325,41 @@ public class ZombossAction implements ZombieAction {
     spawnAt(board, ZombieType.IMP_DRAGON, cell[0], cell[1]);
   }
 
+  /** The mammoth's slingshot: the same flight as Egypt's rocket, with a colder landing. */
   private void fireIceMissile(Zombie zombie, Board board) {
     int[] cell = randomCell(board);
-    System.out.printf("%s fired an ice missile at (%d, %d)!%n",
+    System.out.printf("%s slung an ice boulder at (%d, %d)!%n",
             zombie.getDisplayName(), cell[1] + 1, cell[0] + 1);
-    destroyPlantAt(board, cell[0], cell[1]);
+    board.addBossHazard(BossHazard.iceBoulder(cell[0], cell[1], HAZARD_FLIGHT_TICKS));
+  }
+
+  /** The beach boss has two of these; alternating means neither goes unseen for a whole match. */
+  private void attackFromTheSea(Zombie zombie, Board board) {
+    if (sharkTurn) {
+      releaseSharks(zombie, board);
+    } else {
+      sendLittleOctopus(zombie, board);
+    }
+    sharkTurn = !sharkTurn;
+  }
+
+  /**
+   * Little sharks, let loose at the boss's end of the lawn to swim up their rows.
+   *
+   * <p>Unlike the octopus, which reaches out and eats a plant wherever it is, a shark has to get
+   * there: it crosses the row a tile at a time and takes the first plant it runs into, so a row
+   * the player has left empty costs them nothing.
+   */
+  private void releaseSharks(Zombie zombie, Board board) {
+    if (board.getRows() <= 0) {
+      return;
+    }
+    for (int i = 0; i < SHARK_COUNT; i++) {
+      int row = random.nextInt(board.getRows());
+      board.addBossHazard(BossHazard.shark(row, zombie.getX(), SHARK_SPEED));
+    }
+    System.out.printf("%s let %d little sharks loose on the lawn!%n",
+            zombie.getDisplayName(), SHARK_COUNT);
   }
 
   private void sendLittleOctopus(Zombie zombie, Board board) {
@@ -355,9 +389,16 @@ public class ZombossAction implements ZombieAction {
             zombie.getDisplayName(), zombie.getRow() + 1, zombie.getBottomRow() + 1);
   }
 
+  /**
+   * The charge itself: fast, forward, and over anything in the way.
+   *
+   * <p>moveTo and not setX. setX drags previousX along with it, which is right for a boss being
+   * put back on the far side of the lawn and wrong for one running across it: the renderer had
+   * nothing to tween and the charge came out as ten 0.12-column jumps a second.
+   */
   private void advanceCharge(Zombie zombie, Board board) {
     zombie.setEating(false);
-    zombie.setX(zombie.getX() - CHARGE_SPEED);
+    zombie.moveTo(zombie.getX() - CHARGE_SPEED);
     for (Plant plant : new ArrayList<>(board.getPlants())) {
       if (!plant.isDead()
               && plant.getRow() >= zombie.getRow()
@@ -366,10 +407,25 @@ public class ZombossAction implements ZombieAction {
         plant.takeDamage(DESTROY_DAMAGE);
       }
     }
+    trampleZombiesInTheWay(zombie, board);
     if (zombie.getX() <= CHARGE_STOP_COLUMN) {
       charging = false;
       zombie.setX(board.getColumns() - 1);
       System.out.printf("%s jumped back to the far side of the lawn.%n", zombie.getDisplayName());
+    }
+  }
+
+  /** A charging boss goes through its own zombies as readily as through the plants. */
+  private void trampleZombiesInTheWay(Zombie zombie, Board board) {
+    for (Zombie other : new ArrayList<>(board.getZombies())) {
+      if (other == zombie || other.isBoss() || other.isDead()) {
+        continue;
+      }
+      boolean inTheWay = other.occupiesRow(zombie.getRow())
+              || other.occupiesRow(zombie.getBottomRow());
+      if (inTheWay && Math.abs(other.getX() - zombie.getX()) <= CRUSH_REACH) {
+        other.takeDamage(DESTROY_DAMAGE, true);
+      }
     }
   }
 
@@ -420,15 +476,24 @@ public class ZombossAction implements ZombieAction {
     System.out.printf("%s opened his maw and started dragging rows %d and %d in!%n",
             zombie.getDisplayName(), suckTopRow + 1,
             Math.min(board.getRows(), suckTopRow + ROW_SPAN));
-    for (int row = suckTopRow; row < suckTopRow + ROW_SPAN && row < board.getRows(); row++) {
-      for (int col = 0; col < board.getColumns(); col++) {
-        destroyPlantAt(board, row, col);
-      }
-    }
   }
 
+  /**
+   * The turbine running: everything in those two rows comes towards the boss.
+   *
+   * <p>The rows used to be flattened on the tick the turbine switched on, so nothing was ever seen
+   * being pulled anywhere -- the plants were already gone before the suction clip had a frame on
+   * screen. Plants cannot be moved off their tile, so instead the row is taken from the boss's end
+   * inwards, one plant a tick, while its own zombies are dragged bodily in and eaten.
+   */
   private void dragRowsIn(Zombie zombie, Board board) {
     zombie.setEating(false);
+    for (int row = suckTopRow; row < suckTopRow + ROW_SPAN && row < board.getRows(); row++) {
+      Plant nearest = plantNearestTheBoss(board, row, zombie.getX());
+      if (nearest != null) {
+        nearest.takeDamage(DESTROY_DAMAGE);
+      }
+    }
     for (Zombie other : board.getZombies()) {
       if (other == zombie || other.isBoss() || other.isDead()
               || other.getRow() < suckTopRow || other.getRow() > suckTopRow + ROW_SPAN - 1) {
@@ -439,8 +504,22 @@ public class ZombossAction implements ZombieAction {
         other.takeDamage(DESTROY_DAMAGE, true);
         continue;
       }
-      other.setX(other.getX() + Math.signum(gap) * SUCK_SPEED);
+      other.moveTo(other.getX() + Math.signum(gap) * SUCK_SPEED);
     }
+  }
+
+  /** The plant in this row closest to the turbine, which is the next one to go into it. */
+  private static Plant plantNearestTheBoss(Board board, int row, double bossColumn) {
+    Plant nearest = null;
+    for (Plant plant : board.getPlants()) {
+      if (plant.isDead() || plant.getRow() != row || plant.getCol() > bossColumn) {
+        continue;
+      }
+      if (nearest == null || plant.getCol() > nearest.getCol()) {
+        nearest = plant;
+      }
+    }
+    return nearest;
   }
 
   private static int oppositeTopRow(Zombie zombie, Board board) {
