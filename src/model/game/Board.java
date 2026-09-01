@@ -451,15 +451,7 @@ public class Board {
       p.move();
 
       if (p.isFromZombie()) {
-        Plant plantHere = getPlantAt(Math.round(p.getYCoordinate()), p.getXCoordinate());
-        if (plantHere != null && !plantHere.isDead()) {
-          p.hitPlant(plantHere, currentTick);
-          iterator.remove();
-          continue;
-        }
-        if (p.getXCoordinate() < 0) {
-          iterator.remove();
-        }
+        handleZombieShot(p, iterator, currentTick);
         continue;
       }
 
@@ -475,21 +467,7 @@ public class Board {
         continue;
       }
       reaimLob(p);
-      boolean hitRegistered = false;
-      for (Zombie zombie : zombies) {
-        if (zombie.occupiesRow(p.getYCoordinate())
-                && Math.abs(zombie.getX() - p.getXCoordinate()) < 0.5) {
-          p.hitArea(zombies, zombie);
-          if (zombiesResistIce) {
-            zombie.extinguishFrozenStatus();
-          }
-          if (p.getKillCount() == 2) {
-            pendingMultiKillShots++;
-          }
-          hitRegistered = true;
-          break;
-        }
-      }
+      boolean hitRegistered = hitFirstZombieInPath(p);
       if (p.isBouncing()) {
         handleBouncingProjectile(p, iterator);
         continue;
@@ -501,6 +479,41 @@ public class Board {
       }
     }
   }
+  /** A shot a zombie fired: it lands on the first plant in its way, or leaves the lawn. */
+  private void handleZombieShot(Projectile p, ListIterator<Projectile> iterator, int currentTick) {
+    Plant plantHere = getPlantAt(Math.round(p.getYCoordinate()), p.getXCoordinate());
+    if (plantHere != null && !plantHere.isDead()) {
+      p.hitPlant(plantHere, currentTick);
+      iterator.remove();
+      return;
+    }
+    if (p.getXCoordinate() < 0) {
+      iterator.remove();
+    }
+  }
+
+  /**
+   * Lands a shot on the first zombie sharing its tile.
+   *
+   * @return true when it hit something
+   */
+  private boolean hitFirstZombieInPath(Projectile p) {
+    for (Zombie zombie : zombies) {
+      if (zombie.occupiesRow(p.getYCoordinate())
+              && Math.abs(zombie.getX() - p.getXCoordinate()) < 0.5) {
+        p.hitArea(zombies, zombie);
+        if (zombiesResistIce) {
+          zombie.extinguishFrozenStatus();
+        }
+        if (p.getKillCount() == 2) {
+          pendingMultiKillShots++;
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
   private void reaimLob(Projectile p) {
     if (!p.isLobbed() || p.isFromZombie()) {
       return;

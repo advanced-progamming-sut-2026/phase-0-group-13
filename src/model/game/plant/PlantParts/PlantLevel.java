@@ -75,6 +75,16 @@ public class PlantLevel {
     effects.add(text);
 
     if (value == null) return new PlantLevel(0, 0, 0, 0, 0, effects);
+    PlantLevel core = parseCoreStat(lower, value, effects);
+    if (core != null) return core;
+    PlantLevel extra = parseExtraStat(lower, value, effects);
+    if (extra != null) return extra;
+
+    return new PlantLevel(0, 0, 0, 0, 0, effects);
+  }
+
+  /** The five stats a level carries directly, or null when the text names none of them. */
+  private static PlantLevel parseCoreStat(String lower, int value, List<String> effects) {
     if (lower.contains("hp")) return new PlantLevel(value, 0, 0, 0, 0, effects);
     if (lower.contains("dmg") || lower.contains("damage")) return new PlantLevel(0, value, 0, 0, 0, effects);
     if (lower.contains("cost")) return new PlantLevel(0, 0, value, 0, 0, effects);
@@ -86,7 +96,11 @@ public class PlantLevel {
             || lower.contains("eat time")) {
       return new PlantLevel(0, 0, 0, 0, value, effects);
     }
+    return null;
+  }
 
+  /** The eight side stats behind {@code withExtra}, or null when the text names none of them. */
+  private static PlantLevel parseExtraStat(String lower, int value, List<String> effects) {
     if (lower.contains("atk speed")) {
       return withExtra(effects, value, 0, 0, 0, 0, 0, 0, 0);
     }
@@ -111,8 +125,7 @@ public class PlantLevel {
     if (lower.contains("targets") || lower.contains("bounces")) {
       return withExtra(effects, 0, 0, 0, 0, 0, 0, 0, value);
     }
-
-    return new PlantLevel(0, 0, 0, 0, 0, effects);
+    return null;
   }
 
   private static PlantLevel withExtra(List<String> effects, int attackSpeedPercent, int sunDelta,

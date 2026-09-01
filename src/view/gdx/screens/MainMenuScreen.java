@@ -50,41 +50,29 @@ public final class MainMenuScreen extends MenuScreen {
         new Popup.Choice("Keep playing", UiSkinProvider.BUTTON_GREEN, null));
   }
 
-  @Override
-  protected void buildContent(Table content) {
-    User user = UserManager.getInstance().getCurrentUser();
-    boolean loggedIn = user != null;
+  /** The three big buttons a signed-in player gets at the top of the menu. */
+  private void addPlayButtons(Table menu) {
+    menu.add(button("PLAY", UiSkinProvider.BUTTON_GREEN, this::play))
+        .width(420f)
+        .height(86f)
+        .padBottom(10f)
+        .row();
+    menu.add(button("MULTIPLAYER", UiSkinProvider.BUTTON_PURPLE,
+            () -> go(new MultiplayerScreen(game))))
+        .width(420f)
+        .height(64f)
+        .padBottom(10f)
+        .row();
+    menu.add(button("BONUS GAME", UiSkinProvider.BUTTON_BROWN,
+            () -> go(PlantSelectionScreen.forBonusGame(game))))
+        .width(420f)
+        .height(64f)
+        .padBottom(18f)
+        .row();
+  }
 
-    Table menu = panel();
-    menu.pad(24f, 40f, 28f, 40f);
-    menu.add(new Label(greeting(user), skin, UiSkinProvider.LABEL_MEDIUM)).padBottom(18f).row();
-
-    if (loggedIn) {
-      menu.add(button("PLAY", UiSkinProvider.BUTTON_GREEN, this::play))
-          .width(420f)
-          .height(86f)
-          .padBottom(10f)
-          .row();
-      menu.add(button("MULTIPLAYER", UiSkinProvider.BUTTON_PURPLE,
-              () -> go(new MultiplayerScreen(game))))
-          .width(420f)
-          .height(64f)
-          .padBottom(10f)
-          .row();
-      menu.add(button("BONUS GAME", UiSkinProvider.BUTTON_BROWN,
-              () -> go(PlantSelectionScreen.forBonusGame(game))))
-          .width(420f)
-          .height(64f)
-          .padBottom(18f)
-          .row();
-    } else {
-      Table entry = new Table();
-      entry.defaults().pad(8f).width(200f).height(72f);
-      entry.add(button("Login", UiSkinProvider.BUTTON_GREEN, () -> go(new LoginScreen(game))));
-      entry.add(button("Sign Up", UiSkinProvider.BUTTON_BROWN, () -> go(new SignUpScreen(game))));
-      menu.add(entry).padBottom(24f).row();
-    }
-
+  /** The two rows of smaller destinations, greyed out until someone is signed in. */
+  private void addShortcutRows(Table menu, User user, boolean loggedIn) {
     Table shortcuts = new Table();
     shortcuts.defaults().pad(5f).width(186f).height(58f);
     shortcuts.add(gated(newsLabel(user), ICON_NEWS, () -> go(new NewsScreen(game)), loggedIn));
@@ -105,6 +93,28 @@ public final class MainMenuScreen extends MenuScreen {
     shortcuts2.add(gated("Settings", ICON_SETTINGS,
         () -> go(new SettingsScreen(game)), loggedIn));
     menu.add(shortcuts2).row();
+  }
+
+  @Override
+  protected void buildContent(Table content) {
+    User user = UserManager.getInstance().getCurrentUser();
+    boolean loggedIn = user != null;
+
+    Table menu = panel();
+    menu.pad(24f, 40f, 28f, 40f);
+    menu.add(new Label(greeting(user), skin, UiSkinProvider.LABEL_MEDIUM)).padBottom(18f).row();
+
+    if (loggedIn) {
+      addPlayButtons(menu);
+    } else {
+      Table entry = new Table();
+      entry.defaults().pad(8f).width(200f).height(72f);
+      entry.add(button("Login", UiSkinProvider.BUTTON_GREEN, () -> go(new LoginScreen(game))));
+      entry.add(button("Sign Up", UiSkinProvider.BUTTON_BROWN, () -> go(new SignUpScreen(game))));
+      menu.add(entry).padBottom(24f).row();
+    }
+
+    addShortcutRows(menu, user, loggedIn);
 
     if (loggedIn) {
       menu.add(button("Logout", UiSkinProvider.BUTTON_BROWN, this::logout))

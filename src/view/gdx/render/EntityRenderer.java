@@ -499,42 +499,64 @@ public final class EntityRenderer implements WorldRenderer {
     drawGroundShadows(context, board);
     TextureRegion sheep = hudArt.find("sheep");
     for (int row = 0; row < board.getRows(); row++) {
-      for (Plant plant : board.getPlants()) {
-        if (plant.getRow() == row) {
-          drawPlant(context, plant, sheep, delta);
-        }
-      }
-      // Its own pass over the row, so an octopus is never hidden under the neighbour drawn next.
-      context.getBatch().setColor(Color.WHITE);
-      for (Plant plant : board.getPlants()) {
-        if (plant.getRow() == row) {
-          drawOctopusHold(context, plant);
-        }
-      }
-      context.getBatch().setColor(Color.WHITE);
-      for (Zombie zombie : board.getZombies()) {
-        if (footRow(zombie) == row && !zombie.isDead()) {
-          drawZombie(context, zombie, delta);
-        }
-      }
-      // In the row pass with the living, so a collapsing zombie sorts against its neighbours
-      // instead of being painted over the whole lawn afterwards.
-      drawTheFallen(context, row, delta);
-      context.getBatch().setColor(Color.WHITE);
+      drawLawnRow(context, board, row, sheep, delta);
     }
     drawProjectiles(context, board);
     drawBossHazards(context, board);
-    TextureRegion sun = hudArt.find("sun");
-    if (sun != null) {
-      for (Sun s : board.getSuns()) {
-        // the doc wants the sun kinds told apart; a big one is bigger and a radioactive one glows
-        context.getBatch().setColor(s.getType() == SunType.RADIOACTIVE ? radioactiveSun : Color.WHITE);
-        drawCentred(context, sun, s.getX(), lerp(s.getPreviousY(), s.getY(), tickAlpha),
-            geometry.getCellHeight() * (s.getType() == SunType.LARGE ? 0.58f : 0.42f));
-      }
-      context.getBatch().setColor(Color.WHITE);
-    }
+    drawSuns(context, board);
     drawPlantFoodDrops(context, board);
+    drawLootPickups(context);
+    context.getBatch().setColor(Color.WHITE);
+    drawImpacts(context);
+    drawDeaths(context);
+    drawDebris(context);
+    drawSparks(context);
+    context.getBatch().setColor(Color.WHITE);
+    context.getBatch().end();
+  }
+
+  /** One lane, in the order that keeps its plants, octopuses and zombies sorted against each other. */
+  private void drawLawnRow(RenderContext context, Board board, int row, TextureRegion sheep,
+      float delta) {
+    for (Plant plant : board.getPlants()) {
+      if (plant.getRow() == row) {
+        drawPlant(context, plant, sheep, delta);
+      }
+    }
+    // Its own pass over the row, so an octopus is never hidden under the neighbour drawn next.
+    context.getBatch().setColor(Color.WHITE);
+    for (Plant plant : board.getPlants()) {
+      if (plant.getRow() == row) {
+        drawOctopusHold(context, plant);
+      }
+    }
+    context.getBatch().setColor(Color.WHITE);
+    for (Zombie zombie : board.getZombies()) {
+      if (footRow(zombie) == row && !zombie.isDead()) {
+        drawZombie(context, zombie, delta);
+      }
+    }
+    // In the row pass with the living, so a collapsing zombie sorts against its neighbours
+    // instead of being painted over the whole lawn afterwards.
+    drawTheFallen(context, row, delta);
+    context.getBatch().setColor(Color.WHITE);
+  }
+
+  private void drawSuns(RenderContext context, Board board) {
+    TextureRegion sun = hudArt.find("sun");
+    if (sun == null) {
+      return;
+    }
+    for (Sun s : board.getSuns()) {
+      // the doc wants the sun kinds told apart; a big one is bigger and a radioactive one glows
+      context.getBatch().setColor(s.getType() == SunType.RADIOACTIVE ? radioactiveSun : Color.WHITE);
+      drawCentred(context, sun, s.getX(), lerp(s.getPreviousY(), s.getY(), tickAlpha),
+          geometry.getCellHeight() * (s.getType() == SunType.LARGE ? 0.58f : 0.42f));
+    }
+    context.getBatch().setColor(Color.WHITE);
+  }
+
+  private void drawLootPickups(RenderContext context) {
     for (HitEffects.LootPickup pickup : hits.getPickups()) {
       TextureRegion art = lootIcon(pickup.kind());
       if (art == null) {
@@ -545,13 +567,6 @@ public final class EntityRenderer implements WorldRenderer {
           geometry.getCellHeight() * LOOT_ICON_FRACTION,
           geometry.getCellHeight() * LOOT_LIFT_FRACTION * pickup.progress(), 0f);
     }
-    context.getBatch().setColor(Color.WHITE);
-    drawImpacts(context);
-    drawDeaths(context);
-    drawDebris(context);
-    drawSparks(context);
-    context.getBatch().setColor(Color.WHITE);
-    context.getBatch().end();
   }
 
   /**
@@ -1343,25 +1358,11 @@ public final class EntityRenderer implements WorldRenderer {
 
   private static final int ACTION_POSE_TICKS = 8;
 
-  private String zombieClip(EntityAnimation animation, Zombie zombie) {
-    if (zombie.isBoss()) {
-      String boss = bossClip(animation, zombie);
-      if (boss != null) {
-        return boss;
-      }
-    }
-    String suffix = propSuffix(zombie);
-    if (zombie.isEating()) {
-      // A Gargantuar has no bite. It stops at a plant and brings the pole down on it, and its rig
-      // ships smash_left for that; playing "eat" had it gumming the plant instead.
-      String[] eatNames = zombie.getBehavior() instanceof GargantuarAction
-          ? new String[] {"smash_left", "eat" + suffix, "eat"}
-          : new String[] {"eat" + suffix, "eat"};
-      String eat = animation.pickClip(eatNames);
-      if (eat != null) {
-        return eat;
-      }
-    }
+  /**
+   * The pose a zombie holds for a moment after one of its set pieces -- the Jester's spin, the
+   * Fisherman's cast, the Gargantuar's throw -- or null when it is doing none of them.
+   */
+  private String actionPoseClip(EntityAnimation animation, Zombie zombie) {
     if (zombie.getBehavior() instanceof JesterZombieAction jester && jester.isSpinning()) {
       String spin = animation.pickClip("spin_walk", "spin");
       if (spin != null) {
@@ -1384,6 +1385,32 @@ public final class EntityRenderer implements WorldRenderer {
       if (throwing != null) {
         return throwing;
       }
+    }
+    return null;
+  }
+
+  private String zombieClip(EntityAnimation animation, Zombie zombie) {
+    if (zombie.isBoss()) {
+      String boss = bossClip(animation, zombie);
+      if (boss != null) {
+        return boss;
+      }
+    }
+    String suffix = propSuffix(zombie);
+    if (zombie.isEating()) {
+      // A Gargantuar has no bite. It stops at a plant and brings the pole down on it, and its rig
+      // ships smash_left for that; playing "eat" had it gumming the plant instead.
+      String[] eatNames = zombie.getBehavior() instanceof GargantuarAction
+          ? new String[] {"smash_left", "eat" + suffix, "eat"}
+          : new String[] {"eat" + suffix, "eat"};
+      String eat = animation.pickClip(eatNames);
+      if (eat != null) {
+        return eat;
+      }
+    }
+    String held = actionPoseClip(animation, zombie);
+    if (held != null) {
+      return held;
     }
     // The rest of the roster's signature moves. Every one of these rigs ships a clip for the
     // thing its behaviour does -- the All-Star's kick, the Turquoise's sun-drain, the Tomb
@@ -1826,6 +1853,12 @@ public final class EntityRenderer implements WorldRenderer {
     shapes.end();
 
     shapes.begin(ShapeRenderer.ShapeType.Line);
+    drawMissingArtOutlines(shapes, board);
+    shapes.end();
+  }
+
+  /** A plain box for anything the renderer has neither a rig nor a still for. */
+  private void drawMissingArtOutlines(ShapeRenderer shapes, Board board) {
     shapes.setColor(noArt);
     for (Zombie zombie : board.getZombies()) {
       if (!zombie.isDead() && zombieArt.find(zombie.getName()) == null
@@ -1843,7 +1876,6 @@ public final class EntityRenderer implements WorldRenderer {
           geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * 0.16f,
           geometry.getCellWidth() * 0.44f, geometry.getCellHeight() * 0.56f);
     }
-    shapes.end();
   }
 
   private void drawHitBursts(ShapeRenderer shapes) {

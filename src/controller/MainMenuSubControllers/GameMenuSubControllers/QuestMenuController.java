@@ -201,6 +201,24 @@ public class QuestMenuController implements BaseController {
     }
   }
 
+  /** The mini-game a command name refers to, or {@code NONE} for one that is not on the list. */
+  private static MiniGameType miniGameType(String key) {
+    switch (key) {
+      case "vasebreaker":
+        return MiniGameType.VASEBREAKER;
+      case "wallnut_bowling":
+        return MiniGameType.WALLNUT_BOWLING;
+      case "i_zombie":
+        return MiniGameType.I_ZOMBIE;
+      case "beghouled":
+        return MiniGameType.BEGHOULED;
+      case "zombotany":
+        return MiniGameType.ZOMBOTANY;
+      default:
+        return MiniGameType.NONE;
+    }
+  }
+
   private void handlePlayMiniGame(String name, int level) {
     User user = requireUser();
     if (user == null) return;
@@ -223,27 +241,7 @@ public class QuestMenuController implements BaseController {
       return;
     }
 
-    MiniGameType type;
-    switch (key) {
-      case "vasebreaker":
-        type = MiniGameType.VASEBREAKER;
-        break;
-      case "wallnut_bowling":
-        type = MiniGameType.WALLNUT_BOWLING;
-        break;
-      case "i_zombie":
-        type = MiniGameType.I_ZOMBIE;
-        break;
-      case "beghouled":
-        type = MiniGameType.BEGHOULED;
-        break;
-      case "zombotany":
-        type = MiniGameType.ZOMBOTANY;
-        break;
-      default:
-        type = MiniGameType.NONE;
-        break;
-    }
+    MiniGameType type = miniGameType(key);
 
     MatchSetup.getInstance().setMiniGame(type, level);
     System.out.println("Loading Mini-Game: " + type.name() + " (Level " + level + ") ...");

@@ -110,6 +110,45 @@ public class ZombossAction implements ZombieAction {
     return stunTicksLeft;
   }
 
+  /**
+   * The states that own a whole tick on their own -- stunned, siphoning, charging, or holding the
+   * summon pose. Each of these used to return straight out of {@code execute}.
+   *
+   * @return true when one of them ran and nothing else should happen this tick
+   */
+  private boolean handleHeldPose(Zombie zombie, Board board, int currentTick) {
+    if (stunTicksLeft > 0) {
+      stunTicksLeft--;
+      pose = Pose.STUNNED;
+      zombie.setEating(false);
+      return true;
+    }
+    if (suckTicksLeft > 0) {
+      suckTicksLeft--;
+      pose = Pose.ATTACKING;
+      dragRowsIn(zombie, board);
+      return true;
+    }
+    if (charging) {
+      pose = Pose.MOVING;
+      advanceCharge(zombie, board);
+      return true;
+    }
+
+    // The summon pose runs to its end before the boss goes back to firing: the portal and spawn
+    // clips are wind-ups, and cutting one off after a tick shows nothing at all.
+    if (summonPoseLeft > 0) {
+      summonPoseLeft--;
+      // Station-keeping first and the pose after it, not the other way round: crushOrHoldStation
+      // picks a pose of its own every time it runs, so setting SUMMONING before calling it had the
+      // summon wiped on the very next tick and the portal clip never got past its first frame.
+      crushOrHoldStation(zombie, board, currentTick);
+      pose = Pose.SUMMONING;
+      return true;
+    }
+    return false;
+  }
+
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     if (zombie.isDead()) {
@@ -122,33 +161,7 @@ public class ZombossAction implements ZombieAction {
     seedTimers(currentTick);
     checkSegments(zombie);
 
-    if (stunTicksLeft > 0) {
-      stunTicksLeft--;
-      pose = Pose.STUNNED;
-      zombie.setEating(false);
-      return;
-    }
-    if (suckTicksLeft > 0) {
-      suckTicksLeft--;
-      pose = Pose.ATTACKING;
-      dragRowsIn(zombie, board);
-      return;
-    }
-    if (charging) {
-      pose = Pose.MOVING;
-      advanceCharge(zombie, board);
-      return;
-    }
-
-    // The summon pose runs to its end before the boss goes back to firing: the portal and spawn
-    // clips are wind-ups, and cutting one off after a tick shows nothing at all.
-    if (summonPoseLeft > 0) {
-      summonPoseLeft--;
-      // Station-keeping first and the pose after it, not the other way round: crushOrHoldStation
-      // picks a pose of its own every time it runs, so setting SUMMONING before calling it had the
-      // summon wiped on the very next tick and the portal clip never got past its first frame.
-      crushOrHoldStation(zombie, board, currentTick);
-      pose = Pose.SUMMONING;
+    if (handleHeldPose(zombie, board, currentTick)) {
       return;
     }
     if (movesBetweenRows() && currentTick - lastRowMoveTick >= ROW_MOVE_INTERVAL) {

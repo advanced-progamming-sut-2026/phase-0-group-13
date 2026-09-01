@@ -95,7 +95,23 @@ public class MiniGameController implements BaseController {
       handleAdvance(m);
     } else if (command.equalsIgnoreCase("show map")) {
       renderMap();
-    } else if ((m = smashVasePattern.matcher(command)).matches()) {
+    } else if (handleGameCommand(command)) {
+      return;
+    } else if (command.equalsIgnoreCase("exit")) {
+      exit();
+    } else {
+      System.out.println("invalid input or command not permitted in this mini-game.");
+    }
+  }
+
+  /**
+   * The commands that belong to one particular mini-game, tried in the order they always were.
+   *
+   * @return true when the command was one of them, whether or not the current game accepted it
+   */
+  private boolean handleGameCommand(String command) {
+    Matcher m;
+    if ((m = smashVasePattern.matcher(command)).matches()) {
       if (checkType(MiniGameType.VASEBREAKER)) {
         handleSmashVase(m);
         checkForEnd();
@@ -125,11 +141,10 @@ public class MiniGameController implements BaseController {
         System.out.println(beghouled.upgrade(m.group("type")));
         checkForEnd();
       }
-    } else if (command.equalsIgnoreCase("exit")) {
-      exit();
     } else {
-      System.out.println("invalid input or command not permitted in this mini-game.");
+      return false;
     }
+    return true;
   }
 
   private boolean checkType(MiniGameType required) {

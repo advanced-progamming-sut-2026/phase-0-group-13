@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import java.util.List;
 import model.core.GameManager;
 import model.environment.AncientEgyptSeason;
 import model.environment.BigWaveBeachSeason;
@@ -80,6 +81,19 @@ public final class StageRuleRenderer implements WorldRenderer {
     ShapeRenderer shapes = context.getShapes();
 
     shapes.begin(ShapeRenderer.ShapeType.Filled);
+    drawTornadoTrails(shapes, events, currentTick);
+    shapes.end();
+
+    shapes.begin(ShapeRenderer.ShapeType.Line);
+    drawTornadoSwirls(shapes, events, currentTick);
+    shapes.end();
+
+    drawTornadoClouds(context, events, currentTick);
+  }
+
+  /** The drag mark each tornado left across its lane, with the arrowhead at the far end. */
+  private void drawTornadoTrails(ShapeRenderer shapes,
+      List<AncientEgyptSeason.TornadoEvent> events, int currentTick) {
     for (AncientEgyptSeason.TornadoEvent event : events) {
       float fade = fadeOf(currentTick - event.tick(), AncientEgyptSeason.TORNADO_EVENT_TICKS);
       if (fade <= 0f) {
@@ -95,9 +109,10 @@ public final class StageRuleRenderer implements WorldRenderer {
       shapes.setColor(sandSwirl.r, sandSwirl.g, sandSwirl.b, fade);
       shapes.triangle(to - head, y, to, y + head * 0.55f, to, y - head * 0.55f);
     }
-    shapes.end();
+  }
 
-    shapes.begin(ShapeRenderer.ShapeType.Line);
+  private void drawTornadoSwirls(ShapeRenderer shapes,
+      List<AncientEgyptSeason.TornadoEvent> events, int currentTick) {
     for (AncientEgyptSeason.TornadoEvent event : events) {
       float fade = fadeOf(currentTick - event.tick(), AncientEgyptSeason.TORNADO_EVENT_TICKS);
       if (fade <= 0f) {
@@ -107,8 +122,11 @@ public final class StageRuleRenderer implements WorldRenderer {
       swirl(shapes, onLawn(event.fromColumn()), y, 1f, fade);
       swirl(shapes, onLawn(event.toColumn()), y, 0.6f, fade);
     }
-    shapes.end();
+  }
 
+  /** The sand itself, over the shapes: a streak along the path and a cloud at either end. */
+  private void drawTornadoClouds(RenderContext context,
+      List<AncientEgyptSeason.TornadoEvent> events, int currentTick) {
     TextureRegion cloud = hudArt.find("sandcloud");
     TextureRegion streak = hudArt.find("sandstreak");
     if (cloud == null) {
@@ -183,6 +201,19 @@ public final class StageRuleRenderer implements WorldRenderer {
     Gdx.gl.glEnable(GL20.GL_BLEND);
     ShapeRenderer shapes = context.getShapes();
     shapes.begin(ShapeRenderer.ShapeType.Filled);
+    drawWindBands(shapes, left, width, bottom, height, frontX, fade);
+    shapes.end();
+
+    shapes.begin(ShapeRenderer.ShapeType.Line);
+    drawWindStreaks(shapes, left, width, bottom, height, frontX, progress, fade);
+    shapes.end();
+
+    drawWindGusts(context, left, width, bottom, height, frontX, progress, fade);
+  }
+
+  /** The lane the wind is blowing down: a wash over the whole row, brighter at its leading edge. */
+  private void drawWindBands(ShapeRenderer shapes, float left, float width, float bottom,
+      float height, float frontX, float fade) {
     shapes.setColor(windBand.r, windBand.g, windBand.b, 0.45f * fade);
     shapes.rect(left, bottom, width, height);
     shapes.setColor(windGust.r, windGust.g, windGust.b, 0.85f * fade);
@@ -192,9 +223,10 @@ public final class StageRuleRenderer implements WorldRenderer {
     shapes.setColor(windGust.r, windGust.g, windGust.b, 0.95f * fade);
     shapes.rect(left, bottom, width, edge);
     shapes.rect(left, bottom + height - edge, width, edge);
-    shapes.end();
+  }
 
-    shapes.begin(ShapeRenderer.ShapeType.Line);
+  private void drawWindStreaks(ShapeRenderer shapes, float left, float width, float bottom,
+      float height, float frontX, float progress, float fade) {
     shapes.setColor(windGust.r, windGust.g, windGust.b, fade);
     for (int streak = 0; streak < 5; streak++) {
       float y = bottom + height * (0.22f + 0.14f * streak);
@@ -202,8 +234,10 @@ public final class StageRuleRenderer implements WorldRenderer {
       float x = frontX + geometry.getCellWidth() * 0.25f * (streak % 3);
       shapes.line(Math.max(left, x - tail), y, Math.min(left + width, x), y);
     }
-    shapes.end();
+  }
 
+  private void drawWindGusts(RenderContext context, float left, float width, float bottom,
+      float height, float frontX, float progress, float fade) {
     TextureRegion gust = hudArt.find("snowgust");
     if (gust == null) {
       return;
