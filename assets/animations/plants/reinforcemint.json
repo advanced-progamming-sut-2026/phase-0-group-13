@@ -1,0 +1,20 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "intro": 2,
+        "loop": 10,
+        "outro": 1.2
+      },
+      "name": "REINFORCEMINT",
+      "pam": "768/INITIAL/EMPOWERMINTS/PLANT/REINFORCEMINT/REINFORCEMINT.PAM"
+    }
+  ],
+  "atlas": "textures/plants/reinforcemint.atlas",
+  "entity": "Reinforce-mint",
+  "source_folder": "images/768/.../reinforcemint"
+}

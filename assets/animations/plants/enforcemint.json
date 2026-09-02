@@ -1,0 +1,20 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "intro": 2.8333,
+        "loop": 3.3667,
+        "outro": 2.1667
+      },
+      "name": "ENFORCEMINT",
+      "pam": "768/INITIAL/EMPOWERMINTS/PLANT/ENFORCEMINT/ENFORCEMINT.PAM"
+    }
+  ],
+  "atlas": "textures/plants/enforcemint.atlas",
+  "entity": "Enforce-mint",
+  "source_folder": "images/768/.../enforcemint"
+}

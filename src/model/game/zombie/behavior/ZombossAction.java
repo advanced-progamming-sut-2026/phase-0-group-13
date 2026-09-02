@@ -58,6 +58,13 @@ public class ZombossAction implements ZombieAction {
   /** How long a missile or a boulder is in the air, in ticks: long enough to be seen coming. */
   private static final int HAZARD_FLIGHT_TICKS = 14;
   private static final int SHARK_COUNT = 2;
+
+  /** How many of the iced column's tiles get a zombie planted in them, at most one per row. */
+  private static final int FROZEN_COLUMN_ZOMBIES = 3;
+
+  /** Frostbite's own walkers, so what thaws out of the ice belongs to the chapter. */
+  private static final ZombieType[] FROZEN_MINION_TYPES =
+      {ZombieType.TROGLOBITE, ZombieType.HUNTER, ZombieType.CONEHEAD};
   private static final double SHARK_SPEED = 0.06;
 
   private final ZombieType chapter;
@@ -472,7 +479,54 @@ public class ZombossAction implements ZombieAction {
         other.applyEffect(StatusEffect.FROZEN, FREEZE_TICKS);
       }
     }
+    plantFrozenZombiesInColumn(zombie, board, column);
     System.out.printf("Column %d froze solid, zombies and all.%n", column + 1);
+
+    // The column freeze is the mammoth putting zombies on the lawn, so it holds the summoning pose
+    // rather than the attacking one: its rig's glacier_column clips are exactly this move, and
+    // under ATTACKING the boss played its slingshot -- the missile throw -- while icing a column.
+    // attackPoseLeft is cleared because unleashUltimate arms it before dispatching here, and
+    // otherwise it would take the pose straight back the tick the summon ran out.
+    attackPoseLeft = 0;
+    summonPoseLeft = SUMMON_POSE_TICKS;
+    pose = Pose.SUMMONING;
+  }
+
+  /**
+   * The other half of the mammoth's column freeze: it plants frozen zombies in the tiles it just
+   * iced over.
+   *
+   * <p>The doc's move is "freezes one column at random and plants frozen zombies in that column's
+   * tiles"; only the icing was happening, so the column went cold and stayed empty and the move
+   * cost the player nothing once it thawed. These arrive frozen for as long as the ice lasts,
+   * which is the same deal Frostbite's own frozen zombies get, and thaw into ordinary walkers.
+   *
+   * <p>Not a contradiction of the mammoth summoning no zombies: that rule is about the roaming
+   * minions the other three bosses drop, and these are part of this one's own attack.
+   */
+  private void plantFrozenZombiesInColumn(Zombie zombie, Board board, int column) {
+    if (GameDataManager.zombieRepository == null || board.getRows() <= 0) {
+      return;
+    }
+    String alias = aliasForAny(FROZEN_MINION_TYPES);
+    if (alias == null) {
+      return;
+    }
+    int planted = 0;
+    for (int row = 0; row < board.getRows() && planted < FROZEN_COLUMN_ZOMBIES; row++) {
+      Zombie frozen = new ZombieFactory(GameDataManager.zombieRepository)
+              .createZombie(alias, row, column);
+      if (frozen == null) {
+        continue;
+      }
+      frozen.applyEffect(StatusEffect.FROZEN, FREEZE_TICKS);
+      board.spawnZombie(frozen);
+      planted++;
+    }
+    if (planted > 0) {
+      System.out.printf("%s planted %d frozen zombies down column %d.%n",
+              zombie.getDisplayName(), planted, column + 1);
+    }
   }
 
   private void freezePlantsInRow(Board board, int row, int currentTick) {
@@ -593,6 +647,11 @@ public class ZombossAction implements ZombieAction {
   }
 
   private static String aliasFor(ZombieType type) {
+    // Guarded here as well as at each call site: every caller has to check anyway, and one that
+    // forgets gets a null alias and a summon that does not happen rather than an NPE mid-tick.
+    if (GameDataManager.zombieRepository == null) {
+      return null;
+    }
     for (ZombieTemplate template : GameDataManager.zombieRepository.getAll()) {
       String alias = template.getName();
       if (alias != null && alias.startsWith("Zombie")

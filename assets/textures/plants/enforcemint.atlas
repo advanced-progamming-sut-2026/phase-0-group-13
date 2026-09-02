@@ -1,0 +1,117 @@
+plantenforcemint_768_00.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+enforcemint_112x32
+  rotate: false
+  xy: 137, 221
+  size: 72, 21
+  orig: 72, 21
+  offset: 0, 0
+  index: -1
+enforcemint_112x32_2
+  rotate: false
+  xy: 1, 233
+  size: 72, 21
+  orig: 72, 21
+  offset: 0, 0
+  index: -1
+enforcemint_113x151
+  rotate: false
+  xy: 167, 1
+  size: 73, 97
+  orig: 73, 97
+  offset: 0, 0
+  index: -1
+enforcemint_117x105
+  rotate: false
+  xy: 60, 164
+  size: 75, 67
+  orig: 75, 67
+  offset: 0, 0
+  index: -1
+enforcemint_14x16
+  rotate: false
+  xy: 242, 25
+  size: 9, 10
+  orig: 9, 10
+  offset: 0, 0
+  index: -1
+enforcemint_163x163
+  rotate: false
+  xy: 60, 1
+  size: 105, 105
+  orig: 105, 105
+  offset: 0, 0
+  index: -1
+enforcemint_16x17
+  rotate: false
+  xy: 242, 1
+  size: 10, 11
+  orig: 10, 11
+  offset: 0, 0
+  index: -1
+enforcemint_18x13
+  rotate: false
+  xy: 242, 14
+  size: 12, 9
+  orig: 12, 9
+  offset: 0, 0
+  index: -1
+enforcemint_229x84
+  rotate: false
+  xy: 60, 108
+  size: 147, 54
+  orig: 147, 54
+  offset: 0, 0
+  index: -1
+enforcemint_26x33
+  rotate: false
+  xy: 211, 214
+  size: 17, 21
+  orig: 17, 21
+  offset: 0, 0
+  index: -1
+enforcemint_37x31
+  rotate: false
+  xy: 192, 192
+  size: 24, 20
+  orig: 24, 20
+  offset: 0, 0
+  index: -1
+enforcemint_37x31_2
+  rotate: false
+  xy: 218, 192
+  size: 24, 20
+  orig: 24, 20
+  offset: 0, 0
+  index: -1
+enforcemint_58x69
+  rotate: false
+  xy: 209, 100
+  size: 37, 44
+  orig: 37, 44
+  offset: 0, 0
+  index: -1
+enforcemint_58x69_2
+  rotate: false
+  xy: 209, 146
+  size: 37, 44
+  orig: 37, 44
+  offset: 0, 0
+  index: -1
+enforcemint_83x86
+  rotate: false
+  xy: 137, 164
+  size: 53, 55
+  orig: 53, 55
+  offset: 0, 0
+  index: -1
+enforcemint_89x327
+  rotate: false
+  xy: 1, 1
+  size: 57, 210
+  orig: 57, 210
+  offset: 0, 0
+  index: -1

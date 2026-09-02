@@ -107,6 +107,45 @@
   },
   "note": "Region names are the upstream path leaf, unchanged. Atlas pages keep their upstream file name, lowercased. Every runtime file here is a byte copy of a file under resources/raw/pvz2/ATLASES.",
   "plants": {
+    "Appease-mint": {
+      "animation_data": "animations/plants/appeasemint.json",
+      "atlas": "appeasemint.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantappeasemint_768_00.png"
+      ],
+      "regions": 18,
+      "source_folder": "images/768/.../appeasemint",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTAPPEASEMINT_768_00"
+      ]
+    },
+    "Arma-mint": {
+      "animation_data": "animations/plants/armamint.json",
+      "atlas": "armamint.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantarmamint_768_00.png"
+      ],
+      "regions": 29,
+      "source_folder": "images/768/.../armamint",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTARMAMINT_768_00"
+      ]
+    },
+    "Bombard-mint": {
+      "animation_data": "animations/plants/bombardmint.json",
+      "atlas": "bombardmint.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantbombardmint_768_00.png"
+      ],
+      "regions": 23,
+      "source_folder": "images/768/.../bombardmint",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTBOMBARDMINT_768_00"
+      ]
+    },
     "Bonk Choy": {
       "animation_data": "animations/plants/bonkchoy.json",
       "atlas": "bonkchoy.atlas",
@@ -239,6 +278,19 @@
         "ATLASIMAGE_ATLAS_PLANTELECTRICBLUEBERRY_768_00"
       ]
     },
+    "Enchant-mint": {
+      "animation_data": "animations/plants/enchantmint.json",
+      "atlas": "enchantmint.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantenchantmint_768_00.png"
+      ],
+      "regions": 18,
+      "source_folder": "images/768/.../enchantmint",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTENCHANTMINT_768_00"
+      ]
+    },
     "Endurian": {
       "animation_data": "animations/plants/endurian.json",
       "atlas": "endurian.atlas",
@@ -250,6 +302,32 @@
       "source_folder": "images/768/.../endurian",
       "source_pages": [
         "ATLASIMAGE_ATLAS_PLANTENDURIAN_768_00"
+      ]
+    },
+    "Enforce-mint": {
+      "animation_data": "animations/plants/enforcemint.json",
+      "atlas": "enforcemint.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantenforcemint_768_00.png"
+      ],
+      "regions": 16,
+      "source_folder": "images/768/.../enforcemint",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTENFORCEMINT_768_00"
+      ]
+    },
+    "Enlighten-mint": {
+      "animation_data": "animations/plants/enlightenmint.json",
+      "atlas": "enlightenmint.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantenlightenmint_768_00.png"
+      ],
+      "regions": 22,
+      "source_folder": "images/768/.../enlightenmint",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTENLIGHTENMINT_768_00"
       ]
     },
     "Explode-o-nut": {
@@ -564,6 +642,19 @@
         "ATLASIMAGE_ATLAS_PLANTPHATBEET_768_00"
       ]
     },
+    "Pierce-mint": {
+      "animation_data": "animations/plants/piercemint.json",
+      "atlas": "piercemint.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantspearmint_768_00.png"
+      ],
+      "regions": 25,
+      "source_folder": "images/768/.../spearmint",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTSPEARMINT_768_00"
+      ]
+    },
     "Potato Mine": {
       "animation_data": "animations/plants/potatomine.json",
       "atlas": "potatomine.atlas",
@@ -627,6 +718,19 @@
       "source_folder": "images/768/.../pumpkin",
       "source_pages": [
         "ATLASIMAGE_ATLAS_PLANTPUMPKIN_768_00"
+      ]
+    },
+    "Reinforce-mint": {
+      "animation_data": "animations/plants/reinforcemint.json",
+      "atlas": "reinforcemint.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantreinforcemint_768_00.png"
+      ],
+      "regions": 24,
+      "source_folder": "images/768/.../reinforcemint",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTREINFORCEMINT_768_00"
       ]
     },
     "Repeater": {
@@ -875,6 +979,19 @@
       "source_pages": [
         "ATLASIMAGE_ATLAS_PLANTWINTERMELON_768_00"
       ]
+    },
+    "catTail-mint": {
+      "animation_data": "animations/plants/cattailmint.json",
+      "atlas": "cattailmint.atlas",
+      "duplicate_region_names": [],
+      "pages": [
+        "plantailmint_768_00.png"
+      ],
+      "regions": 33,
+      "source_folder": "images/768/.../ailmint",
+      "source_pages": [
+        "ATLASIMAGE_ATLAS_PLANTAILMINT_768_00"
+      ]
     }
   },
   "resolution": "768",
@@ -961,53 +1078,8 @@
       "roster": "environment animations"
     },
     {
-      "entity": "Appease-mint",
-      "reason": "no 768 art folder whose name normalises to appeasemint",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "Arma-mint",
-      "reason": "no 768 art folder whose name normalises to armamint",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "Bombard-mint",
-      "reason": "no 768 art folder whose name normalises to bombardmint",
-      "roster": "plants.json"
-    },
-    {
       "entity": "Cat-tail",
       "reason": "no 768 art folder whose name normalises to cattail",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "Enchant-mint",
-      "reason": "no 768 art folder whose name normalises to enchantmint",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "Enforce-mint",
-      "reason": "no 768 art folder whose name normalises to enforcemint",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "Enlighten-mint",
-      "reason": "no 768 art folder whose name normalises to enlightenmint",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "Pierce-mint",
-      "reason": "no 768 art folder whose name normalises to piercemint",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "Reinforce-mint",
-      "reason": "no 768 art folder whose name normalises to reinforcemint",
-      "roster": "plants.json"
-    },
-    {
-      "entity": "catTail-mint",
-      "reason": "no 768 art folder whose name normalises to cattailmint",
       "roster": "plants.json"
     }
   ],

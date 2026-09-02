@@ -30,29 +30,83 @@ class WiredClipCoverageTest {
   private static final Path PLANTS = Path.of("assets", "animations", "plants");
   private static final Path ZOMBIES = Path.of("assets", "animations", "zombies");
 
+  private static final Path ROSTER = Path.of("src", "data", "database", "plants.json");
+
+  /** Kept in step with EntityRenderer.PLANT_FOOD_CLIPS, which is what the lawn actually asks. */
+  private static final String[] PLANT_FOOD_CLIPS =
+      {"plantfood", "plantfood_on", "plantfood_loop", "pf"};
+
   /**
-   * Plants with no plant-food clip, every one of them a plant with no plant-food effect to show.
-   * plants.json marks these "None (single-use plant)" -- a cherry bomb has already gone off by the
-   * time a dose could land on it -- so the gap is in the game's design, not in the wiring.
+   * Plants with no plant-food clip to show, read off the roster rather than listed here: a plant
+   * whose "Plant Food Effect" is "None (single-use plant)" has already gone off by the time a dose
+   * could land on it, so the gap is in the game's design and not in the wiring.
+   *
+   * <p>Read rather than hardcoded because a hardcoded copy goes stale silently the moment a rig is
+   * added -- which is exactly what the nine mints did.
    */
-  private static final Set<String> NO_PLANT_FOOD = Set.of(
-      "gravebuster", "seashroom", "goldbloom", "cherrybomb", "grapeshot",
-      "jalapeno", "imitater", "doomshroom", "hotpotato", "tallnut");
+  private static Set<String> rigsWithNoPlantFood() throws IOException {
+    Set<String> out = new LinkedHashSet<>();
+    for (var element : JsonParser.parseString(Files.readString(ROSTER)).getAsJsonArray()) {
+      JsonObject plant = element.getAsJsonObject();
+      String effect = plant.has("Plant Food Effect")
+          ? plant.get("Plant Food Effect").getAsString() : "";
+      if (effect.toLowerCase().startsWith("none")) {
+        out.add(normalise(plant.get("Name").getAsString()));
+      }
+    }
+    return out;
+  }
+
+  /** The rule the extractor names manifests by: lowercase, letters and digits only. */
+  private static String normalise(String name) {
+    return name.toLowerCase().replaceAll("[^a-z0-9]", "");
+  }
+
+  /**
+   * Tall-nut takes a dose -- the roster gives it permanent armour for one -- but its rig carries
+   * only idle, damage and damage2, so there is no clip to play and nothing to wire. Listed here
+   * on its own rather than folded in with the single-use plants, which are exempt for a different
+   * reason entirely; drop this line if the art is ever authored.
+   */
+  private static final Set<String> NO_PLANT_FOOD_ART = Set.of("tallnut");
 
   @Test
   void everyPlantThatCanTakePlantFoodHasAClipForIt() throws IOException {
+    Set<String> exempt = new LinkedHashSet<>(rigsWithNoPlantFood());
+    exempt.addAll(NO_PLANT_FOOD_ART);
     List<String> missing = new ArrayList<>();
     for (Path rig : manifests(PLANTS)) {
       String name = rigName(rig);
-      if (NO_PLANT_FOOD.contains(name)) {
+      if (exempt.contains(name)) {
         continue;
       }
-      if (pick(clipsOf(rig), "plantfood", "plantfood_on", "plantfood_loop") == null) {
+      if (pick(clipsOf(rig), PLANT_FOOD_CLIPS) == null) {
         missing.add(name);
       }
     }
     assertTrue(missing.isEmpty(),
         "plant rigs with no plantfood clip that were expected to have one: " + missing);
+  }
+
+  /**
+   * The mints are the only rigs in the library built as intro/loop/outro with no idle at all, and
+   * the doc asks for both the idle and the short entry animation. Both have to resolve, or a mint
+   * shows a still: "idle" finds nothing on these rigs, which is why the renderer also asks for
+   * "loop".
+   */
+  @Test
+  void everyMintHasBothTheClipsTheRendererAsksItFor() throws IOException {
+    List<String> rigs = new ArrayList<>();
+    for (Path rig : manifests(PLANTS)) {
+      if (rigName(rig).endsWith("mint")) {
+        rigs.add(rigName(rig));
+        List<String> clips = clipsOf(rig);
+        assertTrue(clips.contains("intro"), rigName(rig) + " has no intro clip");
+        assertTrue(pick(clips, "idle", "loop") != null,
+            rigName(rig) + " resolves to no standing clip at all");
+      }
+    }
+    assertEquals(9, rigs.size(), "expected the roster's nine mints to have rigs, found " + rigs);
   }
 
   @Test

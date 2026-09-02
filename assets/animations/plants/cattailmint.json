@@ -1,0 +1,20 @@
+{
+  "animations": [
+    {
+      "canvas": [
+        390,
+        390
+      ],
+      "clips": {
+        "intro": 2.3333,
+        "loop": 1.3667,
+        "outro": 2.3333
+      },
+      "name": "AILMINT",
+      "pam": "768/INITIAL/EMPOWERMINTS/PLANT/AILMINT/AILMINT.PAM"
+    }
+  ],
+  "atlas": "textures/plants/cattailmint.atlas",
+  "entity": "catTail-mint",
+  "source_folder": "images/768/.../ailmint"
+}
