@@ -319,11 +319,12 @@ public final class EntityRenderer implements WorldRenderer {
     context.getBatch().setColor(Color.WHITE);
   }
 
-  private void drawPlant(RenderContext context, Plant plant, TextureRegion sheep, float delta) {
+  private void drawPlant(RenderContext context, Plant plant, TextureRegion sheep, float delta,
+      boolean onWater) {
     boolean cursed = plant.isCursed() && sheep != null;
     drawPlantFoodGlow(context, plant);
     context.getBatch().setColor(flashed(plantTint(plant), plant));
-    if (!cursed && drawPlantAnimation(context, plant, delta)) {
+    if (!cursed && drawPlantAnimation(context, plant, delta, onWater)) {
       return;
     }
     TextureRegion art = cursed ? sheep : plantArt.find(plant.getName());
@@ -520,7 +521,8 @@ public final class EntityRenderer implements WorldRenderer {
       float delta) {
     for (Plant plant : board.getPlants()) {
       if (plant.getRow() == row) {
-        drawPlant(context, plant, sheep, delta);
+        drawPlant(context, plant, sheep, delta,
+            board.isWaterAt(plant.getRow(), plant.getCol()));
       }
     }
     // Its own pass over the row, so an octopus is never hidden under the neighbour drawn next.
@@ -993,9 +995,10 @@ public final class EntityRenderer implements WorldRenderer {
     return PLANT_IDLE_BOB_FRACTION * (float) Math.sin(clock * PLANT_IDLE_SPEED + phase);
   }
 
-  private boolean drawPlantAnimation(RenderContext context, Plant plant, float delta) {
+  private boolean drawPlantAnimation(RenderContext context, Plant plant, float delta,
+      boolean onWater) {
     EntityAnimation animation = animations.find(AnimationLibrary.PLANTS, plant.getName());
-    String clip = animation == null ? null : plantClip(animation, plant);
+    String clip = animation == null ? null : plantClip(animation, plant, onWater);
     if (clip == null) {
       return false;
     }
@@ -1003,7 +1006,9 @@ public final class EntityRenderer implements WorldRenderer {
     float time = fuse >= 0f ? playback.hold(plant, clip, fuse) : playback.advance(plant, clip, delta);
     float x = geometry.columnCentreX(plant.getCol());
     float y = geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * PLANT_FOOT_INSET;
-    float scale = scaleFor(animation.width(clip), PLANT_ANIM_UNITS, PLANT_ROW_FILL);
+    float scale = HALO_WIDE_PLANTS.contains(plant.getName())
+        ? geometry.getCellHeight() * PLANT_ROW_FILL / PLANT_ANIM_UNITS
+        : scaleFor(animation.width(clip), PLANT_ANIM_UNITS, PLANT_ROW_FILL);
     animation.draw(context.getBatch(), clip, time, x, y, scale, false);
     noteMuzzle(plant, animation, clip, time, x, y, scale);
     return true;
@@ -1087,7 +1092,7 @@ public final class EntityRenderer implements WorldRenderer {
    * of a mine, then its attack while that is still running, then its idle -- damage-staged for the
    * plants whose rigs wear down as they are eaten.
    */
-  private String plantClip(EntityAnimation animation, Plant plant) {
+  private String plantClip(EntityAnimation animation, Plant plant, boolean onWater) {
     int stage = growthStage(plant);
 
     // A lit fuse outranks everything else: whatever else the plant might be showing, it is about
@@ -1122,6 +1127,17 @@ public final class EntityRenderer implements WorldRenderer {
       }
     }
 
+    // Standing in water is a resting pose, not an action: 55 of the rigs ship a "water" variant
+    // that sits the plant in the surface with ripples round it, and the Big Wave Beach tide floods
+    // tiles under plants that are already there. Nothing ever asked for it, so a flooded lawn drew
+    // every plant bolt upright on dry land.
+    if (onWater) {
+      String wet = animation.pickClip("water");
+      if (wet != null) {
+        return wet;
+      }
+    }
+
     String[] idleNames = stage > 0
         ? new String[] {"idle_stage" + stage, "idle"}
         : new String[] {"idle"};
@@ -1132,12 +1148,32 @@ public final class EntityRenderer implements WorldRenderer {
   private static final String[] EXPLODE_CLIPS =
       {"attack", "explode", "stage3_explode", "stage2_explode", "stage1_explode"};
 
-  /** Clip names for a plant-food dose, most specific first. */
-  private static final String[] PLANT_FOOD_CLIPS = {"plantfood", "plantfood_on", "plantfood_loop"};
+  /**
+   * Clip names for a plant-food dose, most specific first.
+   *
+   * <p>"pf" is last because it is the Sea-shroom's, and only the Sea-shroom's: its rig abbreviates
+   * the name, so the dose had no animation at all while the clip for it sat there unasked for.
+   * Tried after the full spellings so it can never win over a rig that names the clip properly.
+   */
+  private static final String[] PLANT_FOOD_CLIPS =
+      {"plantfood", "plantfood_on", "plantfood_loop", "pf"};
 
   /** Plants whose rigs carry a wear-down sequence instead of only one idle. */
   private static final Set<String> DAMAGE_STAGE_PLANTS =
       Set.of("Wall-nut", "Tall-nut", "Garlic", "Explode-o-nut", "Endurian");
+
+  /**
+   * Plants wrapped in a halo far wider than the plant inside it, which skip the lane width clamp.
+   *
+   * <p>The clamp shrinks a rig until its clip bounds fit one lane, and for these three the bounds
+   * are mostly soft glow: the Iceberg Lettuce came out at 43% and the Magnet-shroom at 42% of the
+   * scale every other plant is drawn at. Named one by one on purpose. The halo layers cannot be
+   * told apart from the body by name -- the same glow image hangs both under a labelled node and
+   * directly under the root -- and every rule broad enough to catch these also caught Citron,
+   * Torchwood and Fire Peashooter, which are correctly sized as they are.
+   */
+  private static final Set<String> HALO_WIDE_PLANTS =
+      Set.of("Ice-shroom", "Magnet-shroom", "Iceberg Lettuce");
 
   /**
    * The wear-down clips for a defensive plant, worst damage first, or nothing for a plant whose
@@ -1919,7 +1955,7 @@ public final class EntityRenderer implements WorldRenderer {
       return true;
     }
     EntityAnimation animation = animations.find(AnimationLibrary.PLANTS, plant.getName());
-    return (animation != null && plantClip(animation, plant) != null)
+    return (animation != null && plantClip(animation, plant, false) != null)
         || plantArt.find(plant.getName()) != null;
   }
 
