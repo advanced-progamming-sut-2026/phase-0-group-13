@@ -185,17 +185,31 @@ public class GamePlayController implements BaseController {
       return;
     }
 
-    Plant plant = null;
+    Plant plant = buildPlant(buildType, type, rc, userLevel);
+    if (plant == null) {
+      return;
+    }
+    placePlantAndReport(gm, plant, type, buildType, m, rc);
+  }
+
+  /** Builds the plant to put down, reporting and giving back null when it cannot be built. */
+  private Plant buildPlant(String buildType, String type, int[] rc, int userLevel) {
+    Plant plant;
     try {
-      plant = new PlantFactory(GameDataManager.plantRepository).createPlant(buildType, rc[0], rc[1], userLevel);
+      plant = new PlantFactory(GameDataManager.plantRepository)
+              .createPlant(buildType, rc[0], rc[1], userLevel);
     } catch (RuntimeException e) {
       System.out.println("error: could not build plant '" + type + "'");
-      return;
+      return null;
     }
     if (plant == null) {
       System.out.println("error: unknown plant '" + type + "'");
-      return;
     }
+    return plant;
+  }
+
+  private void placePlantAndReport(GameManager gm, Plant plant, String type, String buildType,
+          Matcher m, int[] rc) {
     if (gm.placePlant(plant, rc[0], rc[1])) {
       gm.recordPlanting(type);
       System.out.printf("Planted %s at (%s, %s).%n", type, m.group("x"), m.group("y"));

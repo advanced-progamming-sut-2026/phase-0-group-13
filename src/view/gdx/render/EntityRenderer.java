@@ -322,11 +322,12 @@ public final class EntityRenderer implements WorldRenderer {
     context.getBatch().setColor(Color.WHITE);
   }
 
-  private void drawPlant(RenderContext context, Plant plant, TextureRegion sheep, float delta) {
+  private void drawPlant(RenderContext context, Plant plant, TextureRegion sheep, float delta,
+      boolean onWater) {
     boolean cursed = plant.isCursed() && sheep != null;
     drawPlantFoodGlow(context, plant);
     context.getBatch().setColor(flashed(plantTint(plant), plant));
-    if (!cursed && drawPlantAnimation(context, plant, delta)) {
+    if (!cursed && drawPlantAnimation(context, plant, delta, onWater)) {
       return;
     }
     TextureRegion art = cursed ? sheep : plantArt.find(plant.getName());
@@ -526,10 +527,29 @@ public final class EntityRenderer implements WorldRenderer {
     drawGroundShadows(context, board);
     TextureRegion sheep = hudArt.find("sheep");
     for (int row = 0; row < board.getRows(); row++) {
-      for (Plant plant : board.getPlants()) {
-        if (plant.getRow() == row) {
-          drawPlant(context, plant, sheep, delta);
-        }
+      drawLawnRow(context, board, row, sheep, delta);
+    }
+    drawProjectiles(context, board);
+    drawBossHazards(context, board);
+    drawSuns(context, board);
+    drawPlantFoodDrops(context, board);
+    drawLootPickups(context);
+    context.getBatch().setColor(Color.WHITE);
+    drawImpacts(context);
+    drawDeaths(context);
+    drawDebris(context);
+    drawSparks(context);
+    context.getBatch().setColor(Color.WHITE);
+    context.getBatch().end();
+  }
+
+  /** One lane, in the order that keeps its plants, octopuses and zombies sorted against each other. */
+  private void drawLawnRow(RenderContext context, Board board, int row, TextureRegion sheep,
+      float delta) {
+    for (Plant plant : board.getPlants()) {
+      if (plant.getRow() == row) {
+        drawPlant(context, plant, sheep, delta,
+            board.isWaterAt(plant.getRow(), plant.getCol()));
       }
       // Its own pass over the row, so neither an octopus nor a block of ice is hidden under the
       // neighbouring plant drawn next, and both sit over the plant they have hold of.
@@ -540,19 +560,20 @@ public final class EntityRenderer implements WorldRenderer {
           drawOctopusHold(context, plant);
         }
       }
-      context.getBatch().setColor(Color.WHITE);
-      for (Zombie zombie : board.getZombies()) {
-        if (footRow(zombie) == row && !zombie.isDead()) {
-          drawZombie(context, zombie, delta);
-        }
-      }
-      // In the row pass with the living, so a collapsing zombie sorts against its neighbours
-      // instead of being painted over the whole lawn afterwards.
-      drawTheFallen(context, row, delta);
-      context.getBatch().setColor(Color.WHITE);
     }
-    drawProjectiles(context, board);
-    drawBossHazards(context, board);
+    context.getBatch().setColor(Color.WHITE);
+    for (Zombie zombie : board.getZombies()) {
+      if (footRow(zombie) == row && !zombie.isDead()) {
+        drawZombie(context, zombie, delta);
+      }
+    }
+    // In the row pass with the living, so a collapsing zombie sorts against its neighbours
+    // instead of being painted over the whole lawn afterwards.
+    drawTheFallen(context, row, delta);
+    context.getBatch().setColor(Color.WHITE);
+  }
+
+  private void drawSuns(RenderContext context, Board board) {
     TextureRegion sun = hudArt.find("sun");
     if (sun != null) {
       for (Sun s : board.getSuns()) {
@@ -564,7 +585,16 @@ public final class EntityRenderer implements WorldRenderer {
       }
       context.getBatch().setColor(Color.WHITE);
     }
-    drawPlantFoodDrops(context, board);
+    for (Sun s : board.getSuns()) {
+      // the doc wants the sun kinds told apart; a big one is bigger and a radioactive one glows
+      context.getBatch().setColor(s.getType() == SunType.RADIOACTIVE ? radioactiveSun : Color.WHITE);
+      drawCentred(context, sun, s.getX(), lerp(s.getPreviousY(), s.getY(), tickAlpha),
+          geometry.getCellHeight() * (s.getType() == SunType.LARGE ? 0.58f : 0.42f));
+    }
+    context.getBatch().setColor(Color.WHITE);
+  }
+
+  private void drawLootPickups(RenderContext context) {
     for (HitEffects.LootPickup pickup : hits.getPickups()) {
       TextureRegion art = lootIcon(pickup.kind());
       if (art == null) {
@@ -575,13 +605,6 @@ public final class EntityRenderer implements WorldRenderer {
           geometry.getCellHeight() * LOOT_ICON_FRACTION,
           geometry.getCellHeight() * LOOT_LIFT_FRACTION * pickup.progress(), 0f);
     }
-    context.getBatch().setColor(Color.WHITE);
-    drawImpacts(context);
-    drawDeaths(context);
-    drawDebris(context);
-    drawSparks(context);
-    context.getBatch().setColor(Color.WHITE);
-    context.getBatch().end();
   }
 
   /**
@@ -1016,9 +1039,10 @@ public final class EntityRenderer implements WorldRenderer {
     return PLANT_IDLE_BOB_FRACTION * (float) Math.sin(clock * PLANT_IDLE_SPEED + phase);
   }
 
-  private boolean drawPlantAnimation(RenderContext context, Plant plant, float delta) {
+  private boolean drawPlantAnimation(RenderContext context, Plant plant, float delta,
+      boolean onWater) {
     EntityAnimation animation = animations.find(AnimationLibrary.PLANTS, plant.getName());
-    String clip = animation == null ? null : plantClip(animation, plant);
+    String clip = animation == null ? null : plantClip(animation, plant, onWater);
     if (clip == null) {
       return false;
     }
@@ -1028,7 +1052,9 @@ public final class EntityRenderer implements WorldRenderer {
         : playback.advance(plant, clip, delta);
     float x = geometry.columnCentreX(plant.getCol());
     float y = geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * PLANT_FOOT_INSET;
-    float scale = scaleFor(animation.width(clip), PLANT_ANIM_UNITS, PLANT_ROW_FILL);
+    float scale = HALO_WIDE_PLANTS.contains(plant.getName())
+        ? geometry.getCellHeight() * PLANT_ROW_FILL / PLANT_ANIM_UNITS
+        : scaleFor(animation.width(clip), PLANT_ANIM_UNITS, PLANT_ROW_FILL);
     animation.draw(context.getBatch(), clip, time, x, y, scale, false);
     noteMuzzle(plant, animation, clip, time, x, y, scale);
     return true;
@@ -1112,7 +1138,7 @@ public final class EntityRenderer implements WorldRenderer {
    * of a mine, then its attack while that is still running, then its idle -- damage-staged for the
    * plants whose rigs wear down as they are eaten.
    */
-  private String plantClip(EntityAnimation animation, Plant plant) {
+  private String plantClip(EntityAnimation animation, Plant plant, boolean onWater) {
     int stage = growthStage(plant);
 
     // A lit fuse outranks everything else: whatever else the plant might be showing, it is about
@@ -1198,6 +1224,19 @@ public final class EntityRenderer implements WorldRenderer {
   /** Plants whose rigs carry a wear-down sequence instead of only one idle. */
   private static final Set<String> DAMAGE_STAGE_PLANTS =
       Set.of("Wall-nut", "Tall-nut", "Garlic", "Explode-o-nut", "Endurian");
+
+  /**
+   * Plants wrapped in a halo far wider than the plant inside it, which skip the lane width clamp.
+   *
+   * <p>The clamp shrinks a rig until its clip bounds fit one lane, and for these three the bounds
+   * are mostly soft glow: the Iceberg Lettuce came out at 43% and the Magnet-shroom at 42% of the
+   * scale every other plant is drawn at. Named one by one on purpose. The halo layers cannot be
+   * told apart from the body by name -- the same glow image hangs both under a labelled node and
+   * directly under the root -- and every rule broad enough to catch these also caught Citron,
+   * Torchwood and Fire Peashooter, which are correctly sized as they are.
+   */
+  private static final Set<String> HALO_WIDE_PLANTS =
+      Set.of("Ice-shroom", "Magnet-shroom", "Iceberg Lettuce");
 
   /**
    * The wear-down clips for a defensive plant, worst damage first, or nothing for a plant whose
@@ -1418,25 +1457,11 @@ public final class EntityRenderer implements WorldRenderer {
 
   private static final int ACTION_POSE_TICKS = 8;
 
-  private String zombieClip(EntityAnimation animation, Zombie zombie) {
-    if (zombie.isBoss()) {
-      String boss = bossClip(animation, zombie);
-      if (boss != null) {
-        return boss;
-      }
-    }
-    String suffix = propSuffix(zombie);
-    if (zombie.isEating()) {
-      // A Gargantuar has no bite. It stops at a plant and brings the pole down on it, and its rig
-      // ships smash_left for that; playing "eat" had it gumming the plant instead.
-      String[] eatNames = zombie.getBehavior() instanceof GargantuarAction
-          ? new String[] {"smash_left", "eat" + suffix, "eat"}
-          : new String[] {"eat" + suffix, "eat"};
-      String eat = animation.pickClip(eatNames);
-      if (eat != null) {
-        return eat;
-      }
-    }
+  /**
+   * The pose a zombie holds for a moment after one of its set pieces -- the Jester's spin, the
+   * Fisherman's cast, the Gargantuar's throw -- or null when it is doing none of them.
+   */
+  private String actionPoseClip(EntityAnimation animation, Zombie zombie) {
     if (zombie.getBehavior() instanceof JesterZombieAction jester && jester.isSpinning()) {
       String spin = animation.pickClip("spin_walk", "spin");
       if (spin != null) {
@@ -1459,6 +1484,32 @@ public final class EntityRenderer implements WorldRenderer {
       if (throwing != null) {
         return throwing;
       }
+    }
+    return null;
+  }
+
+  private String zombieClip(EntityAnimation animation, Zombie zombie) {
+    if (zombie.isBoss()) {
+      String boss = bossClip(animation, zombie);
+      if (boss != null) {
+        return boss;
+      }
+    }
+    String suffix = propSuffix(zombie);
+    if (zombie.isEating()) {
+      // A Gargantuar has no bite. It stops at a plant and brings the pole down on it, and its rig
+      // ships smash_left for that; playing "eat" had it gumming the plant instead.
+      String[] eatNames = zombie.getBehavior() instanceof GargantuarAction
+          ? new String[] {"smash_left", "eat" + suffix, "eat"}
+          : new String[] {"eat" + suffix, "eat"};
+      String eat = animation.pickClip(eatNames);
+      if (eat != null) {
+        return eat;
+      }
+    }
+    String held = actionPoseClip(animation, zombie);
+    if (held != null) {
+      return held;
     }
     // The rest of the roster's signature moves. Every one of these rigs ships a clip for the
     // thing its behaviour does -- the All-Star's kick, the Turquoise's sun-drain, the Tomb
@@ -1901,6 +1952,12 @@ public final class EntityRenderer implements WorldRenderer {
     shapes.end();
 
     shapes.begin(ShapeRenderer.ShapeType.Line);
+    drawMissingArtOutlines(shapes, board);
+    shapes.end();
+  }
+
+  /** A plain box for anything the renderer has neither a rig nor a still for. */
+  private void drawMissingArtOutlines(ShapeRenderer shapes, Board board) {
     shapes.setColor(noArt);
     for (Zombie zombie : board.getZombies()) {
       if (!zombie.isDead() && zombieArt.find(zombie.getName()) == null
@@ -1918,7 +1975,6 @@ public final class EntityRenderer implements WorldRenderer {
           geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * 0.16f,
           geometry.getCellWidth() * 0.44f, geometry.getCellHeight() * 0.56f);
     }
-    shapes.end();
   }
 
   private void drawHitBursts(ShapeRenderer shapes) {
@@ -1962,7 +2018,7 @@ public final class EntityRenderer implements WorldRenderer {
       return true;
     }
     EntityAnimation animation = animations.find(AnimationLibrary.PLANTS, plant.getName());
-    return (animation != null && plantClip(animation, plant) != null)
+    return (animation != null && plantClip(animation, plant, false) != null)
         || plantArt.find(plant.getName()) != null;
   }
 

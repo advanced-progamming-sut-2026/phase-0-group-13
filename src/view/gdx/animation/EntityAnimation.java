@@ -327,49 +327,64 @@ public final class EntityAnimation {
     float bestArea = 0f;
     float[] bestBounds = null;
     for (int f = 0; f < frames.length; f++) {
-      Frame frame = frames[f];
-      int count = 0;
-      float minX = Float.MAX_VALUE;
-      float minY = Float.MAX_VALUE;
-      float maxX = -Float.MAX_VALUE;
-      float maxY = -Float.MAX_VALUE;
-      for (int i = 0; i < frame.count; i++) {
-        Part part = parts[frame.partIds[i]];
-        if (!wanted[part.id] || part.texture == null) {
-          continue;
-        }
-        count++;
-        for (int c = i * 8; c < i * 8 + 8; c += 2) {
-          minX = Math.min(minX, frame.corners[c]);
-          maxX = Math.max(maxX, frame.corners[c]);
-          minY = Math.min(minY, frame.corners[c + 1]);
-          maxY = Math.max(maxY, frame.corners[c + 1]);
-        }
-      }
-      float area = count == 0 ? 0f : (maxX - minX) * (maxY - minY);
+      float[] measured = measureFrame(frames[f], wanted);
+      int count = (int) measured[0];
+      float area = count == 0 ? 0f : (measured[3] - measured[1]) * (measured[4] - measured[2]);
       if (count > bestCount || (count == bestCount && area > bestArea)) {
         bestFrame = f;
         bestCount = count;
         bestArea = area;
-        bestBounds = new float[] {minX, minY, maxX, maxY};
+        bestBounds = new float[] {measured[1], measured[2], measured[3], measured[4]};
       }
     }
-    Loose piece = null;
-    if (bestFrame >= 0 && bestCount > 0 && bestBounds[3] > bestBounds[1]) {
-      Frame frame = frames[bestFrame];
-      int[] entries = new int[bestCount];
-      int at = 0;
-      for (int i = 0; i < frame.count; i++) {
-        Part part = parts[frame.partIds[i]];
-        if (wanted[part.id] && part.texture != null) {
-          entries[at++] = i;
-        }
-      }
-      piece = new Loose(bestFrame, entries, (bestBounds[0] + bestBounds[2]) / 2f,
-          (bestBounds[1] + bestBounds[3]) / 2f, bestBounds[3] - bestBounds[1]);
-    }
+    Loose piece = buildLoose(bestFrame, bestCount, bestBounds, wanted);
     looseParts.put(found.name, piece);
     return piece;
+  }
+
+  /**
+   * How much of the wanted subtree one frame draws, and the box it draws it in.
+   *
+   * @return {@code {count, minX, minY, maxX, maxY}}
+   */
+  private float[] measureFrame(Frame frame, boolean[] wanted) {
+    int count = 0;
+    float minX = Float.MAX_VALUE;
+    float minY = Float.MAX_VALUE;
+    float maxX = -Float.MAX_VALUE;
+    float maxY = -Float.MAX_VALUE;
+    for (int i = 0; i < frame.count; i++) {
+      Part part = parts[frame.partIds[i]];
+      if (!wanted[part.id] || part.texture == null) {
+        continue;
+      }
+      count++;
+      for (int c = i * 8; c < i * 8 + 8; c += 2) {
+        minX = Math.min(minX, frame.corners[c]);
+        maxX = Math.max(maxX, frame.corners[c]);
+        minY = Math.min(minY, frame.corners[c + 1]);
+        maxY = Math.max(maxY, frame.corners[c + 1]);
+      }
+    }
+    return new float[] {count, minX, minY, maxX, maxY};
+  }
+
+  /** The detachable piece taken from the frame that showed the most of it, or null. */
+  private Loose buildLoose(int bestFrame, int bestCount, float[] bestBounds, boolean[] wanted) {
+    if (bestFrame < 0 || bestCount <= 0 || bestBounds[3] <= bestBounds[1]) {
+      return null;
+    }
+    Frame frame = frames[bestFrame];
+    int[] entries = new int[bestCount];
+    int at = 0;
+    for (int i = 0; i < frame.count; i++) {
+      Part part = parts[frame.partIds[i]];
+      if (wanted[part.id] && part.texture != null) {
+        entries[at++] = i;
+      }
+    }
+    return new Loose(bestFrame, entries, (bestBounds[0] + bestBounds[2]) / 2f,
+        (bestBounds[1] + bestBounds[3]) / 2f, bestBounds[3] - bestBounds[1]);
   }
 
   /** A part and everything hanging off it, since a gib is a little tree and not one image. */

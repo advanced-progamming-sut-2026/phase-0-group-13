@@ -159,6 +159,17 @@ public final class NetworkIZombieScreen extends SnapshotIZombieScreen {
 
   private Table reactions(Skin skin) {
     Table bar = new Table();
+    bar.add(textReactions(skin)).padRight(8f);
+    bar.add(emojiReactions(skin)).padRight(8f);
+    bar.add(stickerReactions(skin)).padRight(10f);
+
+    reactionLabel = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
+    reactionLabel.setWrap(true);
+    bar.add(reactionLabel).width(230f);
+    return bar;
+  }
+
+  private Table textReactions(Skin skin) {
     Table words = new Table();
     for (String text : TEXT_REACTIONS) {
       TextButton button = new TextButton(text, skin, UiSkinProvider.BUTTON_BROWN);
@@ -170,8 +181,10 @@ public final class NetworkIZombieScreen extends SnapshotIZombieScreen {
       });
       words.add(button).width(150f).height(38f).padBottom(3f).row();
     }
-    bar.add(words).padRight(8f);
+    return words;
+  }
 
+  private Table emojiReactions(Skin skin) {
     Table icons = new Table();
     // The skin styles its buttons as TextButtons, so a plain Button has to borrow their
     // drawables rather than ask for a style name that was never registered under that type.
@@ -194,8 +207,10 @@ public final class NetworkIZombieScreen extends SnapshotIZombieScreen {
       });
       icons.add(button).size(46f).padBottom(3f).row();
     }
-    bar.add(icons).padRight(8f);
+    return icons;
+  }
 
+  private Table stickerReactions(Skin skin) {
     Table stickers = new Table();
     for (Sticker sticker : STICKER_REACTIONS) {
       TextButton button = new TextButton(sticker.label(), skin, UiSkinProvider.BUTTON_PURPLE);
@@ -207,12 +222,7 @@ public final class NetworkIZombieScreen extends SnapshotIZombieScreen {
       });
       stickers.add(button).width(110f).height(38f).padBottom(3f).row();
     }
-    bar.add(stickers).padRight(10f);
-
-    reactionLabel = new Label("", skin, UiSkinProvider.LABEL_MEDIUM);
-    reactionLabel.setWrap(true);
-    bar.add(reactionLabel).width(230f);
-    return bar;
+    return stickers;
   }
 
   private TextureRegion emojiArt(String emoji) {

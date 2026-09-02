@@ -126,14 +126,28 @@ public abstract class MenuScreen extends BaseScreen {
 
     playEntrance(root);
 
-    if (DebugPanel.isEnabled()) {
-      Table corner = new Table();
-      corner.setFillParent(true);
-      corner.bottom().left().pad(12f);
-      corner.add(new DebugPanel(skin, this::toast));
-      stage.addActor(corner);
-    }
+    addDebugCorner();
+    addEscapeListener();
 
+    if (notice != null) {
+      toast(notice);
+      notice = null;
+    }
+  }
+
+  private void addDebugCorner() {
+    if (!DebugPanel.isEnabled()) {
+      return;
+    }
+    Table corner = new Table();
+    corner.setFillParent(true);
+    corner.bottom().left().pad(12f);
+    corner.add(new DebugPanel(skin, this::toast));
+    stage.addActor(corner);
+  }
+
+  /** Escape backs out of the screen, wherever the focus happens to be. */
+  private void addEscapeListener() {
     stage.addListener(
         new InputListener() {
           @Override
@@ -145,11 +159,6 @@ public abstract class MenuScreen extends BaseScreen {
             return true;
           }
         });
-
-    if (notice != null) {
-      toast(notice);
-      notice = null;
-    }
   }
 
   private void addBackground() {
