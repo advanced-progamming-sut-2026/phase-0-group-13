@@ -1,0 +1,58 @@
+{
+  "username": "Arash",
+  "targetChapter": "1",
+  "targetLevel": 2,
+  "difficultyLevel": 1,
+  "selectedPlants": [
+    "peashooter",
+    "sunflower",
+    "wall-nut",
+    "potato-mine",
+    "cabbage-pult",
+    "puff-shroom",
+    "repeater"
+  ],
+  "boostedPlants": [],
+  "plants": [
+    {
+      "name": "Sunflower",
+      "row": 1,
+      "col": 0,
+      "health": 300,
+      "level": 1
+    },
+    {
+      "name": "Cabbage-pult",
+      "row": 1,
+      "col": 1,
+      "health": 300,
+      "level": 1
+    },
+    {
+      "name": "Repeater",
+      "row": 2,
+      "col": 1,
+      "health": 300,
+      "level": 1
+    },
+    {
+      "name": "Potato Mine",
+      "row": 2,
+      "col": 6,
+      "health": 300,
+      "level": 1
+    }
+  ],
+  "sun": 100,
+  "plantFood": 0,
+  "waveIndex": 1,
+  "wavesStarted": true,
+  "mowersAvailable": [
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "savedAt": 1788466191603
+}

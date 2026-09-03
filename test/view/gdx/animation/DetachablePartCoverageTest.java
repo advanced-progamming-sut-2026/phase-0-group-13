@@ -39,14 +39,17 @@ class DetachablePartCoverageTest {
    */
   private static final Set<String> NO_HEAD_GIB = new TreeSet<>(List.of(
       "zombiebeachfisherman", "zombiedarkking", "zombieegyptgargantuar", "zombieiceagedodo",
-      "zombietutorialgargantuar", "zombiezombossmechcowboy", "zombiezombossmechdark",
-      "zombiezombossmechegypt", "zombiezombossmechpirate"));
+      "zombiepiano", "zombietutorialgargantuar", "zombiezombossmechcowboy",
+      "zombiezombossmechdark", "zombiezombossmechegypt", "zombiezombossmechpirate"));
 
   /** The same, for arms. The Fisherman and the King keep an arm gib but have no head one. */
   private static final Set<String> NO_ARM_GIB = new TreeSet<>(List.of(
-      "zombieegyptgargantuar", "zombieiceagedodo", "zombietutorialgargantuar",
+      "zombieegyptgargantuar", "zombieiceagedodo", "zombiepiano", "zombietutorialgargantuar",
       "zombiezombossmechcowboy", "zombiezombossmechdark", "zombiezombossmechegypt",
       "zombiezombossmechpirate"));
+
+  // zombiepiano is the instrument the Pianist pushes, not a zombie: upstream ships it as its own
+  // rig alongside ZOMBIE_PIANO, and furniture has neither a head nor an arm to throw.
 
   @BeforeAll
   static void useRealFiles() {

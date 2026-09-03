@@ -32,6 +32,7 @@ import model.game.zombie.behavior.HunterZombieAction;
 import model.game.zombie.behavior.JesterZombieAction;
 import model.game.zombie.behavior.KingAuraZombieAction;
 import model.game.zombie.behavior.OctopusThrowerZombieAction;
+import model.game.zombie.behavior.PianistZombieAction;
 import model.game.zombie.behavior.RaHealAuraZombieAction;
 import model.game.zombie.behavior.TacklerZombieAction;
 import model.game.zombie.behavior.TombRaiserZombieAction;
@@ -83,9 +84,22 @@ public final class EntityRenderer implements WorldRenderer {
   private static final float LOB_ARC_HEIGHT = 0.85f;
   /** How far across the plant's head the mouth sits, as a share of the head's own width. */
   private static final float MUZZLE_HEAD_REACH = 0.35f;
-  private static final float MUZZLE_RELEASE_OF_CLIP = 0.4f;
-  private static final float MUZZLE_MIN_RELEASE = 0.15f;
-  private static final float MUZZLE_MAX_RELEASE = 0.5f;
+  /**
+   * Where in the firing motion the shot actually leaves, as a share of the attack clip.
+   *
+   * <p>One means the very end of it: the pea is held in the mouth for the whole of the shooting
+   * animation and only sets off as the plant finishes the throw. It used to be 0.4, so the shot
+   * left a third of the way in, while the plant was still winding up, and the release read as
+   * unrelated to the animation playing.
+   */
+  private static final float MUZZLE_RELEASE_OF_CLIP = 1f;
+  private static final float MUZZLE_MIN_RELEASE = 0.35f;
+  /**
+   * Never a whole tick. The shot has already done its damage on the tick it was fired, so holding
+   * it in the mouth for all of that tick would leave the hit landing on a pea that had not left
+   * yet; this keeps the release inside the tick it belongs to.
+   */
+  private static final float MUZZLE_MAX_RELEASE = 0.92f;
   private static final float MUZZLE_MAX_FORWARD = 0.5f;
   private static final float MUZZLE_MAX_LIFT_LANES = 0.4f;
   private static final float FREEZE_LEVELS = Plant.MAX_FREEZE_LEVEL;
@@ -251,6 +265,8 @@ public final class EntityRenderer implements WorldRenderer {
   private final Map<Sun, double[]> seenSuns = new java.util.IdentityHashMap<>();
   /** Muzzle of each plant drawn this frame, filled in as the lawn is drawn. See muzzleOf. */
   private final Map<Plant, float[]> muzzles = new java.util.IdentityHashMap<>();
+  /** The same for the zombies that shoot: a Zombotany pea, a Hunter's ice. */
+  private final Map<Zombie, float[]> zombieMuzzles = new java.util.IdentityHashMap<>();
   private boolean seenABoard;
 
   /**
@@ -570,6 +586,7 @@ public final class EntityRenderer implements WorldRenderer {
 
   private void drawSprites(RenderContext context, Board board, float delta) {
     muzzles.clear();
+    zombieMuzzles.clear();
     context.getBatch().begin();
     drawGroundShadows(context, board);
     TextureRegion sheep = hudArt.find("sheep");
@@ -877,6 +894,7 @@ public final class EntityRenderer implements WorldRenderer {
     // What each zombie was wearing is remembered for exactly as long as the zombie is on the
     // board; anything not seen this frame has died or walked off and cannot break armour again.
     wornArmourGroups.keySet().removeIf(zombie -> !zombiesThisFrame.containsKey(zombie));
+    pianoKeys.keySet().removeIf(zombie -> !zombiesThisFrame.containsKey(zombie));
     collectTheFallen();
     for (Projectile projectile : board.getProjectiles()) {
       hits.observeProjectile(projectile, projectile.getXCoordinate(),
@@ -1440,7 +1458,77 @@ public final class EntityRenderer implements WorldRenderer {
     animation.draw(context.getBatch(), clip, anchor, time, x, y, scale, zombie.isHypnotized(),
         armourVisibility(animation, zombie));
     drawPlantHead(context, zombie, animation, clip, anchor, time, x, y, scale);
+    drawPiano(context, zombie, clip, delta, x, y, scale);
+    noteZombieMuzzle(zombie, animation, clip, anchor, time, x, y, scale);
     return true;
+  }
+
+  /** The rig name of the piano itself, which is a separate animation from the zombie pushing it. */
+  private static final String PIANO_RIG = "ZombiePiano";
+
+  /**
+   * The Pianist's piano, drawn over the zombie that is playing it.
+   *
+   * <p>Upstream ships these as two rigs -- ZOMBIE_PIANO is the player, PIANO is the instrument --
+   * and only the player was ever loaded, so the Pianist walked the lawn miming at nothing. The two
+   * share one atlas page and one canvas, so the piano stands on the same spot at the same scale.
+   */
+  private void drawPiano(RenderContext context, Zombie zombie, String zombieClip, float delta,
+      float x, float y, float scale) {
+    if (!(zombie.getBehavior() instanceof PianistZombieAction)) {
+      return;
+    }
+    EntityAnimation piano = animations.find(AnimationLibrary.ZOMBIES, PIANO_RIG);
+    if (piano == null) {
+      return;
+    }
+    // The instrument follows the player: both rigs ship idle, play and die, so asking for the
+    // zombie's own clip first keeps the keys moving when the zombie is playing and still when it
+    // is not.
+    String clip = piano.pickClip(zombieClip, "play", "idle");
+    if (clip == null) {
+      return;
+    }
+    float time = playback.advance(pianoOf(zombie), clip, delta * animationRate(zombie, clip));
+    piano.draw(context.getBatch(), clip, clip, time, x, y, scale, zombie.isHypnotized(), null);
+  }
+
+  /**
+   * A per-zombie key for the piano's own playback, so two Pianists on the lawn do not share one
+   * clip position and the piano is not advanced on the zombie's own state.
+   */
+  private Object pianoOf(Zombie zombie) {
+    return pianoKeys.computeIfAbsent(zombie, z -> new Object());
+  }
+
+  private final Map<Zombie, Object> pianoKeys = new java.util.IdentityHashMap<>();
+
+  /**
+   * The same muzzle note the shooting plants get, for the zombies that fire something.
+   *
+   * <p>Their shots had none, so a Zombotany pea or a Hunter's ice blinked into being a tile from
+   * the zombie the instant it was fired, with the throw still playing behind it. Mirrored rather
+   * than shared because a zombie faces the other way, so its mouth is on its left.
+   */
+  private void noteZombieMuzzle(Zombie zombie, EntityAnimation animation, String clip,
+      String anchor, float time, float x, float y, float scale) {
+    if (geometry.getCellWidth() <= 0f) {
+      return;
+    }
+    float[] head = animation.topPartBox(clip, anchor, time, x, y, scale, zombie.isHypnotized());
+    if (head == null) {
+      return;
+    }
+    float mouth = zombie.isHypnotized()
+        ? head[0] + head[2] * MUZZLE_HEAD_REACH
+        : head[0] + head[2] * (1f - MUZZLE_HEAD_REACH);
+    float lane = geometry.getCellHeight();
+    zombieMuzzles.put(zombie, new float[] {
+        clamp((mouth - x) / geometry.getCellWidth(), -MUZZLE_MAX_FORWARD, MUZZLE_MAX_FORWARD),
+        clamp(head[1] - geometry.rowCentreY(zombie.getRow()),
+            -lane * MUZZLE_MAX_LIFT_LANES, lane * MUZZLE_MAX_LIFT_LANES),
+        clamp(animation.duration(clip) * MUZZLE_RELEASE_OF_CLIP / GdxConfig.SECONDS_PER_TICK,
+            MUZZLE_MIN_RELEASE, MUZZLE_MAX_RELEASE)});
   }
 
   private float throwLift(float flight) {
@@ -2042,8 +2130,12 @@ public final class EntityRenderer implements WorldRenderer {
    * guessed per plant, so nothing about the artwork has to change.
    */
   private float[] muzzleOf(Board board, Projectile projectile) {
-    if (projectile.isFromZombie() || projectile.isLobbed()) {
+    if (projectile.isLobbed()) {
       return null;
+    }
+    if (projectile.isFromZombie()) {
+      Zombie shooter = board.getZombieAt(projectile.getYCoordinate(), projectile.getLaunchX());
+      return shooter == null ? null : zombieMuzzles.get(shooter);
     }
     int col = (int) Math.round(projectile.getLaunchX());
     Plant plant = board.getPlantAt(projectile.getYCoordinate(), col);
