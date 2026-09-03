@@ -430,11 +430,8 @@ public final class IZombieEngine {
             + plantSun;
   }
 
-  public void tick() {
-    if (won || lost) {return;}
-    tickCount++;
-    rechargeLeft.replaceAll((type, left) -> Math.max(0, left - 1));
-    plantRechargeLeft.replaceAll((type, left) -> Math.max(0, left - 1));
+  /** The imps that sit still and make sun for you. */
+  private void tickSunProducingZombies() {
     for (DeployedZombie zombie : deployedZombies) {
       if (zombie.isDead() || !zombie.spec.producesSun) {
         continue;
@@ -447,6 +444,10 @@ public final class IZombieEngine {
                 zombie.spec.name, (int) Math.round(zombie.column) + 1, zombie.row + 1, zombieSun);
       }
     }
+  }
+
+  /** The lawn's own plants, which either bank sun or shoot the nearest zombie ahead of them. */
+  private void tickDefensePlants() {
     for (DefensePlant plant : defensePlants) {
       if (plant.isDead()) {
         continue;
@@ -465,6 +466,10 @@ public final class IZombieEngine {
         target.health -= plant.damagePerTick;
       }
     }
+  }
+
+  /** The zombies that walk: they eat whatever blocks them, or press on towards the brain. */
+  private void advanceAttackingZombies() {
     for (DeployedZombie zombie : deployedZombies) {
       if (zombie.isDead() || zombie.spec.producesSun) {
         continue;
@@ -486,6 +491,16 @@ public final class IZombieEngine {
         }
       }
     }
+  }
+
+  public void tick() {
+    if (won || lost) {return;}
+    tickCount++;
+    rechargeLeft.replaceAll((type, left) -> Math.max(0, left - 1));
+    plantRechargeLeft.replaceAll((type, left) -> Math.max(0, left - 1));
+    tickSunProducingZombies();
+    tickDefensePlants();
+    advanceAttackingZombies();
     reportCasualties();
     defensePlants.removeIf(DefensePlant::isDead);
     deployedZombies.removeIf(DeployedZombie::isDead);

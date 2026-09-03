@@ -28,18 +28,8 @@ public final class ProfileScreen extends MenuScreen {
     return new MainMenuScreen(game);
   }
 
-  @Override
-  protected void buildContent(Table content) {
-    User user = UserManager.getInstance().getCurrentUser();
-    Table panel = panel();
-
-    if (user == null) {
-      panel.add(new Label("error: no user logged in", skin, UiSkinProvider.LABEL_MEDIUM)).row();
-      panel.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget()))).width(220f);
-      content.add(panel);
-      return;
-    }
-
+  /** The read-only half of the page: who the player is and how far they have got. */
+  private void addAccountSummary(Table panel, User user) {
     info(panel, "Username", user.getUsername());
     info(panel, "Nickname", user.getNickname());
     info(panel, "Email", user.getEmail());
@@ -49,7 +39,10 @@ public final class ProfileScreen extends MenuScreen {
     info(panel, "Stages completed", String.valueOf(completedStages(user)));
     info(panel, "Highest My-Point", String.valueOf(user.getHighestMeowPoints()));
     info(panel, "Total My-Points", String.valueOf(user.getMeowPoints()));
+  }
 
+  /** The four things a player can change about their account, each with its own button. */
+  private void addEditors(Table panel) {
     TextField newUsername = field(panel, "New Username", false);
     panel.add(button("Change Username", UiSkinProvider.BUTTON_GREEN,
             () -> changeUsername(newUsername)))
@@ -81,6 +74,22 @@ public final class ProfileScreen extends MenuScreen {
         .width(280f)
         .padTop(6f)
         .row();
+  }
+
+  @Override
+  protected void buildContent(Table content) {
+    User user = UserManager.getInstance().getCurrentUser();
+    Table panel = panel();
+
+    if (user == null) {
+      panel.add(new Label("error: no user logged in", skin, UiSkinProvider.LABEL_MEDIUM)).row();
+      panel.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget()))).width(220f);
+      content.add(panel);
+      return;
+    }
+
+    addAccountSummary(panel, user);
+    addEditors(panel);
 
     panel.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget())))
         .colspan(2)

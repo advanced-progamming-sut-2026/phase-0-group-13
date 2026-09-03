@@ -54,22 +54,8 @@ public final class SeedCard extends Table {
     float artHeight = compact ? 40f : 62f;
     float textWidth = compact ? 96f : 118f;
 
-    setBackground(skin.getDrawable(UiSkinProvider.PANEL_BACKGROUND));
-    if (compact) {
-      pad(4f);
-    } else {
-      pad(17f, 22f, 24f, 22f);
-    }
-
-    if (art != null) {
-      Image portrait = new Image(art);
-      portrait.setScaling(Scaling.fit);
-      add(portrait).size(artWidth, artHeight).colspan(2).padBottom(2f).row();
-    } else {
-      Label none = new Label("no art", skin, "secondary");
-      none.setAlignment(Align.center);
-      add(none).size(artWidth, artHeight).colspan(2).padBottom(2f).row();
-    }
+    addBackdrop();
+    addPortrait(art, artWidth, artHeight);
 
     nameLabel = new Label(label, skin, compact ? "secondary" : UiSkinProvider.LABEL_MEDIUM);
     nameLabel.setWrap(true);
@@ -91,17 +77,7 @@ public final class SeedCard extends Table {
     statusLabel.setAlignment(Align.center);
     add(statusLabel).width(textWidth).colspan(2);
 
-    if (onSelect != null) {
-      setTouchable(Touchable.enabled);
-      addListener(new ClickListener() {
-        @Override
-        public void clicked(InputEvent event, float x, float y) {
-          if (enabled) {
-            onSelect.accept(key);
-          }
-        }
-      });
-    }
+    addSelectListener(onSelect);
 
     // A full card gets room for the frame; a compact one never wears it, so content size is enough.
     float border = this.compact ? 0f : 1f;
@@ -109,6 +85,43 @@ public final class SeedCard extends Table {
         border * skin.getDrawable(UiSkinProvider.DIALOG_BORDER).getMinWidth());
     lockedPrefHeight = Math.max(super.getPrefHeight(),
         border * skin.getDrawable(UiSkinProvider.DIALOG_BORDER).getMinHeight());
+  }
+
+  private void addBackdrop() {
+    setBackground(skin.getDrawable(UiSkinProvider.PANEL_BACKGROUND));
+    if (compact) {
+      pad(4f);
+    } else {
+      pad(17f, 22f, 24f, 22f);
+    }
+  }
+
+  /** The plant's picture, or a placeholder label for one the packet sheet has nothing for. */
+  private void addPortrait(TextureRegion art, float artWidth, float artHeight) {
+    if (art != null) {
+      Image portrait = new Image(art);
+      portrait.setScaling(Scaling.fit);
+      add(portrait).size(artWidth, artHeight).colspan(2).padBottom(2f).row();
+    } else {
+      Label none = new Label("no art", skin, "secondary");
+      none.setAlignment(Align.center);
+      add(none).size(artWidth, artHeight).colspan(2).padBottom(2f).row();
+    }
+  }
+
+  private void addSelectListener(Consumer<String> onSelect) {
+    if (onSelect == null) {
+      return;
+    }
+    setTouchable(Touchable.enabled);
+    addListener(new ClickListener() {
+      @Override
+      public void clicked(InputEvent event, float x, float y) {
+        if (enabled) {
+          onSelect.accept(key);
+        }
+      }
+    });
   }
 
   @Override

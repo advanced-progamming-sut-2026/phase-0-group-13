@@ -100,7 +100,31 @@ public final class AdventureScreen extends MenuScreen {
   private void buildChapterChooser(Table content, User user) {
     Table footer = new Table();
 
-    WorldCarousel carousel = new WorldCarousel(skin, art, AdventureMap.MAX_STAGES,
+    WorldCarousel carousel = chapterCarousel(user);
+
+    TextButton prev = button("<", UiSkinProvider.BUTTON_BROWN, () -> {});
+    TextButton next = button(">", UiSkinProvider.BUTTON_BROWN, () -> {});
+    Runnable syncArrows = () -> {
+      prev.setDisabled(!carousel.canStep(-1));
+      next.setDisabled(!carousel.canStep(1));
+    };
+    onChapterChanged = syncArrows;
+    prev.addListener(stepper(carousel, -1, syncArrows));
+    next.addListener(stepper(carousel, 1, syncArrows));
+    arrowKeys(direction -> {
+      carousel.step(direction);
+      syncArrows.run();
+    });
+    syncArrows.run();
+
+    content.add(sideBySide(prev, carousel, next)).grow().row();
+    buildChapterFooter(footer);
+    content.add(footer).padTop(4f);
+  }
+
+  /** The islands themselves: what each card says, and what picking or entering one does. */
+  private WorldCarousel chapterCarousel(User user) {
+    return new WorldCarousel(skin, art, AdventureMap.MAX_STAGES,
         startingChapter(user), new WorldCarousel.State() {
           @Override
           public boolean locked(int stage) {
@@ -130,23 +154,9 @@ public final class AdventureScreen extends MenuScreen {
             openChapter(user, stage);
           }
         });
+  }
 
-    TextButton prev = button("<", UiSkinProvider.BUTTON_BROWN, () -> {});
-    TextButton next = button(">", UiSkinProvider.BUTTON_BROWN, () -> {});
-    Runnable syncArrows = () -> {
-      prev.setDisabled(!carousel.canStep(-1));
-      next.setDisabled(!carousel.canStep(1));
-    };
-    onChapterChanged = syncArrows;
-    prev.addListener(stepper(carousel, -1, syncArrows));
-    next.addListener(stepper(carousel, 1, syncArrows));
-    arrowKeys(direction -> {
-      carousel.step(direction);
-      syncArrows.run();
-    });
-    syncArrows.run();
-
-    content.add(sideBySide(prev, carousel, next)).grow().row();
+  private void buildChapterFooter(Table footer) {
     footer.defaults().pad(6f).width(230f);
     MatchSave saved = MatchSaveManager.load();
     if (saved != null) {
@@ -156,7 +166,6 @@ public final class AdventureScreen extends MenuScreen {
     footer.add(button("Travel Log", UiSkinProvider.BUTTON_GREEN,
         () -> go(new QuestScreen(game))));
     footer.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(new MainMenuScreen(game))));
-    content.add(footer).padTop(4f);
   }
 
   /**
@@ -244,33 +253,7 @@ public final class AdventureScreen extends MenuScreen {
     Progress progress = user.getProgress();
     chosenLevel = firstPlayable(progress);
 
-    LevelMap map = new LevelMap(skin, art, openChapter, AdventureMap.LEVELS_PER_STAGE,
-        new LevelMap.Source() {
-          @Override
-          public LevelMap.NodeState stateOf(int level) {
-            if (!progress.isLevelAccessible(openChapter, level)) {
-              return LevelMap.NodeState.LOCKED;
-            }
-            if (level <= clearedLevels(progress, openChapter)) {
-              return LevelMap.NodeState.COMPLETED;
-            }
-            return level == AdventureMap.LEVELS_PER_STAGE
-                ? LevelMap.NodeState.BOSS : LevelMap.NodeState.AVAILABLE;
-          }
-
-          @Override
-          public int currentLevel() {
-            return chosenLevel;
-          }
-        }, level -> {
-          if (level == chosenLevel) {
-            startLevel(level);
-            return;
-          }
-          if (onLevelChanged != null) {
-            onLevelChanged.run();
-          }
-        });
+    LevelMap map = levelMap(progress);
 
     playButton = button("Play Level " + chosenLevel, UiSkinProvider.BUTTON_GREEN,
         () -> startLevel(chosenLevel));
@@ -301,6 +284,37 @@ public final class AdventureScreen extends MenuScreen {
     footer.add(playButton);
     footer.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(new AdventureScreen(game))));
     content.add(footer).padTop(4f);
+  }
+
+  /** The nodes on the path: what each one looks like, and what clicking one does. */
+  private LevelMap levelMap(Progress progress) {
+    return new LevelMap(skin, art, openChapter, AdventureMap.LEVELS_PER_STAGE,
+        new LevelMap.Source() {
+          @Override
+          public LevelMap.NodeState stateOf(int level) {
+            if (!progress.isLevelAccessible(openChapter, level)) {
+              return LevelMap.NodeState.LOCKED;
+            }
+            if (level <= clearedLevels(progress, openChapter)) {
+              return LevelMap.NodeState.COMPLETED;
+            }
+            return level == AdventureMap.LEVELS_PER_STAGE
+                ? LevelMap.NodeState.BOSS : LevelMap.NodeState.AVAILABLE;
+          }
+
+          @Override
+          public int currentLevel() {
+            return chosenLevel;
+          }
+        }, level -> {
+          if (level == chosenLevel) {
+            startLevel(level);
+            return;
+          }
+          if (onLevelChanged != null) {
+            onLevelChanged.run();
+          }
+        });
   }
 
   private int firstPlayable(Progress progress) {

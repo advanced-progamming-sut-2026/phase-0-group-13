@@ -34,30 +34,8 @@ public final class SettingsScreen extends MenuScreen {
     return new MainMenuScreen(game);
   }
 
-  @Override
-  protected void buildContent(Table content) {
-    User user = UserManager.getInstance().getCurrentUser();
-    Table panel = panel();
-
-    if (user == null) {
-      panel.add(new Label("error: no user logged in", skin, UiSkinProvider.LABEL_MEDIUM)).row();
-      panel.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget()))).width(220f);
-      content.add(panel);
-      return;
-    }
-
-    SelectBox<String> difficulty = new SelectBox<>(skin);
-    difficulty.setItems(LEVELS);
-    difficulty.setSelected(String.valueOf(user.getDifficultyLevel()));
-    panel.add(new Label("Difficulty", skin, UiSkinProvider.LABEL_MEDIUM)).right().padRight(14f);
-    panel.add(difficulty).width(200f).height(46f).row();
-
-    SelectBox<String> speed = new SelectBox<>(skin);
-    speed.setItems(SPEEDS);
-    speed.setSelected(String.valueOf(GameSettings.getGameSpeed()));
-    panel.add(new Label("Game speed", skin, UiSkinProvider.LABEL_MEDIUM)).right().padRight(14f);
-    panel.add(speed).width(200f).height(46f).row();
-
+  /** The rows that take effect the moment they are touched, rather than waiting for Apply. */
+  private void addAudioAndToggleRows(Table panel) {
     panel.add(new Label("Music", skin, UiSkinProvider.LABEL_MEDIUM)).right().padRight(14f);
     panel.add(volumeSlider(GameSettings.getMusicVolume(), GameSettings::setMusicVolume))
         .width(200f).height(46f).row();
@@ -84,6 +62,33 @@ public final class SettingsScreen extends MenuScreen {
     panel.add(toggle(GameSettings.isDebugMode(),
         () -> GameSettings.setDebugMode(!GameSettings.isDebugMode())))
         .width(200f).height(46f).row();
+  }
+
+  @Override
+  protected void buildContent(Table content) {
+    User user = UserManager.getInstance().getCurrentUser();
+    Table panel = panel();
+
+    if (user == null) {
+      panel.add(new Label("error: no user logged in", skin, UiSkinProvider.LABEL_MEDIUM)).row();
+      panel.add(button("Back", UiSkinProvider.BUTTON_BROWN, () -> go(backTarget()))).width(220f);
+      content.add(panel);
+      return;
+    }
+
+    SelectBox<String> difficulty = new SelectBox<>(skin);
+    difficulty.setItems(LEVELS);
+    difficulty.setSelected(String.valueOf(user.getDifficultyLevel()));
+    panel.add(new Label("Difficulty", skin, UiSkinProvider.LABEL_MEDIUM)).right().padRight(14f);
+    panel.add(difficulty).width(200f).height(46f).row();
+
+    SelectBox<String> speed = new SelectBox<>(skin);
+    speed.setItems(SPEEDS);
+    speed.setSelected(String.valueOf(GameSettings.getGameSpeed()));
+    panel.add(new Label("Game speed", skin, UiSkinProvider.LABEL_MEDIUM)).right().padRight(14f);
+    panel.add(speed).width(200f).height(46f).row();
+
+    addAudioAndToggleRows(panel);
 
     Table actions = new Table();
     actions.defaults().pad(6f).width(200f).height(56f);
