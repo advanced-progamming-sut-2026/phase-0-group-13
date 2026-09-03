@@ -267,6 +267,8 @@ public final class EntityRenderer implements WorldRenderer {
   private final Map<Plant, float[]> muzzles = new java.util.IdentityHashMap<>();
   /** The same for the zombies that shoot: a Zombotany pea, a Hunter's ice. */
   private final Map<Zombie, float[]> zombieMuzzles = new java.util.IdentityHashMap<>();
+  /** The board being drawn this frame, for the clip picker's "is anything in range" test. */
+  private Board frameBoard;
   private boolean seenABoard;
 
   /**
@@ -585,6 +587,7 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   private void drawSprites(RenderContext context, Board board, float delta) {
+    frameBoard = board;
     muzzles.clear();
     zombieMuzzles.clear();
     context.getBatch().begin();
@@ -1148,9 +1151,12 @@ public final class EntityRenderer implements WorldRenderer {
     if (clip == null) {
       return false;
     }
-    float fuse = fuseTime(plant, animation, clip);
-    float time = fuse >= 0f
-        ? playback.hold(plant, clip, fuse)
+    float scripted = fuseTime(plant, animation, clip);
+    if (scripted < 0f) {
+      scripted = windUpTime(plant, animation, clip);
+    }
+    float time = scripted >= 0f
+        ? playback.hold(plant, clip, scripted)
         : playback.advance(plant, clip, delta);
     float x = geometry.columnCentreX(plant.getCol());
     float y = geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * PLANT_FOOT_INSET;
@@ -1289,9 +1295,9 @@ public final class EntityRenderer implements WorldRenderer {
       return intro;
     }
 
-    String[] names = ACTION_CLIP_NAMES.getOrDefault(plant.getName(), new String[] {"attack"});
-    String attack = animation.pickClip(withStage(names, stage));
-    if (attack != null && justActed(plant, animation.duration(attack)) && !isWaitingTrap(plant)) {
+    String attack = attackClip(animation, plant, stage);
+    if (attack != null && !isWaitingTrap(plant)
+        && (firedThisTick(plant) || windingUp(plant, animation.duration(attack)))) {
       return attack;
     }
 
@@ -1308,7 +1314,9 @@ public final class EntityRenderer implements WorldRenderer {
     String[] idleNames = stage > 0
         ? new String[] {"idle_stage" + stage, "idle", "loop"}
         : new String[] {"idle", "loop"};
-    return animation.pickClip(concat(damageStageClips(plant), concat(idleNames, names)));
+    String[] actionNames =
+        ACTION_CLIP_NAMES.getOrDefault(plant.getName(), new String[] {"attack"});
+    return animation.pickClip(concat(damageStageClips(plant), concat(idleNames, actionNames)));
   }
 
   /**
@@ -1426,6 +1434,88 @@ public final class EntityRenderer implements WorldRenderer {
     System.arraycopy(first, 0, out, 0, first.length);
     System.arraycopy(second, 0, out, first.length, second.length);
     return out;
+  }
+
+  private String attackClip(EntityAnimation animation, Plant plant, int stage) {
+    String[] names = ACTION_CLIP_NAMES.getOrDefault(plant.getName(), new String[] {"attack"});
+    return animation.pickClip(withStage(names, stage));
+  }
+
+  /** The tick a plant fires on: the frame its shooting animation should be finishing on. */
+  private boolean firedThisTick(Plant plant) {
+    return plant.getLastActionTick() > 0 && plant.getLastActionTick() == currentTick;
+  }
+
+  /**
+   * True while a plant is winding up to a shot it is about to take.
+   *
+   * <p>The attack used to be played for a few ticks *after* the plant had fired, which put the
+   * projectile at the start of the shooting animation: the pea was already a tile downrange while
+   * the plant was still drawing back. Reading the behaviour's own interval lets the clip run in
+   * the ticks leading up to the shot instead, so the animation finishes on the frame the pea
+   * leaves. Nothing here can change when the plant actually fires -- the model owns that -- and a
+   * behaviour with no interval falls back to the old post-hoc hold.
+   */
+  private boolean windingUp(Plant plant, float attackSeconds) {
+    int interval = plant.getBehavior() == null ? 0 : plant.getBehavior().actionIntervalTicks();
+    if (interval <= 0) {
+      return justActed(plant, attackSeconds);
+    }
+    // A plant with nothing to shoot at does not fire, so it must not mime a shot either.
+    if (!hasTargetNear(plant)) {
+      return false;
+    }
+    int next = plant.getLastActionTick() + interval;
+    return currentTick > next - windUpTicks(plant, attackSeconds) && currentTick <= next;
+  }
+
+  /** How long the wind-up runs: the clip's own length, never longer than the firing interval. */
+  private int windUpTicks(Plant plant, float attackSeconds) {
+    int interval = plant.getBehavior() == null ? 0 : plant.getBehavior().actionIntervalTicks();
+    int clipTicks = Math.max(1, Math.round(attackSeconds * GdxConfig.TICKS_PER_SECOND));
+    return interval > 0 ? Math.min(interval, clipTicks) : clipTicks;
+  }
+
+  /** Anything in this plant's lane or either neighbour, which covers the lane-spread shooters. */
+  private boolean hasTargetNear(Plant plant) {
+    if (frameBoard == null) {
+      return true;
+    }
+    for (int row = plant.getRow() - 1; row <= plant.getRow() + 1; row++) {
+      if (row >= 0 && row < frameBoard.getRows()
+          && frameBoard.hasZombieInRow(row, plant.getCol())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Where in its attack clip a plant that is winding up should be drawn, or -1 for one that is not.
+   *
+   * <p>Driven off the tick the shot is due on rather than off the frame clock, the same way a lit
+   * fuse is, so the last frame of the wind-up lands on the tick the projectile is created however
+   * long the clip happens to be.
+   */
+  private float windUpTime(Plant plant, EntityAnimation animation, String clip) {
+    if (!clip.equals(attackClip(animation, plant, growthStage(plant)))) {
+      return -1f;
+    }
+    float length = animation.duration(clip);
+    if (length <= 0f) {
+      return -1f;
+    }
+    if (firedThisTick(plant)) {
+      return length;
+    }
+    int interval = plant.getBehavior() == null ? 0 : plant.getBehavior().actionIntervalTicks();
+    if (interval <= 0) {
+      return -1f;
+    }
+    int windUp = windUpTicks(plant, length);
+    int next = plant.getLastActionTick() + interval;
+    float left = (next - currentTick) - tickAlpha;
+    return Math.max(0f, Math.min(1f, 1f - left / windUp)) * length;
   }
 
   private boolean justActed(Plant plant, float attackSeconds) {

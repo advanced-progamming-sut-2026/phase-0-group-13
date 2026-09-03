@@ -59,6 +59,11 @@ public class ShootForwardAction implements PlantAction {
     this.pierceLimit = Math.max(0, pierceLimit);
   }
 
+  @Override
+  public int actionIntervalTicks() {
+    return actionInterval;
+  }
+
   /** Shots per direction per volley: Repeater's 2, Mega Gatling Pea's 4. */
   public void setVolleySize(int volleySize) {
     this.volleySize = Math.max(1, volleySize);

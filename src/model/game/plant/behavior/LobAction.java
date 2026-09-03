@@ -25,6 +25,11 @@ public class LobAction implements PlantAction {
   }
 
   @Override
+  public int actionIntervalTicks() {
+    return actionInterval;
+  }
+
+  @Override
   public void execute(Plant plant, Board board, int currentTick) {
     if (currentTick - plant.getLastActionTick() < actionInterval) return;
 

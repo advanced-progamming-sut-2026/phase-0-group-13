@@ -1660,16 +1660,48 @@
       "potato-mine",
       "cabbage-pult",
       "puff-shroom",
-      "repeater"
+      "repeater",
+      "bonk choy",
+      "grave buster",
+      "iceberg lettuce",
+      "hot potato"
     ],
     "unlockedZombies": [
       "zombie_zombiemummyarmor2default",
       "zombie_zombieegyptimpdefault",
       "zombie_zombiepianodefault",
       "zombie_zombiemodernallstardefault",
-      "zombie_zombiedarkturquoisedefault"
+      "zombie_zombiedarkturquoisedefault",
+      "zombie_zombieparasoldefault",
+      "zombie_zombiemummyarmor1default",
+      "zombie_zombiemummydefault",
+      "zombie_zombiedarkarmor3default",
+      "zombie_zombieeightiesarcade",
+      "zombie_zombiemodernnewspaperdefault",
+      "zombie_zombiezombossmechegypt",
+      "zombie_zombiedarkbarrelrollerdefault"
     ],
     "recentGames": [
+      {
+        "won": true,
+        "score": 200,
+        "rewardCoins": 250
+      },
+      {
+        "won": true,
+        "score": 280,
+        "rewardCoins": 150
+      },
+      {
+        "won": true,
+        "score": 100,
+        "rewardCoins": 200
+      },
+      {
+        "won": true,
+        "score": 180,
+        "rewardCoins": 200
+      },
       {
         "won": true,
         "score": 200,
@@ -1677,10 +1709,11 @@
       }
     ],
     "unlockedStages": [
-      "stage_1"
+      "stage_1",
+      "stage_2"
     ],
     "progress": {
-      "currentStage": 1,
+      "currentStage": 2,
       "currentLevel": 2,
       "miniGamesUnlocked": true,
       "survivalModeUnlocked": false,
@@ -1692,12 +1725,14 @@
         "zombotany"
       ],
       "clearedMiniGameLevels": {},
-      "maxClearedStage": 1,
+      "maxClearedStage": 2,
       "maxClearedLevel": 1,
       "adventureCompleted": false
     },
     "inventory": {
-      "items": {}
+      "items": {
+        "pot": 3
+      }
     },
     "greenHouse": {
       "maxCapacity": 20,
@@ -1824,6 +1859,142 @@
         }
       ],
       "unreadNews": [
+        {
+          "type": "plant",
+          "targetId": "hot potato",
+          "title": "New Plant",
+          "message": "New plant unlocked: Hot Potato",
+          "timestamp": 1788468010103,
+          "isRead": false
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkbarrelrollerdefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Dark Barrel Roller",
+          "timestamp": 1788467923803,
+          "isRead": false
+        },
+        {
+          "type": "stage",
+          "targetId": "stage_2",
+          "title": "New Stage",
+          "message": "New stage available: Chapter 2 - Frostbite Caves",
+          "timestamp": 1788467876420,
+          "isRead": false
+        },
+        {
+          "type": "plant",
+          "targetId": "iceberg lettuce",
+          "title": "New Plant",
+          "message": "New plant unlocked: Iceberg Lettuce",
+          "timestamp": 1788467876420,
+          "isRead": false
+        },
+        {
+          "type": "quest",
+          "targetId": "Demolition Expert",
+          "title": "Quest Complete",
+          "message": "Quest completed: Demolition Expert",
+          "timestamp": 1788467876420,
+          "isRead": false
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombossmechegypt",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Zomboss Mech Egypt",
+          "timestamp": 1788467706025,
+          "isRead": false
+        },
+        {
+          "type": "plant",
+          "targetId": "grave buster",
+          "title": "New Plant",
+          "message": "New plant unlocked: Grave Buster",
+          "timestamp": 1788467657851,
+          "isRead": false
+        },
+        {
+          "type": "quest",
+          "targetId": "Undefended Cross",
+          "title": "Quest Complete",
+          "message": "Quest completed: Undefended Cross",
+          "timestamp": 1788467657850,
+          "isRead": false
+        },
+        {
+          "type": "quest",
+          "targetId": "Blossom Under Constraints",
+          "title": "Quest Complete",
+          "message": "Quest completed: Blossom Under Constraints",
+          "timestamp": 1788467657850,
+          "isRead": false
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiemodernnewspaperdefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Modern Newspaper",
+          "timestamp": 1788467624061,
+          "isRead": false
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieeightiesarcade",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Eighties Arcade",
+          "timestamp": 1788467539463,
+          "isRead": false
+        },
+        {
+          "type": "plant",
+          "targetId": "bonk choy",
+          "title": "New Plant",
+          "message": "New plant unlocked: Bonk Choy",
+          "timestamp": 1788467511794,
+          "isRead": false
+        },
+        {
+          "type": "quest",
+          "targetId": "Defense Master",
+          "title": "Quest Complete",
+          "message": "Quest completed: Defense Master",
+          "timestamp": 1788467511793,
+          "isRead": false
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkarmor3default",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Dark Armor 3",
+          "timestamp": 1788467439693,
+          "isRead": false
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiemummydefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Mummy",
+          "timestamp": 1788467417592,
+          "isRead": false
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiemummyarmor1default",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Mummy Armor 1",
+          "timestamp": 1788467380203,
+          "isRead": false
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieparasoldefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Parasol",
+          "timestamp": 1788467362316,
+          "isRead": false
+        },
         {
           "type": "zombie",
           "targetId": "zombie_zombiedarkturquoisedefault",
@@ -1965,8 +2136,8 @@
         "Reward": "200 Gems",
         "Priority": "Critical",
         "progressOfQuest": 0.0,
-        "isCompleted": false,
-        "rewardClaimed": false,
+        "isCompleted": true,
+        "rewardClaimed": true,
         "questTarget": 0.0
       },
       {
@@ -1987,7 +2158,7 @@
         "Reward": "100 Coins",
         "Priority": "Low",
         "progressOfQuest": 0.0,
-        "isCompleted": false,
+        "isCompleted": true,
         "rewardClaimed": false,
         "questTarget": 0.0
       },
@@ -2022,7 +2193,7 @@
         "Priority": "High",
         "Variable": "Shroom",
         "progressOfQuest": 0.0,
-        "isCompleted": false,
+        "isCompleted": true,
         "rewardClaimed": false,
         "questTarget": 0.0
       },
@@ -2113,7 +2284,7 @@
         "Priority": "High",
         "Variable": "4",
         "progressOfQuest": 0.0,
-        "isCompleted": false,
+        "isCompleted": true,
         "rewardClaimed": false,
         "questTarget": 0.0
       },
@@ -2184,9 +2355,20 @@
       "potatomine": 1,
       "puffshroom": 1,
       "sunflower": 1,
-      "repeater": 1
+      "repeater": 1,
+      "bonkchoy": 1,
+      "gravebuster": 1,
+      "iceberglettuce": 1,
+      "hotpotato": 1
     },
-    "selectedDeck": [],
+    "selectedDeck": [
+      "potato-mine",
+      "cabbage-pult",
+      "peashooter",
+      "iceberg lettuce",
+      "hot potato",
+      "wall-nut"
+    ],
     "boostedPlants": [],
     "username": "Arash",
     "passwordHash": "1bdcb54d3fb432a2da62e8f003269fb21bedaef1cb05efde1047a7e209084a95",
@@ -2194,10 +2376,10 @@
     "nickname": "Arash",
     "securityQuestionNumber": "1",
     "securityAnswer": "test",
-    "coins": 150,
-    "diamonds": 0,
+    "coins": 950,
+    "diamonds": 200,
     "difficultyLevel": 1,
-    "lastShopRefreshTime": 1788465910743,
+    "lastShopRefreshTime": 1788468029631,
     "lastDailyDealPurchaseTime": 0,
     "meowPoints": 0,
     "highestMeowPoints": 0,

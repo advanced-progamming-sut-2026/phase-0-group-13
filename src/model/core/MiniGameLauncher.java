@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import model.enums.Menu;
 import model.enums.MiniGameType;
+import model.environment.AncientEgyptSeason;
+import model.environment.Season;
 import model.game.Wave;
 import model.game.WaveGenerator;
+import model.game.zombie.Zombie;
 
 public final class MiniGameLauncher {
   private static final int ROWS = 5;
@@ -44,8 +47,14 @@ public final class MiniGameLauncher {
     MiniGameType type = MatchSetup.getInstance().getCurrentMiniGame();
     int level = MatchSetup.getInstance().getMiniGameLevel();
 
+    // Same reason as the bonus game: with no season the renderer paints the Dark Ages night lawn
+    // while sky sun keeps falling on it, because only DarkAgesSeason turns that off.
+    Season season = new AncientEgyptSeason();
+
     GameManager gameManager = new GameManager();
-    gameManager.initializeLevel(ROWS, COLS, buildWaves(level, type));
+    gameManager.initializeLevel(ROWS, COLS, buildWaves(level, type, season));
+    season.applySeasonEffects(gameManager.getBoard().getGameState());
+    gameManager.setSeason(season);
     gameManager.startGame();
 
     GameSession.start(gameManager, Menu.QuestMenu);
@@ -60,18 +69,29 @@ public final class MiniGameLauncher {
     System.out.println(entryMessage(type));
   }
 
-  private static List<Wave> buildWaves(int level, MiniGameType type) {
+  /**
+   * Zombotany draws its own four; everything else takes the season's roster.
+   *
+   * <p>The non-Zombotany branch used to sweep the whole of Zombies.json, which meant a mini-game
+   * could open on all four Dr. Zombosses, or on a prop with no hit points, no speed and no rig.
+   */
+  private static List<Wave> buildWaves(int level, MiniGameType type, Season season) {
     List<String> zombieNames = new ArrayList<>();
-    if (GameDataManager.zombieRepository != null) {
-      for (var template : GameDataManager.zombieRepository.getAll()) {
-        String name = template.getName();
-        if (name == null || zombieNames.contains(name)) {
-          continue;
+    if (type == MiniGameType.ZOMBOTANY) {
+      if (GameDataManager.zombieRepository != null) {
+        for (var template : GameDataManager.zombieRepository.getAll()) {
+          String name = template.getName();
+          if (name != null && name.toLowerCase().contains("zombotany")
+                  && !zombieNames.contains(name)) {
+            zombieNames.add(name);
+          }
         }
-        if (type == MiniGameType.ZOMBOTANY && !name.toLowerCase().contains("zombotany")) {
-          continue;
+      }
+    } else {
+      for (Zombie zombie : season.getAvailableZombies()) {
+        if (zombie.getName() != null && !zombieNames.contains(zombie.getName())) {
+          zombieNames.add(zombie.getName());
         }
-        zombieNames.add(name);
       }
     }
     return WaveGenerator.generate(level, zombieNames);

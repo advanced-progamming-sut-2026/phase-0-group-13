@@ -13,6 +13,11 @@ public class ButterLobAction implements PlantAction {
   private static final int STUN_TICKS = 30;
 
   private final int actionInterval;
+
+  @Override
+  public int actionIntervalTicks() {
+    return actionInterval;
+  }
   private final int kernelDamage;
   private final int butterDamage;
   private final int butterChancePercent;
