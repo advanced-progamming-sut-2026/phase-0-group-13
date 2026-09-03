@@ -1155,9 +1155,17 @@ public final class EntityRenderer implements WorldRenderer {
     if (scripted < 0f) {
       scripted = windUpTime(plant, animation, clip);
     }
+    // Grave Buster is the one rig with no resting clip at all -- attack, attack1, water and
+    // nothing else -- so the idle fallback lands it on its own eating animation and it chewed the
+    // air for as long as it stood there. With nothing to rest on it holds its first frame, and
+    // runs the clip through only while it is actually busting a grave.
+    String anchor = anchorClip(animation, plant);
+    boolean noRestingClip = anchor == null && !justActed(plant, animation.duration(clip));
     float time = scripted >= 0f
         ? playback.hold(plant, clip, scripted)
-        : playback.advance(plant, clip, delta);
+        : noRestingClip
+            ? playback.hold(plant, clip, 0f)
+            : playback.advance(plant, clip, delta);
     float x = geometry.columnCentreX(plant.getCol());
     float y = geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * PLANT_FOOT_INSET;
     // Sized and placed by the plant's resting clip, not the one playing. Both are taken from the
@@ -1165,7 +1173,6 @@ public final class EntityRenderer implements WorldRenderer {
     // that reading them off the playing clip made the plant lurch forward and shrink on the shot.
     // The halo-wide plants still skip the clamp entirely: their boxes are mostly glow whichever
     // clip is measured, so anchoring alone would not bring them back to size.
-    String anchor = anchorClip(animation, plant);
     float scale = HALO_WIDE_PLANTS.contains(plant.getName())
         ? geometry.getCellHeight() * PLANT_ROW_FILL / PLANT_ANIM_UNITS
         : scaleFor(animation.width(anchor), PLANT_ANIM_UNITS, PLANT_ROW_FILL);
