@@ -574,10 +574,28 @@ public final class EntityAnimation {
     }
 
     private static boolean isOptional(String name) {
-      return name != null && (name.equals("butter") || name.equals("ink")
-          || name.contains("armor") || name.contains("custom")
-          || name.startsWith("ground_swatch") || name.contains("arm_outer_upper_bone"));
+      return isStrayPart(name);
     }
+  }
+
+  /**
+   * Parts the rigs carry but do not mean to show.
+   *
+   * <p>Matched narrowly on purpose. "item" as a plain substring also catches the Grape Shot's
+   * whiteMelonBody, which is the plant itself, so the slot suffix is anchored: a {@code *_Item}
+   * is the placeholder a rig holds something in, and Magnet-shroom's was drawing as a flat purple
+   * slab across its face because nothing has ever been put in it. "Duplicate Items Folder/" is
+   * the artists' own leftovers -- a Sun-shroom eye highlight sitting in Rotobaga, an E.M.Peach arc
+   * in the Egypt Zomboss, a stray bounding box -- none of which belong to the rig they were left
+   * in.
+   *
+   * <p>Package-visible so a test can pin the matching, which is easy to widen by accident.
+   */
+  static boolean isStrayPart(String name) {
+    return name != null && (name.equals("butter") || name.equals("ink")
+        || name.contains("armor") || name.contains("custom")
+        || name.endsWith("_Item") || name.startsWith("Duplicate Items Folder/")
+        || name.startsWith("ground_swatch") || name.contains("arm_outer_upper_bone"));
   }
 
   private static final class Frame {
