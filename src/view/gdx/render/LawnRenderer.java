@@ -103,7 +103,8 @@ public final class LawnRenderer implements WorldRenderer {
     }
     if (background != null) {
       context.getBatch().begin();
-      SeasonBackdrop.draw(context.getBatch(), backgroundAtlas, season);
+      SeasonBackdrop.draw(context.getBatch(), backgroundAtlas, season,
+          context.getViewport().getWorldWidth(), context.getViewport().getWorldHeight());
       context.getBatch().end();
     }
   }
@@ -133,6 +134,21 @@ public final class LawnRenderer implements WorldRenderer {
 
   public static float[] lawnBounds(String seasonKey) {
     return SeasonBackdrop.lawnBounds(seasonKey);
+  }
+
+  /**
+   * The lawn's box for a viewport that is not 16:9.
+   *
+   * <p>The grid is painted into the backdrop, so it has to be placed with the same scale the
+   * backdrop was drawn at or the tiles drift off the painting. The screens pass their viewport's
+   * own size, which is what makes the board land on the artwork on a 16:10 laptop.
+   */
+  public static float[] lawnBounds(GameManager game, float worldWidth, float worldHeight) {
+    return SeasonBackdrop.lawnBounds(seasonKey(game), worldWidth, worldHeight);
+  }
+
+  public static float[] lawnBounds(String seasonKey, float worldWidth, float worldHeight) {
+    return SeasonBackdrop.lawnBounds(seasonKey, worldWidth, worldHeight);
   }
 
   private void drawGrid(RenderContext context, Board board) {

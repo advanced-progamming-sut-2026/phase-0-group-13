@@ -129,8 +129,23 @@ public final class EntityAnimation {
    */
   public void draw(Batch batch, String clip, float time, float x, float y, float scale,
       boolean flip, Map<String, Boolean> visibility) {
+    draw(batch, clip, clip, time, x, y, scale, flip, visibility);
+  }
+
+  /**
+   * Draws a clip standing where {@code anchorClip} would stand.
+   *
+   * <p>Every clip is placed by its own box: the middle of that box goes on {@code x} and the
+   * bottom of it on {@code y}. That is right within one clip and wrong the moment an entity
+   * changes clip, because the boxes are not the same -- a Snow Pea's attack is 42% wider than its
+   * idle and a Cabbage-pult's is 84% wider, so a plant taking a shot jumped sideways as the clip
+   * swapped in and jumped back when it finished. Naming a clip to be placed by, and giving it the
+   * idle, keeps a plant still while its own animation plays inside the box.
+   */
+  public void draw(Batch batch, String clip, String anchorClip, float time, float x, float y,
+      float scale, boolean flip, Map<String, Boolean> visibility) {
     Clip found = clips.get(clip);
-    Bounds bounds = boundsOf(clip);
+    Bounds bounds = boundsOf(anchorClip == null ? clip : anchorClip);
     if (found == null || bounds == null) {
       return;
     }
@@ -171,8 +186,14 @@ public final class EntityAnimation {
   }
 
   public float[] topPartBox(String clip, float time, float x, float y, float scale, boolean flip) {
+    return topPartBox(clip, clip, time, x, y, scale, flip);
+  }
+
+  /** Same as {@link #topPartBox}, placed by {@code anchorClip} so it agrees with a stable draw. */
+  public float[] topPartBox(String clip, String anchorClip, float time, float x, float y,
+      float scale, boolean flip) {
     Clip found = clips.get(clip);
-    Bounds bounds = boundsOf(clip);
+    Bounds bounds = boundsOf(anchorClip == null ? clip : anchorClip);
     if (found == null || bounds == null) {
       return null;
     }

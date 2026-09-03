@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import data.persistence.UserManager;
 import model.account.User;
 import model.core.MiniGameLauncher;
@@ -116,7 +116,7 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
     art = new ArcadeRenderer(geometry);
     skin = game.getUiSkin().get();
 
-    stage = new Stage(new FillViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
+    stage = new Stage(new ExtendViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
     if (skin != null) {
       buildHud();
     }
@@ -204,7 +204,8 @@ public abstract class ArcadeBoardScreen extends BaseScreen {
   }
 
   private void layout() {
-    float[] box = LawnRenderer.lawnBounds(seasonKey());
+    float[] box = LawnRenderer.lawnBounds(seasonKey(),
+        context().getViewport().getWorldWidth(), context().getViewport().getWorldHeight());
     geometry.setBounds(box[0], box[1], box[2], box[3]);
   }
 

@@ -38,25 +38,38 @@ public final class SeasonBackdrop {
     }
   }
 
-  private static float scaleFor(Layout layout) {
-    return GdxConfig.WORLD_HEIGHT / SIDE_HEIGHT;
+  /**
+   * How far the painting is blown up to stand in the window.
+   *
+   * <p>Driven by the height the viewport actually has rather than by {@link GdxConfig#WORLD_HEIGHT}
+   * so that a window taller than 16:9 -- any 16:10 laptop -- gets a backdrop that reaches the top
+   * of it. One scale for both axes, because the doc asks for the background to cover the screen
+   * "بدون اینکه نسبت ابعاد آن تغییر کند": grown, never stretched.
+   */
+  private static float scaleFor(float worldHeight) {
+    return worldHeight / SIDE_HEIGHT;
   }
 
   public static float[] lawnBounds(String seasonKey) {
-    return lawnBounds(layoutFor(seasonKey));
+    return lawnBounds(seasonKey, GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT);
   }
 
-  private static float[] lawnBounds(Layout layout) {
-    float scale = scaleFor(layout);
+  public static float[] lawnBounds(String seasonKey, float worldWidth, float worldHeight) {
+    return lawnBounds(layoutFor(seasonKey), worldWidth, worldHeight);
+  }
+
+  private static float[] lawnBounds(Layout layout, float worldWidth, float worldHeight) {
+    float scale = scaleFor(worldHeight);
     float width = layout.gridWidth() * scale;
     float height = layout.gridHeight() * scale;
-    float x = (GdxConfig.WORLD_WIDTH - width) / 2f;
-    float y = GdxConfig.WORLD_HEIGHT - (layout.gridTop() + layout.gridHeight()) * scale;
+    float x = (worldWidth - width) / 2f;
+    float y = worldHeight - (layout.gridTop() + layout.gridHeight()) * scale;
     return new float[] {x, y, width, height};
   }
 
-  private static float mainLeft(Layout layout) {
-    return lawnBounds(layout)[0] - layout.gridX() * scaleFor(layout);
+  private static float mainLeft(Layout layout, float worldWidth, float worldHeight) {
+    return lawnBounds(layout, worldWidth, worldHeight)[0]
+        - layout.gridX() * scaleFor(worldHeight);
   }
 
   /**
@@ -65,6 +78,11 @@ public final class SeasonBackdrop {
    * @return true if anything was drawn
    */
   public static boolean draw(Batch batch, TextureAtlas atlas, String seasonKey) {
+    return draw(batch, atlas, seasonKey, GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT);
+  }
+
+  public static boolean draw(Batch batch, TextureAtlas atlas, String seasonKey, float worldWidth,
+      float worldHeight) {
     if (atlas == null) {
       return false;
     }
@@ -73,21 +91,20 @@ public final class SeasonBackdrop {
       return false;
     }
     Layout layout = layoutFor(seasonKey);
-    float scale = scaleFor(layout);
-    float left = mainLeft(layout);
+    float scale = scaleFor(worldHeight);
+    float left = mainLeft(layout, worldWidth, worldHeight);
     float mainWidth = layout.mainWidth() * scale;
     float mainHeight = layout.mainHeight() * scale;
-    float sideHeight = GdxConfig.WORLD_HEIGHT;
 
     TextureRegion leftStrip = atlas.findRegion(LEFT_REGION);
     if (leftStrip != null) {
       float stripWidth = layout.leftWidth() * scale;
-      batch.draw(leftStrip, left - stripWidth, 0f, stripWidth, sideHeight);
+      batch.draw(leftStrip, left - stripWidth, 0f, stripWidth, worldHeight);
     }
-    batch.draw(main, left, GdxConfig.WORLD_HEIGHT - mainHeight, mainWidth, mainHeight);
+    batch.draw(main, left, worldHeight - mainHeight, mainWidth, mainHeight);
     TextureRegion rightStrip = atlas.findRegion(RIGHT_REGION);
     if (rightStrip != null) {
-      batch.draw(rightStrip, left + mainWidth, 0f, layout.rightWidth() * scale, sideHeight);
+      batch.draw(rightStrip, left + mainWidth, 0f, layout.rightWidth() * scale, worldHeight);
     }
     return true;
   }

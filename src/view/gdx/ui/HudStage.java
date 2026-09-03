@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -69,7 +69,7 @@ public final class HudStage implements Disposable {
   private String selected;
 
   public HudStage() {
-    this.stage = new Stage(new FillViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
+    this.stage = new Stage(new ExtendViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT));
   }
 
   public Stage getStage() {

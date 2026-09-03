@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import view.gdx.core.GdxConfig;
 
@@ -23,7 +23,7 @@ public final class RenderContext implements Disposable {
     this.batch = new SpriteBatch();
     this.shapes = new ShapeRenderer();
     this.camera = new OrthographicCamera();
-    this.viewport = new FillViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT, camera);
+    this.viewport = new ExtendViewport(GdxConfig.WORLD_WIDTH, GdxConfig.WORLD_HEIGHT, camera);
     this.viewport.apply(true);
   }
 

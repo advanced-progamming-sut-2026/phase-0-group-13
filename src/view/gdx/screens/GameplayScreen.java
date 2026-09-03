@@ -415,7 +415,8 @@ public final class GameplayScreen extends BaseScreen {
   }
 
   private void layout() {
-    float[] box = LawnRenderer.lawnBounds(match);
+    float[] box = LawnRenderer.lawnBounds(match,
+        context().getViewport().getWorldWidth(), context().getViewport().getWorldHeight());
     geometry.setBounds(box[0], box[1], box[2], box[3]);
   }
 

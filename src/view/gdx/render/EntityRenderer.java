@@ -924,7 +924,8 @@ public final class EntityRenderer implements WorldRenderer {
       animation.draw(context.getBatch(), clip, playback.advance(fallen, clip, delta),
           geometry.columnCentreX(fallen.column),
           geometry.rowToY(fallen.row) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET,
-          zombieAnimationScale(fallen.zombie, animation, clip),
+          zombieAnimationScale(fallen.zombie, animation,
+              zombieAnchorClip(animation, fallen.zombie)),
           fallen.zombie.isHypnotized(), corpseVisibility(animation, fallen));
     }
   }
@@ -1028,10 +1029,26 @@ public final class EntityRenderer implements WorldRenderer {
         : playback.advance(plant, clip, delta);
     float x = geometry.columnCentreX(plant.getCol());
     float y = geometry.rowToY(plant.getRow()) + geometry.getCellHeight() * PLANT_FOOT_INSET;
-    float scale = scaleFor(animation.width(clip), PLANT_ANIM_UNITS, PLANT_ROW_FILL);
-    animation.draw(context.getBatch(), clip, time, x, y, scale, false);
-    noteMuzzle(plant, animation, clip, time, x, y, scale);
+    // Sized and placed by the plant's resting clip, not the one playing. Both are taken from the
+    // clip's own box, and the boxes differ enough between a plant standing and a plant shooting
+    // that reading them off the playing clip made the plant lurch forward and shrink on the shot.
+    String anchor = anchorClip(animation, plant);
+    float scale = scaleFor(animation.width(anchor), PLANT_ANIM_UNITS, PLANT_ROW_FILL);
+    animation.draw(context.getBatch(), clip, anchor, time, x, y, scale, false, null);
+    noteMuzzle(plant, animation, clip, anchor, time, x, y, scale);
     return true;
+  }
+
+  /**
+   * The clip a plant is sized and placed by: its idle for whatever growth stage it is at.
+   *
+   * <p>Growth stages are kept apart because a Sun-shroom really is smaller at stage one, and that
+   * is a change in the plant rather than a wobble from swapping clips.
+   */
+  private String anchorClip(EntityAnimation animation, Plant plant) {
+    int stage = growthStage(plant);
+    String idle = animation.pickClip(withStage(new String[] {"idle"}, stage));
+    return idle != null ? idle : animation.pickClip("idle", "loop");
   }
 
   /**
@@ -1062,12 +1079,14 @@ public final class EntityRenderer implements WorldRenderer {
    * read off the length of the clip that is playing and kept inside the tick it was fired on so
    * the shot is never held back past the tick that already dealt its damage.
    */
-  private void noteMuzzle(Plant plant, EntityAnimation animation, String clip, float time,
-      float x, float y, float scale) {
+  private void noteMuzzle(Plant plant, EntityAnimation animation, String clip, String anchor,
+      float time, float x, float y, float scale) {
     if (geometry.getCellWidth() <= 0f) {
       return;
     }
-    float[] head = animation.topPartBox(clip, time, x, y, scale, false);
+    // Same anchor the plant was drawn with, or the muzzle is measured against a body that is not
+    // where the body actually is and the shot leaves from beside the plant.
+    float[] head = animation.topPartBox(clip, anchor, time, x, y, scale, false);
     if (head == null) {
       return;
     }
@@ -1276,10 +1295,11 @@ public final class EntityRenderer implements WorldRenderer {
     float x = geometry.columnCentreX(column);
     float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
         + throwLift(flight);
-    float scale = zombieAnimationScale(zombie, animation, clip);
-    animation.draw(context.getBatch(), clip, time, x, y, scale, zombie.isHypnotized(),
+    String anchor = zombieAnchorClip(animation, zombie);
+    float scale = zombieAnimationScale(zombie, animation, anchor);
+    animation.draw(context.getBatch(), clip, anchor, time, x, y, scale, zombie.isHypnotized(),
         armourVisibility(animation, zombie));
-    drawPlantHead(context, zombie, animation, clip, time, x, y, scale);
+    drawPlantHead(context, zombie, animation, clip, anchor, time, x, y, scale);
     return true;
   }
 
@@ -1291,14 +1311,15 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   private void drawPlantHead(RenderContext context, Zombie zombie, EntityAnimation body,
-      String clip, float time, float x, float y, float scale) {
+      String clip, String anchor, float time, float x, float y, float scale) {
     String plant = ZombieArt.zombotanyPlant(zombie.getName());
     if (plant == null) {
       return;
     }
     EntityAnimation rig = animations.find(AnimationLibrary.PLANTS, plant);
     String idle = rig == null ? null : rig.pickClip("idle");
-    float[] head = body.topPartBox(clip, time, x, y, scale, zombie.isHypnotized());
+    // Measured against the same anchor the body was drawn with, so the head rides the shoulders.
+    float[] head = body.topPartBox(clip, anchor, time, x, y, scale, zombie.isHypnotized());
     if (idle == null || head == null) {
       return;
     }
@@ -1538,6 +1559,21 @@ public final class EntityRenderer implements WorldRenderer {
     return clip != null && clip.toLowerCase().contains("walk");
   }
 
+  /**
+   * The clip a zombie is sized and placed by: whatever it looks like walking.
+   *
+   * <p>Same reason plants are anchored to their idle. A clip's box is measured across all of its
+   * frames, and eating, dying and every signature move have boxes of their own, so reading the
+   * box off whatever is playing resized and shifted the zombie every time it changed what it was
+   * doing. The prop suffix comes along so a Newspaper zombie stays measured against the clip it
+   * is actually walking with.
+   */
+  private static String zombieAnchorClip(EntityAnimation animation, Zombie zombie) {
+    String suffix = propSuffix(zombie);
+    String walk = animation.pickClip("walk" + suffix, "walk", "idle" + suffix, "idle");
+    return walk != null ? walk : animation.pickClip("idle");
+  }
+
   private float zombieAnimationScale(Zombie zombie, EntityAnimation animation, String clip) {
     float height = animation.height(clip);
     if (isBoss(zombie)) {
@@ -1569,6 +1605,7 @@ public final class EntityRenderer implements WorldRenderer {
       return null;
     }
     String clip = zombieClip(animation, zombie);
+    String anchor = zombieAnchorClip(animation, zombie);
     float time = playback.peek(zombie);
     float flight = zombie.flightProgress();
     double column = flight > 0f
@@ -1577,8 +1614,8 @@ public final class EntityRenderer implements WorldRenderer {
     float x = geometry.columnCentreX(onBoard(column));
     float y = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
         + throwLift(flight);
-    float scale = zombieAnimationScale(zombie, animation, clip);
-    float[] top = animation.topPartBox(clip, time, x, y, scale, zombie.isHypnotized());
+    float scale = zombieAnimationScale(zombie, animation, anchor);
+    float[] top = animation.topPartBox(clip, anchor, time, x, y, scale, zombie.isHypnotized());
     return top == null ? null : top[1] + top[3] / 2f;
   }
 
@@ -1593,7 +1630,8 @@ public final class EntityRenderer implements WorldRenderer {
     EntityAnimation animation = zombieAnimation(zombie);
     if (animation != null) {
       String clip = zombieClip(animation, zombie);
-      return animation.height(clip) * zombieAnimationScale(zombie, animation, clip);
+      return animation.height(clip)
+          * zombieAnimationScale(zombie, animation, zombieAnchorClip(animation, zombie));
     }
     TextureRegion art = zombieArt.find(zombie.getName());
     return art == null
