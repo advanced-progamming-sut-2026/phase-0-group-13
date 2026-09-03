@@ -716,12 +716,18 @@ public class Board {
     }
     return top;
   }
+  /**
+   * The plant a zombie standing here has to get through, or null for an open tile.
+   *
+   * <p>A disabled plant is still a plant. This used to return null for one, which confused "cannot
+   * act" with "is not there": a Wizard's sheep and an octopus-pinned plant both stopped blocking
+   * anything, so a single Wizard walking down a lane turned the whole wall behind it into scenery
+   * and every zombie in that lane strolled through to the house. Being unable to shoot has never
+   * been the same as being intangible -- a Wall-nut does nothing but sit there and it still stops
+   * a zombie dead.
+   */
   public Plant getEdiblePlantAt(int row, double x, int currentTick) {
-    Plant plant = getTopPlantAt(row, x);
-    if (plant != null && plant.isDisabled(currentTick)) {
-      return null;
-    }
-    return plant;
+    return getTopPlantAt(row, x);
   }
   public Zombie getZombieAt(int row, double x) {
     for (Zombie z : zombies) {

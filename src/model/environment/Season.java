@@ -103,7 +103,8 @@ public abstract class Season {
   private static ZombieTemplate templateFor(ZombieType type) {
     for (ZombieTemplate template : GameDataManager.zombieRepository.getAll()) {
       String alias = template.getName();
-      if (alias == null || !alias.startsWith("Zombie") || isBossTier(template)) {
+      if (alias == null || !alias.startsWith("Zombie") || isBossTier(template)
+              || isProp(template)) {
         continue;
       }
       if (ZombieTypeResolver.resolve(template) == type) {
@@ -111,6 +112,19 @@ public abstract class Season {
       }
     }
     return null;
+  }
+
+  /**
+   * True for a sheet that is scenery rather than a zombie.
+   *
+   * <p>Zombies.json holds a few of these -- ZombieEightiesArcadePushAction has no hit points, no
+   * speed and no animation rig at all. It resolves to the same ZombieType as the real Arcade
+   * zombie and sits directly after it in the file, so the only thing keeping it off the lawn was
+   * the order the entries happen to be in. Spawned, it would stand where it was put, unable to
+   * move or be drawn, and a wave that never clears is a level that can never be won.
+   */
+  private static boolean isProp(ZombieTemplate template) {
+    return template.getBaseHp() <= 0 || template.getBaseSpeed() <= 0;
   }
 
   private static boolean isBossTier(ZombieTemplate template) {

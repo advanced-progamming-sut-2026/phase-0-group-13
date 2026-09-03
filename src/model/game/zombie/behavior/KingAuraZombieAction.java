@@ -36,7 +36,9 @@ public class KingAuraZombieAction implements ZombieAction {
       promoteOne(zombie, board);
     }
 
-    // The doc keeps the King in the column he arrived in; he only ever eats what reaches him.
+    // The King holds the column he arrived in and only eats what reaches him. Checked against the
+    // art rather than assumed: his rig ships idle, idle2, intro, special and die and no walk cycle
+    // at all, so he was authored as a stationary summoner. His template's Speed field goes unused.
     Plant targetPlant = board.getEdiblePlantAt(zombie.getRow(), zombie.getX(), currentTick);
     if (targetPlant != null && !targetPlant.isDead()) {
       zombie.setEating(true);

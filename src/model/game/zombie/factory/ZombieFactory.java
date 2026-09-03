@@ -103,7 +103,7 @@ public class ZombieFactory {
       case FISHERMAN -> new HookPullZombieAction(70, eatDamage);
       case OCTOPUS -> new OctopusThrowerZombieAction(70, eatDamage);
       case SNORKEL -> new SubmergedZombieAction(50, 100, eatDamage);
-      case WIZARD -> new WizardZombieAction();
+      case WIZARD -> new WizardZombieAction(eatDamage);
       case KING -> new KingAuraZombieAction(1.5, 3.0, eatDamage);
       default -> throw new UnsupportedOperationException("Unknown ZombieType: " + type);
     };

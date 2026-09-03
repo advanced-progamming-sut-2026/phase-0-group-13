@@ -36,6 +36,7 @@ import model.game.zombie.behavior.RaHealAuraZombieAction;
 import model.game.zombie.behavior.TacklerZombieAction;
 import model.game.zombie.behavior.TombRaiserZombieAction;
 import model.game.zombie.behavior.TurquoiseZombieAction;
+import model.game.zombie.behavior.WizardZombieAction;
 import model.game.zombie.behavior.ZombossAction;
 import view.gdx.animation.AnimationLibrary;
 import view.gdx.animation.AnimationStates;
@@ -1656,7 +1657,9 @@ public final class EntityRenderer implements WorldRenderer {
     String[] names;
     if (behavior instanceof TacklerZombieAction tackler) {
       actedAt = tackler.getLastTackleTick();
-      names = new String[] {"kick", "tackle"};
+      // "push" is the Arcade zombie's: it shoves its cabinet rather than kicking, and its rig has
+      // no kick or tackle at all, so it was the one tackler that flattened plants while walking.
+      names = new String[] {"kick", "tackle", "push"};
     } else if (behavior instanceof TurquoiseZombieAction turquoise) {
       actedAt = turquoise.getLastStealTick();
       names = new String[] {"power", "power_up"};
@@ -1669,6 +1672,11 @@ public final class EntityRenderer implements WorldRenderer {
     } else if (behavior instanceof OctopusThrowerZombieAction thrower) {
       actedAt = thrower.getLastThrowTick();
       names = new String[] {"toss"};
+    } else if (behavior instanceof WizardZombieAction wizard) {
+      // The Wizard rig ships a "sheep" clip -- the spell it casts -- and nothing ever played it,
+      // so plants turned into sheep with the Wizard still plainly walking.
+      actedAt = wizard.getLastCurseTick();
+      names = new String[] {"sheep", "cast"};
     } else {
       return null;
     }

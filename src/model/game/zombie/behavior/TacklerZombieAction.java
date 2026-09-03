@@ -30,10 +30,15 @@ public class TacklerZombieAction implements ZombieAction {
     return lastTackleTick;
   }
 
+  /** The last plant it flattened, so one charge cannot be spent on the same plant every tick. */
+  private Plant lastVictim;
+
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
-    Plant targetPlant = board.getPlantAt(zombie.getRow(), zombie.getX());
-    if (targetPlant != null && !targetPlant.isDead()) {
+    // getTopPlantAt, so a shielded plant is hit through its Pumpkin rather than under it.
+    Plant targetPlant = board.getTopPlantAt(zombie.getRow(), zombie.getX());
+    if (targetPlant != null && !targetPlant.isDead() && targetPlant != lastVictim) {
+      lastVictim = targetPlant;
       lastTackleTick = currentTick;
       targetPlant.takeDamage(10000);
       System.out.printf("%s tackled through %s!%n", zombie.getName(), targetPlant.getName());

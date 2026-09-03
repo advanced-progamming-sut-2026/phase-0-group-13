@@ -71,7 +71,11 @@ public class TurquoiseZombieAction implements ZombieAction {
   private void fireLaser(Zombie zombie, Board board) {
     System.out.printf("%s fired a laser down row %d!%n", zombie.getName(), zombie.getRow() + 1);
     int nearestCol = (int) Math.floor(zombie.getX());
-    for (int col = nearestCol; col > nearestCol - LASER_RANGE; col--) {
+    // >=, not >. getPlantAhead spots a plant up to LASER_RANGE tiles away inclusive, and the
+    // laser stopped one tile short of that: a Turquoise that halted for a plant exactly four
+    // tiles ahead fired past it forever, never killed it, and never moved again -- it stood there
+    // for the rest of the match siphoning sun, and the lane could never be cleared.
+    for (int col = nearestCol; col >= nearestCol - LASER_RANGE; col--) {
       if (col < 0 || col >= board.getColumns()) {
         continue;
       }
