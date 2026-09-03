@@ -69,10 +69,15 @@ public class PvzGdxGame extends Game {
     if (!Gdx.input.isKeyJustPressed(Input.Keys.F11) && !altEnter) {
       return;
     }
-    if (Gdx.graphics.isFullscreen()) {
+    // Grows and shrinks the window instead of taking the display over. setFullscreenMode switches
+    // the monitor into that mode, which on a Retina Mac drops it out of its scaled mode and
+    // resizes everything else on the machine; filling the screen with a window does not.
+    boolean filling = Gdx.graphics.getWidth() >= Gdx.graphics.getDisplayMode().width;
+    if (filling) {
       Gdx.graphics.setWindowedMode(GdxConfig.WINDOW_WIDTH, GdxConfig.WINDOW_HEIGHT);
     } else {
-      Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+      Gdx.graphics.setWindowedMode(Gdx.graphics.getDisplayMode().width,
+          Gdx.graphics.getDisplayMode().height);
     }
   }
 
