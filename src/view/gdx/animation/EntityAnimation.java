@@ -144,9 +144,38 @@ public final class EntityAnimation {
    */
   public void draw(Batch batch, String clip, String anchorClip, float time, float x, float y,
       float scale, boolean flip, Map<String, Boolean> visibility) {
-    Clip found = clips.get(clip);
     Bounds bounds = boundsOf(anchorClip == null ? clip : anchorClip);
-    if (found == null || bounds == null) {
+    if (bounds == null) {
+      return;
+    }
+    drawAt(batch, clip, time, x, y, scale, flip, visibility,
+        (bounds.minX + bounds.maxX) / 2f, bounds.maxY);
+  }
+
+  /**
+   * The point a clip is placed by, in rig units: the middle of its box across, its bottom down.
+   *
+   * <p>For a caller that has to place a second rig against this one.
+   */
+  public float[] anchorOf(String clip) {
+    Bounds bounds = boundsOf(clip);
+    return bounds == null
+        ? null : new float[] {(bounds.minX + bounds.maxX) / 2f, bounds.maxY};
+  }
+
+  /**
+   * Draws a clip placed by an anchor measured somewhere else.
+   *
+   * <p>For two rigs authored in one scene -- the Pianist is a zombie rig and a piano rig sharing a
+   * 390x390 canvas. Each placed by its own box lands both boxes on the same middle, which throws
+   * away the offset the artist drew between them: the piano's box is the bigger of the two, so it
+   * swallowed the zombie whole. Given the other rig's anchor, both keep the origin they were drawn
+   * against and stand apart exactly as authored.
+   */
+  public void drawAt(Batch batch, String clip, float time, float x, float y, float scale,
+      boolean flip, Map<String, Boolean> visibility, float anchorX, float anchorBottom) {
+    Clip found = clips.get(clip);
+    if (found == null) {
       return;
     }
     int span = found.end - found.start + 1;
@@ -155,9 +184,8 @@ public final class EntityAnimation {
 
     boolean[] visible = visibleParts(visibility);
     float sx = flip ? -scale : scale;
-    float anchorX = (bounds.minX + bounds.maxX) / 2f;
     float originX = x - sx * anchorX;
-    float originY = y + scale * bounds.maxY;
+    float originY = y + scale * anchorBottom;
 
     Color batchColor = batch.getColor();
     boolean plain = batchColor.r == 1f && batchColor.g == 1f && batchColor.b == 1f

@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.utils.Scaling;
 import data.persistence.UserManager;
 import model.Result;
@@ -143,6 +144,12 @@ public final class GreenhouseScreen extends MenuScreen {
     Stack stack = new Stack();
     stack.add(bottomAligned(hudArt.find("potshadow"), POT_WIDTH * 0.70f, 16f, 0f, 0.55f));
 
+    // Pot first, plant after: a Stack draws in the order things go into it, so putting the pot on
+    // last stood it in front of whatever was growing and the plant was only ever a leaf or two
+    // poking over the rim. The plant is lifted to sit in the soil rather than behind the pot.
+    TextureRegion potArt = hudArt.find(ready ? "potgold" : "pot");
+    stack.add(bottomAligned(potArt, POT_WIDTH * 0.80f, 46f, 0f, locked ? 0.5f : 1f));
+
     if (!locked && pot != null && !pot.isEmpty()) {
       // The doc asks for the potted plant's idle animation; the still packet is the fallback for
       // the handful of plants with no rig.
@@ -156,9 +163,6 @@ public final class GreenhouseScreen extends MenuScreen {
         }
       }
     }
-
-    TextureRegion potArt = hudArt.find(ready ? "potgold" : "pot");
-    stack.add(bottomAligned(potArt, POT_WIDTH * 0.80f, 46f, 0f, locked ? 0.5f : 1f));
 
     if (locked) {
       stack.add(bottomAligned(hudArt.find("potlocked"), 22f, 28f, 18f, 1f));
@@ -191,13 +195,28 @@ public final class GreenhouseScreen extends MenuScreen {
     return holder;
   }
 
+  /**
+   * The seed picker for an empty pot.
+   *
+   * <p>Planting used to roll a seed for you -- half the time the house marigold, otherwise one of
+   * yours at random -- so you pressed Plant and only then found out what was in the pot. The pot
+   * is yours and the wait is hours long, so the choice is the player's.
+   */
   private void openEmptyPot(User user, int index) {
+    java.util.List<String> seeds = user.getGreenHouse().plantableSeeds(user);
     Table body = new Table();
-    body.add(new Label("Pot " + (index + 1) + " is empty.\nPlanting picks a seed the same way\n"
-            + "the greenhouse always has.", skin, UiSkinProvider.LABEL_MEDIUM)).row();
+    body.defaults().pad(5f);
+    body.add(new Label("Pot " + (index + 1) + " is empty. Pick a seed to plant.",
+            skin, UiSkinProvider.LABEL_MEDIUM)).row();
+
+    SelectBox<String> picker = new SelectBox<>(skin);
+    picker.setItems(seeds.toArray(new String[0]));
+    body.add(picker).width(320f).height(52f).row();
+    body.add(new Label(GreenHouse.HOUSE_SEED + " takes 2 hours; anything of your own takes 8.",
+            skin, "secondary")).row();
 
     Popup.show(stage, skin, "Empty pot", body, "Plant", () -> {
-      Result result = user.getGreenHouse().plantSeed(index, user);
+      Result result = user.getGreenHouse().plantSeed(index, user, picker.getSelected());
       toast(result.message());
       saveState();
       refresh();

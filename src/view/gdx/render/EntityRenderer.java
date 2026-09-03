@@ -1545,10 +1545,12 @@ public final class EntityRenderer implements WorldRenderer {
         + throwLift(flight);
     String anchor = zombieAnchorClip(animation, zombie);
     float scale = zombieAnimationScale(zombie, animation, anchor);
+    // The piano goes down before the zombie does. It is the taller of the two rigs -- its lid and
+    // tip jar sit above his head in the shared canvas -- so painting it last buried him behind it.
+    drawPiano(context, zombie, clip, anchor, animation, delta, x, y, scale);
     animation.draw(context.getBatch(), clip, anchor, time, x, y, scale, zombie.isHypnotized(),
         armourVisibility(animation, zombie));
     drawPlantHead(context, zombie, animation, clip, anchor, time, x, y, scale);
-    drawPiano(context, zombie, clip, delta, x, y, scale);
     noteZombieMuzzle(zombie, animation, clip, anchor, time, x, y, scale);
     return true;
   }
@@ -1563,13 +1565,20 @@ public final class EntityRenderer implements WorldRenderer {
    * and only the player was ever loaded, so the Pianist walked the lawn miming at nothing. The two
    * share one atlas page and one canvas, so the piano stands on the same spot at the same scale.
    */
-  private void drawPiano(RenderContext context, Zombie zombie, String zombieClip, float delta,
-      float x, float y, float scale) {
+  private void drawPiano(RenderContext context, Zombie zombie, String zombieClip, String anchorClip,
+      EntityAnimation body, float delta, float x, float y, float scale) {
     if (!(zombie.getBehavior() instanceof PianistZombieAction)) {
       return;
     }
     EntityAnimation piano = animations.find(AnimationLibrary.ZOMBIES, PIANO_RIG);
     if (piano == null) {
+      return;
+    }
+    // Placed by the zombie's anchor, not its own. Both rigs were drawn into one 390x390 canvas, so
+    // the offset between player and instrument only survives if they share an origin; giving the
+    // piano its own box put both middles on the same spot and the larger box hid the zombie.
+    float[] anchor = body.anchorOf(anchorClip);
+    if (anchor == null) {
       return;
     }
     // The instrument follows the player: both rigs ship idle, play and die, so asking for the
@@ -1580,7 +1589,8 @@ public final class EntityRenderer implements WorldRenderer {
       return;
     }
     float time = playback.advance(pianoOf(zombie), clip, delta * animationRate(zombie, clip));
-    piano.draw(context.getBatch(), clip, clip, time, x, y, scale, zombie.isHypnotized(), null);
+    piano.drawAt(context.getBatch(), clip, time, x, y, scale, zombie.isHypnotized(), null,
+        anchor[0], anchor[1]);
   }
 
   /**
