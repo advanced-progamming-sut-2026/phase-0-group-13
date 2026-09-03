@@ -15,12 +15,30 @@ public final class PlantArt implements Disposable {
   private TextureAtlas atlas;
   private boolean loadFailed;
 
+  /**
+   * A portrait taken from the plant's own rig, for the four plants the seed-packet sheet has no
+   * card for.
+   *
+   * <p>seedpackets.atlas is missing rotobaga, piercemint, cattailmint and cattail, so their seed
+   * cards drew nothing at all -- which is why Roto-baga looked absent from the plant picker even
+   * once it had been unlocked. Three of them ship a full rig of their own, so the card is drawn
+   * from a whole-body region of that rig rather than from a new asset. Cat-tail has no art
+   * anywhere in the project and is not listed here; see the audit note.
+   */
+  private static final java.util.Map<String, String[]> RIG_PORTRAITS = java.util.Map.of(
+      "rotobaga", new String[] {"rotobaga", "rotorutabaga_123x123"},
+      "piercemint", new String[] {"piercemint", "spearmint_111x116"},
+      "cattailmint", new String[] {"cattailmint", "ailmint_141x163"});
+
   public TextureRegion find(String plantName) {
     TextureAtlas loaded = atlas();
-    if (loaded == null) {
-      return null;
+    String key = normalise(plantName);
+    TextureRegion card = loaded == null ? null : loaded.findRegion(key);
+    if (card != null) {
+      return card;
     }
-    return loaded.findRegion(normalise(plantName));
+    String[] portrait = RIG_PORTRAITS.get(key);
+    return portrait == null ? null : findPart(portrait[0], portrait[1]);
   }
 
   public boolean has(String plantName) {

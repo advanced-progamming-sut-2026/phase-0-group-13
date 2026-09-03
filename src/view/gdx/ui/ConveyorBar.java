@@ -31,7 +31,6 @@ public final class ConveyorBar extends WidgetGroup implements Disposable {
   private static final float TREAD_WIDTH = 9f;
 
   private static final Color READY = new Color(1f, 1f, 1f, 1f);
-  private static final Color WAITING = new Color(0.4f, 0.4f, 0.46f, 1f);
   private static final Color TRACK = new Color(0.09f, 0.09f, 0.11f, 0.8f);
   private static final Color TREAD = new Color(0.34f, 0.35f, 0.4f, 0.75f);
 
@@ -41,7 +40,6 @@ public final class ConveyorBar extends WidgetGroup implements Disposable {
     private final String plant;
     private float x;
     private int slot;
-    private boolean wrapping;
 
     private Riding(SeedCard card, String plant, float x, int slot) {
       this.card = card;
@@ -85,25 +83,31 @@ public final class ConveyorBar extends WidgetGroup implements Disposable {
 
   /** Kept for the HUD, which pokes the belt once a frame; the riding itself happens in act. */
   public void update() {
-    String ready = rule.peekReadyPlant();
-    String key = ready == null ? "" : ready;
+    String key = String.join("|", rule.getDeliveredPlants());
     if (!key.equals(shown)) {
       shown = key;
-      advance();
+      load();
     }
     paint();
   }
 
   private void load() {
+    List<Float> wasAt = new ArrayList<>();
+    for (Riding rider : riding) {
+      wasAt.add(rider.x);
+    }
     clearChildren();
     riding.clear();
-    List<String> plants = rule.getBeltPlants();
+    // The cards the belt has actually handed over. This used to be getBeltPlants() -- the whole
+    // roster the stage draws from -- so the player saw every plant in the level riding the belt
+    // with all but one greyed out, whether or not it had ever been delivered.
+    List<String> plants = rule.getDeliveredPlants();
     if (plants.isEmpty()) {
       addActor(empty);
       return;
     }
-    for (int i = 0; i < slots(); i++) {
-      String plant = plants.get(i % plants.size());
+    for (int i = 0; i < plants.size(); i++) {
+      String plant = plants.get(i);
       SeedCard card = new SeedCard(skin, SeedCard.Size.COMPACT, plant, plant,
           plantArt.find(plant), hudArt, onPick);
       // The belt's cards carry the same sun cost the seed bank's do; the doc asks for the belt to
@@ -116,68 +120,20 @@ public final class ConveyorBar extends WidgetGroup implements Disposable {
       }
       card.setSize(SeedBar.CARD_WIDTH, SeedBar.CARD_HEIGHT);
       addActor(card);
-      riding.add(new Riding(card, plant, slotX(i), i));
+      // Cards already on the belt keep the screen position they had, so a delivery slides the new
+      // card on from the right instead of the whole belt jumping a slot.
+      float from = i < wasAt.size() ? wasAt.get(i) : slotX(plants.size());
+      riding.add(new Riding(card, plant, from, i));
     }
-    shown = rule.peekReadyPlant() == null ? "" : rule.peekReadyPlant();
-    orderReadyFirst();
+    shown = String.join("|", plants);
     paint();
-  }
-
-  /**
-   * Runs the belt on until the plant the rule is now offering has reached the head. Cards that
-   * pass the near end doing so ride off it and are put back on at the far end, which is what keeps
-   * the queue full; the rest simply close up the gap.
-   */
-  private void advance() {
-    int shift = 1;
-    String ready = rule.peekReadyPlant();
-    if (ready != null) {
-      for (Riding rider : riding) {
-        if (rider.plant.equalsIgnoreCase(ready)) {
-          shift = rider.slot;
-          break;
-        }
-      }
-    }
-    if (shift <= 0 || riding.isEmpty()) {
-      return;
-    }
-    for (Riding rider : riding) {
-      int next = Math.floorMod(rider.slot - shift, riding.size());
-      rider.wrapping |= next > rider.slot;
-      rider.slot = next;
-    }
-  }
-
-  /** Puts the plant the rule is offering at the head of the queue when the belt is first built. */
-  private void orderReadyFirst() {
-    String ready = rule.peekReadyPlant();
-    if (ready == null) {
-      return;
-    }
-    int head = -1;
-    for (Riding rider : riding) {
-      if (rider.plant.equalsIgnoreCase(ready)) {
-        head = rider.slot;
-        break;
-      }
-    }
-    if (head <= 0) {
-      return;
-    }
-    for (Riding rider : riding) {
-      rider.slot = Math.floorMod(rider.slot - head, riding.size());
-      rider.x = slotX(rider.slot);
-    }
   }
 
   private void paint() {
     for (Riding rider : riding) {
-      boolean available = rider.plant.equalsIgnoreCase(shown);
-      rider.card.setStatus(available ? "free" : "queued");
-      rider.card.setSelected(available);
-      rider.card.setEnabled(available);
-      rider.card.setTint(available ? READY : WAITING);
+      rider.card.setStatus("free");
+      rider.card.setEnabled(true);
+      rider.card.setTint(READY);
     }
   }
 
@@ -187,14 +143,8 @@ public final class ConveyorBar extends WidgetGroup implements Disposable {
     float travel = delta * SLOTS_PER_SECOND * step();
     treadOffset = (treadOffset + travel) % TREAD_SPACING;
     for (Riding rider : riding) {
-      float target = rider.wrapping ? offTrackLeft() : slotX(rider.slot);
-      rider.x = Math.max(target, rider.x - travel);
-      if (rider.wrapping && rider.x <= target) {
-        rider.wrapping = false;
-        // Back on at the far end, a whole belt ahead of where it is going, so several cards
-        // wrapping at once come back on in the order they left.
-        rider.x = slotX(rider.slot) + step() * riding.size();
-      }
+      float target = slotX(rider.slot);
+      rider.x = rider.x > target ? Math.max(target, rider.x - travel) : target;
       rider.card.setPosition(rider.x, TRACK_PAD);
     }
   }
@@ -221,9 +171,8 @@ public final class ConveyorBar extends WidgetGroup implements Disposable {
     }
   }
 
-  /** One card per plant on the belt, so everything the rule can offer is on screen. */
   private int slots() {
-    return rule.getBeltPlants().size();
+    return riding.size();
   }
 
   private float step() {
@@ -232,10 +181,6 @@ public final class ConveyorBar extends WidgetGroup implements Disposable {
 
   private float slotX(int slot) {
     return TRACK_PAD + slot * step();
-  }
-
-  private float offTrackLeft() {
-    return -step();
   }
 
   @Override

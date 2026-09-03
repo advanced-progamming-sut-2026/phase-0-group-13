@@ -78,7 +78,8 @@ public final class GdxGameActions implements GameActionBridge {
     ConveyorRule belt = match.getSpecialStageRule() == null
             ? null : match.getSpecialStageRule().belt();
     if (belt != null) {
-      belt.consumeReadyPlant();
+      // The card that was planted, not whichever happens to be at the head of the belt.
+      belt.consume(plantType);
     }
     return true;
   }

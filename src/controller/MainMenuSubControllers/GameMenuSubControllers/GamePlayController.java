@@ -218,7 +218,7 @@ public class GamePlayController implements BaseController {
       }
       activateBoostIfAny(plant, buildType);
       if (gm.getSpecialStageRule() != null && gm.getSpecialStageRule().belt() != null) {
-        gm.getSpecialStageRule().belt().consumeReadyPlant();
+        gm.getSpecialStageRule().belt().consume(type);
       }
     } else {
       System.out.println("error: cannot plant there (tile occupied or not enough sun)");
@@ -339,8 +339,9 @@ public class GamePlayController implements BaseController {
       return;
     }
     if (gm.getSpecialStageRule() != null && gm.getSpecialStageRule().belt() != null) {
-      String offer = gm.getSpecialStageRule().belt().peekReadyPlant();
-      System.out.println("  Conveyor belt is offering: " + (offer == null ? "nothing yet" : offer));
+      java.util.List<String> onBelt = gm.getSpecialStageRule().belt().getDeliveredPlants();
+      System.out.println("  Conveyor belt is offering: "
+              + (onBelt.isEmpty() ? "nothing yet" : String.join(", ", onBelt)));
     }
     for (String name : deck) {
       PlantTemplate template = GameDataManager.plantRepository.find(name);
