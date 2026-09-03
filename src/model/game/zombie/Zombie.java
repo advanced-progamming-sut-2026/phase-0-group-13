@@ -238,6 +238,13 @@ public class Zombie {
   public boolean isHypnotized() { return hypnotized; }
   public void setHypnotized(boolean hypnotized) { this.hypnotized = hypnotized; }
   public boolean isSubmerged() { return submerged; }
+
+  /** True for a zombie that may stand on a water tile. See ZombieType.canCrossWater. */
+  public boolean canCrossWater() { return waterborne; }
+
+  public void setCanCrossWater(boolean waterborne) { this.waterborne = waterborne; }
+
+  private boolean waterborne;
   public void setSubmerged(boolean submerged) { this.submerged = submerged; }
   public void setSpeedMultiplier(double speedMultiplier) { this.speedMultiplier = speedMultiplier; }
   public boolean hasShieldBlocker() { return shieldBlocker; }

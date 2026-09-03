@@ -52,14 +52,23 @@ public final class WallnutBowlingScreen extends ArcadeBoardScreen {
         + (WallnutBowlingEngine.RED_LINE_COLUMN + 1);
   }
 
+  /**
+   * One card per nut the belt has actually delivered.
+   *
+   * <p>It used to lay out a card for every {@link NutType} that exists and grey out all but one,
+   * so the belt showed the whole catalogue whether or not any of it had been handed over.
+   */
   @Override
   protected void buildPicker(Table picker, Skin skin) {
+    this.picker = picker;
+    this.pickerSkin = skin;
     cards.clear();
-    shownReady = engine.getReadyNutLabel();
+    picker.clearChildren();
+    shownReady = String.join("|", engine.getBeltQueue());
     picker.add(new Label("belt", skin, "secondary")).padRight(10f);
-    for (NutType nut : NutType.values()) {
-      SeedCard card = new SeedCard(skin, SeedCard.Size.COMPACT, nut.label, nut.label,
-          art.plantPortrait(packetOf(nut)), hudArt, null);
+    for (String label : engine.getBeltQueue()) {
+      SeedCard card = new SeedCard(skin, SeedCard.Size.COMPACT, label, label,
+          art.plantPortrait(packetOf(NutType.byLabel(label))), hudArt, null);
       picker.add(card).width(114f).height(116f).padRight(4f);
       cards.add(card);
     }
@@ -68,21 +77,24 @@ public final class WallnutBowlingScreen extends ArcadeBoardScreen {
 
   @Override
   protected void refreshPicker() {
-    if (!engine.getReadyNutLabel().equals(shownReady)) {
-      shownReady = engine.getReadyNutLabel();
-      paintBelt();
+    if (picker != null && pickerSkin != null
+        && !String.join("|", engine.getBeltQueue()).equals(shownReady)) {
+      buildPicker(picker, pickerSkin);
     }
   }
 
+  /** The head of the belt is the nut that rolls next; the rest are queued behind it. */
   private void paintBelt() {
-    NutType[] all = NutType.values();
-    for (int i = 0; i < cards.size() && i < all.length; i++) {
-      boolean ready = all[i].label.equalsIgnoreCase(shownReady);
-      cards.get(i).setStatus(ready ? "ready" : "queued");
-      cards.get(i).setSelected(ready);
-      cards.get(i).setTint(ready ? READY : WAITING);
+    for (int i = 0; i < cards.size(); i++) {
+      boolean next = i == 0;
+      cards.get(i).setStatus(next ? "ready" : "queued");
+      cards.get(i).setSelected(next);
+      cards.get(i).setTint(next ? READY : WAITING);
     }
   }
+
+  private Table picker;
+  private Skin pickerSkin;
 
   private static String packetOf(NutType nut) {
     return nut == NutType.EXPLODE_O_NUT ? "Explode-o-nut" : "Wall-nut";

@@ -28,9 +28,23 @@ public class BigWaveBeachSeason extends Season {
     gameState.update(gameState.getCurrentWave(), this);
   }
 
+  /**
+   * The sea roster only.
+   *
+   * <p>{@link Season#rosterOf} puts the fifteen common land zombies in front of whatever a season
+   * asks for, and zombies enter at the right-hand column -- which on this map is open sea at every
+   * tide. So the beach was spawning Coneheads and All-Stars into the water and walking them
+   * across it. Only the zombies that can be on water belong in this pool.
+   */
   @Override
   public List<Zombie> getAvailableZombies() {
-    return rosterOf(ZombieType.FISHERMAN, ZombieType.SNORKEL, ZombieType.OCTOPUS);
+    List<Zombie> pool = new ArrayList<>();
+    for (Zombie zombie : rosterOf(ZombieType.FISHERMAN, ZombieType.SNORKEL, ZombieType.OCTOPUS)) {
+      if (zombie.canCrossWater()) {
+        pool.add(zombie);
+      }
+    }
+    return pool;
   }
 
   @Override

@@ -46,6 +46,19 @@ public enum ZombieType {
   ZOMBOSS_COWBOY("Dr. Zomboss (Frostbite Caves)"),
   ZOMBOSS_DARK("Dr. Zomboss (Dark Ages)");
 
+  /**
+   * Whether this zombie can be on a water tile.
+   *
+   * <p>Only the sea roster and the bosses can: the Fisherman works from a boat, the Snorkel swims,
+   * the Octopus rides the surface, and a Zomboss is a machine that hovers over the lawn. Everything
+   * else is a land unit, and Big Wave Beach's whole right-hand side is sea.
+   */
+  public boolean canCrossWater() {
+    return this == FISHERMAN || this == SNORKEL || this == OCTOPUS
+            || this == ZOMBOSS_EGYPT || this == ZOMBOSS_PIRATE
+            || this == ZOMBOSS_COWBOY || this == ZOMBOSS_DARK;
+  }
+
   private final String displayName;
 
   ZombieType(String displayName) {

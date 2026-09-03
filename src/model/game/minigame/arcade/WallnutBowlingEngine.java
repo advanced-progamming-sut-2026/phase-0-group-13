@@ -27,7 +27,7 @@ public final class WallnutBowlingEngine {
       this.label = label;
       this.glyph = glyph;
     }
-    static NutType byLabel(String name) {
+    public static NutType byLabel(String name) {
       for (NutType type : values()) {
         if (type.label.equalsIgnoreCase(name == null ? "" : name.trim())) {
           return type;}}return NORMAL;}
@@ -200,10 +200,22 @@ public final class WallnutBowlingEngine {
             type.label, column + 1, lane + 1);
   }
 
+  /**
+   * The nut at the head of the belt: the one {@link #plantNut} will actually roll.
+   *
+   * <p>This used to ask isPlantAllowed for each type in turn and report the first that came back
+   * true. Now that the belt is a queue rather than a single slot, every card on it is allowed, so
+   * that test named whichever type happened to be checked first -- while planting still took the
+   * head. The label and the nut you got could be different nuts.
+   */
   public String getReadyNutLabel() {
-    return conveyor.isPlantAllowed(NutType.NORMAL.label) ? NutType.NORMAL.label
-            : conveyor.isPlantAllowed(NutType.EXPLODE_O_NUT.label) ? NutType.EXPLODE_O_NUT.label
-            : conveyor.isPlantAllowed(NutType.GIANT.label) ? NutType.GIANT.label : "nothing yet";
+    String ready = conveyor.peekReadyPlant();
+    return ready == null ? "nothing yet" : ready;
+  }
+
+  /** Every nut on the belt, oldest first, for the screen to draw. */
+  public List<String> getBeltQueue() {
+    return conveyor.getDeliveredPlants();
   }
 
   public void tick() {

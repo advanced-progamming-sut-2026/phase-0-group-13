@@ -579,6 +579,7 @@ public class Board {
     if (p.isLobbed()) {
       return false;
     }
+    meltIceTrailUnder(p);
     Plant iced = getPlantAt(Math.round(p.getYCoordinate()), p.getXCoordinate());
     if (iced == null || iced.getIceHealth() <= 0) {
       return false;
@@ -589,6 +590,29 @@ public class Board {
       iced.damageIce(p.getDamage());
     }
     return true;
+  }
+
+  /**
+   * A lit pea clears the ice trail it flies over.
+   *
+   * <p>Torchwood's doc says a pea passing through it comes out able to melt ice, and that was only
+   * ever true of ice encasing a plant -- the frozen ground of the Frostbite Caves was untouched by
+   * a shot that was on fire. The trail is a floor, not a wall, so the shot melts it and carries on.
+   */
+  private void meltIceTrailUnder(Projectile p) {
+    if (p.getEffect() != Projectile.ProjectileEffect.FIRE || p.isFromZombie()) {
+      return;
+    }
+    int row = Math.round(p.getYCoordinate());
+    int col = (int) Math.round(p.getXCoordinate());
+    if (row < 0 || row >= rows || col < 0 || col >= columns) {
+      return;
+    }
+    if (tiles[row][col].getEffect() instanceof IceTrailEffect ice && ice.isActive()) {
+      ice.remove();
+      tiles[row][col].setEffect(null);
+      System.out.printf("A burning shot melted the ice at (%d, %d).%n", col + 1, row + 1);
+    }
   }
 
   private void handleLawnmowers() {
@@ -684,6 +708,16 @@ public class Board {
       }
     }
     return thawed;
+  }
+
+  /**
+   * True when this zombie would be standing in water it cannot cross.
+   *
+   * <p>The backstop for the roster rule: a land zombie summoned by a Tomb Raiser, thrown by a
+   * Jester or spawned by a boss must not end up in the sea either.
+   */
+  public boolean isImpassableWaterFor(Zombie zombie, int row, double x) {
+    return !zombie.canCrossWater() && isWaterAt(row, (int) Math.round(x));
   }
 
   public boolean isWaterAt(int row, int col) {

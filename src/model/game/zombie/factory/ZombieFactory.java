@@ -44,6 +44,7 @@ public class ZombieFactory {
     );
 
     zombie.setDisplayName(type.getDisplayName());
+    zombie.setCanCrossWater(type.canCrossWater());
     zombie.setFireImmune(type == ZombieType.IMP_DRAGON);
     if (isZomboss(type)) {
       zombie.setBoss(true);
