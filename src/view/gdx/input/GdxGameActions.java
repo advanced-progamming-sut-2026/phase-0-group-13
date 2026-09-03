@@ -93,7 +93,8 @@ public final class GdxGameActions implements GameActionBridge {
       return plant.getName() + " is locked in this stage.";
     }
     Tile tile = board.getTile(row, column);
-    if (tile != null && tile.getEffect() != null && tile.getEffect().blocksPlanting()) {
+    if (tile != null && tile.getEffect() != null
+            && tile.getEffect().blocksPlanting(plant.getName())) {
       return "A " + tile.getEffect().getName() + " is in the way.";
     }
     boolean aquatic = plant.getTags().contains(PlantTag.WATER);
@@ -203,7 +204,20 @@ public final class GdxGameActions implements GameActionBridge {
     return match == null ? null : match.getBoard();
   }
 
-  private static String resolveImitaterTarget(String selfType) {
+  /**
+   * What Imitater turns into: the last card the player actually played, or the first one in the
+   * seed bank if they have not played anything yet.
+   *
+   * <p>It used to walk the deck and take the first entry that was not itself, which is a fixed
+   * answer for the whole match -- Imitater was permanently locked to whatever happened to sit in
+   * slot one, whatever the player had selected since. "Copies another plant (lets you use the same
+   * card twice)" only means anything if the card it copies is one the player chose.
+   */
+  private String resolveImitaterTarget(String selfType) {
+    String lastPlayed = match == null ? null : match.getLastPlantedType();
+    if (lastPlayed != null && !lastPlayed.equalsIgnoreCase(selfType)) {
+      return lastPlayed;
+    }
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) {
       return null;

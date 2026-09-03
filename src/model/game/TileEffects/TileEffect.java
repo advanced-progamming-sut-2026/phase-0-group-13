@@ -23,6 +23,25 @@ public class TileEffect {
     return false;
   }
 
+  /**
+   * Whether this effect blocks a particular plant.
+   *
+   * <p>Two plants in the roster exist only to be planted on a tile that is otherwise unplantable:
+   * Grave Buster "destroys gravestones" and Hot Potato is "planted on ice to melt it instantly".
+   * Asking the effect rather than special-casing them at the call sites keeps the rule in one
+   * place, and keeps it a property of the obstacle rather than of the placement code.
+   *
+   * @param plantName the plant being placed, or null when the caller is only asking in general
+   */
+  public boolean blocksPlanting(String plantName) {
+    return blocksPlanting() && !clearedBy(plantName);
+  }
+
+  /** True for the plant this obstacle is the whole point of, if it has one. */
+  protected boolean clearedBy(String plantName) {
+    return false;
+  }
+
   public void tick() {
     if (!active) return;
 

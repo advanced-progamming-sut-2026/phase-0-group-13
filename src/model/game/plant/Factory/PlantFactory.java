@@ -195,17 +195,12 @@ public class PlantFactory {
     if (value.contains("/")) {
       value = value.split("/")[0].trim();
     }
+    // "20x2" is two peas of 20, not one pea of 40. Multiplying the two out here is what left
+    // Repeater and Mega Gatling Pea firing a single fat pea instead of the volley their abilities
+    // describe; the count is read separately by parseVolleySize.
     if (value.toLowerCase().contains("x")) {
-      String[] parts = value.toLowerCase().split("x");
-      Integer perShot = tryParse(parts[0]);
-      Integer shots = parts.length > 1 ? tryParse(parts[1]) : null;
-      if (perShot != null && shots != null) {
-        return perShot * shots;
-      }
-      if (perShot != null) {
-        return perShot;
-      }
-      return DEFAULT_DAMAGE;
+      Integer perShot = tryParse(value.toLowerCase().split("x")[0]);
+      return perShot == null ? DEFAULT_DAMAGE : perShot;
     }
 
     Integer parsed = tryParse(value);
@@ -309,15 +304,21 @@ public class PlantFactory {
       case SHOOTER -> buildShooter(interval, power, tags, false, template);
       case STRIKE_THROUGH -> buildShooter(interval, power, tags, true, template);
       case LOBBER -> buildLobber(interval, power, tags, template);
-      case MELEE -> new MeleeAction(interval, power,
-              tags.contains(PlantTag.AOE) ? 1 + stageIndex + levelStats.getRangeDelta() : 0,
-              mentions(template.baseAbility, "behind"));
+      case MELEE -> buildMelee(interval, power, tags, template, stageIndex);
       case HOMING -> determineHomingBehavior(interval, power, template);
       case EXPLOSIVE -> determineExplosiveBehavior(power, tags, template);
       case WALL_NUT -> determineWallNutBehavior(tags, template.name);
       case MODIFIER, MINT -> determineModifierBehavior(template);
       default -> throw new UnsupportedOperationException("Unknown PlantCategory: " + category);
     };
+  }
+
+  private MeleeAction buildMelee(int interval, int power, EnumSet<PlantTag> tags,
+          PlantTemplate template, int stageIndex) {
+    MeleeAction melee = new MeleeAction(interval, power,
+            tags.contains(PlantTag.AOE) ? 1 + stageIndex + levelStats.getRangeDelta() : 0,
+            mentions(template.baseAbility, "behind"));
+    return tags.contains(PlantTag.FIRE) ? melee.warmingTheGround() : melee;
   }
 
   private static final Pattern BUTTER_BONUS =
@@ -388,11 +389,32 @@ public class PlantFactory {
     return new HomingAction(interval, power);
   }
 
+  private static final Pattern VOLLEY_SIZE = Pattern.compile("\\d+\\s*x\\s*(\\d+)",
+          Pattern.CASE_INSENSITIVE);
+
+  /**
+   * How many shots one volley puts in the air, from a {@code 20x2}-style damage figure.
+   *
+   * <p>Only counted for a plant that fires in one direction. Roto-baga's "10x3" sits next to an
+   * ability that names four diagonals, and the direction count is the one the description states
+   * outright, so a multi-direction plant fires one shot per direction.
+   */
+  private int parseVolleySize(String damageStr, int directions) {
+    if (damageStr == null || directions > 1) {
+      return 1;
+    }
+    Matcher matcher = VOLLEY_SIZE.matcher(damageStr);
+    return matcher.find() ? Math.max(1, Integer.parseInt(matcher.group(1))) : 1;
+  }
+
   private ShootForwardAction buildShooter(int interval, int power, EnumSet<PlantTag> tags,
           boolean piercing, PlantTemplate template) {
     ShootForwardAction action = new ShootForwardAction(interval, power,
             resolveProjectileEffect(tags), piercing, parseLaneSpread(template.baseAbility));
-    action.setDirections(parseFiringDirections(template.baseAbility));
+    int[][] directions = parseFiringDirections(template.baseAbility);
+    action.setDirections(directions);
+    action.setVolleySize(
+            parseVolleySize(template.damage, directions == null ? 1 : directions.length));
     if (mentions(template.baseAbility, "ricochet")) {
       action.setRicochet(parseVanishSeconds(template.baseAbility) * TICKS_PER_SECOND);
     }

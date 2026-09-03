@@ -225,8 +225,20 @@ public class GamePlayController implements BaseController {
     }
   }
 
-  /** ایمیتیتر طبق داک اولین گیاه دیگر (غیر از خودش) را از سیدبانک بازیکن کپی می‌کند. */
+  /**
+   * What Imitater turns into: the last card the player actually played, or the first one in the
+   * seed bank if they have not played anything yet.
+   *
+   * <p>It used to walk the deck and take the first entry that was not itself, which is a fixed
+   * answer for the whole match -- Imitater was permanently locked to whatever happened to sit in
+   * slot one, whatever the player had selected since. "Copies another plant (lets you use the same
+   * card twice)" only means anything if the card it copies is one the player chose.
+   */
   private String resolveImitaterTarget(String selfType) {
+    String lastPlayed = activeGame() == null ? null : activeGame().getLastPlantedType();
+    if (lastPlayed != null && !lastPlayed.equalsIgnoreCase(selfType)) {
+      return lastPlayed;
+    }
     User user = UserManager.getInstance().getCurrentUser();
     if (user == null) {
       return null;
@@ -237,6 +249,10 @@ public class GamePlayController implements BaseController {
       }
     }
     return null;
+  }
+
+  private static GameManager activeGame() {
+    return GameSession.getActiveGame();
   }
 
   private int getCurrentPlantLevel(String plantType) {

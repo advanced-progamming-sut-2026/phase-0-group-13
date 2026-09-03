@@ -68,6 +68,6 @@ public class ButterLobAction implements PlantAction {
   private void hitWithButter(Zombie zombie) {
     zombie.takeDamage(butterDamage, false);
     zombie.setEating(false);
-    zombie.applyEffect(StatusEffect.FROZEN, STUN_TICKS);
+    zombie.applyEffect(StatusEffect.STUNNED, STUN_TICKS);
   }
 }

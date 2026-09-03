@@ -201,7 +201,8 @@ public class GameManager {
     if (row < 0 || row >= board.getRows() || col < 0 || col >= board.getColumns()) return false;
 
     model.game.Tile tile = board.getTile(row, col);
-    if (tile != null && tile.getEffect() != null && tile.getEffect().blocksPlanting()) {
+    if (tile != null && tile.getEffect() != null
+            && tile.getEffect().blocksPlanting(plant.getName())) {
       return false;
     }
 
@@ -298,7 +299,24 @@ public class GameManager {
   }
 
   public void recordPlanting(String plantType) {
-    if (plantType != null) lastPlantedTick.put(plantType.toLowerCase(), currentTick);
+    if (plantType == null) {
+      return;
+    }
+    lastPlantedTick.put(plantType.toLowerCase(), currentTick);
+    if (!"imitater".equalsIgnoreCase(plantType)) {
+      lastPlantedType = plantType;
+    }
+  }
+
+  private String lastPlantedType;
+
+  /**
+   * The last card the player actually played this match, which is what Imitater copies.
+   *
+   * <p>Null until something has been planted, so the caller can fall back to the seed bank.
+   */
+  public String getLastPlantedType() {
+    return lastPlantedType;
   }
 
   public void disableCooldowns() {

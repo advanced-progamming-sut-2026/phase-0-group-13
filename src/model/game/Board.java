@@ -473,7 +473,11 @@ public class Board {
         continue;
       }
 
-      if ((hitRegistered && !p.isPiercing()) || p.getXCoordinate() > columns || p.getXCoordinate() < -1
+      // !isActive covers the spike that has used up its pierce limit. Without it a Cactus shot
+      // that pierced its third zombie stayed on the lawn for the rest of the match: move() ignores
+      // a spent shot, so it never left the board by position either, and the spikes piled up.
+      if (!p.isActive() || (hitRegistered && !p.isPiercing())
+              || p.getXCoordinate() > columns || p.getXCoordinate() < -1
               || p.getYCoordinate() < 0 || p.getYCoordinate() >= rows) {
         iterator.remove();
       }
@@ -498,20 +502,35 @@ public class Board {
    * @return true when it hit something
    */
   private boolean hitFirstZombieInPath(Projectile p) {
+    // Nearest first, not list order. A pea landing on the tile behind the one it was actually
+    // touching is invisible on its own, but a Cactus spike walking a crowd resolved its three
+    // pierces in spawn order and skipped zombies it had passed straight through.
+    List<Zombie> inPath = new ArrayList<>();
     for (Zombie zombie : zombies) {
       if (zombie.occupiesRow(p.getYCoordinate())
               && Math.abs(zombie.getX() - p.getXCoordinate()) < 0.5) {
-        p.hitArea(zombies, zombie);
-        if (zombiesResistIce) {
-          zombie.extinguishFrozenStatus();
-        }
-        if (p.getKillCount() == 2) {
-          pendingMultiKillShots++;
-        }
-        return true;
+        inPath.add(zombie);
       }
     }
-    return false;
+    if (inPath.isEmpty()) {
+      return false;
+    }
+    inPath.sort(java.util.Comparator.comparingDouble(z -> Math.abs(z.getX() - p.getXCoordinate())));
+
+    for (Zombie zombie : inPath) {
+      p.hitArea(zombies, zombie);
+      if (zombiesResistIce) {
+        zombie.extinguishFrozenStatus();
+      }
+      // Only a piercing shot carries on to the others standing on the same tile.
+      if (!p.isPiercing() || !p.isActive()) {
+        break;
+      }
+    }
+    if (p.getKillCount() == 2) {
+      pendingMultiKillShots++;
+    }
+    return true;
   }
 
   private void reaimLob(Projectile p) {
@@ -634,6 +653,39 @@ public class Board {
     pendingPlantsLostCount = 0;
     return count;
   }
+  /**
+   * Clears ice from a square of tiles, and returns how many things it thawed.
+   *
+   * <p>The one place ice is removed by heat. Hot Potato was the only plant that did it and it had
+   * its own copy of this loop, so the two plants whose descriptions say they warm the ground --
+   * Wasabi Whip "also warms the surroundings" and Pepper-pult "also warms the surrounding tiles" --
+   * did nothing of the kind, because there was no shared thing for them to call.
+   *
+   * @param except a plant to leave alone, for the plant doing the warming
+   */
+  public int warmTiles(int centreRow, int centreCol, int radius, Plant except) {
+    int thawed = 0;
+    for (int row = centreRow - radius; row <= centreRow + radius; row++) {
+      for (int col = centreCol - radius; col <= centreCol + radius; col++) {
+        if (row < 0 || row >= rows || col < 0 || col >= columns) {
+          continue;
+        }
+        TileEffect effect = tiles[row][col].getEffect();
+        if (effect instanceof IceTrailEffect ice && ice.isActive()) {
+          ice.remove();
+          tiles[row][col].setEffect(null);
+          thawed++;
+        }
+        Plant frozen = getPlantAt(row, col);
+        if (frozen != null && frozen != except && frozen.getIceHealth() > 0) {
+          frozen.meltIce();
+          thawed++;
+        }
+      }
+    }
+    return thawed;
+  }
+
   public boolean isWaterAt(int row, int col) {
     if (row < 0 || row >= rows || col < 0 || col >= columns) {
       return false;
@@ -724,6 +776,35 @@ public class Board {
 
   public List<BossHazard> getBossHazards() {
     return bossHazards;
+  }
+
+  /**
+   * An explosion that went off this tick: where it was, how far it reached, and whether it burns.
+   *
+   * @param radius in tiles, so the flash on screen is the size of the blast that actually landed
+   */
+  public record Blast(int row, int column, int radius, boolean fiery) {}
+
+  private final List<Blast> pendingBlasts = new ArrayList<>();
+
+  /**
+   * Records a blast for the view.
+   *
+   * <p>Explosions had nothing on screen at all: the damage landed, the zombies died and the only
+   * thing drawn was the ash on each corpse, so a Cherry Bomb and a Jalapeno were both "the row
+   * suddenly emptied". Kept as an event list the view drains rather than as state, so a blast is
+   * drawn once, on the tick it happened.
+   */
+  public void recordBlast(int row, int column, int radius, boolean fiery) {
+    if (pendingBlasts.size() < MAX_PENDING_NOTICES) {
+      pendingBlasts.add(new Blast(row, column, radius, fiery));
+    }
+  }
+
+  public List<Blast> drainBlasts() {
+    List<Blast> drained = new ArrayList<>(pendingBlasts);
+    pendingBlasts.clear();
+    return drained;
   }
 
   public void addProjectile(Projectile p) {

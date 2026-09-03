@@ -21,6 +21,8 @@ public final class HitEffects {
 
   public static final float SPARK_SECONDS = 0.42f;
 
+  public static final float BLAST_SECONDS = 0.45f;
+
   private static final float BURST_MAX_RADIUS_FRACTION = 0.42f;
 
   private static final double LAWN_MARGIN = 0.4;
@@ -66,6 +68,28 @@ public final class HitEffects {
     }
   }
 
+  /**
+   * One explosion, expanding and fading over {@link #BLAST_SECONDS}.
+   *
+   * @param radius the blast's real radius in tiles, so the flash covers what the blast damaged
+   */
+  public record Blast(double column, int row, int radius, boolean fiery, float age) {
+
+    public float progress() {
+      return Math.min(1f, age / BLAST_SECONDS);
+    }
+
+    /** Fast out, slow to fade, which is what an explosion looks like. */
+    public float radiusLanes() {
+      float eased = 1f - (1f - progress()) * (1f - progress());
+      return (radius + 0.5f) * (0.35f + 0.65f * eased);
+    }
+
+    public float alpha() {
+      return Math.max(0f, 1f - progress() * progress());
+    }
+  }
+
   public record Spark(String kind, double column, int row, float age) {
 
     public float progress() {
@@ -86,6 +110,7 @@ public final class HitEffects {
   private final List<DeathPuff> deathPuffs = new ArrayList<>();
   private final List<LootPickup> pickups = new ArrayList<>();
   private final List<Spark> sparks = new ArrayList<>();
+  private final List<Blast> blasts = new ArrayList<>();
   private final Map<Object, Integer> counters = new IdentityHashMap<>();
   private int freshDeaths;
   private int freshImpacts;
@@ -129,6 +154,16 @@ public final class HitEffects {
         pickups.remove(i);
       } else {
         pickups.set(i, new LootPickup(pickup.kind(), pickup.column(), pickup.row(), age));
+      }
+    }
+
+    for (int i = blasts.size() - 1; i >= 0; i--) {
+      Blast blast = blasts.get(i);
+      float age = blast.age() + delta;
+      if (age >= BLAST_SECONDS) {
+        blasts.remove(i);
+      } else {
+        blasts.set(i, new Blast(blast.column(), blast.row(), blast.radius(), blast.fiery(), age));
       }
     }
 
@@ -192,6 +227,14 @@ public final class HitEffects {
 
   public void spawnSpark(String kind, double column, int row) {
     sparks.add(new Spark(kind, column, row, 0f));
+  }
+
+  public void spawnBlast(double column, int row, int radius, boolean fiery) {
+    blasts.add(new Blast(column, row, radius, fiery, 0f));
+  }
+
+  public List<Blast> getBlasts() {
+    return blasts;
   }
 
   /**

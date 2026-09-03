@@ -17,8 +17,12 @@ public final class SeasonBackdrop {
       new Layout(1024f, 768f, 278f, 673f, 253.6f, 199.6f, 735.6f, 488.5f);
   private static final Layout FROST =
       new Layout(1022f, 785f, 281f, 673f, 251.6f, 193.4f, 733.4f, 494.9f);
+  // Re-measured off the painting itself: the tile grout in the beach artwork runs 258..991
+  // across and 200.6..687.6 down. The old box started 51px -- more than half a tile -- to the left
+  // of the painted tiles, which is why plants, zombies and the placement cursor all sat between
+  // cells on Big Wave Beach and nowhere else.
   private static final Layout BEACH =
-      new Layout(1024f, 768f, 278f, 673f, 207.0f, 206.0f, 739.0f, 487.0f);
+      new Layout(1024f, 768f, 278f, 673f, 258.0f, 200.6f, 733.0f, 487.0f);
   private static final Layout DARK =
       new Layout(1024f, 768f, 278f, 673f, 251.3f, 201.4f, 746.2f, 487.2f);
 

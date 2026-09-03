@@ -26,6 +26,7 @@ public class HomingAction implements PlantAction {
             Projectile.ProjectileEffect.NORMAL, false, false, false
     );
 
+    projectile.firedBy(plant.getName());
     board.addProjectile(projectile);
     plant.setLastActionTick(currentTick);
     System.out.printf("Plant %s fired homing projectile at %s (row %d)!%n",

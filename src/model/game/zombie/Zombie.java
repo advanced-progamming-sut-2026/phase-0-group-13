@@ -72,7 +72,7 @@ public class Zombie {
       thrownTicks--;
     }
     processEffects();
-    if (!activeEffects.containsKey(StatusEffect.FROZEN) && behavior != null) {
+    if (!isHeldStill() && behavior != null) {
       behavior.execute(this, board, currentTick);
     }
   }
@@ -101,7 +101,7 @@ public class Zombie {
     // previousX to x across the frames between ticks, so leaving it a step behind while the zombie
     // eats or stands frozen makes it shuffle back and forth on the spot instead of holding still.
     this.previousX = x;
-    if (!isEating && !activeEffects.containsKey(StatusEffect.FROZEN)) {
+    if (!isEating && !isHeldStill()) {
       double actualSpeed = activeEffects.containsKey(StatusEffect.CHILLED) ? speed / 2.0 : speed;
       double direction = hypnotized ? 1.0 : -1.0;
       this.x += direction * actualSpeed * speedMultiplier;
@@ -125,7 +125,7 @@ public class Zombie {
    * halves it, the multiplier an enrage or a slowdown sets, and the freeze that stops it dead.
    */
   public double getStrideFraction() {
-    if (activeEffects.containsKey(StatusEffect.FROZEN)) {
+    if (isHeldStill()) {
       return 0.0;
     }
     double chill = activeEffects.containsKey(StatusEffect.CHILLED) ? 0.5 : 1.0;
@@ -182,6 +182,16 @@ public class Zombie {
 
   public void applyEffect(StatusEffect effect, int durationInTicks) {
     this.activeEffects.put(effect, durationInTicks);
+  }
+
+  /** Frozen solid or stunned by a blow: either way this zombie is not going anywhere this tick. */
+  public boolean isHeldStill() {
+    return activeEffects.containsKey(StatusEffect.FROZEN)
+            || activeEffects.containsKey(StatusEffect.STUNNED);
+  }
+
+  public boolean isStunned() {
+    return activeEffects.containsKey(StatusEffect.STUNNED);
   }
 
   public int getIcedOnCell() {

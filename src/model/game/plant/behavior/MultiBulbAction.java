@@ -40,6 +40,7 @@ public class MultiBulbAction implements PlantAction {
   private void fireBulb(Plant plant, Board board, int index) {
     Projectile bulb = new Projectile(damages[index], 0.5, plant.getCol(), plant.getRow(),
             Projectile.ProjectileEffect.NORMAL, false, false, false);
+    bulb.firedBy(plant.getName());
     bulb.setDirection(1, 1);
     bulb.makeBouncing(ricochetLifeTicks);
     board.addProjectile(bulb);

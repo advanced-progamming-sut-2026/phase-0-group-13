@@ -8,6 +8,11 @@ public class TombStoneEffect extends TileEffect {
     return isActive();
   }
 
+  @Override
+  protected boolean clearedBy(String plantName) {
+    return "Grave Buster".equalsIgnoreCase(plantName);
+  }
+
   private int health;
   private final int maxHealth;
   private boolean blocksShots;

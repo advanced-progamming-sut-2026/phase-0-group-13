@@ -107,6 +107,11 @@ public final class EntityRenderer implements WorldRenderer {
    */
   private static final String ICE_BLOCK_RIG = "iceberglettuce";
   private static final String ICE_BLOCK_REGION = "iceburg_85x80";
+  /** The pat of butter Kernel-pult drops, which is what a stunned zombie is wearing. */
+  private static final String BUTTER_RIG = "kernelpult";
+  private static final String BUTTER_REGION = "kernalpult_34x37";
+  private static final float BUTTER_FILL = 0.30f;
+  private static final float BUTTER_WOBBLE = 0.03f;
   private static final float ICE_RIM_FILL = 1.06f;
   private static final float ICE_BLOCK_FILL = 1.18f;
   private static final float ICE_BLOCK_SINK = 0.08f;
@@ -122,6 +127,14 @@ public final class EntityRenderer implements WorldRenderer {
   private static final String PEA_REGION = "pea";
   private static final String SNOW_REGION = "snowgust";
   private static final String DUST_REGION = "dustpuff";
+  /**
+   * The flash of an explosion, tinted warm for a fire blast and pale for a concussive one.
+   *
+   * <p>The hud's burst art, which is a filled yellow-white star. Not "whiteburst", the other
+   * candidate, whose middle is transparent -- blown up to the size of a Cherry Bomb's blast that
+   * reads as a hole in the lawn rather than as a bang.
+   */
+  private static final String BLAST_REGION = "armourbreak";
   private static final String ASH_REGION = "zombieash";
   private static final String DIRT_REGION = "dirtclods";
   private static final String PLANT_PUFF_REGION = "plantpuff";
@@ -181,6 +194,7 @@ public final class EntityRenderer implements WorldRenderer {
   private final Color frozenTint = new Color(0.45f, 0.7f, 1f, 1f);
   private final Color chilledTint = new Color(0.72f, 0.88f, 1f, 1f);
   private final Color hypnoTint = new Color(0.85f, 0.6f, 1f, 1f);
+  private final Color poisonedTint = new Color(0.62f, 1f, 0.45f, 1f);
   private final Color shieldTint = new Color(0.6f, 0.8f, 0.98f, 1f);
   private final Color icedTint = new Color(0.55f, 0.8f, 1f, 1f);
   /** Pale blue and see-through, so the zombie still reads through the ice it is stuck in. */
@@ -209,6 +223,8 @@ public final class EntityRenderer implements WorldRenderer {
   private TextureRegion octopus;
   private boolean octopusChecked;
   private TextureRegion iceBlockRegion;
+  private boolean butterChecked;
+  private TextureRegion butterRegion;
   private boolean iceBlockChecked;
   private final Map<Plant, Boolean> knownPlants = new java.util.IdentityHashMap<>();
   private final Map<Plant, Boolean> seenPlants = new java.util.IdentityHashMap<>();
@@ -356,6 +372,7 @@ public final class EntityRenderer implements WorldRenderer {
     }
     drawHitFlash(context, zombie, rigged);
     drawIceBlock(context, zombie);
+    drawStunButter(context, zombie);
     // Last, so the carried icon sits above both the body and the ice it may be stuck in.
     drawPlantFoodCarrier(context, zombie);
   }
@@ -449,6 +466,35 @@ public final class EntityRenderer implements WorldRenderer {
     batch.draw(region, centreX - width / 2f, bottom, width, height);
   }
 
+  /**
+   * The butter on a stunned zombie's head.
+   *
+   * <p>A stun is not a freeze. Kernel-pult's butter used to apply the FROZEN effect, so a buttered
+   * zombie was drawn inside a block of ice and tinted blue -- the game telling the player it had
+   * done something it had not, and hiding the one plant whose whole job is the stun. The effect is
+   * its own now, and this is what it looks like: the pat of butter off Kernel-pult's own rig,
+   * sitting on the zombie's head and wobbling, with no ice anywhere.
+   */
+  private void drawStunButter(RenderContext context, Zombie zombie) {
+    if (!zombie.isStunned()) {
+      return;
+    }
+    if (!butterChecked) {
+      butterChecked = true;
+      butterRegion = plantArt.findPart(BUTTER_RIG, BUTTER_REGION);
+    }
+    if (butterRegion == null) {
+      return;
+    }
+    float height = geometry.getCellHeight() * BUTTER_FILL;
+    float head = geometry.rowToY(footRow(zombie)) + geometry.getCellHeight() * ZOMBIE_FOOT_INSET
+        + Math.max(zombieSpriteHeight(zombie), geometry.getCellHeight() * 0.6f) * 0.82f;
+    float wobble = geometry.getCellHeight() * BUTTER_WOBBLE
+        * (float) Math.sin(clock * 9f + zombie.getRow());
+    stamp(context.getBatch(), butterRegion,
+        geometry.columnCentreX(drawColumn(zombie)), head + wobble, height);
+  }
+
   private void loadIceBlock() {
     if (iceBlockChecked) {
       return;
@@ -535,6 +581,7 @@ public final class EntityRenderer implements WorldRenderer {
     drawPlantFoodDrops(context, board);
     drawLootPickups(context);
     context.getBatch().setColor(Color.WHITE);
+    drawBlasts(context);
     drawImpacts(context);
     drawDeaths(context);
     drawDebris(context);
@@ -652,6 +699,32 @@ public final class EntityRenderer implements WorldRenderer {
     }
   }
 
+  /**
+   * The flash an explosive plant makes when it goes off.
+   *
+   * <p>Sized off the blast's own radius, so the ring the player sees is the area that was actually
+   * damaged rather than a fixed puff -- a Cherry Bomb's 3x3 and a Jalapeno's whole lane look as
+   * different as they are. Drawn before the impacts and the deaths so the ash and dust of the
+   * zombies it killed land on top of it in the order they happen.
+   */
+  private void drawBlasts(RenderContext context) {
+    TextureRegion flash = hudArt.find(BLAST_REGION);
+    if (flash == null) {
+      return;
+    }
+    float lane = geometry.getCellHeight();
+    for (HitEffects.Blast blast : hits.getBlasts()) {
+      float size = lane * blast.radiusLanes() * 2f;
+      if (blast.fiery()) {
+        context.getBatch().setColor(1f, 0.62f, 0.24f, blast.alpha());
+      } else {
+        context.getBatch().setColor(1f, 0.94f, 0.72f, blast.alpha());
+      }
+      drawCentred(context, flash, onBoard(blast.column()), blast.row(), size);
+    }
+    context.getBatch().setColor(Color.WHITE);
+  }
+
   private void drawImpacts(RenderContext context) {
     TextureRegion art = hudArt.find(SPLAT_REGION);
     if (art == null) {
@@ -753,6 +826,11 @@ public final class EntityRenderer implements WorldRenderer {
     if (zombie.getActiveEffects().containsKey(StatusEffect.FROZEN)) {
       return frozenTint;
     }
+    // Above the chill, because goo that is actively eating a zombie is the more urgent of the two
+    // and the player has no other way to tell it is happening.
+    if (zombie.getActiveEffects().containsKey(StatusEffect.POISONED)) {
+      return poisonedTint;
+    }
     if (zombie.getActiveEffects().containsKey(StatusEffect.CHILLED)) {
       return chilledTint;
     }
@@ -767,6 +845,9 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   private void observeForEffects(Board board) {
+    for (Board.Blast blast : board.drainBlasts()) {
+      hits.spawnBlast(blast.column(), blast.row(), blast.radius(), blast.fiery());
+    }
     for (Plant plant : board.getPlants()) {
       if (!plant.isDead()) {
         hits.observe(plant, plant.getCurrentHealth());
@@ -1191,7 +1272,7 @@ public final class EntityRenderer implements WorldRenderer {
 
     String[] names = ACTION_CLIP_NAMES.getOrDefault(plant.getName(), new String[] {"attack"});
     String attack = animation.pickClip(withStage(names, stage));
-    if (attack != null && justActed(plant, animation.duration(attack))) {
+    if (attack != null && justActed(plant, animation.duration(attack)) && !isWaitingTrap(plant)) {
       return attack;
     }
 
@@ -1250,15 +1331,18 @@ public final class EntityRenderer implements WorldRenderer {
   /**
    * Plants wrapped in a halo far wider than the plant inside it, which skip the lane width clamp.
    *
-   * <p>The clamp shrinks a rig until its clip bounds fit one lane, and for these three the bounds
-   * are mostly soft glow: the Iceberg Lettuce came out at 43% and the Magnet-shroom at 42% of the
-   * scale every other plant is drawn at. Named one by one on purpose. The halo layers cannot be
-   * told apart from the body by name -- the same glow image hangs both under a labelled node and
-   * directly under the root -- and every rule broad enough to catch these also caught Citron,
-   * Torchwood and Fire Peashooter, which are correctly sized as they are.
+   * <p>The clamp shrinks a rig until its clip bounds fit one lane, and for these the bounds are
+   * mostly soft glow or flame rather than plant: the Iceberg Lettuce came out at 43% and the
+   * Magnet-shroom at 42% of the scale every other plant is drawn at. Named one by one on purpose --
+   * the halo layers cannot be told apart from the body by name, since the same glow image hangs
+   * both under a labelled node and directly under the root.
+   *
+   * <p>Torchwood and Fire Peashooter joined the list after the audit: Torchwood's idle box is
+   * mostly the fire it carries and Fire Peashooter's is mostly its flame, so the clamp was reading
+   * the flame as plant width and shrinking both well below their neighbours on the lawn.
    */
   private static final Set<String> HALO_WIDE_PLANTS =
-      Set.of("Ice-shroom", "Magnet-shroom", "Iceberg Lettuce");
+      Set.of("Ice-shroom", "Magnet-shroom", "Iceberg Lettuce", "Torchwood", "Fire Peashooter");
 
   /**
    * The wear-down clips for a defensive plant, worst damage first, or nothing for a plant whose
@@ -1285,6 +1369,19 @@ public final class EntityRenderer implements WorldRenderer {
   private static boolean isArmedMine(Plant plant) {
     return plant.getBehavior() instanceof model.game.plant.behavior.ExplodeAction armed
         && armed.isArmed();
+  }
+
+  /**
+   * A trap lying in wait, which should be showing its idle rather than its attack.
+   *
+   * <p>A contact trap stamps its action tick once, when it arms, and never again -- so Squash was
+   * playing its pounce for the first eight ticks after it was planted, on a lawn where nothing had
+   * happened yet, and then standing still through the one moment the pounce is for. The clip is
+   * shorter than the window it was held for, so it wrapped and pounced twice on the spot.
+   */
+  private static boolean isWaitingTrap(Plant plant) {
+    return plant.getBehavior() instanceof model.game.plant.behavior.ExplodeAction trap
+        && trap.isContactTrap() && !trap.hasDetonated();
   }
 
   private static int growthStage(Plant plant) {
@@ -1600,7 +1697,8 @@ public final class EntityRenderer implements WorldRenderer {
    * dying, a special pose -- keeps its own pace apart from the chill.
    */
   private static float animationRate(Zombie zombie, String clip) {
-    if (zombie.getActiveEffects().containsKey(StatusEffect.FROZEN)) {
+    // Stunned as well as frozen: either way the zombie is not moving, so nor is its rig.
+    if (zombie.isHeldStill()) {
       return 0f;
     }
     if (isWalkClip(clip)) {
@@ -1856,11 +1954,12 @@ public final class EntityRenderer implements WorldRenderer {
       }
       float[] muzzle = muzzleOf(board, projectile);
       double column = shotColumn(projectile, muzzle);
-      double row = lerp(projectile.getPreviousY(), projectile.getExactY(), tickAlpha);
+      double row = shotRow(projectile);
+      float lift = arcLift(projectile, column) + muzzleLift(projectile, muzzle)
+          + (float) projectile.getMuzzleOffset() * geometry.getCellHeight();
       context.getBatch().setColor(projectile.isFromZombie() ? reflectedPea : Color.WHITE);
       drawCentred(context, shot.region(), column, row,
-          geometry.getCellHeight() * shot.rowFraction(),
-          arcLift(projectile, column) + (muzzle == null ? 0f : muzzle[1]), shot.angle());
+          geometry.getCellHeight() * shot.rowFraction(), lift, shot.angle());
     }
     context.getBatch().setColor(Color.WHITE);
   }
@@ -1886,6 +1985,42 @@ public final class EntityRenderer implements WorldRenderer {
       return mouth;
     }
     return lerp(mouth, to, (tickAlpha - release) / (1f - release));
+  }
+
+  /**
+   * The lane to draw a shot in, crossing out of its shooter's lane on the tick it was fired.
+   *
+   * <p>Threepeater puts a pea in the lane above and the lane below, and the model creates each one
+   * already sitting in its lane -- so all the player saw was three peas appearing in three lanes
+   * at once, with nothing to say the middle plant had fired them. Nothing about the simulation
+   * changes: the shot is in its own lane for every tick of hit testing, and this only decides
+   * where it is drawn during the single tick it leaves the plant.
+   */
+  private double shotRow(Projectile projectile) {
+    double travelling = lerp(projectile.getPreviousY(), projectile.getExactY(), tickAlpha);
+    int from = projectile.getLaunchRow();
+    if (from < 0 || projectile.getPreviousX() != projectile.getLaunchX()) {
+      return travelling;
+    }
+    return lerp(from, travelling, tickAlpha);
+  }
+
+  /**
+   * The lift that puts a shot in the plant's mouth as it leaves, and nothing once it has left.
+   *
+   * <p>This used to be added for the shot's whole flight, which meant every pea was drawn at
+   * whatever height its shooter's head happened to be at that frame -- so the pea rose and fell in
+   * mid-air in time with the plant breathing. Worst on Fire Peashooter, whose head travels
+   * furthest. Now it decays across the launch tick, so the shot leaves the mouth and settles onto
+   * its lane instead of being tied to the rig for the rest of its life.
+   */
+  private float muzzleLift(Projectile projectile, float[] muzzle) {
+    if (muzzle == null || projectile.getPreviousX() != projectile.getLaunchX()) {
+      return 0f;
+    }
+    float release = muzzle[2];
+    float left = tickAlpha <= release ? 0f : (tickAlpha - release) / (1f - release);
+    return muzzle[1] * (1f - left);
   }
 
   private static double lerp(double from, double to, float alpha) {

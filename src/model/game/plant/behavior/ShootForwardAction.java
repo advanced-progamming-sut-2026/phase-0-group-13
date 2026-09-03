@@ -16,6 +16,15 @@ public class ShootForwardAction implements PlantAction {
   private int[][] directions = FORWARD_ONLY;
   private int ricochetLifeTicks;
   private int pierceLimit;
+  private int volleySize = 1;
+
+  /**
+   * How far apart the shots of one volley are drawn, as a fraction of a lane.
+   *
+   * <p>Small on purpose: enough that four peas leaving a Mega Gatling on the same tick read as
+   * four, not enough to make any of them look like it is in the next lane.
+   */
+  private static final double MUZZLE_SPREAD = 0.13;
 
   public ShootForwardAction(int actionInterval, int damage, Projectile.ProjectileEffect effect,
                             boolean piercing, int laneSpread) {
@@ -50,6 +59,15 @@ public class ShootForwardAction implements PlantAction {
     this.pierceLimit = Math.max(0, pierceLimit);
   }
 
+  /** Shots per direction per volley: Repeater's 2, Mega Gatling Pea's 4. */
+  public void setVolleySize(int volleySize) {
+    this.volleySize = Math.max(1, volleySize);
+  }
+
+  public int getVolleySize() {
+    return volleySize;
+  }
+
   @Override
   public void execute(Plant plant, Board board, int currentTick) {
     if (currentTick - plant.getLastActionTick() < actionInterval) {
@@ -64,11 +82,15 @@ public class ShootForwardAction implements PlantAction {
         continue;
       }
       for (int[] direction : directions) {
-        for (int shot = Math.max(1, plant.getStackCount()); shot > 0; shot--) {
+        // A Pea Pod fires one pea per head it is wearing; everything else fires its volley.
+        int shots = Math.max(volleySize, plant.getStackCount());
+        for (int shot = 0; shot < shots; shot++) {
           Projectile projectile =
                   new Projectile(damage, 0.5, plant.getCol(), row, effect, piercing, false, false);
           projectile.firedBy(plant.getName());
           projectile.withPierceLimit(pierceLimit);
+          projectile.fromMuzzle(muzzleOffset(shot, shots));
+          projectile.launchedFromRow(plant.getRow());
           projectile.setDirection(direction[0], direction[1]);
           if (ricochetLifeTicks > 0) {
             projectile.setDirection(direction[0], direction[1] != 0 ? direction[1] : 1);
@@ -81,6 +103,11 @@ public class ShootForwardAction implements PlantAction {
               plant.getName(), effect, row + 1);
     }
     plant.setLastActionTick(currentTick);
+  }
+
+  /** Stacks the shots of one volley up the plant, centred, so a single shot is still on the axis. */
+  private static double muzzleOffset(int shot, int shots) {
+    return shots <= 1 ? 0 : (shot - (shots - 1) / 2.0) * MUZZLE_SPREAD;
   }
 
   private boolean hasTargetInAnyLane(Plant plant, Board board) {

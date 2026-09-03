@@ -31,6 +31,11 @@ public class IceTrailEffect extends TileEffect {
     return isActive();
   }
 
+  @Override
+  protected boolean clearedBy(String plantName) {
+    return "Hot Potato".equalsIgnoreCase(plantName);
+  }
+
   public int getLaneShift() {
     return laneShift;
   }

@@ -10,6 +10,13 @@ public class MeleeAction implements PlantAction {
   private final int damage;
   private final int aoeRadius;
   private final boolean hitsBehind;
+  private boolean warming;
+
+  /** Wasabi Whip: its description says the whip warms the ground around it as well as hitting. */
+  public MeleeAction warmingTheGround() {
+    this.warming = true;
+    return this;
+  }
 
   public MeleeAction(int actionInterval, int damage) {
     this(actionInterval, damage, 0);
@@ -26,9 +33,17 @@ public class MeleeAction implements PlantAction {
     this.hitsBehind = hitsBehind;
   }
 
+  private static final int WARM_RADIUS = 1;
+
   @Override
   public void execute(Plant plant, Board board, int currentTick) {
     if (currentTick - plant.getLastActionTick() < actionInterval) return;
+
+    // Independent of whether there is anything to hit: the heat is a property of the plant, so a
+    // Wasabi Whip planted next to an ice trail thaws it without waiting for a zombie to turn up.
+    if (warming) {
+      board.warmTiles(plant.getRow(), plant.getCol(), WARM_RADIUS, plant);
+    }
 
     if (aoeRadius > 0) {
       if (!hasZombieInArea(board, plant)) return;

@@ -44,6 +44,16 @@ public class ExplodeAction implements PlantAction {
     return armedMessageShown;
   }
 
+  /** True once this plant has actually gone off, as opposed to sitting armed and waiting. */
+  public boolean hasDetonated() {
+    return detonated;
+  }
+
+  /** True for a trap that waits to be stepped on rather than burning a fuse of its own. */
+  public boolean isContactTrap() {
+    return requiresContact;
+  }
+
   /** How long this plant burns before it goes off, in ticks; zero for one that never waits. */
   public int getFuseTicks() {
     return fuseTime;
@@ -144,9 +154,12 @@ public class ExplodeAction implements PlantAction {
             "BOOM! %s exploded at (%d, %d)%n",
             plant.getName(), plant.getCol() + 1, plant.getRow() + 1);
 
+    boolean fiery = plant.getTags().contains(model.enums.PlantTag.FIRE);
     if (laneOnly) {
+      board.recordBlast(plant.getRow(), plant.getCol(), board.getColumns(), true);
       scorchLane(plant, board);
     } else {
+      board.recordBlast(plant.getRow(), plant.getCol(), Math.max(1, range), fiery);
       board.applyAreaDamageToZombies(plant.getCol(), plant.getRow(), range, damage);
     }
     scatterGrapes(plant, board);

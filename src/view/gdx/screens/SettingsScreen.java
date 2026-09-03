@@ -1,5 +1,6 @@
 package view.gdx.screens;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -11,6 +12,7 @@ import data.persistence.UserManager;
 import model.account.User;
 import view.gdx.audio.GameAudio;
 import view.gdx.core.GameSettings;
+import view.gdx.core.GdxConfig;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.ui.UiSkinProvider;
 
@@ -62,6 +64,21 @@ public final class SettingsScreen extends MenuScreen {
     panel.add(toggle(GameSettings.isDebugMode(),
         () -> GameSettings.setDebugMode(!GameSettings.isDebugMode())))
         .width(200f).height(46f).row();
+
+    // The game opens fullscreen and F11 was the only way out, which nothing on screen said.
+    panel.add(new Label("Fullscreen", skin, UiSkinProvider.LABEL_MEDIUM)).right().padRight(14f);
+    panel.add(toggle(Gdx.graphics.isFullscreen(), SettingsScreen::flipFullscreen))
+        .width(200f).height(46f).row();
+    panel.add(new Label("(F11 or Alt+Enter)", skin, UiSkinProvider.LABEL_MEDIUM))
+        .colspan(2).padBottom(6f).row();
+  }
+
+  private static void flipFullscreen() {
+    if (Gdx.graphics.isFullscreen()) {
+      Gdx.graphics.setWindowedMode(GdxConfig.WINDOW_WIDTH, GdxConfig.WINDOW_HEIGHT);
+    } else {
+      Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+    }
   }
 
   @Override

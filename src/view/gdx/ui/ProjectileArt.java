@@ -28,6 +28,32 @@ public final class ProjectileArt implements Disposable {
   private static final String KERNEL_PULT = "Kernel-pult";
   private static final float SPIKE_FILL = 0.34f;
 
+  /** What one plant's shot is drawn as: {@code atlas, region, share of a lane, rotation}. */
+  private record Art(String atlas, String region, float rowFraction, float angle) {}
+
+  /**
+   * The plants that fire something of their own rather than a pea.
+   *
+   * <p>Every one of these already had its projectile in its own atlas and was being drawn as a
+   * Peashooter pea, because the only things this class looked at were the shot's effect, whether
+   * it was lobbed and whether it pierced -- three properties a Citron, a Starfruit and a Grapeshot
+   * grape all share with a pea. Keyed by the plant name the shot records when it is fired.
+   *
+   * <p>Regions picked by eye off each plant's own atlas, so nothing here is a new asset.
+   */
+  private static final Map<String, Art> BY_PLANT = Map.ofEntries(
+      // The orange plasma ball, not a pea. Big, because an 800-damage shot should look heavy.
+      Map.entry("Citron", new Art("citron", "citron_31x29_2", 0.30f, 0f)),
+      Map.entry("Starfruit", new Art("starfruit", "starfruit_23x30", 0.24f, 0f)),
+      // The grapes it scatters, which is what the ability text says it throws.
+      Map.entry("Grapeshot", new Art("grapeshot", "grapeshot_32x27", 0.22f, 0f)),
+      Map.entry("Bowling Bulb", new Art("bowlingbulb", "bowlingbulb_31x31", 0.30f, 0f)),
+      Map.entry("Electric Blueberry",
+          new Art("electricblueberry", "electricblueberry_38x33", 0.34f, 0f)),
+      // Caulipower's magic: the red charm swirl off its own rig, so the shot reads as a spell.
+      Map.entry("Caulipower", new Art("caulipower", "caulipower_24x25", 0.30f, 0f)),
+      Map.entry("Rotobaga", new Art("rotobaga", "rotorutabaga_37x28", 0.24f, 0f)));
+
   private final Map<String, TextureAtlas> atlases = new HashMap<>();
   private final List<TextureAtlas> loaded = new ArrayList<>();
 
@@ -38,10 +64,15 @@ public final class ProjectileArt implements Disposable {
     if (projectile.isLobbed()) {
       return lobbed(projectile);
     }
+    Art own = BY_PLANT.get(projectile.getSourceName());
+    if (own != null) {
+      return shot(own.atlas(), own.region(), own.rowFraction(), own.angle());
+    }
     if (projectile.isPiercing()) {
       return projectile.getPierceLimit() > 0
           ? shot("cactus", "cactus_21x65", SPIKE_FILL, -90f)
-          : shot("fumeshroom", "fumeshroom_48x44", CLOUD_FILL, 0f);
+          // Was fumeshroom_48x44, which is one of the rig's arms rather than anything it breathes.
+          : shot("fumeshroom", "fumeshroom_114x88", CLOUD_FILL, 0f);
     }
     return switch (projectile.getEffect()) {
       case FIRE -> shot("firepeashooter", "firepeashooter_33x35", PEA_FILL, 0f);
