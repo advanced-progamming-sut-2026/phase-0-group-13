@@ -203,6 +203,7 @@ public class ExplodeAction implements PlantAction {
       int[] dir = directions[i % directions.length];
       Projectile grape = new Projectile(scatterDamage, 0.5, plant.getCol(), plant.getRow(),
               Projectile.ProjectileEffect.NORMAL, true, false, false);
+      grape.firedBy(plant.getName());
       grape.setDirection(dir[0], dir[1]);
       grape.makeBouncing(scatterLifeTicks);
       board.addProjectile(grape);

@@ -64,7 +64,11 @@ public final class ProjectileArt implements Disposable {
     if (projectile.isLobbed()) {
       return lobbed(projectile);
     }
-    Art own = BY_PLANT.get(projectile.getSourceName());
+    // Never get(null): BY_PLANT is a Map.of, which throws on a null key where a HashMap would
+    // simply miss. A blast's scattered shot has no plant name on it, and looking one up took the
+    // render thread down with it.
+    String source = projectile.getSourceName();
+    Art own = source == null ? null : BY_PLANT.get(source);
     if (own != null) {
       return shot(own.atlas(), own.region(), own.rowFraction(), own.angle());
     }
