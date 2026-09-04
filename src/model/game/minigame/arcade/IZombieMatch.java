@@ -25,8 +25,14 @@ public final class IZombieMatch {
     this.engine = new IZombieEngine(level, new Random(seed));
   }
 
-  /** @return null when applied, otherwise the reason it was rejected */
-  public String apply(MatchRole actor, IZombieAction action) {
+  /**
+   * @return null when applied, otherwise the reason it was rejected
+   */
+  // The three methods that touch the engine's boards are synchronized against each other: the
+  // server ticks a match on its own clock thread while a player's move and the broadcast that
+  // follows it run on that player's connection thread, and both walk the same lists of plants,
+  // zombies and shots.
+  public synchronized String apply(MatchRole actor, IZombieAction action) {
     if (action == null) {
       return "error: empty action";
     }
@@ -47,7 +53,7 @@ public final class IZombieMatch {
     return engineMessage != null && engineMessage.startsWith("error:") ? engineMessage : null;
   }
 
-  public void tick() {
+  public synchronized void tick() {
     if (isFinished()) {
       return;
     }
@@ -87,7 +93,7 @@ public final class IZombieMatch {
     return winner;
   }
 
-  public Snapshot snapshot() {
+  public synchronized Snapshot snapshot() {
     List<PlantView> plants = new ArrayList<>();
     for (IZombieEngine.DefensePlant plant : engine.getDefensePlants()) {
       plants.add(new PlantView(plant.getId(), plant.getName(), plant.getRow(), plant.getCol(),

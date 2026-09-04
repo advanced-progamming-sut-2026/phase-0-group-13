@@ -22,6 +22,7 @@ import model.game.PlantFoodDrop;
 import model.game.Projectile;
 import model.game.Sun;
 import model.game.plant.Plant;
+import model.game.plant.behavior.LobAction;
 import model.game.zombie.Zombie;
 import model.game.zombie.ZombieParts.Armor;
 import model.game.zombie.behavior.BarrelRollerZombieAction;
@@ -1479,33 +1480,37 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   /**
-   * True while a plant is winding up to a shot it is about to take.
+   * True while a plant is playing its attack, either side of the shot.
    *
    * <p>The attack used to be played for a few ticks *after* the plant had fired, which put the
-   * projectile at the start of the shooting animation: the pea was already a tile downrange while
-   * the plant was still drawing back. Reading the behaviour's own interval lets the clip run in
-   * the ticks leading up to the shot instead, so the animation finishes on the frame the pea
-   * leaves. Nothing here can change when the plant actually fires -- the model owns that -- and a
-   * behaviour with no interval falls back to the old post-hoc hold.
+   * projectile at the start of the shooting animation. Then it was played entirely before, which
+   * put the pea a whole recovery behind the throw. It is scheduled around the shot now: see
+   * {@link AttackSchedule}. Nothing here can change when the plant actually fires -- the model
+   * owns that -- and a behaviour with no interval falls back to the old post-hoc hold.
    */
   private boolean windingUp(Plant plant, float attackSeconds) {
     int interval = plant.getBehavior() == null ? 0 : plant.getBehavior().actionIntervalTicks();
-    if (interval <= 0) {
-      return justActed(plant, attackSeconds);
-    }
-    // A plant with nothing to shoot at does not fire, so it must not mime a shot either.
-    if (!hasTargetNear(plant)) {
-      return false;
-    }
-    int next = plant.getLastActionTick() + interval;
-    return currentTick > next - windUpTicks(plant, attackSeconds) && currentTick <= next;
+    return interval <= 0 ? justActed(plant, attackSeconds)
+        : attackClipTime(plant, attackSeconds) >= 0f;
   }
 
-  /** How long the wind-up runs: the clip's own length, never longer than the firing interval. */
-  private int windUpTicks(Plant plant, float attackSeconds) {
+  /**
+   * Where in its attack clip this plant is right now, in seconds, or -1 when it is not shooting.
+   */
+  private float attackClipTime(Plant plant, float length) {
     int interval = plant.getBehavior() == null ? 0 : plant.getBehavior().actionIntervalTicks();
-    int clipTicks = Math.max(1, Math.round(attackSeconds * GdxConfig.TICKS_PER_SECOND));
-    return interval > 0 ? Math.min(interval, clipTicks) : clipTicks;
+    float release = releaseFraction(plant);
+    float time = AttackSchedule.clipTime(length, release, plant.getLastActionTick(), interval,
+        currentTick + tickAlpha);
+    // Winding up is a promise to fire, and a plant with nothing in range will not keep it.
+    return time < release * length && !hasTargetNear(plant) ? -1f : time;
+  }
+
+  /** A pult lets go of its shot earlier in the swing than a shooter does. */
+  private static float releaseFraction(Plant plant) {
+    return plant.getBehavior() instanceof LobAction
+        ? AttackSchedule.LOB_RELEASE
+        : AttackSchedule.SHOOTER_RELEASE;
   }
 
   /** Anything in this plant's lane or either neighbour, which covers the lane-spread shooters. */
@@ -1523,31 +1528,17 @@ public final class EntityRenderer implements WorldRenderer {
   }
 
   /**
-   * Where in its attack clip a plant that is winding up should be drawn, or -1 for one that is not.
+   * Where in its attack clip a shooting plant should be drawn, or -1 for one that is not.
    *
    * <p>Driven off the tick the shot is due on rather than off the frame clock, the same way a lit
-   * fuse is, so the last frame of the wind-up lands on the tick the projectile is created however
+   * fuse is, so the frame the shot leaves on lands on the tick the projectile is created however
    * long the clip happens to be.
    */
   private float windUpTime(Plant plant, EntityAnimation animation, String clip) {
     if (!clip.equals(attackClip(animation, plant, growthStage(plant)))) {
       return -1f;
     }
-    float length = animation.duration(clip);
-    if (length <= 0f) {
-      return -1f;
-    }
-    if (firedThisTick(plant)) {
-      return length;
-    }
-    int interval = plant.getBehavior() == null ? 0 : plant.getBehavior().actionIntervalTicks();
-    if (interval <= 0) {
-      return -1f;
-    }
-    int windUp = windUpTicks(plant, length);
-    int next = plant.getLastActionTick() + interval;
-    float left = (next - currentTick) - tickAlpha;
-    return Math.max(0f, Math.min(1f, 1f - left / windUp)) * length;
+    return attackClipTime(plant, animation.duration(clip));
   }
 
   private boolean justActed(Plant plant, float attackSeconds) {
@@ -1710,20 +1701,11 @@ public final class EntityRenderer implements WorldRenderer {
    * the head sitting in its idle for the whole match while peas came out of it unannounced.
    */
   private float zombotanyWindUp(Zombie zombie, float length) {
-    if (length <= 0f
-        || !(zombie.getBehavior() instanceof ZombotanyPeashooterAction shooter)) {
+    if (!(zombie.getBehavior() instanceof ZombotanyPeashooterAction shooter)) {
       return -1f;
     }
-    int interval = shooter.getShootInterval();
-    if (interval <= 0) {
-      return -1f;
-    }
-    if (shooter.getLastShootTick() == currentTick) {
-      return length;
-    }
-    int windUp = Math.min(interval, Math.max(1, Math.round(length * GdxConfig.TICKS_PER_SECOND)));
-    float left = (shooter.getLastShootTick() + interval - currentTick) - tickAlpha;
-    return left > windUp ? -1f : Math.max(0f, Math.min(1f, 1f - left / windUp)) * length;
+    return AttackSchedule.clipTime(length, AttackSchedule.SHOOTER_RELEASE,
+        shooter.getLastShootTick(), shooter.getShootInterval(), currentTick + tickAlpha);
   }
 
   /**

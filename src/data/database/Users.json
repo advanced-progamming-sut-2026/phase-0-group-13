@@ -2119,11 +2119,69 @@
       "potato-mine",
       "cabbage-pult",
       "puff-shroom",
+      "twin sunflower",
+      "sun-shroom",
+      "primal sunflower",
+      "gold bloom",
       "repeater",
-      "bonk choy",
-      "grave buster",
+      "threepeater",
+      "snow pea",
+      "rotobaga",
+      "pea pod",
+      "split pea",
+      "citron",
+      "caulipower",
+      "electric blueberry",
+      "bowling bulb",
+      "cactus",
+      "fire peashooter",
+      "starfruit",
+      "goo peashooter",
+      "mega gatling pea",
+      "sea-shroom",
+      "fume-shroom",
+      "kernel-pult",
+      "melon-pult",
+      "winter melon",
+      "pepper-pult",
+      "primal potato mine",
+      "cherry bomb",
+      "squash",
+      "grapeshot",
+      "jalapeno",
+      "doom-shroom",
+      "tangle kelp",
       "iceberg lettuce",
-      "hot potato"
+      "bonk choy",
+      "phat beet",
+      "chomper",
+      "wasabi whip",
+      "kiwibeast",
+      "tall-nut",
+      "endurian",
+      "garlic",
+      "sweet potato",
+      "explode-o-nut",
+      "pumpkin",
+      "sun bean",
+      "torchwood",
+      "magnet-shroom",
+      "hypno-shroom",
+      "cat-tail",
+      "imitater",
+      "ice-shroom",
+      "lily pad",
+      "hot potato",
+      "grave buster",
+      "enlighten-mint",
+      "appease-mint",
+      "arma-mint",
+      "bombard-mint",
+      "enforce-mint",
+      "reinforce-mint",
+      "enchant-mint",
+      "pierce-mint",
+      "cattail-mint"
     ],
     "unlockedZombies": [
       "zombie_zombiemummyarmor2default",
@@ -2302,6 +2360,214 @@
       "readNews": [
         {
           "type": "zombie",
+          "targetId": "zombie_zombiepianodefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Piano",
+          "timestamp": 1788466044989,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiemodernallstardefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Modern Allstar",
+          "timestamp": 1788466081505,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Frugal Gardener",
+          "title": "Quest Complete",
+          "message": "Quest completed: Frugal Gardener",
+          "timestamp": 1788466132899,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "OCD Nightmare",
+          "title": "Quest Complete",
+          "message": "Quest completed: OCD Nightmare",
+          "timestamp": 1788466132900,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Cloudy Day",
+          "title": "Quest Complete",
+          "message": "Quest completed: Cloudy Day",
+          "timestamp": 1788466132900,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "One Column Less",
+          "title": "Quest Complete",
+          "message": "Quest completed: One Column Less",
+          "timestamp": 1788466132900,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Steady Gardener",
+          "title": "Quest Complete",
+          "message": "Quest completed: Steady Gardener",
+          "timestamp": 1788466132900,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "repeater",
+          "title": "New Plant",
+          "message": "New plant unlocked: Repeater",
+          "timestamp": 1788466132901,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkturquoisedefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Dark Turquoise",
+          "timestamp": 1788466139209,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieparasoldefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Parasol",
+          "timestamp": 1788467362316,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiemummyarmor1default",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Mummy Armor 1",
+          "timestamp": 1788467380203,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiemummydefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Mummy",
+          "timestamp": 1788467417592,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkarmor3default",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Dark Armor 3",
+          "timestamp": 1788467439693,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Defense Master",
+          "title": "Quest Complete",
+          "message": "Quest completed: Defense Master",
+          "timestamp": 1788467511793,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "bonk choy",
+          "title": "New Plant",
+          "message": "New plant unlocked: Bonk Choy",
+          "timestamp": 1788467511794,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieeightiesarcade",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Eighties Arcade",
+          "timestamp": 1788467539463,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiemodernnewspaperdefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Modern Newspaper",
+          "timestamp": 1788467624061,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Blossom Under Constraints",
+          "title": "Quest Complete",
+          "message": "Quest completed: Blossom Under Constraints",
+          "timestamp": 1788467657850,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Undefended Cross",
+          "title": "Quest Complete",
+          "message": "Quest completed: Undefended Cross",
+          "timestamp": 1788467657850,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "grave buster",
+          "title": "New Plant",
+          "message": "New plant unlocked: Grave Buster",
+          "timestamp": 1788467657851,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombossmechegypt",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Zomboss Mech Egypt",
+          "timestamp": 1788467706025,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Demolition Expert",
+          "title": "Quest Complete",
+          "message": "Quest completed: Demolition Expert",
+          "timestamp": 1788467876420,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "iceberg lettuce",
+          "title": "New Plant",
+          "message": "New plant unlocked: Iceberg Lettuce",
+          "timestamp": 1788467876420,
+          "isRead": true
+        },
+        {
+          "type": "stage",
+          "targetId": "stage_2",
+          "title": "New Stage",
+          "message": "New stage available: Chapter 2 - Frostbite Caves",
+          "timestamp": 1788467876420,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkbarrelrollerdefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Dark Barrel Roller",
+          "timestamp": 1788467923803,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "hot potato",
+          "title": "New Plant",
+          "message": "New plant unlocked: Hot Potato",
+          "timestamp": 1788468010103,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
           "targetId": "zombie_zombiemummyarmor2default",
           "title": "Zombie Spotted",
           "message": "New zombie discovered: Mummy Armor 2",
@@ -2317,216 +2583,7 @@
           "isRead": true
         }
       ],
-      "unreadNews": [
-        {
-          "type": "plant",
-          "targetId": "hot potato",
-          "title": "New Plant",
-          "message": "New plant unlocked: Hot Potato",
-          "timestamp": 1788468010103,
-          "isRead": false
-        },
-        {
-          "type": "zombie",
-          "targetId": "zombie_zombiedarkbarrelrollerdefault",
-          "title": "Zombie Spotted",
-          "message": "New zombie discovered: Dark Barrel Roller",
-          "timestamp": 1788467923803,
-          "isRead": false
-        },
-        {
-          "type": "stage",
-          "targetId": "stage_2",
-          "title": "New Stage",
-          "message": "New stage available: Chapter 2 - Frostbite Caves",
-          "timestamp": 1788467876420,
-          "isRead": false
-        },
-        {
-          "type": "plant",
-          "targetId": "iceberg lettuce",
-          "title": "New Plant",
-          "message": "New plant unlocked: Iceberg Lettuce",
-          "timestamp": 1788467876420,
-          "isRead": false
-        },
-        {
-          "type": "quest",
-          "targetId": "Demolition Expert",
-          "title": "Quest Complete",
-          "message": "Quest completed: Demolition Expert",
-          "timestamp": 1788467876420,
-          "isRead": false
-        },
-        {
-          "type": "zombie",
-          "targetId": "zombie_zombiezombossmechegypt",
-          "title": "Zombie Spotted",
-          "message": "New zombie discovered: Zomboss Mech Egypt",
-          "timestamp": 1788467706025,
-          "isRead": false
-        },
-        {
-          "type": "plant",
-          "targetId": "grave buster",
-          "title": "New Plant",
-          "message": "New plant unlocked: Grave Buster",
-          "timestamp": 1788467657851,
-          "isRead": false
-        },
-        {
-          "type": "quest",
-          "targetId": "Undefended Cross",
-          "title": "Quest Complete",
-          "message": "Quest completed: Undefended Cross",
-          "timestamp": 1788467657850,
-          "isRead": false
-        },
-        {
-          "type": "quest",
-          "targetId": "Blossom Under Constraints",
-          "title": "Quest Complete",
-          "message": "Quest completed: Blossom Under Constraints",
-          "timestamp": 1788467657850,
-          "isRead": false
-        },
-        {
-          "type": "zombie",
-          "targetId": "zombie_zombiemodernnewspaperdefault",
-          "title": "Zombie Spotted",
-          "message": "New zombie discovered: Modern Newspaper",
-          "timestamp": 1788467624061,
-          "isRead": false
-        },
-        {
-          "type": "zombie",
-          "targetId": "zombie_zombieeightiesarcade",
-          "title": "Zombie Spotted",
-          "message": "New zombie discovered: Eighties Arcade",
-          "timestamp": 1788467539463,
-          "isRead": false
-        },
-        {
-          "type": "plant",
-          "targetId": "bonk choy",
-          "title": "New Plant",
-          "message": "New plant unlocked: Bonk Choy",
-          "timestamp": 1788467511794,
-          "isRead": false
-        },
-        {
-          "type": "quest",
-          "targetId": "Defense Master",
-          "title": "Quest Complete",
-          "message": "Quest completed: Defense Master",
-          "timestamp": 1788467511793,
-          "isRead": false
-        },
-        {
-          "type": "zombie",
-          "targetId": "zombie_zombiedarkarmor3default",
-          "title": "Zombie Spotted",
-          "message": "New zombie discovered: Dark Armor 3",
-          "timestamp": 1788467439693,
-          "isRead": false
-        },
-        {
-          "type": "zombie",
-          "targetId": "zombie_zombiemummydefault",
-          "title": "Zombie Spotted",
-          "message": "New zombie discovered: Mummy",
-          "timestamp": 1788467417592,
-          "isRead": false
-        },
-        {
-          "type": "zombie",
-          "targetId": "zombie_zombiemummyarmor1default",
-          "title": "Zombie Spotted",
-          "message": "New zombie discovered: Mummy Armor 1",
-          "timestamp": 1788467380203,
-          "isRead": false
-        },
-        {
-          "type": "zombie",
-          "targetId": "zombie_zombieparasoldefault",
-          "title": "Zombie Spotted",
-          "message": "New zombie discovered: Parasol",
-          "timestamp": 1788467362316,
-          "isRead": false
-        },
-        {
-          "type": "zombie",
-          "targetId": "zombie_zombiedarkturquoisedefault",
-          "title": "Zombie Spotted",
-          "message": "New zombie discovered: Dark Turquoise",
-          "timestamp": 1788466139209,
-          "isRead": false
-        },
-        {
-          "type": "plant",
-          "targetId": "repeater",
-          "title": "New Plant",
-          "message": "New plant unlocked: Repeater",
-          "timestamp": 1788466132901,
-          "isRead": false
-        },
-        {
-          "type": "quest",
-          "targetId": "Steady Gardener",
-          "title": "Quest Complete",
-          "message": "Quest completed: Steady Gardener",
-          "timestamp": 1788466132900,
-          "isRead": false
-        },
-        {
-          "type": "quest",
-          "targetId": "One Column Less",
-          "title": "Quest Complete",
-          "message": "Quest completed: One Column Less",
-          "timestamp": 1788466132900,
-          "isRead": false
-        },
-        {
-          "type": "quest",
-          "targetId": "Cloudy Day",
-          "title": "Quest Complete",
-          "message": "Quest completed: Cloudy Day",
-          "timestamp": 1788466132900,
-          "isRead": false
-        },
-        {
-          "type": "quest",
-          "targetId": "OCD Nightmare",
-          "title": "Quest Complete",
-          "message": "Quest completed: OCD Nightmare",
-          "timestamp": 1788466132900,
-          "isRead": false
-        },
-        {
-          "type": "quest",
-          "targetId": "Frugal Gardener",
-          "title": "Quest Complete",
-          "message": "Quest completed: Frugal Gardener",
-          "timestamp": 1788466132899,
-          "isRead": false
-        },
-        {
-          "type": "zombie",
-          "targetId": "zombie_zombiemodernallstardefault",
-          "title": "Zombie Spotted",
-          "message": "New zombie discovered: Modern Allstar",
-          "timestamp": 1788466081505,
-          "isRead": false
-        },
-        {
-          "type": "zombie",
-          "targetId": "zombie_zombiepianodefault",
-          "title": "Zombie Spotted",
-          "message": "New zombie discovered: Piano",
-          "timestamp": 1788466044989,
-          "isRead": false
-        }
-      ]
+      "unreadNews": []
     },
     "quests": [
       {
@@ -2820,14 +2877,7 @@
       "iceberglettuce": 1,
       "hotpotato": 1
     },
-    "selectedDeck": [
-      "peashooter",
-      "sunflower",
-      "potato-mine",
-      "wall-nut",
-      "cabbage-pult",
-      "puff-shroom"
-    ],
+    "selectedDeck": [],
     "boostedPlants": [],
     "username": "Arash",
     "passwordHash": "1bdcb54d3fb432a2da62e8f003269fb21bedaef1cb05efde1047a7e209084a95",
@@ -2835,10 +2885,10 @@
     "nickname": "Arash",
     "securityQuestionNumber": "1",
     "securityAnswer": "test",
-    "coins": 950,
-    "diamonds": 200,
+    "coins": 1450,
+    "diamonds": 250,
     "difficultyLevel": 1,
-    "lastShopRefreshTime": 1788468029631,
+    "lastShopRefreshTime": 1788502959057,
     "lastDailyDealPurchaseTime": 0,
     "meowPoints": 0,
     "highestMeowPoints": 0,
