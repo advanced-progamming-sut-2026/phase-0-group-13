@@ -91,7 +91,7 @@ public final class IZombieMatch {
     List<PlantView> plants = new ArrayList<>();
     for (IZombieEngine.DefensePlant plant : engine.getDefensePlants()) {
       plants.add(new PlantView(plant.getId(), plant.getName(), plant.getRow(), plant.getCol(),
-          plant.getHealth(), plant.getMaxHealth()));
+          plant.getHealth(), plant.getMaxHealth(), engine.ticksToShot(plant)));
     }
     List<ZombieView> zombies = new ArrayList<>();
     for (IZombieEngine.DeployedZombie zombie : engine.getDeployedZombies()) {
@@ -101,6 +101,10 @@ public final class IZombieMatch {
       zombies.add(new ZombieView(zombie.getId(), zombie.getName(), zombie.getRow(),
           zombie.getColumn(), zombie.getHealth(), zombie.getMaxHealth(), zombie.isEating(),
           zombie.producesSun()));
+    }
+    List<ShotView> shots = new ArrayList<>();
+    for (IZombieEngine.Shot shot : engine.getShots()) {
+      shots.add(new ShotView(shot.getRow(), shot.getColumn()));
     }
     boolean[] brains = new boolean[IZombieEngine.BRAINS];
     for (int row = 0; row < brains.length; row++) {
@@ -115,7 +119,7 @@ public final class IZombieMatch {
       plantRecharge.put(spec.name, engine.plantRechargeTicksLeft(spec.name));
     }
     return new Snapshot(tick, ticksRemaining(), engine.getZombieSun(), engine.getPlantSun(),
-        engine.getBrainsRemaining(), brains, isFinished(), winner, plants, zombies,
+        engine.getBrainsRemaining(), brains, isFinished(), winner, plants, zombies, shots,
         zombieRecharge, plantRecharge);
   }
 
@@ -130,7 +134,12 @@ public final class IZombieMatch {
     return held * POINTS_PER_SECOND_HELD;
   }
 
-  public record PlantView(int id, String name, int row, int col, int health, int maxHealth) {}
+  /** @param ticksToShot ticks until this cutout's next pea, or -1 for one that banks sun instead */
+  public record PlantView(int id, String name, int row, int col, int health, int maxHealth,
+      int ticksToShot) {}
+
+  /** A pea in flight, so the screens can draw the shot that is taking the health off a zombie. */
+  public record ShotView(int row, double column) {}
 
   public record ZombieView(
       int id,
@@ -153,6 +162,7 @@ public final class IZombieMatch {
       MatchRole winner,
       List<PlantView> plants,
       List<ZombieView> zombies,
+      List<ShotView> shots,
       Map<String, Integer> zombieRecharge,
       Map<String, Integer> plantRecharge) {}
 }

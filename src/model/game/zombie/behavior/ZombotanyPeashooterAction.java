@@ -27,6 +27,15 @@ public class ZombotanyPeashooterAction implements ZombieAction {
     this(150, 10.0);
   }
 
+  /** The cadence the view winds the head's attack clip up on, so it ends on the shot. */
+  public int getShootInterval() {
+    return shootInterval;
+  }
+
+  public int getLastShootTick() {
+    return lastShootTick;
+  }
+
   @Override
   public void execute(Zombie zombie, Board board, int currentTick) {
     if (currentTick - lastShootTick >= shootInterval) {

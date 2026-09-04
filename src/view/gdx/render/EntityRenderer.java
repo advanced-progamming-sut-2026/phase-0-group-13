@@ -39,6 +39,7 @@ import model.game.zombie.behavior.TombRaiserZombieAction;
 import model.game.zombie.behavior.TurquoiseZombieAction;
 import model.game.zombie.behavior.WizardZombieAction;
 import model.game.zombie.behavior.ZombossAction;
+import model.game.zombie.behavior.ZombotanyPeashooterAction;
 import view.gdx.animation.AnimationLibrary;
 import view.gdx.animation.AnimationStates;
 import view.gdx.animation.EntityAnimation;
@@ -90,7 +91,8 @@ public final class EntityRenderer implements WorldRenderer {
    * <p>One means the very end of it: the pea is held in the mouth for the whole of the shooting
    * animation and only sets off as the plant finishes the throw. It used to be 0.4, so the shot
    * left a third of the way in, while the plant was still winding up, and the release read as
-   * unrelated to the animation playing.
+   * unrelated to the animation playing. Only for the plants whose clip plays after the shot; see
+   * {@link #releaseOf}.
    */
   private static final float MUZZLE_RELEASE_OF_CLIP = 1f;
   private static final float MUZZLE_MIN_RELEASE = 0.35f;
@@ -1238,8 +1240,31 @@ public final class EntityRenderer implements WorldRenderer {
     muzzles.put(plant, new float[] {
         clamp(forward, -MUZZLE_MAX_FORWARD, MUZZLE_MAX_FORWARD),
         clamp(lift, -lane * MUZZLE_MAX_LIFT_LANES, lane * MUZZLE_MAX_LIFT_LANES),
-        clamp(animation.duration(clip) * MUZZLE_RELEASE_OF_CLIP / GdxConfig.SECONDS_PER_TICK,
-            MUZZLE_MIN_RELEASE, MUZZLE_MAX_RELEASE)});
+        releaseOf(plant, animation, clip)});
+  }
+
+  /**
+   * How far into the firing tick a shot leaves the mouth.
+   *
+   * <p>Zero for a plant whose attack clip leads its shot: the clip has already finished by the
+   * time the tick the shot is fired on begins, so any hold at all is a pause between the plant
+   * finishing the throw and the pea moving. Holding it here used to be what lined the shot up
+   * with the animation, back when the clip started on the firing tick; now it only delays the
+   * release past the frame it belongs to and then flings the pea a whole tile in the sliver of a
+   * tick that is left. A behaviour with no interval still animates after the fact, so its shot is
+   * still held to the release frame of the clip that is only now playing.
+   */
+  private float releaseOf(Plant plant, EntityAnimation animation, String clip) {
+    if (leadsItsShot(plant)) {
+      return 0f;
+    }
+    return clamp(animation.duration(clip) * MUZZLE_RELEASE_OF_CLIP / GdxConfig.SECONDS_PER_TICK,
+        MUZZLE_MIN_RELEASE, MUZZLE_MAX_RELEASE);
+  }
+
+  /** True when the plant's attack clip is scheduled to finish on the tick it fires. */
+  private boolean leadsItsShot(Plant plant) {
+    return plant.getBehavior() != null && plant.getBehavior().actionIntervalTicks() > 0;
   }
 
   private static float clamp(float value, float low, float high) {
@@ -1630,12 +1655,17 @@ public final class EntityRenderer implements WorldRenderer {
         ? head[0] + head[2] * MUZZLE_HEAD_REACH
         : head[0] + head[2] * (1f - MUZZLE_HEAD_REACH);
     float lane = geometry.getCellHeight();
+    // A Zombotany's head has already finished its shooting clip by the time the firing tick
+    // starts, so its pea sets off with it rather than after it.
+    float release = zombie.getBehavior() instanceof ZombotanyPeashooterAction
+        ? 0f
+        : clamp(animation.duration(clip) * MUZZLE_RELEASE_OF_CLIP / GdxConfig.SECONDS_PER_TICK,
+            MUZZLE_MIN_RELEASE, MUZZLE_MAX_RELEASE);
     zombieMuzzles.put(zombie, new float[] {
         clamp((mouth - x) / geometry.getCellWidth(), -MUZZLE_MAX_FORWARD, MUZZLE_MAX_FORWARD),
         clamp(head[1] - geometry.rowCentreY(zombie.getRow()),
             -lane * MUZZLE_MAX_LIFT_LANES, lane * MUZZLE_MAX_LIFT_LANES),
-        clamp(animation.duration(clip) * MUZZLE_RELEASE_OF_CLIP / GdxConfig.SECONDS_PER_TICK,
-            MUZZLE_MIN_RELEASE, MUZZLE_MAX_RELEASE)});
+        release});
   }
 
   private float throwLift(float flight) {
@@ -1663,8 +1693,37 @@ public final class EntityRenderer implements WorldRenderer {
     if (headHeight <= 0f) {
       return;
     }
-    rig.draw(context.getBatch(), idle, time, head[0], head[1] - span / 2f,
-        span / headHeight, !zombie.isHypnotized());
+    // The head is the half of a Zombotany that does the shooting, so the shot is animated on it:
+    // its plant's own attack clip, wound up to finish on the tick the pea is fired.
+    String attack = rig.pickClip("attack");
+    float firing = attack == null ? -1f : zombotanyWindUp(zombie, rig.duration(attack));
+    String playing = firing >= 0f ? attack : idle;
+    rig.draw(context.getBatch(), playing, firing >= 0f ? firing : time, head[0],
+        head[1] - span / 2f, span / headHeight, !zombie.isHypnotized());
+  }
+
+  /**
+   * Where in its attack clip a Zombotany's head should be, or -1 when it is not shooting.
+   *
+   * <p>The same schedule the lawn's own shooters run on: the clip is played across the ticks
+   * leading up to the shot so its last frame lands on the tick the pea is created, rather than
+   * the head sitting in its idle for the whole match while peas came out of it unannounced.
+   */
+  private float zombotanyWindUp(Zombie zombie, float length) {
+    if (length <= 0f
+        || !(zombie.getBehavior() instanceof ZombotanyPeashooterAction shooter)) {
+      return -1f;
+    }
+    int interval = shooter.getShootInterval();
+    if (interval <= 0) {
+      return -1f;
+    }
+    if (shooter.getLastShootTick() == currentTick) {
+      return length;
+    }
+    int windUp = Math.min(interval, Math.max(1, Math.round(length * GdxConfig.TICKS_PER_SECOND)));
+    float left = (shooter.getLastShootTick() + interval - currentTick) - tickAlpha;
+    return left > windUp ? -1f : Math.max(0f, Math.min(1f, 1f - left / windUp)) * length;
   }
 
   /**

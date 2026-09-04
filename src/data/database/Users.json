@@ -1659,6 +1659,465 @@
       "wall-nut",
       "potato-mine",
       "cabbage-pult",
+      "puff-shroom"
+    ],
+    "unlockedZombies": [],
+    "recentGames": [],
+    "unlockedStages": [
+      "stage_1"
+    ],
+    "progress": {
+      "currentStage": 1,
+      "currentLevel": 1,
+      "miniGamesUnlocked": true,
+      "survivalModeUnlocked": false,
+      "unlockedMiniGames": [
+        "vasebreaker",
+        "i_zombie",
+        "wallnut_bowling",
+        "beghouled",
+        "zombotany"
+      ],
+      "clearedMiniGameLevels": {
+        "i_zombie": 1
+      },
+      "maxClearedStage": 0,
+      "maxClearedLevel": 0,
+      "adventureCompleted": false
+    },
+    "inventory": {
+      "items": {}
+    },
+    "greenHouse": {
+      "maxCapacity": 20,
+      "pots": [
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": true,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        },
+        {
+          "isUnlocked": false,
+          "plantTime": 0,
+          "growthDurationMillis": 0
+        }
+      ]
+    },
+    "newsBox": {
+      "readNews": [],
+      "unreadNews": [
+        {
+          "type": "quest",
+          "targetId": "Arcade Regular",
+          "title": "Quest Complete",
+          "message": "Quest completed: Arcade Regular",
+          "timestamp": 1788501533449,
+          "isRead": false
+        }
+      ]
+    },
+    "quests": [
+      {
+        "Quest Name": "Daily Sun Catcher",
+        "Category": "Daily",
+        "Completion Condition": "Collect sun_amount sun in a single day",
+        "Reward": "sun_amount / 100 Coins",
+        "Priority": "Medium",
+        "Variable": "3000-4000-5000",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Chapter Hunter",
+        "Category": "Main",
+        "Completion Condition": "Defeat 50 zombies from the chapter chapter",
+        "Reward": "10 Seed Packets",
+        "Priority": "High",
+        "Variable": "Ancient Egypt",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Pro Plant Player",
+        "Category": "Daily",
+        "Completion Condition": "Kill ten zombies using only plant",
+        "Reward": "A random new plant",
+        "Priority": "High",
+        "Variable": "any plant that can kill",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Only Cactus",
+        "Category": "Daily",
+        "Completion Condition": "Kill ten zombies using only the cactus",
+        "Reward": "20 Gems",
+        "Priority": "High",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Frugal Gardener",
+        "Category": "Main",
+        "Completion Condition": "Win a level without losing more than n plants",
+        "Reward": "20 Seed Packets",
+        "Priority": "High",
+        "Variable": "3",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Defense Master",
+        "Category": "Epic Challenge",
+        "Completion Condition": "Finish a level with exactly zero sun spent",
+        "Reward": "200 Gems",
+        "Priority": "Critical",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Quick Reflexes",
+        "Category": "Main",
+        "Completion Condition": "Kill 10 zombies within 30 seconds of the first wave",
+        "Reward": "500 Coins",
+        "Priority": "Medium",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Demolition Expert",
+        "Category": "Daily",
+        "Completion Condition": "Use 3 explosive plants in a single level",
+        "Reward": "100 Coins",
+        "Priority": "Low",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Symmetry",
+        "Category": "Daily",
+        "Completion Condition": "The final garden layout must be symmetric",
+        "Reward": "500 Coins",
+        "Priority": "High",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Family Massacre",
+        "Category": "Daily",
+        "Completion Condition": "Use only plants of the family_type family to kill zombies",
+        "Reward": "1000 Coins",
+        "Priority": "Medium",
+        "Variable": "Pea",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Blossom Under Constraints",
+        "Category": "Daily",
+        "Completion Condition": "Win a level without using any plant of the family_type family",
+        "Reward": "100 Gems",
+        "Priority": "High",
+        "Variable": "Shroom",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Night or Day",
+        "Category": "Epic Challenge",
+        "Completion Condition": "Finish a daytime level with night plants (mushrooms)",
+        "Reward": "20 Gems",
+        "Priority": "High",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Win After Win",
+        "Category": "Daily",
+        "Completion Condition": "Win 5 levels in a row on the highest difficulty",
+        "Reward": "5000 Coins",
+        "Priority": "Medium",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Almost a Winner",
+        "Category": "Daily",
+        "Completion Condition": "Kill 10 zombies in the first column of a lane with no lawn mower",
+        "Reward": "300 Coins",
+        "Priority": "Medium",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "OCD Nightmare",
+        "Category": "Daily",
+        "Completion Condition": "Win a level with no symmetry in the garden (except the middle row)",
+        "Reward": "800 Coins",
+        "Priority": "Medium",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Cloudy Day",
+        "Category": "Daily",
+        "Completion Condition": "Win a level using exactly 3 sun-producing plants",
+        "Reward": "10 Gems",
+        "Priority": "High",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "One Column Less",
+        "Category": "Daily",
+        "Completion Condition": "Win a level without planting anything in column n",
+        "Reward": "10 Gems",
+        "Priority": "High",
+        "Variable": "5",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Undefended Row",
+        "Category": "Daily",
+        "Completion Condition": "Win a level without planting anything in row n",
+        "Reward": "20 Gems",
+        "Priority": "High",
+        "Variable": "3",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Undefended Cross",
+        "Category": "Daily",
+        "Completion Condition": "Win a level with both column n and row n left empty",
+        "Reward": "25 Gems",
+        "Priority": "High",
+        "Variable": "4",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Mowing Time",
+        "Category": "Daily",
+        "Completion Condition": "Destroy zombies using only the lawn mower",
+        "Reward": "15 Gems",
+        "Priority": "High",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Lawn Patrol",
+        "Category": "Repeatable",
+        "Completion Condition": "Defeat 25 zombies in any level",
+        "Reward": "250 Coins",
+        "Priority": "Low",
+        "Variable": "25",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Steady Gardener",
+        "Category": "Repeatable",
+        "Completion Condition": "Clear a stage of any chapter",
+        "Reward": "1 Plant Food",
+        "Priority": "Low",
+        "Variable": "1",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      },
+      {
+        "Quest Name": "Arcade Regular",
+        "Category": "Repeatable",
+        "Completion Condition": "Clear any mini-game level",
+        "Reward": "2 Gems",
+        "Priority": "Low",
+        "Variable": "2",
+        "progressOfQuest": 2.0,
+        "isCompleted": true,
+        "rewardClaimed": false,
+        "questTarget": 2.0
+      },
+      {
+        "Quest Name": "Sun Shift",
+        "Category": "Repeatable",
+        "Completion Condition": "Collect sun_amount sun across your matches",
+        "Reward": "sun_amount / 100 Coins",
+        "Priority": "Low",
+        "Variable": "1500",
+        "progressOfQuest": 0.0,
+        "isCompleted": false,
+        "rewardClaimed": false,
+        "questTarget": 0.0
+      }
+    ],
+    "plantLevels": {
+      "cabbagepult": 1,
+      "wallnut": 1,
+      "peashooter": 1,
+      "potatomine": 1,
+      "puffshroom": 1,
+      "sunflower": 1
+    },
+    "selectedDeck": [],
+    "boostedPlants": [],
+    "username": "Arash2",
+    "passwordHash": "55d7b85c6b75596e6c1bcd5d1e760bd31f28893742affe01949465daa12bfd8d",
+    "email": "heeey@gmail.heeey",
+    "nickname": "Arash2",
+    "securityQuestionNumber": "1",
+    "securityAnswer": "test",
+    "coins": 300,
+    "diamonds": 0,
+    "difficultyLevel": 3,
+    "lastShopRefreshTime": 0,
+    "lastDailyDealPurchaseTime": 0,
+    "meowPoints": 400,
+    "highestMeowPoints": 200,
+    "winStreakAtMaxDifficulty": 0
+  },
+  {
+    "gender": "male",
+    "unlockedPlants": [
+      "peashooter",
+      "sunflower",
+      "wall-nut",
+      "potato-mine",
+      "cabbage-pult",
       "puff-shroom",
       "repeater",
       "bonk choy",
@@ -2362,12 +2821,12 @@
       "hotpotato": 1
     },
     "selectedDeck": [
-      "potato-mine",
-      "cabbage-pult",
       "peashooter",
-      "iceberg lettuce",
-      "hot potato",
-      "wall-nut"
+      "sunflower",
+      "potato-mine",
+      "wall-nut",
+      "cabbage-pult",
+      "puff-shroom"
     ],
     "boostedPlants": [],
     "username": "Arash",

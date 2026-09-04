@@ -2,6 +2,7 @@ package view.gdx.screens;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -12,6 +13,7 @@ import model.enums.MiniGameType;
 import model.game.minigame.arcade.IZombieEngine;
 import model.game.minigame.arcade.IZombieEngine.DefensePlant;
 import model.game.minigame.arcade.IZombieEngine.DeployedZombie;
+import model.game.minigame.arcade.IZombieEngine.Shot;
 import model.game.minigame.arcade.IZombieEngine.ZombieSpec;
 import view.gdx.core.PvzGdxGame;
 import view.gdx.render.ArcadeRenderer;
@@ -21,6 +23,7 @@ import view.gdx.ui.SeedCard;
 public final class IZombieScreen extends ArcadeBoardScreen {
 
   private static final float BRAIN_ROW_FILL = 0.42f;
+  private static final float PEA_ROW_FILL = 0.22f;
   private static final Color READY = new Color(1f, 1f, 1f, 1f);
   private static final Color UNAVAILABLE = new Color(0.45f, 0.45f, 0.5f, 1f);
   private static final Color EATEN_BRAIN = new Color(0.35f, 0.35f, 0.38f, 0.55f);
@@ -140,8 +143,10 @@ public final class IZombieScreen extends ArcadeBoardScreen {
         art.drawBesideLane(batch, art.icon("brain"), row, BRAIN_ROW_FILL, LANE_PROP_GAP);
       }
     }
+    float alpha = context().getTickAlpha();
     for (DefensePlant plant : engine.getDefensePlants()) {
-      art.drawPlant(batch, plant, plant.getName(), plant.getCol(), plant.getRow());
+      art.drawPlant(batch, plant, plant.getName(), plant.getCol(), plant.getRow(),
+          engine.ticksToShot(plant), alpha);
     }
     for (DeployedZombie zombie : engine.getDeployedZombies()) {
       if (zombie.isDead()) {
@@ -149,6 +154,11 @@ public final class IZombieScreen extends ArcadeBoardScreen {
       }
       art.drawZombie(batch, zombie, zombie.getName(), Math.max(0.0, zombie.getColumn()),
           zombie.getRow(), zombie.isEating());
+    }
+    TextureRegion pea = art.icon("pea");
+    for (Shot shot : engine.getShots()) {
+      art.drawProp(batch, pea, shot.getColumn() - IZombieEngine.SHOT_SPEED * (1f - alpha),
+          shot.getRow(), PEA_ROW_FILL);
     }
     drawPlacementGhost(batch);
   }

@@ -30,6 +30,8 @@ public final class IZombieEngine {
   // 1.5s (15 ticks at 10 ticks/second), matching the Peashooter's Action Interval in plants.json.
   public static final int PLANT_FIRE_INTERVAL = 15;
   public static final int TICKS_PER_SECOND = 10;
+  /** How far a cutout's pea travels each tick, in tiles: the same half-tile the lawn's peas do. */
+  public static final double SHOT_SPEED = 0.5;
   public static final int PLANT_STARTING_SUN = 150;
   public static final String CUTOUT_PLANT = "Peashooter";
 
@@ -231,6 +233,38 @@ public final class IZombieEngine {
     }
   }
 
+  /**
+   * A pea in flight.
+   *
+   * <p>The cutouts used to take their damage off the nearest zombie in range the instant they
+   * fired, with nothing drawn in between, so a zombie lost health to a plant several tiles away
+   * that never appeared to do anything. The shot is a real thing now: it leaves the plant, crosses
+   * the lawn and lands its damage on whatever it reaches first.
+   */
+  public static final class Shot {
+    private final int row;
+    private final double origin;
+    private final double reach;
+    private double column;
+    private final int damage;
+
+    private Shot(int row, double origin, double reach, int damage) {
+      this.row = row;
+      this.origin = origin;
+      this.reach = reach;
+      this.column = origin;
+      this.damage = damage;
+    }
+
+    public int getRow() {
+      return row;
+    }
+
+    public double getColumn() {
+      return column;
+    }
+  }
+
   public static final class DefensePlant {
     private final int id;
     private final String name;
@@ -293,6 +327,7 @@ public final class IZombieEngine {
 
   private final List<DeployedZombie> deployedZombies = new ArrayList<>();
   private final List<DefensePlant> defensePlants = new ArrayList<>();
+  private final List<Shot> shots = new ArrayList<>();
   private final Map<String, Integer> rechargeLeft = new HashMap<>();
   private final Map<String, Integer> plantRechargeLeft = new HashMap<>();
   private final boolean[] brainAlive = new boolean[BRAINS];
@@ -461,11 +496,61 @@ public final class IZombieEngine {
         plantSun += plant.sunPerCycle;
         continue;
       }
-      DeployedZombie target = nearestZombieAhead(plant);
-      if (target != null) {
-        target.health -= plant.damagePerTick;
+      if (nearestZombieAhead(plant) != null) {
+        shots.add(new Shot(plant.row, plant.col, plant.col + plant.range, plant.damagePerTick));
       }
     }
+  }
+
+  /** Carries the peas down their lanes, each landing on the first zombie it catches up with. */
+  private void advanceShots() {
+    shots.removeIf(shot -> {
+      shot.column += SHOT_SPEED;
+      DeployedZombie hit = zombieUnder(shot);
+      if (hit != null) {
+        hit.health -= shot.damage;
+        return true;
+      }
+      // Falls short at the edge of the plant's range, which is as far as the instant hit reached.
+      return shot.column > shot.reach;
+    });
+  }
+
+  /**
+   * The first zombie the pea has reached: the one nearest its plant that it has now drawn level
+   * with. Bounded below by where the pea started so it cannot strike something standing behind
+   * the plant that fired it, which is the same reach the instant hit had.
+   */
+  private DeployedZombie zombieUnder(Shot shot) {
+    DeployedZombie hit = null;
+    for (DeployedZombie zombie : deployedZombies) {
+      if (zombie.row != shot.row || zombie.isDead()
+          || zombie.column > shot.column || zombie.column < shot.origin) {
+        continue;
+      }
+      if (hit == null || zombie.column < hit.column) {
+        hit = zombie;
+      }
+    }
+    return hit;
+  }
+
+  public List<Shot> getShots() {
+    return shots;
+  }
+
+  /**
+   * Ticks until this plant's next shot, or -1 when it is not about to take one.
+   *
+   * <p>What the view winds a cutout's attack clip up against. A Wall-nut and a Sunflower never
+   * shoot, and a plant with nothing in range does not fire when its timer comes round, so neither
+   * should be drawn miming a shot.
+   */
+  public int ticksToShot(DefensePlant plant) {
+    if (plant.producesSun() || plant.damagePerTick <= 0 || nearestZombieAhead(plant) == null) {
+      return -1;
+    }
+    return Math.max(0, plant.intervalTicks - plant.timer);
   }
 
   /** The zombies that walk: they eat whatever blocks them, or press on towards the brain. */
@@ -500,6 +585,7 @@ public final class IZombieEngine {
     plantRechargeLeft.replaceAll((type, left) -> Math.max(0, left - 1));
     tickSunProducingZombies();
     tickDefensePlants();
+    advanceShots();
     advanceAttackingZombies();
     reportCasualties();
     defensePlants.removeIf(DefensePlant::isDead);

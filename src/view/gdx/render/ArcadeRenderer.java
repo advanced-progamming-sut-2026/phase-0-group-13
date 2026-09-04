@@ -10,6 +10,7 @@ import java.util.Map;
 import view.gdx.animation.AnimationLibrary;
 import view.gdx.animation.AnimationStates;
 import view.gdx.animation.EntityAnimation;
+import view.gdx.core.GdxConfig;
 import view.gdx.ui.HudArt;
 import view.gdx.ui.PlantArt;
 import view.gdx.ui.ZombieArt;
@@ -127,13 +128,31 @@ public final class ArcadeRenderer implements Disposable {
   }
 
   public boolean drawPlant(Batch batch, Object key, String plantName, double col, int row) {
+    return drawPlant(batch, key, plantName, col, row, -1, 0f);
+  }
+
+  /**
+   * Same, for a plant that shoots.
+   *
+   * @param ticksToShot ticks until its next shot, or -1 for one that does not shoot: its attack
+   *     clip is played across the ticks leading up to that so it finishes on the shot rather than
+   *     the plant standing in its idle while peas come out of it
+   * @param tickAlpha how far through the current tick this frame is
+   */
+  public boolean drawPlant(Batch batch, Object key, String plantName, double col, int row,
+      int ticksToShot, float tickAlpha) {
     EntityAnimation animation = animations.find(AnimationLibrary.PLANTS, plantName);
-    String clip = animation == null ? null : animation.pickClip("idle", "attack");
-    if (clip != null) {
-      animation.draw(batch, clip, playback.advance(key, clip, delta),
+    String resting = animation == null ? null : animation.pickClip("idle", "attack");
+    if (resting != null) {
+      String attack = animation.pickClip("attack");
+      float windUp = attack == null ? -1f : windUpTime(animation, attack, ticksToShot, tickAlpha);
+      String clip = windUp >= 0f ? attack : resting;
+      animation.draw(batch, clip,
+          windUp >= 0f ? playback.hold(key, clip, windUp) : playback.advance(key, clip, delta),
           geometry.columnCentreX(col),
           geometry.rowToY(row) + geometry.getCellHeight() * PLANT_FOOT_INSET,
-          scaleFor(animation.width(clip), PLANT_ANIM_UNITS, PLANT_ROW_FILL), false);
+          // Sized by the resting clip either way, so the plant does not change size as it shoots.
+          scaleFor(animation.width(resting), PLANT_ANIM_UNITS, PLANT_ROW_FILL), false);
       return true;
     }
     TextureRegion portrait = plantArt.find(plantName);
@@ -144,6 +163,18 @@ public final class ArcadeRenderer implements Disposable {
         scaleFor(portrait.getRegionWidth(), PLANT_REFERENCE_HEIGHT, PLANT_ROW_FILL),
         PLANT_FOOT_INSET);
     return true;
+  }
+
+  /** Where in its attack clip a plant this close to firing is, or -1 for one that is not. */
+  private float windUpTime(EntityAnimation animation, String attack, int ticksToShot,
+      float tickAlpha) {
+    float length = animation.duration(attack);
+    if (ticksToShot < 0 || length <= 0f) {
+      return -1f;
+    }
+    int windUp = Math.max(1, Math.round(length * GdxConfig.TICKS_PER_SECOND));
+    float left = ticksToShot - tickAlpha;
+    return left < 0f || left > windUp ? -1f : (1f - left / windUp) * length;
   }
 
   /**
