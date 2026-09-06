@@ -1794,17 +1794,17 @@
       ]
     },
     "newsBox": {
-      "readNews": [],
-      "unreadNews": [
+      "readNews": [
         {
           "type": "quest",
           "targetId": "Arcade Regular",
           "title": "Quest Complete",
           "message": "Quest completed: Arcade Regular",
           "timestamp": 1788501533449,
-          "isRead": false
+          "isRead": true
         }
-      ]
+      ],
+      "unreadNews": []
     },
     "quests": [
       {
@@ -2101,12 +2101,12 @@
     "nickname": "Arash2",
     "securityQuestionNumber": "1",
     "securityAnswer": "test",
-    "coins": 300,
+    "coins": 450,
     "diamonds": 0,
     "difficultyLevel": 3,
     "lastShopRefreshTime": 0,
     "lastDailyDealPurchaseTime": 0,
-    "meowPoints": 400,
+    "meowPoints": 600,
     "highestMeowPoints": 200,
     "winStreakAtMaxDifficulty": 0
   },
@@ -2124,7 +2124,14 @@
       "grave buster",
       "iceberg lettuce",
       "hot potato",
-      "grapeshot"
+      "grapeshot",
+      "sun-shroom",
+      "fire peashooter",
+      "appease-mint",
+      "torchwood",
+      "threepeater",
+      "mega gatling pea",
+      "sun bean"
     ],
     "unlockedZombies": [
       "zombie_zombiemummyarmor2default",
@@ -2139,9 +2146,95 @@
       "zombie_zombieeightiesarcade",
       "zombie_zombiemodernnewspaperdefault",
       "zombie_zombiezombossmechegypt",
-      "zombie_zombiedarkbarrelrollerdefault"
+      "zombie_zombiedarkbarrelrollerdefault",
+      "zombie_zombieradefault",
+      "zombie_zombiemummyarmor4default",
+      "zombie_zombiedarkking",
+      "zombie_zombiebeachfisherman",
+      "zombie_zombiebeachsnorkel",
+      "zombie_zombieexplorerdefault",
+      "zombie_zombieiceagedodo",
+      "zombie_zombieiceagehunter",
+      "zombie_zombietombraiserdefault",
+      "zombie_zombieiceagetroglobite",
+      "zombie_zombieegyptgargantuar",
+      "zombie_zombieprospectordefault",
+      "zombie_zombiedarkjugglerdefault",
+      "zombie_zombiedarkimpdragondefault",
+      "zombie_zombiebeachoctopus",
+      "zombie_zombiezombossmechdark",
+      "zombie_zombiezombotanypeashooterdefault",
+      "zombie_zombiezombotanywallnutdefault",
+      "zombie_zombiezombotanyjalapenodefault",
+      "zombie_zombiezombotanysquashdefault",
+      "zombie_zombiezombossmechcowboy"
     ],
     "recentGames": [
+      {
+        "won": false,
+        "score": 150,
+        "rewardCoins": 0
+      },
+      {
+        "won": true,
+        "score": 270,
+        "rewardCoins": 150
+      },
+      {
+        "won": true,
+        "score": 0,
+        "rewardCoins": 150
+      },
+      {
+        "won": true,
+        "score": 0,
+        "rewardCoins": 150
+      },
+      {
+        "won": true,
+        "score": 40,
+        "rewardCoins": 150
+      },
+      {
+        "won": true,
+        "score": 20,
+        "rewardCoins": 150
+      },
+      {
+        "won": true,
+        "score": 0,
+        "rewardCoins": 150
+      },
+      {
+        "won": true,
+        "score": 300,
+        "rewardCoins": 150
+      },
+      {
+        "won": true,
+        "score": 0,
+        "rewardCoins": 200
+      },
+      {
+        "won": true,
+        "score": 40,
+        "rewardCoins": 150
+      },
+      {
+        "won": true,
+        "score": 100,
+        "rewardCoins": 250
+      },
+      {
+        "won": false,
+        "score": 0,
+        "rewardCoins": 0
+      },
+      {
+        "won": true,
+        "score": 200,
+        "rewardCoins": 150
+      },
       {
         "won": true,
         "score": 200,
@@ -2170,13 +2263,15 @@
     ],
     "unlockedStages": [
       "stage_1",
-      "stage_2"
+      "stage_2",
+      "stage_3",
+      "stage_4"
     ],
     "progress": {
-      "currentStage": 2,
-      "currentLevel": 2,
+      "currentStage": 4,
+      "currentLevel": 4,
       "miniGamesUnlocked": true,
-      "survivalModeUnlocked": false,
+      "survivalModeUnlocked": true,
       "unlockedMiniGames": [
         "vasebreaker",
         "i_zombie",
@@ -2184,14 +2279,23 @@
         "beghouled",
         "zombotany"
       ],
-      "clearedMiniGameLevels": {},
-      "maxClearedStage": 2,
-      "maxClearedLevel": 1,
-      "adventureCompleted": false
+      "clearedMiniGameLevels": {
+        "beghouled": 1,
+        "zombotany": 1,
+        "i_zombie": 1
+      },
+      "maxClearedStage": 4,
+      "maxClearedLevel": 4,
+      "adventureCompleted": true
     },
     "inventory": {
       "items": {
-        "pot": 3
+        "pot": 4,
+        "seed_peashooter": 10,
+        "seed_potato-mine": 10,
+        "seed_sunflower": 10,
+        "seed_puff-shroom": 10,
+        "seed_bonk choy": 20
       }
     },
     "greenHouse": {
@@ -2301,6 +2405,286 @@
     },
     "newsBox": {
       "readNews": [
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombietombraiserdefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Tombraiser",
+          "timestamp": 1788507818406,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieiceagetroglobite",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Iceage Troglobite",
+          "timestamp": 1788508239493,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieegyptgargantuar",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Egypt Gargantuar",
+          "timestamp": 1788508322828,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieprospectordefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Prospector",
+          "timestamp": 1788509176973,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkjugglerdefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Dark Juggler",
+          "timestamp": 1788509383964,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkimpdragondefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Dark Imp Dragon",
+          "timestamp": 1788509526256,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "fire peashooter",
+          "title": "New Plant",
+          "message": "New plant unlocked: Fire Peashooter",
+          "timestamp": 1788509669465,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiebeachoctopus",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Beach Octopus",
+          "timestamp": 1788509734411,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombossmechdark",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Zomboss Mech Dark",
+          "timestamp": 1788510073732,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "appease-mint",
+          "title": "New Plant",
+          "message": "New plant unlocked: Appease-mint",
+          "timestamp": 1788510259736,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "torchwood",
+          "title": "New Plant",
+          "message": "New plant unlocked: Torchwood",
+          "timestamp": 1788510696236,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "threepeater",
+          "title": "New Plant",
+          "message": "New plant unlocked: Threepeater",
+          "timestamp": 1788510707520,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "mega gatling pea",
+          "title": "New Plant",
+          "message": "New plant unlocked: Mega Gatling Pea",
+          "timestamp": 1788510726770,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "sun bean",
+          "title": "New Plant",
+          "message": "New plant unlocked: Sun Bean",
+          "timestamp": 1788510751519,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombotanypeashooterdefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Zombotany Peashooter",
+          "timestamp": 1788511013930,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombotanywallnutdefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Zombotany Wallnut",
+          "timestamp": 1788511028345,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombotanyjalapenodefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Zombotany Jalapeno",
+          "timestamp": 1788511028347,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombotanysquashdefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Zombotany Squash",
+          "timestamp": 1788511051245,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Night or Day",
+          "title": "Quest Complete",
+          "message": "Quest completed: Night or Day",
+          "timestamp": 1788511064948,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Arcade Regular",
+          "title": "Quest Complete",
+          "message": "Quest completed: Arcade Regular",
+          "timestamp": 1788511064948,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiezombossmechcowboy",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Zomboss Mech Cowboy",
+          "timestamp": 1788511357923,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieradefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Ra",
+          "timestamp": 1788507109299,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiemummyarmor4default",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Mummy Armor 4",
+          "timestamp": 1788507247314,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Undefended Row",
+          "title": "Quest Complete",
+          "message": "Quest completed: Undefended Row",
+          "timestamp": 1788507281709,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiedarkking",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Dark King",
+          "timestamp": 1788507442877,
+          "isRead": true
+        },
+        {
+          "type": "quest",
+          "targetId": "Mowing Time",
+          "title": "Quest Complete",
+          "message": "Quest completed: Mowing Time",
+          "timestamp": 1788507449578,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiebeachfisherman",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Beach Fisherman",
+          "timestamp": 1788507493945,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombiebeachsnorkel",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Beach Snorkel",
+          "timestamp": 1788507517045,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieexplorerdefault",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Explorer",
+          "timestamp": 1788507571804,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieiceagedodo",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Iceage Dodo",
+          "timestamp": 1788507656022,
+          "isRead": true
+        },
+        {
+          "type": "zombie",
+          "targetId": "zombie_zombieiceagehunter",
+          "title": "Zombie Spotted",
+          "message": "New zombie discovered: Iceage Hunter",
+          "timestamp": 1788507762972,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "sun-shroom",
+          "title": "New Plant",
+          "message": "New plant unlocked: Sun-shroom",
+          "timestamp": 1788506611784,
+          "isRead": true
+        },
+        {
+          "type": "plant",
+          "targetId": "grapeshot",
+          "title": "New Plant",
+          "message": "New plant unlocked: Grapeshot",
+          "timestamp": 1788503512464,
+          "isRead": true
+        },
+        {
+          "type": "stage",
+          "targetId": "stage_3",
+          "title": "New Stage",
+          "message": "New stage available: Chapter 3 - Big Wave Beach",
+          "timestamp": 1788506282240,
+          "isRead": true
+        },
+        {
+          "type": "stage",
+          "targetId": "stage_4",
+          "title": "New Stage",
+          "message": "New stage available: Chapter 4 - Dark Ages",
+          "timestamp": 1788506282240,
+          "isRead": true
+        },
         {
           "type": "zombie",
           "targetId": "zombie_zombiepianodefault",
@@ -2526,16 +2910,7 @@
           "isRead": true
         }
       ],
-      "unreadNews": [
-        {
-          "type": "plant",
-          "targetId": "grapeshot",
-          "title": "New Plant",
-          "message": "New plant unlocked: Grapeshot",
-          "timestamp": 1788503512464,
-          "isRead": false
-        }
-      ]
+      "unreadNews": []
     },
     "quests": [
       {
@@ -2594,7 +2969,7 @@
         "Variable": "3",
         "progressOfQuest": 0.0,
         "isCompleted": true,
-        "rewardClaimed": false,
+        "rewardClaimed": true,
         "questTarget": 0.0
       },
       {
@@ -2672,7 +3047,7 @@
         "Reward": "20 Gems",
         "Priority": "High",
         "progressOfQuest": 0.0,
-        "isCompleted": false,
+        "isCompleted": true,
         "rewardClaimed": false,
         "questTarget": 0.0
       },
@@ -2740,7 +3115,7 @@
         "Priority": "High",
         "Variable": "3",
         "progressOfQuest": 0.0,
-        "isCompleted": false,
+        "isCompleted": true,
         "rewardClaimed": false,
         "questTarget": 0.0
       },
@@ -2763,7 +3138,7 @@
         "Reward": "15 Gems",
         "Priority": "High",
         "progressOfQuest": 0.0,
-        "isCompleted": false,
+        "isCompleted": true,
         "rewardClaimed": false,
         "questTarget": 0.0
       },
@@ -2798,10 +3173,10 @@
         "Reward": "2 Gems",
         "Priority": "Low",
         "Variable": "2",
-        "progressOfQuest": 0.0,
-        "isCompleted": false,
+        "progressOfQuest": 2.0,
+        "isCompleted": true,
         "rewardClaimed": false,
-        "questTarget": 0.0
+        "questTarget": 2.0
       },
       {
         "Quest Name": "Sun Shift",
@@ -2819,7 +3194,7 @@
     "plantLevels": {
       "cabbagepult": 1,
       "wallnut": 1,
-      "peashooter": 1,
+      "peashooter": 2,
       "potatomine": 1,
       "puffshroom": 1,
       "sunflower": 1,
@@ -2828,30 +3203,38 @@
       "gravebuster": 1,
       "iceberglettuce": 1,
       "hotpotato": 1,
-      "grapeshot": 1
+      "grapeshot": 1,
+      "sunshroom": 1,
+      "firepeashooter": 1,
+      "appeasemint": 1,
+      "torchwood": 1,
+      "threepeater": 1,
+      "megagatlingpea": 1,
+      "sunbean": 1
     },
     "selectedDeck": [
-      "grapeshot",
-      "peashooter",
-      "sunflower",
-      "wall-nut",
+      "cabbage-pult",
       "potato-mine",
-      "cabbage-pult"
+      "wall-nut",
+      "sunflower",
+      "peashooter",
+      "mega gatling pea",
+      "grapeshot"
     ],
     "boostedPlants": [],
-    "username": "Arash",
+    "username": "Arash1",
     "passwordHash": "1bdcb54d3fb432a2da62e8f003269fb21bedaef1cb05efde1047a7e209084a95",
     "email": "hey@mail.hey",
-    "nickname": "Arash",
+    "nickname": "Arash Nick",
     "securityQuestionNumber": "1",
     "securityAnswer": "test",
-    "coins": 650,
-    "diamonds": 250,
-    "difficultyLevel": 1,
-    "lastShopRefreshTime": 1788502959057,
-    "lastDailyDealPurchaseTime": 0,
-    "meowPoints": 0,
-    "highestMeowPoints": 0,
+    "coins": 2150,
+    "diamonds": 577,
+    "difficultyLevel": 5,
+    "lastShopRefreshTime": 1788506806669,
+    "lastDailyDealPurchaseTime": 1788506846272,
+    "meowPoints": 1180,
+    "highestMeowPoints": 580,
     "winStreakAtMaxDifficulty": 0
   }
 ]

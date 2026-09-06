@@ -11,6 +11,8 @@ public class DesktopLauncher {
   private DesktopLauncher() {}
 
   public static void main(String[] args) {
+    // Must come first: on macOS this hands the whole game to a new JVM and does not return.
+    StartOnFirstThread.handOverIfNeeded(DesktopLauncher.class.getName(), args);
     Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
     config.setTitle(GdxConfig.WINDOW_TITLE);
     // Borderless at the size of the desktop, rather than setFullscreenMode, which takes the

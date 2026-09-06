@@ -80,6 +80,12 @@ tasks.named('processResources') {
     from('resources/skin') {
         into 'skin'
     }
+    // قالب‌های فقط-خواندنیِ بازی، تا جارِ بسته‌بندی‌شده بدون درختِ پروژه هم پیدایشان کند.
+    // ذخیره‌ها و حساب‌ها اینجا نمی‌آیند: شخصی‌اند و نباید همراه جار سفر کنند.
+    from('src/data/database') {
+        include 'plants.json', 'Zombies.json', 'Quests.json'
+        into 'database'
+    }
 }
 
 // نسخه گرافیکی (LibGDX). نسخه ترمینالی دست‌نخورده با همان Main قبلی اجرا می‌شود.
@@ -94,6 +100,86 @@ tasks.register('runGdx', JavaExec) {
     if (System.getProperty('os.name').toLowerCase().contains('mac')) {
         jvmArgs '-XstartOnFirstThread'
     }
+}
+
+// دو جارِ قابل‌اجرا: یکی خودِ بازی و یکی سرور فاز ۳.
+// دقت: rig‌های PAM (resources/raw) و دیتابیس JSON از کنارِ working directory خوانده می‌شوند،
+// نه از کلاس‌پث، پس هر دو جار باید از ریشهٔ پروژه اجرا شوند.
+// امضای جارهای اصلی بعد از ادغام بی‌اعتبار می‌شود و JVM جار را رد می‌کند، پس حذفشان می‌کنیم.
+def mergedJarNoise = ['META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'module-info.class']
+
+// کتابخانه‌های گرافیکی. سرور هیچ‌کدامشان را لازم ندارد: در model/ data/ network/ حتی یک
+// import از com.badlogic هم نیست، پس از جارِ سرور بیرون می‌مانند.
+def graphicsLibs = ['gdx', 'lwjgl', 'tenpatch', 'jlayer', 'jorbis']
+
+// rig‌هایی که واقعا استفاده می‌شوند. resources/raw حدود ۵۱۱ مگابایت است ولی مانیفست‌ها فقط ۱۰۶
+// فایل PAM (~۲۳ مگابایت) را صدا می‌زنند و PNG‌هایش اصلا خوانده نمی‌شود، چون هنر بازی از اطلس‌های
+// داخل assets/ می‌آید. با خواندن خودِ مانیفست‌ها، این لیست همیشه با آن‌ها هم‌گام می‌ماند.
+def referencedPams = {
+    def refs = [] as Set
+    fileTree('assets/animations').matching { include '**/*.json' }.each { manifest ->
+        new groovy.json.JsonSlurper().parse(manifest).animations.each { entry ->
+            if (entry.pam) {
+                refs << entry.pam
+            }
+        }
+    }
+    refs.toList()
+}
+
+// خودِ بازی. روی مک به -XstartOnFirstThread هم نیاز دارد.
+tasks.register('gameJar', Jar) {
+    group = 'build'
+    description = 'Builds the runnable game jar. Run it from the project root.'
+    archiveBaseName = 'pvz-game'
+    archiveVersion = ''
+    manifest {
+        attributes 'Main-Class': 'view.gdx.DesktopLauncher'
+        // LWJGL بارگذاری کتابخانه‌های نیتیو را با JDK 24 به بعد اعلام می‌کند، وگرنه هر بار
+        // چند خط WARNING چاپ می‌شود. JDKهای قدیمی‌تر این خط را بی‌ضرر نادیده می‌گیرند.
+        attributes 'Enable-Native-Access': 'ALL-UNNAMED'
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from sourceSets.main.output
+    from('resources/raw/pvz2/IMAGES') {
+        into 'resources/raw/pvz2/IMAGES'
+        include referencedPams()
+    }
+    from {
+        configurations.runtimeClasspath.filter { it.name.endsWith('.jar') }.collect { zipTree(it) }
+    }
+    exclude mergedJarNoise
+}
+
+// سرور. نه کلاس‌های گرافیکی می‌گیرد نه assets، چون هیچ‌کدام را باز نمی‌کند.
+tasks.register('serverJar', Jar) {
+    group = 'build'
+    description = 'Builds the runnable server jar. Run it from the project root.'
+    archiveBaseName = 'pvz-server'
+    archiveVersion = ''
+    manifest {
+        attributes 'Main-Class': 'network.server.ServerApplication'
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(sourceSets.main.output.classesDirs) {
+        exclude 'view/gdx/**'
+    }
+    from(sourceSets.main.output) {
+        include 'database/**'
+    }
+    from {
+        configurations.runtimeClasspath
+                .filter { file -> file.name.endsWith('.jar')
+                        && graphicsLibs.every { !file.name.startsWith(it) } }
+                .collect { zipTree(it) }
+    }
+    exclude mergedJarNoise
+}
+
+tasks.register('jars') {
+    group = 'build'
+    description = 'Builds both runnable jars.'
+    dependsOn 'gameJar', 'serverJar'
 }
 
 // نسخه ترمینالی فاز ۱
